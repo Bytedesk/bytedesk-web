@@ -19,12 +19,11 @@
 ## 测试会话
 
 - 登录管理员账号
-- 打开连接地址：http://154.8.212.157/visitor/chat?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&placeholder=placeholder
+- 打开连接地址：https://www.bytedesk.com/chat?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph
 - 选择业务类型：留学
 - 选择工作组：北京-美国，注：选择其他工作组，需要登录相应的客服账号
 - 上述操作完成之后，即可以正常会话
 - 注：管理员修改某个客服账号所属工作组之后，相应客服账号需要刷新页面或者重新登录才会生效
-
 
 ## 获取客服链接连接
 
@@ -43,7 +42,7 @@
 ### 单独窗口
 
 ```
-<a href="http://154.8.212.157/visitor/chat?uid=201808221551193&wid=201810201809427&type=visitor&aid=201810201811085&placeholder=placeholder" target="_blank">在线客服</a>
+<a href="https://www.bytedesk.com/chat?uid=201808221551193&wid=201810201809427&type=visitor&aid=201810201811085&ph=ph" target="_blank">在线客服</a>
 ```
 
 - uid: 管理员唯一ID，可在客服管理->客服账号页面查看
@@ -66,7 +65,7 @@ window.agentUid = "201810201811085";
 (function () {
   d = document;
   s = d.createElement("script");
-  s.src = "http://154.8.212.157/js/deploy/dxz/n.js";
+  s.src = "https://www.bytedesk.com/js/n.js";
   s.async = 1;
   d.getElementsByTagName("head")[0].appendChild(s);
 })();
@@ -79,6 +78,3 @@ window.agentUid = "201810201811085";
 - subDomain：企业号，可在客服管理->客服账号页面查看
 - type：有两个值，1. 'visitor' 代表一对一会话，'workGroup' 为工作组会话
 - agentUid：为一对一会话指定客服账号唯一ID，必须；工作组会话值设置为空，但需要保留参数
-
-
-
