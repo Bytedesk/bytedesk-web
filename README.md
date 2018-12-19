@@ -79,6 +79,9 @@ window.agentUid = "201810201811085";
 - type：有两个值，1. 'visitor' 代表一对一会话，'workGroup' 为工作组会话
 - agentUid：为一对一会话指定客服账号唯一ID，必须；工作组会话值设置为空，但需要保留参数
 
+
+
+
 ## 其他
 
 - [iOS SDK](https://github.com/pengjinning/bytedesk-ios)
