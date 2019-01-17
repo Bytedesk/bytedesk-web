@@ -23,6 +23,11 @@ var utils = {
     $("#byteDesk-leave").show();
     $("#byteDesk-rate").hide();
   },
+  hideLeaveMessage: function() {
+    data.showLeaveMessage = false;
+    $("#byteDesk-chat").show();
+    $("#byteDesk-leave").hide();
+  },
   switchRobot: function() {
     console.log("switch robot");
     data.showLeaveMessage = false;
@@ -50,8 +55,21 @@ var utils = {
     $("#byteDesk-leave").hide();
     $("#byteDesk-rate").show();
   },
+  hideRate: function() {
+    data.rateDialogVisible = false;
+    $("#byteDesk-chat").show();
+    $("#byteDesk-rate").hide();
+  },
   showUploadDialog: function() {
     console.log("show upload dialog");
+    if (data.isRobot) {
+      alert("自助服务暂不支持图片");
+      return;
+    }
+    if (data.isThreadClosed) {
+      alert("会话已经结束");
+      return;
+    }
     $('input[id=imagefile]').click();
   },
   clearMessages: function() {

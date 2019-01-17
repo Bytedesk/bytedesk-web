@@ -40,6 +40,40 @@ var utils = {
     console.log("show upload dialog");
     $('input[id=imagefile]').click();
   },
+  // 显示右侧提示登录漂浮按钮
+  showLoginFloat: function() {
+    var contentHtml = '<div id="byteDesk-start" class="byteDesk-start-normal" onclick="utils.showLoginForm()">\n' +
+    '            <div class="byteDesk-start-normal-div">\n' +
+    '                点我登录\n' +
+    '            </div>\n' +
+    '        </div>';
+    //
+    var byteDesk = document.getElementById('bytedesk-im');
+    byteDesk.insertAdjacentHTML('beforeend', contentHtml);
+  },
+  showLoginForm: function() {
+    data.layerLogin = data.layer.open({
+      type: 1,
+      title:"登录",
+      closeBtn: false,
+      shift: 2,
+      area: ['400px', '300px'],
+      shadeClose: true,
+      // btn: ['新增', '取消'],
+      // btnAlign: 'c',
+      content: $("#byteDesk-login"),
+      success: function(layero, index){},
+      yes:function(){
+      }
+    });
+  },
+  //关闭页面
+  closeWin: function() {
+    data.layer.close(data.layerLogin)
+    // parent.location.reload(); // 父页面刷新
+    // var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+    // parent.layer.close(index); //再执行关闭 
+  },
   clearMessages: function() {
     console.log("clearMessages");
   },
@@ -648,5 +682,55 @@ var utils = {
     }
 
     return result;
+  },
+  // TODO: 判断是否手机浏览器，判断浏览器类型
+  browserType: function() { 
+   var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串 
+   var isOpera = userAgent.indexOf("Opera") > -1; //判断是否Opera浏览器 
+   // var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera; //判断是否IE浏览器 
+   var isIE=window.ActiveXObject || "ActiveXObject" in window
+   // var isEdge = userAgent.indexOf("Windows NT 6.1; Trident/7.0;") > -1 && !isIE; //判断是否IE的Edge浏览器 
+   var isEdge = userAgent.indexOf("Edge") > -1; //判断是否IE的Edge浏览器
+   var isFF = userAgent.indexOf("Firefox") > -1; //判断是否Firefox浏览器 
+   var isSafari = userAgent.indexOf("Safari") > -1 && userAgent.indexOf("Chrome") == -1; //判断是否Safari浏览器 
+   var isChrome = userAgent.indexOf("Chrome") > -1 && userAgent.indexOf("Safari") > -1&&!isEdge; //判断Chrome浏览器 
+  
+   if (isIE) { 
+      var reIE = new RegExp("MSIE (\\d+\\.\\d+);"); 
+      reIE.test(userAgent); 
+      var fIEVersion = parseFloat(RegExp["$1"]); 
+      if(userAgent.indexOf('MSIE 6.0')!=-1){
+        return "IE6";
+      } else if(fIEVersion == 7) { return "IE7";} 
+      else if(fIEVersion == 8) { return "IE8";} 
+      else if(fIEVersion == 9) { return "IE9";} 
+      else if(fIEVersion == 10) { return "IE10";} 
+      else if(userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)){ return "IE11";} 
+      else{ return "0"}//IE版本过低
+    }//isIE end 
+      
+    if (isFF) { return "FF";} 
+    if (isOpera) { return "Opera";} 
+    if (isSafari) { return "Safari";} 
+    if (isChrome) { return "Chrome";} 
+    if (isEdge) { return "Edge";} 
+  },
+  isMobileBrowser: function () {
+    var userAgent = navigator.userAgent;
+    var isAndroid = userAgent.indexOf('Android') > -1 || userAgent.indexOf('Linux') > -1;
+    var isIPhone = userAgent.indexOf("iPhone") != -1;
+    var isIpad = userAgent.indexOf('iPad') > -1;
+    var isWechat=!!userAgent.match(/MicroMessenger/i);
+    var isWeibo=!!userAgent.match(/Weibo/i);
+    //
+    if (isAndroid || isIPhone || isIpad || isWechat || isWeibo) {
+      return true;
+    }
+    return false;
+  },
+  iframeLoad: function (){
+    document.getElementById("byteDesk-im-iframe").height=0;
+    document.getElementById("byteDesk-im-iframe").height=document.getElementById("byteDesk-im-iframe").contentWindow.document.body.scrollHeight;
   }
+
 };

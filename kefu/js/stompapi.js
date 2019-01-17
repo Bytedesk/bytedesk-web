@@ -147,11 +147,6 @@ var stompapi = {
    */
   sendTextMessage: function () {
     //
-    if (data.isThreadClosed) {
-      alert("会话已经结束");
-      return;
-    }
-    //
     var content = $.trim($("#inputcontent").val());
     if (content.length === 0) {
       return;
@@ -160,6 +155,11 @@ var stompapi = {
     if (data.isRobot) {
       httpapi.messageAnswer(content);
     } else {
+      //
+      if (data.isThreadClosed) {
+        alert("会话已经结束");
+        return;
+      }
       // 发送/广播会话消息
       // stompapi.sendTextMessageSync(content);
       data.stompClient.send("/app/" + data.threadTopic(), 
@@ -184,6 +184,16 @@ var stompapi = {
     );
   },
   sendImageMessage: function (imageUrl) {
+    //
+    if (data.isRobot) {
+      alert("自助服务暂不支持图片")
+      return;
+    } 
+    //
+    if (data.isThreadClosed) {
+      alert("会话已经结束");
+      return;
+    }
     // 发送/广播会话消息
     // stompapi.sendImageMessageSync(imageUrl);
     data.stompClient.send("/app/" + data.threadTopic(), 

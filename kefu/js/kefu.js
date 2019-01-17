@@ -101,6 +101,19 @@ $(document).ready(function () {
       return returnValue;
     }
   }
+  // 屏幕宽度小于340的时候，隐藏右侧栏
+  console.log("window width: " + $(window).width())
+  if ($(window).width() <= 340) {
+    $("#byteDesk-right").hide();
+    $("#byteDesk-chat").width("100%");
+    $("#input-pc").width("100%");
+    $("#input-pc").height("115px");
+    $("#input-pc-send").height("25px");
+    $("#input-pc-send").css("line-height","25px");
+    $("#input-pc-send").css("bottom","30px");
+    $("#input-pc-send").css("right","20px");
+    $("#inputcontent").height("50px");
+  }
   //
   $('input[id=imagefile]').change(function(result) {
     console.log("upload:", $(this).val(), $(this));

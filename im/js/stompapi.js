@@ -326,7 +326,7 @@ var stompapi = {
         stompapi.subscribeTopic(topic)
         
         // 使用layim作为演示UI, 初始化layim界面
-        layim.init();
+        layim.initIM();
       },
       function (error) {
         console.log("连接断开【" + error + "】");

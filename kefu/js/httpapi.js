@@ -7,30 +7,6 @@ var httpapi = {
    */
   initAxios: function () {
     // http response 拦截器
-    // axios.interceptors.response.use((response) => {
-    //   return response;
-    // }, error => {
-    //   if (error.response) {
-    //     switch (error.response.status) {
-    //       case 400:
-    //         console.log("axios interception error 400");
-    //       // FIXME: 用户名密码无效，则重新分配用户名，并登录
-    //       case 401:
-    //         console.log("axios interception error 401");
-    //       // FIXME:
-    //       case 403:
-    //         // 401 清除token信息并登录
-    //         // 403 无权限，跳转到首页
-    //         console.log("axios interception error 403");
-    //         localStorage.removeItem(app.token);
-    //         if (app.username !== "") {
-    //           app.login();
-    //         } else {
-    //           app.requestUsername();
-    //         }
-    //     }
-    //   }
-    // });
   },
   /**
    * 1. 首先判断是否已经注册过
@@ -441,6 +417,8 @@ var httpapi = {
         //
         if (response.status_code === 200) {
           alert("评价成功");
+          $("#byteDesk-chat").show();
+          $("#byteDesk-rate").hide();
         } else {
           alert(response.message);
         }
@@ -723,6 +701,8 @@ var httpapi = {
         console.log("leave message: ", response.data);
         if (response.status_code === 200) {
           alert("留言成功");
+          $("#byteDesk-chat").show();
+          $("#byteDesk-leave").hide();
         } else {
           alert(response.message);
         }

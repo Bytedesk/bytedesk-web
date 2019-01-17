@@ -494,3 +494,27 @@ body {
     border: 1px solid gray; 
     border-radius: 5px; 
 }
+
+
+.byteDesk-start-normal {
+    text-align: center;
+    cursor: pointer;
+    position: fixed;
+    bottom: 70px;
+    right: 40px;
+    background-color: #007bff;
+    color: white;
+    /*圆形*/
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    z-index: 10000;
+}
+
+.byteDesk-start-normal-div {
+    margin-top: 12px;
+}
+
+.byteDesk-start-normal-icon {
+    font-size: 25px !important;
+}

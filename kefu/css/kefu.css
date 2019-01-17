@@ -273,7 +273,7 @@ body {
     color: black;
     position: relative;
     padding: 5px 10px 5px;
-    max-width: calc(100% - 250px);
+    max-width: calc(100% - 150px);
     min-height: 30px;
     line-height: 2.5;
     font-size: 12px;
@@ -497,6 +497,7 @@ body {
     cursor: pointer; 
     width: 100px; 
     margin-left: 20px;
+    margin-top: 10px;
     text-align: center;
     border: 1px solid gray; 
     border-radius: 5px; 

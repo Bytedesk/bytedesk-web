@@ -15,7 +15,6 @@ var im = {
     if (tokenLocal != null) {
       data.passport.token = JSON.parse(tokenLocal);
     }
-
   },
   /**
    * 通过缓存判断是否需要登录
@@ -29,13 +28,14 @@ var im = {
     ) {
       // 之前登录过，初始化数据：加载好友
       httpapi.init();
-      
     } else {
       // 提示需要登录
-      utils.switchLogin()
+      // utils.switchLogin()
+      utils.showLoginFloat();
     }
+    var browserType = utils.browserType();
+    console.log('browserType:' + browserType);
   }
-  
 };
 
 /**
@@ -90,6 +90,7 @@ $(document).ready(function () {
     });
   });
   //
+  layim.initUI();
   im.created();
   im.mounted();
 });

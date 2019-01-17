@@ -3,15 +3,29 @@
  */
 var layim = {
   /**
+   * 
+   */
+  initUI: function() {
+    layui.use(['layer', 'form'], () => {
+      data.layer = layui.layer
+      data.form = layui.form
+      //提交监听事件
+      data.form.on('submit(login)', function (data) {
+        console.log('submit login');
+        httpapi.login();
+        utils.closeWin()
+        return false;
+      }) 
+    })
+  },
+  /**
    * 登录后初始化Layim
    */
-  init: function() {
+  initIM: function() {
+    $("#byteDesk-start").hide();
     if (data.layim !== null) {
       return
     }
-    layui.use('layer', () => {
-      data.layer = layui.layer
-    })
     //
     layui.use('layim', function(layim){
       //基础配置
@@ -47,28 +61,52 @@ var layim = {
       // 监听在线状态的切换事件
       layim.on('online', data => {
         console.log('online:', data)
+        layer.open({
+          title: '提示'
+          ,content: '设置在线状态'
+        }); 
       })
       // 创建群组
       layim.on('find', data => {
         console.log('find:', data)
         // this.createGroupDialogVisible = true
+        layer.open({
+          title: '提示'
+          ,content: '群组、好友搜索添加'
+        }); 
       })
       // 查看消息通知
       layim.on('msgbox', data => {
         console.log('msgbox:', data)
+        layer.open({
+          title: '提示'
+          ,content: '通知消息'
+        }); 
       })
       // 查看聊天记录
       layim.on('chatLog', chat => {
         console.log('chatLog:', chat)
         // this.messageDialogVisible = true
+        layer.open({
+          title: '提示'
+          ,content: '聊天记录'
+        });
       })
       // 查看群组成员
       layim.on('groupMembers', chat => {
         console.log('groupMembers:', chat)
+        layer.open({
+          title: '提示'
+          ,content: '查看群组成员'
+        }); 
       })
       // 监听签名修改
       layim.on('sign', value => {
         console.log('sign: ', value)
+        layer.open({
+          title: '提示'
+          ,content: '修改签名'
+        }); 
       })
       // 设置皮肤
       layim.on('setSkin', (filename, src) => {
