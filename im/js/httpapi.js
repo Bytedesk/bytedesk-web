@@ -53,8 +53,19 @@ var httpapi = {
     data.password = password;
     data.subDomain = subDomain;
     //
+    httpapi.doLogin();
+  },
+  /**
+   * 调用授权接口
+   * 201901171638181
+   */
+  doLogin: function () {
+    console.log('do login: ', data.username, data.password);
+    //
     $.ajax({
       url: data.HTTP_HOST + "/oauth/token",
+      // contentType: "application/json; charset=utf-8",
+      // dataType: "json",
       type: "post",
       data: { 
         "username": data.username,
@@ -66,9 +77,13 @@ var httpapi = {
         xhr.setRequestHeader('Authorization', 'Basic Y2xpZW50OnNlY3JldA==');
       },
       success:function(response){
-        console.log("login success: ", response.data);
+        console.log("login success: ", response);
         // 本地存储，
         data.passport.token = response;
+        // 本地存储
+        localStorage.username = data.username;
+        localStorage.password = data.password;
+        localStorage.subDomain = data.subDomain;
         // localStorage 存储
         localStorage.setItem(data.token, JSON.stringify(response));
         // TODO: 显示聊天窗口, 暂未启用
@@ -81,9 +96,9 @@ var httpapi = {
       }
     });
   },
-
   /**
    * 初始化加载基本信息: 1. 用户个人资料；2. 联系人；3.群组等
+   * FIXME: 401报错自动清理本地存储access_token, 然后重新获取access_token
    */
   init: function() {
     console.log("init");
@@ -97,7 +112,6 @@ var httpapi = {
       },
       success:function(response){
         console.log(response.data);
-
         // 用户信息
         var info = response.data.info
         utils.storeUserinfo(info);
@@ -132,12 +146,15 @@ var httpapi = {
 
         // 建立长连接
         stompapi.byteDeskConnect()
-        
       },
-      error: function(error) {
-        console.log(error);
-        alert(error);
-      }
+      error: function(xhr, textStatus, errorThrown){
+        console.log(xhr, textStatus, errorThrown)
+    　　if (xhr.status == 401) {
+    　　　　console.log('is 401');
+      　} else{
+          console.log('other error')
+    　　 }
+  　　}
     });
   },
 

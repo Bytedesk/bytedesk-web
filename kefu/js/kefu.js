@@ -15,15 +15,16 @@ var kefu = {
     // data.type = utils.getUrlParam("type");
     // data.agentUid = utils.getUrlParam("aid");
     //
-    data.adminUid = "201808221551193";
-    data.workGroupWid = "201807171659201";
-    data.subDomain = "vip";
-    data.type = "workGroup";
-    data.agentUid = "";
+    data.adminUid = window.adminUid;
+    data.workGroupWid = window.workGroupWid;
+    data.subDomain = window.subDomain;
+    data.type = window.type;
+    data.agentUid = window.agentUid;
     //
     data.uid = localStorage.uid;
     data.username = localStorage.username;
     data.password = data.username;
+    // data.subDomain = localStorage.subDomain;
     var tokenLocal = localStorage.getItem(data.token);
     if (tokenLocal != null) {
       data.passport.token = JSON.parse(tokenLocal);
@@ -43,16 +44,13 @@ var kefu = {
    */
   mounted: function() {
     // console.log("mount");
-    // httpapi.initAxios();
     if (
       data.passport.token.access_token !== null &&
       data.passport.token.access_token !== undefined &&
       data.passport.token.access_token !== ""
     ) {
-      // 请求会话
-      httpapi.requestThread();
-      // 加载常见问题
-      httpapi.getTopAnswers();
+      //
+      httpapi.login();
     } else if (
       data.username !== null &&
       data.username !== undefined &&

@@ -112,6 +112,10 @@ var httpapi = {
         console.log("login success: ", response.data);
         // 本地存储，
         data.passport.token = response;
+        // 本地存储
+        localStorage.username = data.username;
+        localStorage.password = data.password;
+        localStorage.subDomain = data.subDomain;
         // localStorage 存储
         localStorage.setItem(data.token, JSON.stringify(response));
         // 请求会话

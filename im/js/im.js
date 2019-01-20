@@ -10,7 +10,8 @@ var im = {
     //
     data.uid = localStorage.uid;
     data.username = localStorage.username;
-    data.password = data.username;
+    data.password = localStorage.password;
+    data.subDomain = localStorage.subDomain;
     var tokenLocal = localStorage.getItem(data.token);
     if (tokenLocal != null) {
       data.passport.token = JSON.parse(tokenLocal);
@@ -27,7 +28,7 @@ var im = {
       data.passport.token.access_token !== ""
     ) {
       // 之前登录过，初始化数据：加载好友
-      httpapi.init();
+      httpapi.doLogin();
     } else {
       // 提示需要登录
       // utils.switchLogin()
@@ -61,6 +62,18 @@ $(document).ready(function () {
       return returnValue;
     }
   }
+  //setup ajax error handling
+  $.ajaxSetup({
+    error: function (x, status, error) {
+      console.log(x, status, error)
+      if (x.status == 401) {
+        alert("Sorry, your session has expired. Please login again to continue");
+      }
+      else {
+        alert("An error occurred: " + status + "nError: " + error);
+      }
+    }
+  });
   // 上传并发送图片
   $('input[id=imagefile]').change(function(result) {
     console.log("upload:", $(this).val(), $(this));
