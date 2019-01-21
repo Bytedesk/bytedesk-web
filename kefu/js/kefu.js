@@ -15,11 +15,17 @@ var kefu = {
     // data.type = utils.getUrlParam("type");
     // data.agentUid = utils.getUrlParam("aid");
     //
-    data.adminUid = window.adminUid;
-    data.workGroupWid = window.workGroupWid;
-    data.subDomain = window.subDomain;
-    data.type = window.type;
-    data.agentUid = window.agentUid;
+    // data.adminUid = window.adminUid;
+    // data.workGroupWid = window.workGroupWid;
+    // data.subDomain = window.subDomain;
+    // data.type = window.type;
+    // data.agentUid = window.agentUid;
+    //
+    data.adminUid = "201808221551193";
+    data.workGroupWid = "201807171659201";
+    data.subDomain = "vip";
+    data.type = "workGroup";
+    data.agentUid = "201808221551193";
     //
     data.uid = localStorage.uid;
     data.username = localStorage.username;
