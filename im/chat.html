@@ -40,49 +40,69 @@
 
   <div id="bytedesk-im">
     
-    <!-- 登录 -->
-    <div id="byteDesk-login" style="display: none;">
-
-      <div style="margin: auto; margin-top: 10px; height: 100%;">
-
-          <form class="layui-form" id="login-form" action="">
-              <!-- 测试提示：可统一使用 'vip' -->
-            <div class="layui-form-item center" >
-              <label class="layui-form-label" style="width: 100px" >企业号</label>
-              <div class="layui-input-block">
-              <input id="subdomain" type="text" name="subdomain" required value="vip" style="width: 240px" lay-verify="required" placeholder="请输入企业号" autocomplete="off" class="layui-input">
-              </div>
-            </div>
-            <!-- 测试用户名：test1、test2、...., test15 -->
-            <div class="layui-form-item">
-              <label class="layui-form-label" style="width: 100px">用户名</label>
-              <div class="layui-input-block">
-              <input id="username" type="text" name="username" required value="test1" style="width: 240px" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
-              </div>
-            </div>
-            <!-- 测试提示：可统一使用 '123456' -->
-            <div class="layui-form-item">
-              <label class="layui-form-label" style="width: 100px">密码</label>
-              <div class="layui-input-block">
-              <input id="password" type="text" name="password" required value="123456" style="width: 240px" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
-              </div>
-            </div>
-            <div class="layui-form-item">
-              <div class="layui-input-block">
-              <button class="layui-btn" lay-submit lay-filter="login">登录</button>
-              <!-- <button type="reset" class="layui-btn layui-btn-primary" id="closeBtn" >重置</button> -->
-              </div>
-            </div> 
-          </form> 
-
-      </div>
-    </div>
-
   </div>
 
-  <!-- Minified version of `es6-promise-auto` below. -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script> -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>  -->
+  <!-- 登录 -->
+  <div id="byteDesk-login" style="display: none;">
+
+    <div style="margin: auto; margin-top: 10px; height: 100%;">
+
+        <form class="layui-form" id="login-form" action="">
+          <!-- 测试提示：可统一使用 'vip' -->
+          <div class="layui-form-item center" >
+            <label class="layui-form-label" style="width: 100px" >企业号</label>
+            <div class="layui-input-block">
+            <input id="subdomain" type="text" name="subdomain" required value="vip" style="width: 240px" lay-verify="required" placeholder="请输入企业号" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <!-- 测试用户名：test1、test2、...., test15 -->
+          <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">用户名</label>
+            <div class="layui-input-block">
+            <input id="username" type="text" name="username" required value="test1" style="width: 240px" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <!-- 测试提示：可统一使用 '123456' -->
+          <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">密码</label>
+            <div class="layui-input-block">
+            <input id="password" type="text" name="password" required value="123456" style="width: 240px" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="login">登录</button>
+            <!-- <button type="reset" class="layui-btn layui-btn-primary" id="closeBtn" >重置</button> -->
+            </div>
+          </div>
+        </form>
+
+    </div>
+  </div>
+
+  <!-- 社交关系 -->
+  <div id="byteDesk-social" style="display: none;">
+    <div class="layui-tab layui-tab-brief" lay-filter="social">
+      <ul class="layui-tab-title">
+        <li class="layui-this">测试用户</li>
+        <li>群组</li>
+        <li>关注</li>
+        <li>粉丝</li>
+        <li>好友</li>
+        <li>黑名单</li>
+      </ul>
+      <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show" id="byteDesk-test-users"></div>
+        <div class="layui-tab-item" id="byteDesk-groups">
+          <!-- <button class="layui-btn">创建群组</button> -->
+        </div>
+        <div class="layui-tab-item" id="byteDesk-follows"></div>
+        <div class="layui-tab-item" id="byteDesk-fans"></div>
+        <div class="layui-tab-item" id="byteDesk-friends"></div>
+        <div class="layui-tab-item" id="byteDesk-blocks"></div>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
   <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.min.js"></script> -->
@@ -92,7 +112,7 @@
   <!-- layui -->
   <script type="text/javascript" src="https://cdn.bytedesk.com/js/vendor/layui/src/layui.js"></script>
   <!-- 长连接 -->
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.0.0/sockjs.min.js"></script>
   <script type="text/javascript" src="./js/stomp/1.2/stomp.min.js"></script>
 
   <script type="text/javascript" src="./js/constants.js"></script>

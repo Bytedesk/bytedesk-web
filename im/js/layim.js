@@ -6,17 +6,43 @@ var layim = {
    * 
    */
   initUI: function() {
-    layui.use(['layer', 'form'], () => {
+    layui.use(['layer', 'form', 'element'], () => {
       data.layer = layui.layer
       data.form = layui.form
+      data.element = layui.element
       //提交监听事件
       data.form.on('submit(login)', function (data) {
         console.log('submit login');
         httpapi.login();
         utils.closeWin()
         return false;
-      }) 
+      })
+      //
+      data.element.on('tab(social)', function(element) {
+        console.log('tab change index: ', element.index);
+        if (element.index == 0) {
+          // 测试用户
+          httpapi.getContacts()
+        } else if (element.index == 1) {
+          // 群组
+          httpapi.getGroups()
+        } else if (element.index == 2) {
+          // 关注
+          httpapi.getFollows(0, 20)
+        } else if (element.index == 3) {
+          // 粉丝
+          httpapi.getFans(0, 20)
+        } else if (element.index == 4) {
+          // 好友
+          httpapi.getFriends(0, 20)
+        } else if (element.index == 5) {
+          // 黑名单
+          httpapi.getBlocks(0, 20)
+        }
+      })
     })
+    var device = layui.device();
+    console.log('layui device:', device)
   },
   /**
    * 登录后初始化Layim
@@ -64,16 +90,12 @@ var layim = {
         layer.open({
           title: '提示'
           ,content: '设置在线状态'
-        }); 
+        });
       })
       // 创建群组
       layim.on('find', data => {
         console.log('find:', data)
-        // this.createGroupDialogVisible = true
-        layer.open({
-          title: '提示'
-          ,content: '群组、好友搜索添加'
-        }); 
+        utils.showSocialDialog()
       })
       // 查看消息通知
       layim.on('msgbox', data => {
@@ -86,19 +108,16 @@ var layim = {
       // 查看聊天记录
       layim.on('chatLog', chat => {
         console.log('chatLog:', chat)
-        // this.messageDialogVisible = true
-        layer.open({
-          title: '提示'
-          ,content: '聊天记录'
-        });
+        if (chat.data.type === 'friend') {
+          httpapi.getContactMessages(chat.data.id, 0, 100)
+        } else if (chat.data.type === 'group') {
+          httpapi.getGroupMessages(chat.data.id, 0, 100)
+        }
       })
       // 查看群组成员
       layim.on('groupMembers', chat => {
         console.log('groupMembers:', chat)
-        layer.open({
-          title: '提示'
-          ,content: '查看群组成员'
-        }); 
+        httpapi.getGroupMembers(chat.data.id);
       })
       // 监听签名修改
       layim.on('sign', value => {

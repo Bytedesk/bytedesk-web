@@ -55,7 +55,7 @@ var utils = {
     data.layerLogin = data.layer.open({
       type: 1,
       title:"登录",
-      closeBtn: false,
+      closeBtn: true,
       shift: 2,
       area: ['400px', '300px'],
       shadeClose: true,
@@ -66,6 +66,90 @@ var utils = {
       yes:function(){
       }
     });
+  },
+  showSocialDialog: function() {
+    data.layerSocial = data.layer.open({
+      type: 1,
+      title:"好友/群组管理",
+      closeBtn: false,
+      shift: 2,
+      area: ['600px', '400px'],
+      shadeClose: true,
+      btn: ['关闭'],
+      btnAlign: 'c',
+      content: $("#byteDesk-social"),
+      success: function(layero, index){
+      },
+      yes:function(){
+        layer.close(data.layerSocial);
+      }
+    });
+  },
+  appendTestUsers: function(contacts) {
+    $("#byteDesk-test-users").children('li').remove();
+    for (var i = 0; i < contacts.length; i++) {
+      var user = contacts[i];
+      $("#byteDesk-test-users").append('<li>\n'+
+      '<div id="'+user.uid+'">\n'+
+        user.realName +
+      '</div>'+
+      '</li>')
+    }
+  },
+  appendGroups: function(groups) {
+    $("#byteDesk-groups").children('li').remove();
+    for (var i = 0; i < groups.length; i++) {
+      var group = groups[i];
+      $("#byteDesk-groups").append('<li>\n'+
+      '<div id="'+group.gid+'">\n'+
+        group.nickname +
+      '</div>'+
+      '</li>')
+    }
+  },
+  appendFollows: function(follows) {
+    $("#byteDesk-follows").children('li').remove();
+    for (var i = 0; i < follows.length; i++) {
+      var user = follows[i];
+      $("#byteDesk-follows").append('<li>\n'+
+      '<div id="'+user.uid+'">\n'+
+        user.realName +
+      '</div>'+
+      '</li>')
+    }
+  },
+  appendFans: function(fans) {
+    $("#byteDesk-fans").children('li').remove();
+    for (var i = 0; i < fans.length; i++) {
+      var user = fans[i];
+      $("#byteDesk-fans").append('<li>\n'+
+      '<div id="'+user.uid+'">\n'+
+        user.realName +
+      '</div>'+
+      '</li>')
+    }
+  },
+  appendFriends: function(friends) {
+    $("#byteDesk-friends").children('li').remove();
+    for (var i = 0; i < friends.length; i++) {
+      var user = friends[i];
+      $("#byteDesk-friends").append('<li>\n'+
+      '<div id="'+user.uid+'">\n'+
+        user.realName +
+      '</div>'+
+      '</li>')
+    }
+  },
+  appendBlocks: function(blocks) {
+    $("#byteDesk-blocks").children('li').remove();
+    for (var i = 0; i < blocks.length; i++) {
+      var user = blocks[i];
+      $("#byteDesk-blocks").append('<li>\n'+
+      '<div id="'+user.uid+'">\n'+
+        user.realName +
+      '</div>'+
+      '</li>')
+    }
   },
   //关闭页面
   closeWin: function() {

@@ -37,12 +37,7 @@ var kefu = {
     }
     // TODO: 获取浏览器信息，提交给服务器
     console.log(
-      "adminUid：" +
-        data.adminUid +
-        " workGroupWid:" +
-        data.workGroupWid +
-        " subDomain:" +
-        data.subDomain
+      "adminUid：" + data.adminUid + " workGroupWid:" + data.workGroupWid + " subDomain:" + data.subDomain
     );
   },
   /**

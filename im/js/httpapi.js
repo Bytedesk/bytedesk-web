@@ -118,7 +118,10 @@ var httpapi = {
 
         // 全部联系人
         var contacts = response.data.contacts
+        // 本地存储
         utils.storeFriends(contacts);
+        // 界面显示
+        utils.appendTestUsers(contacts);
 
         // 群组
         var groups = response.data.groups
@@ -182,8 +185,798 @@ var httpapi = {
         console.log(error);
       }
     });
-  }
+  },
 
+  /**
+   * 加载客服会话访客聊天记录
+   */
+  getMessages: function(uid, page, size) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/messages/user?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        uid: uid,
+        page: page,
+        size: size,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get user messages success:", response);
+      },
+      error: function(error) {
+        console.log("get user messages error:", error);
+      }
+    });
+  },
+
+  /**
+   * 加载一对一联系人消息
+   */
+  getContactMessages: function(cid, page, size) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/messages/contact?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        cid: cid,
+        page: page,
+        size: size,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get contacts messages success:", response);
+      },
+      error: function(error) {
+        console.log("get contacts messages error:", error);
+      }
+    });
+  },
+
+  /**
+   * 加载群组消息
+   */
+  getGroupMessages: function(gid, page, size) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/messages/group?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        gid: gid,
+        page: page,
+        size: size,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get group messages success:", response);
+      },
+      error: function(error) {
+        console.log("get group messages error:", error);
+      }
+    });
+  },
+
+  /**
+   * 获取客服全部联系人
+   */
+  getContacts: function() {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/contacts?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        client: data.client
+      },
+      success:function(response){
+        console.log("get contacts success:", response);
+        var contacts = response.data
+        // 界面显示
+        utils.appendTestUsers(contacts);
+      },
+      error: function(error) {
+        console.log("get contacts error:", error);
+      }
+    });
+  },
+
+  /**
+   * 获取全部群组
+   */
+  getGroups: function() {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/get?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        client: data.client
+      },
+      success:function(response){
+        console.log("get groups success:", response);
+        var groups = response.data;
+        utils.appendGroups(groups);
+      },
+      error: function(error) {
+        console.log("get groups error:", error);
+      }
+    });
+  },
+
+  /**
+   * 获取群组详情
+   */
+  getGroupDetail: function(gid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/detail?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        gid: gid,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get group detail success:", response);
+      },
+      error: function(error) {
+        console.log("get group detail error:", error);
+      }
+    });
+  },
+
+  /**
+   * 获取群组全部成员
+   */
+  getGroupMembers: function(gid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/members?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        gid: gid,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get group detail success:", response);
+      },
+      error: function(error) {
+        console.log("get group detail error:", error);
+      }
+    });
+  },
+
+  /**
+   * 创建群组
+   */
+  createGroup: function(nickname, selectedContacts) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/create?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        nickname: nickname,
+        selectedContacts: selectedContacts,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("create group success: ", response);
+      },
+      error: function(error) {
+        console.log("create group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 更新群组: 群名称等
+   */
+  updateGroupNickname: function(gid, nickname) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/update/nickname?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        nickname: nickname,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("update group nickname success: ", response);
+      },
+      error: function(error) {
+        console.log("update group nickname error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 更新群组公告
+   */
+  updateGroupAnnouncement: function(gid, announcement) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/update/announcement?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        announcement: announcement,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("update group announcement success: ", response);
+      },
+      error: function(error) {
+        console.log("update group announcement error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 更新群组简介
+   */
+  updateGroupDescription: function(gid, description) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/update/description?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        description: description,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("update group description success: ", response);
+      },
+      error: function(error) {
+        console.log("update group description error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 邀请/直接拉入群
+   */
+  inviteGroup: function(uid, gid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/invite?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        uid: uid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("invite group success: ", response);
+      },
+      error: function(error) {
+        console.log("invite group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 主动申请入群
+   */
+  applyGroup: function(gid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/apply?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("apply group success: ", response);
+      },
+      error: function(error) {
+        console.log("apply group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 主动申请入群：同意
+   */
+  applyGroupApprove: function(nid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/apply/approve?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        nid: nid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("apply group success: ", response);
+      },
+      error: function(error) {
+        console.log("apply group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 主动申请入群:拒绝
+   */
+  applyGroupDeny: function(nid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/apply/deny?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        nid: nid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("apply group deny success: ", response);
+      },
+      error: function(error) {
+        console.log("deny group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 踢人
+   */
+  kickGroupMember: function(gid, uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/kick?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        uid: uid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("kick group member success: ", response);
+      },
+      error: function(error) {
+        console.log("kick group member error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 禁言
+   */
+  muteGroupMember: function(gid, uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/mute?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        uid: uid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("mute group success: ", response);
+      },
+      error: function(error) {
+        console.log("mute group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 移交群组
+   */
+  transferGroup: function(uid, gid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/transfer?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        uid: uid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("transfer group success: ", response);
+      },
+      error: function(error) {
+        console.log("transfer group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 移交群组：同意
+   */
+  transferGroupApprove: function(nid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/transfer/approve?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        nid: nid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("transfer group approve success: ", response);
+      },
+      error: function(error) {
+        console.log("transfer group approve error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 移交群组: 拒绝
+   */
+  transferGroupDeny: function(nid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/transfer/deny?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        nid: nid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("transfer group deny success: ", response);
+      },
+      error: function(error) {
+        console.log("transfer group deny error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 退出群组
+   */
+  withdrawGroup: function(gid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/withdraw?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("withdraw group success: ", response);
+      },
+      error: function(error) {
+        console.log("withdraw group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 解散群组
+   */
+  dismissGroup: function(gid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/dismiss?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("dismiss group success: ", response);
+      },
+      error: function(error) {
+        console.log("dismiss group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 搜索过滤群组
+   */
+  filterGroup: function(keyword) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/filter?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        keyword: keyword,
+        client: data.client
+      },
+      success:function(response){
+        console.log("filter group success:", response);
+      },
+      error: function(error) {
+        console.log("filter group error:", error);
+      }
+    });
+  },
+
+  /**
+   * 获取关注
+   */
+  getFollows: function(page, size) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/follows?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        page: page,
+        size: size,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get follows success:", response);
+        var follows = response.data;
+        utils.appendFollows(follows);
+      },
+      error: function(error) {
+        console.log("get follows error:", error);
+      }
+    });
+  },
+
+  /**
+   * 获取粉丝
+   */
+  getFans: function(page, size) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/fans?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        page: page,
+        size: size,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get fans success:", response);
+        var fans = response.data;
+        utils.appendFans(fans);
+      },
+      error: function(error) {
+        console.log("get fans error:", error);
+      }
+    });
+  },
+
+  /**
+   * 获取好友
+   */
+  getFriends: function(page, size) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/friends?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        page: page,
+        size: size,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get friends success:", response);
+        var friends = response.data;
+        utils.appendFriends(friends);
+      },
+      error: function(error) {
+        console.log("get friends error:", error);
+      }
+    });
+  },
+
+  /**
+   * 添加关注
+   */
+  addFollow: function(uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/follow?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        uid: uid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("addFollow success: ", response);
+      },
+      error: function(error) {
+        console.log("addFollow error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 取消关注
+   */
+  unFollow: function(uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/unfollow?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        uid: uid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("unfollow success: ", response);
+      },
+      error: function(error) {
+        console.log("unfollow error: ", error);
+      }
+    });
+  },
+
+  /**
+   * 判断是否关注
+   */
+  isFollowed: function(uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/isfollowed?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        uid,
+        client: data.client
+      },
+      success:function(response){
+        console.log("isfollowed success:", response);
+      },
+      error: function(error) {
+        console.log("isfollowed error:", error);
+      }
+    });
+  },
+
+  /**
+   * 判断好友关系
+   */
+  getRelation: function(uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/relation?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        uid,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get relation success:", response);
+      },
+      error: function(error) {
+        console.log("get relation error:", error);
+      }
+    });
+  },
+
+  /**
+   * 分页获取拉黑访客
+   */
+  getBlocks: function(page, size) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/block/get?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        page: page,
+        size: size,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get relation success:", response);
+        var blocks = response.data;
+        utils.appendBlocks(blocks);
+      },
+      error: function(error) {
+        console.log("get relation error:", error);
+      }
+    });
+  },
+
+  /**
+   * 添加黑名单
+   */
+  addBlock: function(uid, type, note) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/block/add?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        uid,
+        type,
+        note,
+        client: data.client
+      },
+      success:function(response){
+        console.log("isfollowed success:", response);
+      },
+      error: function(error) {
+        console.log("isfollowed error:", error);
+      }
+    });
+  },
+
+  /**
+   * 取消黑名单
+   */
+  removeBlock: function(uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/block/remove?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        uid,
+        client: data.client
+      },
+      success:function(response){
+        console.log("isfollowed success:", response);
+      },
+      error: function(error) {
+        console.log("isfollowed error:", error);
+      }
+    });
+  }
 
 };
 
