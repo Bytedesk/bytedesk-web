@@ -5,19 +5,24 @@ var httpapi = {
 
   /**
    * 注册
+   * 实例：
+   * httpapi.register('my_test_im', '昵称mytest', '123456', 'vip');
+   * 
    * @param {*} username 用户名
+   * @param {*} nickname 昵称
    * @param {*} password 密码
-   * @param {*} subDomain 企业号
+   * @param {*} subDomain 企业号: 测试期间固定写死为 ’vip‘
    */
-  register: function(username, password, subDomain) {
+  register: function(username, nickname, password, subDomain) {
     //
     $.ajax({
-      url: data.HTTP_HOST + "/api/visitor/register/user",
+      url: data.HTTP_HOST + "/visitor/api/register/user",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       type: "post",
       data: JSON.stringify({
         username: username,
+        nickname: nickname,
         password: password,
         subDomain: subDomain,
         client: data.client
@@ -57,7 +62,6 @@ var httpapi = {
   },
   /**
    * 调用授权接口
-   * 201901171638181
    */
   doLogin: function () {
     console.log('do login: ', data.username, data.password);

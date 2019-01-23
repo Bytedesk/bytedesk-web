@@ -37,62 +37,45 @@
 
 <body>
 
-  <!--TODO: 适配微信-->
-  <div id="app-wrapper">
-    <div id="app">
-
-      <!-- 导航 -->
-      <nav class="navbar navbar-default navbar-fixed-top">
-        <div class="container">
-          <div class="navbar-header">
-            <a class="navbar-brand" href="#">萝卜丝</a>
-          </div>
-          <div id="navbar" class="navbar-collapse collapse">
-              <ul class="nav navbar-nav">
-                <li class="nav-item" style="cursor: pointer;">
-                  <!-- <a class="nav-link" onclick="utils.switchLogin()">登录</a> -->
-                </li>
-              </ul>
-            <ul class="nav navbar-nav navbar-right">
-              <li>
-                <a class="nav-link" onclick="httpapi.closeWebPage()" style="color: white;">
-                  <!-- <span style="cursor: pointer;"><i class="iconfont icon-close"></i></span> -->
-                </a>
-              </li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </nav>
-
-      <!--主区域-->
-      <main id="main" role="main">
-
-        <!-- main + bottom + rightSide-->
-        <div id="content" class="row">
-
-
-        </div>
-
-      </main>
-
+  <!-- 社交关系 -->
+  <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+    <ul class="layui-tab-title">
+      <li class="layui-this">网站设置</li>
+      <li>用户管理</li>
+      <li>权限分配</li>
+      <li>商品管理</li>
+      <li>订单管理</li>
+    </ul>
+    <div class="layui-tab-content">
+      <div class="layui-tab-item layui-show">内容1</div>
+      <div class="layui-tab-item">内容2</div>
+      <div class="layui-tab-item">内容3</div>
+      <div class="layui-tab-item">内容4</div>
+      <div class="layui-tab-item">内容5</div>
     </div>
   </div>
 
+  <script src="https://cdn.bootcss.com/jquery/1.9.1/jquery.min.js"></script>
+  <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.min.js"></script> -->
+  <script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
 
-  <!--萝卜丝·嵌入式IM代码 开始 -->
-  <div id="byteDesk"></div>
-  <script type="text/javascript">
-      // 以下所有值均需要替换为真实值
-      window.subDomain = "vip";
-      (function () {
-          d = document;
-          s = d.createElement("script");
-          s.src = "js/iframe.js";
-          s.async = 1;
-          d.getElementsByTagName("head")[0].appendChild(s);
-      })();
-  </script>
-  <!--./萝卜丝·嵌入式IM代码 结束 -->
+  <!-- layui -->
+  <script type="text/javascript" src="https://cdn.bytedesk.com/js/vendor/layui/src/layui.js"></script>
+
+  <script type="text/javascript" src="./js/constants.js"></script>
+  <script type="text/javascript" src="./js/data.js"></script>
+  <script type="text/javascript" src="./js/utils.js"></script>
+  <script type="text/javascript" src="./js/httpapi.js"></script>
+
+  <script>
+    //注意：选项卡 依赖 element 模块，否则无法进行功能性操作
+    layui.use('element', function(){
+      var element = layui.element;
+      
+      //…
+    });
+    </script>
 
 </body>
 

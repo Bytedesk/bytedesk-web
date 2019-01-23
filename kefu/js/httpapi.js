@@ -17,8 +17,11 @@ var httpapi = {
   requestUsername: function () {
     //
     data.username = localStorage.username;
+    data.password = localStorage.password;
     if (data.username) {
-      data.password = data.username;
+      if (data.password == null) {
+        data.password = data.username;
+      }
       httpapi.login();
     } else {
       //
@@ -39,6 +42,7 @@ var httpapi = {
           // 本地存储
           localStorage.uid = data.uid;
           localStorage.username = data.username;
+          localStorage.password = data.password;
           // 登录
           httpapi.login();
         },

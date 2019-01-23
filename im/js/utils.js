@@ -44,7 +44,7 @@ var utils = {
   showLoginFloat: function() {
     var contentHtml = '<div id="byteDesk-start" class="byteDesk-start-normal" onclick="utils.showLoginForm()">\n' +
     '            <div class="byteDesk-start-normal-div">\n' +
-    '                点我登录\n' +
+    '                登录\n' +
     '            </div>\n' +
     '        </div>';
     //

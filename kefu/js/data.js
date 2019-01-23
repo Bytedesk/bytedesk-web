@@ -2,6 +2,8 @@
  * bytedesk.com
  */
 var data = {
+  // HTTP_HOST: "http://127.0.0.1:8000",
+  // STOMP_HOST: "http://127.0.0.1:8000",
   HTTP_HOST: "https://api.bytedesk.com",
   STOMP_HOST: "https://stomp.bytedesk.com",
   //

@@ -37,16 +37,13 @@
 
 <body>
 
-
   <div id="bytedesk-im">
     
   </div>
 
   <!-- 登录 -->
   <div id="byteDesk-login" style="display: none;">
-
     <div style="margin: auto; margin-top: 10px; height: 100%;">
-
         <form class="layui-form" id="login-form" action="">
           <!-- 测试提示：可统一使用 'vip' -->
           <div class="layui-form-item center" >
@@ -71,7 +68,50 @@
           </div>
           <div class="layui-form-item">
             <div class="layui-input-block">
-            <button class="layui-btn" lay-submit lay-filter="login">登录</button>
+              <button class="layui-btn" lay-submit lay-filter="login">登录</button>
+              <!-- <button class="layui-btn layui-btn-primary" id="registerBtn">注册</button> -->
+            </div>
+          </div>
+        </form>
+    </div>
+  </div>
+
+  <!-- 注册 -->
+  <div id="byteDesk-register" style="display: none;">
+
+    <div style="margin: auto; margin-top: 10px; height: 100%;">
+
+        <form class="layui-form" id="login-form" action="">
+          <!-- 测试提示：可统一使用 'vip' -->
+          <div class="layui-form-item center" >
+            <label class="layui-form-label" style="width: 100px" >企业号</label>
+            <div class="layui-input-block">
+            <input id="subdomain" type="text" name="subdomain" required value="vip" style="width: 240px" lay-verify="required" placeholder="请输入企业号" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <!-- 测试用户名：test1、test2、...., test15 -->
+          <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">用户名</label>
+            <div class="layui-input-block">
+            <input id="username" type="text" name="username" required value="test1" style="width: 240px" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">昵称</label>
+            <div class="layui-input-block">
+            <input id="username" type="text" name="username" required value="test1" style="width: 240px" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <!-- 测试提示：可统一使用 '123456' -->
+          <div class="layui-form-item">
+            <label class="layui-form-label" style="width: 100px">密码</label>
+            <div class="layui-input-block">
+            <input id="password" type="text" name="password" required value="123456" style="width: 240px" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="register">注册</button>
             <!-- <button type="reset" class="layui-btn layui-btn-primary" id="closeBtn" >重置</button> -->
             </div>
           </div>

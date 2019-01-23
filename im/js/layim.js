@@ -10,10 +10,17 @@ var layim = {
       data.layer = layui.layer
       data.form = layui.form
       data.element = layui.element
-      //提交监听事件
+      //提交登录事件
       data.form.on('submit(login)', function (data) {
-        console.log('submit login');
+        console.log('submit login:', data);
         httpapi.login();
+        utils.closeWin()
+        return false;
+      })
+      //提交注册事件
+      data.form.on('submit(register)', function (data) {
+        console.log('submit register:', data);
+        // httpapi.register();
         utils.closeWin()
         return false;
       })
