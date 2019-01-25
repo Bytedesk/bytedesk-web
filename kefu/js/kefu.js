@@ -6,38 +6,37 @@ var kefu = {
    * 
    */
   created: function() {
-    //
+    // 单独窗口形式
     // data.adminUid = utils.getUrlParam("uid");
     // data.workGroupWid = utils.getUrlParam("wid");
     // data.subDomain = window.location.host.split(".").length > 2
-    //     ? window.location.host.split(".")[0]
-    //     : "";
+    // ? window.location.host.split(".")[0]
+    // : "";
     // data.type = utils.getUrlParam("type");
     // data.agentUid = utils.getUrlParam("aid");
     //
-    // data.adminUid = window.adminUid;
-    // data.workGroupWid = window.workGroupWid;
-    // data.subDomain = window.subDomain;
-    // data.type = window.type;
-    // data.agentUid = window.agentUid;
-    //
-    data.adminUid = "201808221551193";
-    data.workGroupWid = "201807171659201";
-    data.subDomain = "vip";
-    data.type = "workGroup";
-    data.agentUid = "201808221551193";
+    // 嵌入窗口形式
+    data.adminUid = localStorage.adminUid;
+    data.workGroupWid = localStorage.workGroupWid;
+    data.subDomain = localStorage.subDomain;
+    data.type = localStorage.type;
+    data.agentUid = localStorage.agentUid;
     //
     data.uid = localStorage.uid;
     data.username = localStorage.username;
-    data.password = data.username;
-    // data.subDomain = localStorage.subDomain;
+    data.password = localStorage.password;
+    if (data.password === undefined || data.password === null) {
+      data.password = data.username;
+    }
     var tokenLocal = localStorage.getItem(data.token);
     if (tokenLocal != null) {
       data.passport.token = JSON.parse(tokenLocal);
     }
     // TODO: 获取浏览器信息，提交给服务器
     console.log(
-      "adminUid：" + data.adminUid + " workGroupWid:" + data.workGroupWid + " subDomain:" + data.subDomain
+      "adminUid: " + data.adminUid + 
+      " workGroupWid: " + data.workGroupWid + 
+      " subDomain: " + data.subDomain
     );
   },
   /**

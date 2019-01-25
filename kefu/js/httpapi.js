@@ -86,6 +86,7 @@ var httpapi = {
         // 本地存储
         localStorage.uid = data.uid;
         localStorage.username = data.username;
+        localStorage.password = data.password;
         // 登录
         httpapi.login();
       },
@@ -99,9 +100,10 @@ var httpapi = {
    * 2. oauth2登录
    */
   login: function () {
+    console.log('do login: ', data.username, data.password);
+    //
     $.ajax({
       url: data.HTTP_HOST + "/oauth/token",
-      // contentType: "application/json; charset=utf-8",
       type: "post",
       data: { 
         "username": data.username,
@@ -113,7 +115,7 @@ var httpapi = {
         xhr.setRequestHeader('Authorization', 'Basic Y2xpZW50OnNlY3JldA==');
       },
       success:function(response){
-        console.log("login success: ", response.data);
+        console.log("login success: ", response);
         // 本地存储，
         data.passport.token = response;
         // 本地存储
