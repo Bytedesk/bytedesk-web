@@ -68,8 +68,6 @@ var httpapi = {
     //
     $.ajax({
       url: data.HTTP_HOST + "/oauth/token",
-      // contentType: "application/json; charset=utf-8",
-      // dataType: "json",
       type: "post",
       data: { 
         "username": data.username,
@@ -193,6 +191,10 @@ var httpapi = {
 
   /**
    * 加载客服会话访客聊天记录
+   * 
+   * @param {*} uid 访客uid
+   * @param {*} page 聊天记录起始页面，首页为0
+   * @param {*} size 聊天记录每页消息条数，如：20
    */
   getMessages: function(uid, page, size) {
     $.ajax({
@@ -217,6 +219,10 @@ var httpapi = {
 
   /**
    * 加载一对一联系人消息
+   * 
+   * @param {*} cid 联系人uid
+   * @param {*} page 聊天记录起始页面，首页为0
+   * @param {*} size 聊天记录每页消息条数，如：20
    */
   getContactMessages: function(cid, page, size) {
     $.ajax({
@@ -241,6 +247,10 @@ var httpapi = {
 
   /**
    * 加载群组消息
+   * 
+   * @param {*} gid 群组gid
+   * @param {*} page 聊天记录起始页面，首页为0
+   * @param {*} size 聊天记录每页消息条数，如：20
    */
   getGroupMessages: function(gid, page, size) {
     $.ajax({
@@ -312,6 +322,8 @@ var httpapi = {
 
   /**
    * 获取群组详情
+   * 
+   * @param {*} gid 群组唯一gid
    */
   getGroupDetail: function(gid) {
     $.ajax({
@@ -334,6 +346,8 @@ var httpapi = {
 
   /**
    * 获取群组全部成员
+   * 
+   * @param {*} gid 群组唯一gid
    */
   getGroupMembers: function(gid) {
     $.ajax({
@@ -356,6 +370,8 @@ var httpapi = {
 
   /**
    * 创建群组
+   * @param {*} nickname 群组昵称
+   * @param {*} selectedContacts 群组成员uid数组，如 [1111, 2222, 3333]
    */
   createGroup: function(nickname, selectedContacts) {
     $.ajax({
@@ -381,6 +397,9 @@ var httpapi = {
 
   /**
    * 更新群组: 群名称等
+   * 
+   * @param {string} gid 群组唯一gid
+   * @param {string} nickname 群组新昵称
    */
   updateGroupNickname: function(gid, nickname) {
     $.ajax({
@@ -406,6 +425,8 @@ var httpapi = {
 
   /**
    * 更新群组公告
+   * @param {string} gid 群组唯一gid
+   * @param {string} announcement 群组公告
    */
   updateGroupAnnouncement: function(gid, announcement) {
     $.ajax({
@@ -431,6 +452,8 @@ var httpapi = {
 
   /**
    * 更新群组简介
+   * @param {string} gid 群组唯一gid
+   * @param {string} description 群简介
    */
   updateGroupDescription: function(gid, description) {
     $.ajax({
@@ -456,6 +479,8 @@ var httpapi = {
 
   /**
    * 邀请/直接拉入群
+   * @param {*} uid 被邀请人uid
+   * @param {*} gid 群组唯一gid
    */
   inviteGroup: function(uid, gid) {
     $.ajax({
@@ -481,6 +506,7 @@ var httpapi = {
 
   /**
    * 主动申请入群
+   * @param {string} gid 群组唯一gid
    */
   applyGroup: function(gid) {
     $.ajax({
@@ -505,6 +531,7 @@ var httpapi = {
 
   /**
    * 主动申请入群：同意
+   * @param {*} nid 通知唯一nid
    */
   applyGroupApprove: function(nid) {
     $.ajax({
@@ -529,6 +556,7 @@ var httpapi = {
 
   /**
    * 主动申请入群:拒绝
+   * @param {*} nid 通知唯一nid
    */
   applyGroupDeny: function(nid) {
     $.ajax({
@@ -553,6 +581,8 @@ var httpapi = {
 
   /**
    * 踢人
+   * @param {string} gid 群组唯一gid
+   * @param {string} uid 被踢用户唯一uid
    */
   kickGroupMember: function(gid, uid) {
     $.ajax({
@@ -578,6 +608,8 @@ var httpapi = {
 
   /**
    * 禁言
+   * @param {*} gid 群组唯一gid
+   * @param {*} uid 被禁言用户唯一uid
    */
   muteGroupMember: function(gid, uid) {
     $.ajax({
@@ -603,8 +635,10 @@ var httpapi = {
 
   /**
    * 移交群组
+   * @param {string} gid 群组唯一gid
+   * @param {string} uid 被移交用户uid
    */
-  transferGroup: function(uid, gid) {
+  transferGroup: function(gid, uid) {
     $.ajax({
       url: data.HTTP_HOST +
       "/api/group/transfer?access_token=" +
@@ -628,6 +662,7 @@ var httpapi = {
 
   /**
    * 移交群组：同意
+   * @param {*} nid 通知唯一nid
    */
   transferGroupApprove: function(nid) {
     $.ajax({
@@ -652,6 +687,7 @@ var httpapi = {
 
   /**
    * 移交群组: 拒绝
+   * @param {string} nid 通知唯一nid
    */
   transferGroupDeny: function(nid) {
     $.ajax({
@@ -676,6 +712,7 @@ var httpapi = {
 
   /**
    * 退出群组
+   * @param {string} gid 群组唯一gid
    */
   withdrawGroup: function(gid) {
     $.ajax({
@@ -700,6 +737,7 @@ var httpapi = {
 
   /**
    * 解散群组
+   * @param {string} gid 群组唯一gid
    */
   dismissGroup: function(gid) {
     $.ajax({
@@ -724,6 +762,7 @@ var httpapi = {
 
   /**
    * 搜索过滤群组
+   * @param {string} keyword 关键词
    */
   filterGroup: function(keyword) {
     $.ajax({
@@ -746,6 +785,8 @@ var httpapi = {
 
   /**
    * 获取关注
+   * @param {int} page 起始页码，如：0
+   * @param {int} size 每页大小，如：20
    */
   getFollows: function(page, size) {
     $.ajax({
@@ -771,6 +812,8 @@ var httpapi = {
 
   /**
    * 获取粉丝
+   * @param {int} page 起始页码，如：0
+   * @param {int} size 每页大小，如：20
    */
   getFans: function(page, size) {
     $.ajax({
@@ -796,6 +839,8 @@ var httpapi = {
 
   /**
    * 获取好友
+   * @param {int} page 起始页码，如：0
+   * @param {int} size 每页大小，如：20
    */
   getFriends: function(page, size) {
     $.ajax({
@@ -821,6 +866,7 @@ var httpapi = {
 
   /**
    * 添加关注
+   * @param {*} uid 用户唯一uid
    */
   addFollow: function(uid) {
     $.ajax({
@@ -845,6 +891,7 @@ var httpapi = {
 
   /**
    * 取消关注
+   * @param {*} uid 用户唯一uid
    */
   unFollow: function(uid) {
     $.ajax({
@@ -869,6 +916,7 @@ var httpapi = {
 
   /**
    * 判断是否关注
+   * @param {*} uid 用户唯一uid
    */
   isFollowed: function(uid) {
     $.ajax({
@@ -891,6 +939,7 @@ var httpapi = {
 
   /**
    * 判断好友关系
+   * @param {*} uid 用户唯一uid
    */
   getRelation: function(uid) {
     $.ajax({
@@ -913,6 +962,8 @@ var httpapi = {
 
   /**
    * 分页获取拉黑访客
+   * @param {int} page 起始页码，如：0
+   * @param {int} size 每页大小，如：20
    */
   getBlocks: function(page, size) {
     $.ajax({
@@ -938,6 +989,9 @@ var httpapi = {
 
   /**
    * 添加黑名单
+   * @param {*} uid 用户uid
+   * @param {*} type 写死固定值：'默认类型'
+   * @param {*} note 备注
    */
   addBlock: function(uid, type, note) {
     $.ajax({
@@ -962,6 +1016,7 @@ var httpapi = {
 
   /**
    * 取消黑名单
+   * @param {string} uid 用户uid
    */
   removeBlock: function(uid) {
     $.ajax({
