@@ -1,18 +1,54 @@
 /**
  * bytedesk.com
  */
+/**
+ * @apiDefine User 用户
+ *
+ * 用户相关接口
+ */
+/**
+ * @apiDefine Group 群组
+ *
+ * 群组相关接口
+ */
+/**
+ * @apiDefine SubDomainClientParam
+ * @apiParam {String} subDomain 企业号，测试可填写 'vip'，上线请填写真实企业号
+ * @apiParam {String} client 固定写死为 'web'
+ */
+/**
+ * @apiDefine UserResultSuccess
+ * @apiSuccess {String} uid 用户唯一uid.
+ * @apiSuccess {String} username  用户名.
+ * @apiSuccess {String} nickname  昵称.
+ */
+/**
+ * @apiDefine ResponseResultSuccess
+ * @apiSuccess {String} message 返回提示
+ * @apiSuccess {Number} status_code 状态码
+ * @apiSuccess {String} data 返回内容
+ */
+/**
+ * @apiDefine Social 社交
+ *
+ * 社交关系相关接口
+ */
 var httpapi = {
   /**
-   * 工具函数
-   */
-  initAxios: function () {
-    // http response 拦截器
-  },
-  /**
-   * 1. 首先判断是否已经注册过
-   * 2. 如果已经注册过，则直接调用登录接口
-   * 3. 如果没有注册过，则从服务器请求用户名
-   * FIXME: 暂未考虑浏览器不支持localStorage的情况
+   * @api {get} /visitor/api/username 生成默认访客账号
+   * @apiName requestUsername
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission none
+   * 
+   * @apiUse SubDomainClientParam
+   * 
+   * @apiDescription 1. 首先判断是否已经注册过；
+   * 2. 如果已经注册过，则直接调用登录接口；
+   * 3. 如果没有注册过，则从服务器请求用户名；
+   * 4. FIXME: 暂未考虑浏览器不支持localStorage的情况
+   *
+   * @apiUse UserResultSuccess
    */
   requestUsername: function () {
     //
@@ -54,7 +90,21 @@ var httpapi = {
     }
   },
   /**
-   * 保存自定义用户名
+   * @api {post} /visitor/api/register/user 自定义用户名生成访客账号
+   * @apiName saveUsername
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission none
+   * 
+   * @apiParam {String} username 用户名
+   * @apiParam {String} nickname 昵称
+   * @apiParam {String} password 密码
+   * @apiUse SubDomainClientParam
+   * 
+   * @apiDescription 开发者在需要跟自己业务系统账号对接的情况下，
+   * 可以通过自定义用户名生成访客账号
+   *
+   * @apiUse UserResultSuccess
    */
   saveUsername: function () {
     //
@@ -97,7 +147,25 @@ var httpapi = {
     });
   },
   /**
-   * 2. oauth2登录
+   * @api {post} /oauth/token 登录
+   * @apiName login
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission none
+   * 
+   * @apiHeader {String} Authorization 值固定写死为: 'Basic Y2xpZW50OnNlY3JldA=='
+   * 
+   * @apiParam {String} username 用户名
+   * @apiParam {String} password 密码
+   * 
+   * @apiDescription 登录
+   *
+   * @apiSuccess {String} access_token 访问令牌
+   * @apiSuccess {Number} expires_in 过期时间
+   * @apiSuccess {String} jti
+   * @apiSuccess {String} refresh_token 刷新令牌
+   * @apiSuccess {String} scope 固定值：'all'
+   * @apiSuccess {String} token_type 固定值：'bearer'
    */
   login: function () {
     console.log('do login: ', data.username, data.password);
@@ -284,18 +352,31 @@ var httpapi = {
     });
   },
   /**
-   * 请求会话
+   * @api {get} /api/thread/request 请求会话
+   * @apiName requestThread
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wId 工作组唯一wid
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 请求会话
+   *
+   * @apiUse ResponseResultSuccess
    */
   requestThread: function () {
     console.log('start request thread')
     $.ajax({
       url: data.HTTP_HOST +
-      "/api/thread/request?access_token=" +
-      data.passport.token.access_token,
+      "/api/thread/request",
       contentType: "application/json; charset=utf-8",
       type: "get",
       data: {
-        uId: data.adminUid,
+        access_token: data.passport.token.access_token,
         wId: data.workGroupWid,
         type: data.type,
         aId: data.agentUid,
@@ -384,14 +465,47 @@ var httpapi = {
     httpapi.fingerPrint2();
   },
   /**
+   * @api {get} /api/answer/init 请求机器人问答
+   * @apiName requestRobot
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wId 工作组唯一wid
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 加载常见问题
    *
+   * @apiUse ResponseResultSuccess
    */
   requestRobot: function () {
     console.log("自助答疑");
     httpapi.initAnswer();
   },
   /**
-   * 满意度评价
+   * @api {get} /api/rate/do 满意度评价
+   * @apiName rate
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uId 管理员uid
+   * @apiParam {String} wId 工作组唯一wid
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} score 分数
+   * @apiParam {String} note 备注
+   * @apiParam {String} invite 是否邀请评价
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 满意度评价
+   *
+   * @apiUse ResponseResultSuccess
    */
   rate: function () {
     // 隐藏满意度评价dialog
@@ -440,7 +554,19 @@ var httpapi = {
     });
   },
   /**
-   * 关闭当前窗口
+   * @api {get} /api/thread/visitor/close 关闭当前窗口
+   * @apiName closeWebPage
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 关闭当前窗口
+   *
+   * @apiUse ResponseResultSuccess
    */
   closeWebPage: function () {
     $.ajax({
@@ -483,8 +609,22 @@ var httpapi = {
     });
   },
   /**
-   * 加载更多聊天记录
+   * @api {get} /api/messages/user 加载更多聊天记录
+   * @apiName loadMoreMessages
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wId 工作组唯一wid
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 加载更多聊天记录
    * TODO: 访客端暂时不开放聊天记录
+   *
+   * @apiUse ResponseResultSuccess
    */
   loadMoreMessages: function () {
     $.ajax({
@@ -528,7 +668,21 @@ var httpapi = {
     });
   },
   /**
-   * 加载常见问题
+   * @api {get} /api/answer/init 加载常见问题
+   * @apiName initAnswer
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wId 工作组唯一wid
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 加载常见问题
+   *
+   * @apiUse ResponseResultSuccess
    */
   initAnswer: function () {
     $.ajax({
@@ -559,7 +713,19 @@ var httpapi = {
     });
   },
   /**
+   * @api {get} /api/answer/top 获取热门问题
+   * @apiName getTopAnswers
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 工作组唯一wid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 获取热门问题
    *
+   * @apiUse ResponseResultSuccess
    */
   getTopAnswers: function () {
     $.ajax({
@@ -586,7 +752,23 @@ var httpapi = {
       }
     });
   },
-  //
+  /**
+   * @api {get} /api/answer/query 根据问题qid请求智能问答答案
+   * @apiName getAnswer
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 管理员uid
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} aId 问题aid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 请求会话
+   *
+   * @apiUse ResponseResultSuccess
+   */
   getAnswer: function (aid) {
     $.ajax({
       url: data.HTTP_HOST +
@@ -619,7 +801,23 @@ var httpapi = {
       }
     });
   },
-  // 输入内容，请求智能答案
+  /**
+   * @api {get} /api/answer/message 输入内容，请求智能答案
+   * @apiName messageAnswer
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 管理员uid
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} content 内容
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 输入内容，请求智能答案
+   *
+   * @apiUse ResponseResultSuccess
+   */
   messageAnswer: function (content) {
     $.ajax({
       url: data.HTTP_HOST +
@@ -655,6 +853,23 @@ var httpapi = {
       }
     });
   },
+  /**
+   * @api {post} /api/thread/request 评价智能问答结果(TODO，未上线)
+   * @apiName rateAnswer
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 管理员uid
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效
+   * @apiParam {String} rate 是否有用
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 评价智能问答结果，是否有用
+   *
+   * @apiUse ResponseResultSuccess
+   */
   rateAnswer: function (rate) {
     //
     $.ajax({
@@ -684,7 +899,24 @@ var httpapi = {
     });
   },
   /**
-   * 留言
+   * @api {post} /api/leavemsg/save 留言
+   * @apiName leaveMessage
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wId 工作组唯一wid
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效 
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} mobile 手机
+   * @apiParam {String} email 邮箱
+   * @apiParam {String} content 留言内容
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 留言
+   *
+   * @apiUse ResponseResultSuccess
    */
   leaveMessage: function () {
     var mobile = $("#leavemsgmobile").val();
@@ -724,7 +956,20 @@ var httpapi = {
     });
   },
   /**
-   * 选择问卷答案
+   * @api {get} /api/thread/questionnaire 选择问卷答案
+   * @apiName chooseQuestionnaire
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} tId 会话唯一tid
+   * @apiParam {String} itemQid 选择qid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 选择问卷答案
+   *
+   * @apiUse ResponseResultSuccess
    */
   chooseQuestionnaire: function (itemQid) {
     console.log("choose questionnaire: " + itemQid);
@@ -766,7 +1011,20 @@ var httpapi = {
     });
   },
   /**
-   * 选择要留学国家
+   * @api {get} /api/thread/country 选择要留学国家
+   * @apiName chooseCountry
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} companyCid 公司cid
+   * @apiParam {String} countryCid 国家cid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 选择要留学国家
+   *
+   * @apiUse ResponseResultSuccess
    */
   chooseCountry: function (companyCid, countryCid) {
     $.ajax({
@@ -803,7 +1061,20 @@ var httpapi = {
     });
   },
   /**
-   * 选择工作组
+   * @api {get} /api/thread/choose/workGroup 选择工作组
+   * @apiName chooseWorkGroup
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wId 工作组唯一wid
+   * @apiParam {String} tId 当前会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 选择工作组
+   *
+   * @apiUse ResponseResultSuccess
    */
   chooseWorkGroup: function (wId) {
     console.log("choose workgroup:", wId);

@@ -396,10 +396,10 @@
             el: '#app',
             data() {
                 return {
-                    // HTTP_HOST: "http://127.0.0.1:8000",
-                    // STOMP_HOST: "http://127.0.0.1:8000",
-                    HTTP_HOST: 'https://api.bytedesk.com',
-                    STOMP_HOST: 'https://stomp.bytedesk.com',
+                    HTTP_HOST: "http://127.0.0.1:8000",
+                    STOMP_HOST: "http://127.0.0.1:8000",
+                    // HTTP_HOST: 'https://api.bytedesk.com',
+                    // STOMP_HOST: 'https://stomp.bytedesk.com',
                     //
                     imageDialogVisible: false,
                     currentImageUrl: '',
@@ -1936,15 +1936,28 @@
                 }
             },
             created() {
-                // console.log("created");
-                this.adminUid = this.getUrlParam("uid");
-                this.workGroupWid = this.getUrlParam("wid");
-                this.subDomain = window.location.host.split('.').length > 2 ? window.location.host.split('.')[0]: '';
-                this.type = this.getUrlParam("type");
-                this.agentUid = this.getUrlParam("aid");
+                console.log("created:", localStorage.iframe);
+                //
+                if (localStorage.iframe === "1") {
+                    this.adminUid = localStorage.adminUid;
+                    this.workGroupWid = localStorage.workGroupWid;
+                    this.subDomain = localStorage.subDomain;
+                    this.type = localStorage.type;
+                    this.agentUid = localStorage.agentUid;
+                } else {
+                    this.adminUid = this.getUrlParam("uid");
+                    this.workGroupWid = this.getUrlParam("wid");
+                    this.subDomain = window.location.host.split('.').length > 2 ? window.location.host.split('.')[0]: '';
+                    this.type = this.getUrlParam("type");
+                    this.agentUid = this.getUrlParam("aid");
+                }
+                //
                 this.uid = localStorage.uid;
                 this.username = localStorage.username;
-                this.password = this.username;
+                this.password = localStorage.password;
+                if (this.password === undefined || this.password === null) {
+                    this.password = this.username;
+                }
                 var tokenLocal = localStorage.getItem(this.token);
                 if (tokenLocal != null) {
                     this.passport.token = JSON.parse(tokenLocal);

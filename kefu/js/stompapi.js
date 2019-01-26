@@ -1,3 +1,11 @@
+/**
+ * bytedesk.com
+ */
+/**
+ * @apiDefine Message 消息
+ *
+ * 发送消息相关
+ */
 var stompapi = {
   /**
    * 发送同步消息

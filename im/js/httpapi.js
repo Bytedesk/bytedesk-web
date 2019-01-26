@@ -1,17 +1,60 @@
 /**
  * bytedesk.com
  */
+/**
+ * @apiDefine User 用户
+ *
+ * 用户相关接口
+ */
+/**
+ * @apiDefine Group 群组
+ *
+ * 群组相关接口
+ */
+/**
+ * @apiDefine Social 社交
+ *
+ * 社交关系相关接口
+ */
+/**
+ * @apiDefine SubDomainClientParam
+ * @apiParam {String} subDomain 企业号，测试可填写 'vip'，上线请填写真实企业号
+ * @apiParam {String} client 固定写死为 'web'
+ */
+/**
+ * @apiDefine PageSizeClientParam
+ * @apiParam {String} page 起始页面，首页为: 0
+ * @apiParam {String} size 每页消息条数，如: 20
+ * @apiParam {String} client 固定写死为 'web'
+ */
+/**
+ * @apiDefine UserResultSuccess
+ * @apiSuccess {String} uid 用户唯一uid.
+ * @apiSuccess {String} username  用户名.
+ * @apiSuccess {String} nickname  昵称.
+ */
+/**
+ * @apiDefine ResponseResultSuccess
+ * @apiSuccess {String} message 返回提示
+ * @apiSuccess {Number} status_code 状态码
+ * @apiSuccess {String} data 返回内容
+ */
 var httpapi = {
-
   /**
-   * 注册
-   * 实例：
-   * httpapi.register('my_test_im', '昵称mytest', '123456', 'vip');
+   * @api {post} /visitor/api/register/user 注册
+   * @apiName register
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission none
    * 
-   * @param {*} username 用户名
-   * @param {*} nickname 昵称
-   * @param {*} password 密码
-   * @param {*} subDomain 企业号: 测试期间固定写死为 ’vip‘
+   * @apiParam {String} username 用户名
+   * @apiParam {String} nickname 昵称
+   * @apiParam {String} password 密码
+   * @apiUse SubDomainClientParam
+   * 
+   * @apiDescription httpapi.register('my_test_im', '昵称mytest', '123456', 'vip');
+   *
+   * @apiUse UserResultSuccess
    */
   register: function(username, nickname, password, subDomain) {
     //
@@ -35,18 +78,31 @@ var httpapi = {
       }
     });
   },
-
   /**
-   * 登录:
+   * @api {post} /oauth/token 登录
+   * @apiName login
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission none
    * 
+   * @apiHeader {String} Authorization 值固定写死为: 'Basic Y2xpZW50OnNlY3JldA=='
+   * 
+   * @apiParam {String} username 用户名
+   * @apiParam {String} password 密码
+   * @apiParam {String} subDomain 企业号
+   * 
+   * @apiDescription 函数内部实际调用doLogin函数
    * 测试用户：
    * 用户名：test1、test2、...., test15
    * 密码：123456
    * 企业号：vip
-   * 
-   * @param {*} username 用户名
-   * @param {*} password 密码
-   * @param {*} subDomain 企业号
+   *
+   * @apiSuccess {String} access_token 访问令牌
+   * @apiSuccess {Number} expires_in 过期时间
+   * @apiSuccess {String} jti
+   * @apiSuccess {String} refresh_token 刷新令牌
+   * @apiSuccess {String} scope 固定值：'all'
+   * @apiSuccess {String} token_type 固定值：'bearer'
    */
   login: function () {
     //
@@ -61,7 +117,29 @@ var httpapi = {
     httpapi.doLogin();
   },
   /**
-   * 调用授权接口
+   * @api {post} /oauth/token 调用授权接口
+   * @apiName doLogin
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission none
+   * 
+   * @apiHeader {String} Authorization 值固定写死为: 'Basic Y2xpZW50OnNlY3JldA=='
+   * 
+   * @apiParam {String} username 用户名
+   * @apiParam {String} password 密码
+   * @apiParam {String} subDomain 企业号
+   * 
+   * @apiDescription 测试用户：
+   * 用户名：test1、test2、...., test15
+   * 密码：123456
+   * 企业号：vip
+   *
+   * @apiSuccess {String} access_token 访问令牌
+   * @apiSuccess {Number} expires_in 过期时间
+   * @apiSuccess {String} jti
+   * @apiSuccess {String} refresh_token 刷新令牌
+   * @apiSuccess {String} scope 固定值：'all'
+   * @apiSuccess {String} token_type 固定值：'bearer'
    */
   doLogin: function () {
     console.log('do login: ', data.username, data.password);
@@ -99,8 +177,23 @@ var httpapi = {
     });
   },
   /**
-   * 初始化加载基本信息: 1. 用户个人资料；2. 联系人；3.群组等
-   * FIXME: 401报错自动清理本地存储access_token, 然后重新获取access_token
+   * @api {post} /api/user/init 初始化加载基本信息
+   * @apiName init
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} username 用户名
+   * @apiParam {String} password 密码
+   * @apiParam {String} subDomain 企业号
+   * 
+   * @apiDescription 初始化加载基本信息: 
+   * 1. 用户个人资料；
+   * 2. 联系人；
+   * 3.群组等
+   *
+   * @apiUse ResponseResultSuccess
    */
   init: function() {
     console.log("init");
@@ -164,7 +257,18 @@ var httpapi = {
   },
 
   /**
-   * 退出登录
+   * @api {post} /api/user/logout 退出登录
+   * @apiName logout
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 退出登录
+   *
+   * @apiUse ResponseResultSuccess
    */
   logout: function() {
     //
@@ -190,11 +294,19 @@ var httpapi = {
   },
 
   /**
-   * 加载客服会话访客聊天记录
+   * @api {get} /api/messages/user 加载客服会话访客聊天记录
+   * @apiName getMessages
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
    * 
-   * @param {*} uid 访客uid
-   * @param {*} page 聊天记录起始页面，首页为0
-   * @param {*} size 聊天记录每页消息条数，如：20
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 访客uid
+   * @apiUse PageSizeClientParam
+   * 
+   * @apiDescription 加载客服会话访客聊天记录
+   *
+   * @apiUse ResponseResultSuccess
    */
   getMessages: function(uid, page, size) {
     $.ajax({
@@ -218,11 +330,20 @@ var httpapi = {
   },
 
   /**
-   * 加载一对一联系人消息
+   * @api {get} /api/messages/contact 加载一对一联系人消息
+   * @apiName getContactMessages
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
    * 
-   * @param {*} cid 联系人uid
-   * @param {*} page 聊天记录起始页面，首页为0
-   * @param {*} size 聊天记录每页消息条数，如：20
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} cid 联系人uid
+   * @apiUse PageSizeClientParam
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 加载一对一联系人消息
+   *
+   * @apiUse ResponseResultSuccess
    */
   getContactMessages: function(cid, page, size) {
     $.ajax({
@@ -246,11 +367,20 @@ var httpapi = {
   },
 
   /**
-   * 加载群组消息
+   * @api {get} /api/messages/group 加载群组聊天记录
+   * @apiName getGroupMessages
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
    * 
-   * @param {*} gid 群组gid
-   * @param {*} page 聊天记录起始页面，首页为0
-   * @param {*} size 聊天记录每页消息条数，如：20
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组gid
+   * @apiUse PageSizeClientParam
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 加载群组聊天记录
+   *
+   * @apiUse ResponseResultSuccess
    */
   getGroupMessages: function(gid, page, size) {
     $.ajax({
@@ -274,7 +404,18 @@ var httpapi = {
   },
 
   /**
-   * 获取客服全部联系人
+   * @api {get} /api/user/contacts 获取客服全部联系人
+   * @apiName getContacts
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 获取客服全部联系人
+   *
+   * @apiUse ResponseResultSuccess
    */
   getContacts: function() {
     $.ajax({
@@ -298,7 +439,18 @@ var httpapi = {
   },
 
   /**
-   * 获取全部群组
+   * @api {get} /api/user/contacts 获取全部群组
+   * @apiName getGroups
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 获取全部群组
+   *
+   * @apiUse ResponseResultSuccess
    */
   getGroups: function() {
     $.ajax({
@@ -321,9 +473,19 @@ var httpapi = {
   },
 
   /**
-   * 获取群组详情
+   * @api {get} /api/group/detail 获取群组详情
+   * @apiName getGroupDetail
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
    * 
-   * @param {*} gid 群组唯一gid
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 获取群组详情
+   *
+   * @apiUse ResponseResultSuccess
    */
   getGroupDetail: function(gid) {
     $.ajax({
@@ -345,9 +507,19 @@ var httpapi = {
   },
 
   /**
-   * 获取群组全部成员
+   * @api {get} /api/group/members 获取群组全部成员
+   * @apiName getContacts
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
    * 
-   * @param {*} gid 群组唯一gid
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 获取群组全部成员
+   *
+   * @apiUse ResponseResultSuccess
    */
   getGroupMembers: function(gid) {
     $.ajax({
@@ -369,9 +541,20 @@ var httpapi = {
   },
 
   /**
-   * 创建群组
-   * @param {*} nickname 群组昵称
-   * @param {*} selectedContacts 群组成员uid数组，如 [1111, 2222, 3333]
+   * @api {post} /api/group/create 创建群组
+   * @apiName createGroup
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} nickname 群组昵称
+   * @apiParam {String} selectedContacts 群组成员uid数组，如 [1111, 2222, 3333]
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 创建群组
+   *
+   * @apiUse ResponseResultSuccess
    */
   createGroup: function(nickname, selectedContacts) {
     $.ajax({
@@ -396,10 +579,20 @@ var httpapi = {
   },
 
   /**
-   * 更新群组: 群名称等
+   * @api {post} /api/group/update/nickname 更新群组: 群名称等
+   * @apiName updateGroupNickname
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
    * 
-   * @param {string} gid 群组唯一gid
-   * @param {string} nickname 群组新昵称
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} nickname 群组新昵称
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 更新群组: 群名称等
+   *
+   * @apiUse ResponseResultSuccess
    */
   updateGroupNickname: function(gid, nickname) {
     $.ajax({
@@ -424,9 +617,20 @@ var httpapi = {
   },
 
   /**
-   * 更新群组公告
-   * @param {string} gid 群组唯一gid
-   * @param {string} announcement 群组公告
+   * @api {post} /api/group/create 更新群组公告
+   * @apiName updateGroupAnnouncement
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} announcement 群组公告
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 更新群组公告
+   *
+   * @apiUse ResponseResultSuccess
    */
   updateGroupAnnouncement: function(gid, announcement) {
     $.ajax({
@@ -451,9 +655,20 @@ var httpapi = {
   },
 
   /**
-   * 更新群组简介
-   * @param {string} gid 群组唯一gid
-   * @param {string} description 群简介
+   * @api {post} /api/group/update/description 更新群组简介
+   * @apiName updateGroupDescription
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} description 群简介
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 更新群组简介
+   *
+   * @apiUse ResponseResultSuccess
    */
   updateGroupDescription: function(gid, description) {
     $.ajax({
@@ -478,9 +693,20 @@ var httpapi = {
   },
 
   /**
-   * 邀请/直接拉入群
-   * @param {*} uid 被邀请人uid
-   * @param {*} gid 群组唯一gid
+   * @api {post} /api/group/invite 邀请/直接拉入群
+   * @apiName createGroup
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 被邀请人uid
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 邀请/直接拉入群
+   *
+   * @apiUse ResponseResultSuccess
    */
   inviteGroup: function(uid, gid) {
     $.ajax({
@@ -505,8 +731,19 @@ var httpapi = {
   },
 
   /**
-   * 主动申请入群
-   * @param {string} gid 群组唯一gid
+   * @api {post} /api/group/apply 主动申请入群
+   * @apiName applyGroup
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 主动申请入群
+   *
+   * @apiUse ResponseResultSuccess
    */
   applyGroup: function(gid) {
     $.ajax({
@@ -530,8 +767,19 @@ var httpapi = {
   },
 
   /**
-   * 主动申请入群：同意
-   * @param {*} nid 通知唯一nid
+   * @api {post} /api/group/apply/approve 主动申请入群：同意
+   * @apiName applyGroupApprove
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} nid 通知唯一nid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 主动申请入群：同意
+   *
+   * @apiUse ResponseResultSuccess
    */
   applyGroupApprove: function(nid) {
     $.ajax({
@@ -555,8 +803,19 @@ var httpapi = {
   },
 
   /**
-   * 主动申请入群:拒绝
-   * @param {*} nid 通知唯一nid
+   * @api {post} /api/group/apply/deny 主动申请入群:拒绝
+   * @apiName applyGroupDeny
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} nid 通知唯一nid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 主动申请入群:拒绝
+   *
+   * @apiUse ResponseResultSuccess
    */
   applyGroupDeny: function(nid) {
     $.ajax({
@@ -580,9 +839,20 @@ var httpapi = {
   },
 
   /**
-   * 踢人
-   * @param {string} gid 群组唯一gid
-   * @param {string} uid 被踢用户唯一uid
+   * @api {post} /api/group/kick 踢人
+   * @apiName kickGroupMember
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} uid 被踢用户唯一uid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 踢人
+   *
+   * @apiUse ResponseResultSuccess
    */
   kickGroupMember: function(gid, uid) {
     $.ajax({
@@ -607,9 +877,20 @@ var httpapi = {
   },
 
   /**
-   * 禁言
-   * @param {*} gid 群组唯一gid
-   * @param {*} uid 被禁言用户唯一uid
+   * @api {post} /api/group/mute 禁言
+   * @apiName muteGroupMember
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} uid 被禁言用户唯一uid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 禁言
+   *
+   * @apiUse ResponseResultSuccess
    */
   muteGroupMember: function(gid, uid) {
     $.ajax({
@@ -634,9 +915,20 @@ var httpapi = {
   },
 
   /**
-   * 移交群组
-   * @param {string} gid 群组唯一gid
-   * @param {string} uid 被移交用户uid
+   * @api {post} /api/group/transfer 移交群组
+   * @apiName transferGroup
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} uid 被移交用户uid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 移交群组
+   *
+   * @apiUse ResponseResultSuccess
    */
   transferGroup: function(gid, uid) {
     $.ajax({
@@ -661,8 +953,19 @@ var httpapi = {
   },
 
   /**
-   * 移交群组：同意
-   * @param {*} nid 通知唯一nid
+   * @api {post} /api/group/transfer/approve 移交群组：同意
+   * @apiName transferGroupApprove
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} nid 通知唯一nid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 移交群组：同意
+   *
+   * @apiUse ResponseResultSuccess
    */
   transferGroupApprove: function(nid) {
     $.ajax({
@@ -686,8 +989,19 @@ var httpapi = {
   },
 
   /**
-   * 移交群组: 拒绝
-   * @param {string} nid 通知唯一nid
+   * @api {post} /api/group/transfer/deny 移交群组: 拒绝
+   * @apiName transferGroupDeny
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} nid 通知唯一nid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 移交群组: 拒绝
+   *
+   * @apiUse ResponseResultSuccess
    */
   transferGroupDeny: function(nid) {
     $.ajax({
@@ -711,8 +1025,19 @@ var httpapi = {
   },
 
   /**
-   * 退出群组
-   * @param {string} gid 群组唯一gid
+   * @api {post} /api/group/withdraw 退出群组
+   * @apiName withdrawGroup
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 退出群组
+   *
+   * @apiUse ResponseResultSuccess
    */
   withdrawGroup: function(gid) {
     $.ajax({
@@ -736,8 +1061,19 @@ var httpapi = {
   },
 
   /**
-   * 解散群组
-   * @param {string} gid 群组唯一gid
+   * @api {post} /api/group/dismiss 解散群组
+   * @apiName dismissGroup
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 解散群组
+   *
+   * @apiUse ResponseResultSuccess
    */
   dismissGroup: function(gid) {
     $.ajax({
@@ -761,8 +1097,19 @@ var httpapi = {
   },
 
   /**
-   * 搜索过滤群组
-   * @param {string} keyword 关键词
+   * @api {get} /api/group/filter 搜索过滤群组
+   * @apiName filterGroup
+   * @apiGroup Group
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} keyword 关键词
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 搜索过滤群组
+   *
+   * @apiUse ResponseResultSuccess
    */
   filterGroup: function(keyword) {
     $.ajax({
@@ -784,9 +1131,19 @@ var httpapi = {
   },
 
   /**
-   * 获取关注
-   * @param {int} page 起始页码，如：0
-   * @param {int} size 每页大小，如：20
+   * @api {get} /api/user/follows 获取关注
+   * @apiName getFollows
+   * @apiGroup Social
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 访客uid
+   * @apiUse PageSizeClientParam
+   * 
+   * @apiDescription 获取关注
+   *
+   * @apiUse ResponseResultSuccess
    */
   getFollows: function(page, size) {
     $.ajax({
@@ -811,9 +1168,19 @@ var httpapi = {
   },
 
   /**
-   * 获取粉丝
-   * @param {int} page 起始页码，如：0
-   * @param {int} size 每页大小，如：20
+   * @api {get} /api/user/fans 获取粉丝
+   * @apiName getMessages
+   * @apiGroup Social
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 访客uid
+   * @apiUse PageSizeClientParam
+   * 
+   * @apiDescription 获取粉丝
+   *
+   * @apiUse ResponseResultSuccess
    */
   getFans: function(page, size) {
     $.ajax({
@@ -838,9 +1205,18 @@ var httpapi = {
   },
 
   /**
-   * 获取好友
-   * @param {int} page 起始页码，如：0
-   * @param {int} size 每页大小，如：20
+   * @api {get} /api/user/friends 获取好友
+   * @apiName getFriends
+   * @apiGroup Social
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiUse PageSizeClientParam
+   * 
+   * @apiDescription 获取好友
+   *
+   * @apiUse ResponseResultSuccess
    */
   getFriends: function(page, size) {
     $.ajax({
@@ -865,8 +1241,19 @@ var httpapi = {
   },
 
   /**
-   * 添加关注
-   * @param {*} uid 用户唯一uid
+   * @api {post} /api/group/withdraw 添加关注
+   * @apiName addFollow
+   * @apiGroup Social
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 用户唯一uid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 添加关注
+   *
+   * @apiUse ResponseResultSuccess
    */
   addFollow: function(uid) {
     $.ajax({
@@ -890,8 +1277,19 @@ var httpapi = {
   },
 
   /**
-   * 取消关注
-   * @param {*} uid 用户唯一uid
+   * @api {post} /api/user/unfollow 取消关注
+   * @apiName unFollow
+   * @apiGroup Social
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 用户唯一uid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 取消关注
+   *
+   * @apiUse ResponseResultSuccess
    */
   unFollow: function(uid) {
     $.ajax({
@@ -915,8 +1313,19 @@ var httpapi = {
   },
 
   /**
-   * 判断是否关注
-   * @param {*} uid 用户唯一uid
+   * @api {get} /api/user/isfollowed 判断是否关注
+   * @apiName isFollowed
+   * @apiGroup Social
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 访客uid
+   * @apiUse PageSizeClientParam
+   * 
+   * @apiDescription 判断是否关注
+   *
+   * @apiUse ResponseResultSuccess
    */
   isFollowed: function(uid) {
     $.ajax({
@@ -938,8 +1347,19 @@ var httpapi = {
   },
 
   /**
-   * 判断好友关系
-   * @param {*} uid 用户唯一uid
+   * @api {get} /api/user/relation 判断好友关系
+   * @apiName getBlocks
+   * @apiGroup Social
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 用户唯一uid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 判断好友关系
+   *
+   * @apiUse ResponseResultSuccess
    */
   getRelation: function(uid) {
     $.ajax({
@@ -961,9 +1381,18 @@ var httpapi = {
   },
 
   /**
-   * 分页获取拉黑访客
-   * @param {int} page 起始页码，如：0
-   * @param {int} size 每页大小，如：20
+   * @api {get} /api/messages/user 分页获取拉黑访客
+   * @apiName getBlocks
+   * @apiGroup Social
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiUse PageSizeClientParam
+   * 
+   * @apiDescription 分页获取拉黑访客
+   *
+   * @apiUse ResponseResultSuccess
    */
   getBlocks: function(page, size) {
     $.ajax({
@@ -988,10 +1417,21 @@ var httpapi = {
   },
 
   /**
-   * 添加黑名单
-   * @param {*} uid 用户uid
-   * @param {*} type 写死固定值：'默认类型'
-   * @param {*} note 备注
+   * @api {post} /api/block/add 添加黑名单
+   * @apiName addBlock
+   * @apiGroup Social
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 用户uid
+   * @apiParam {String} type 写死固定值：'默认类型'
+   * @apiParam {String} note 备注
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 添加黑名单
+   *
+   * @apiUse ResponseResultSuccess
    */
   addBlock: function(uid, type, note) {
     $.ajax({
@@ -1015,8 +1455,19 @@ var httpapi = {
   },
 
   /**
-   * 取消黑名单
-   * @param {string} uid 用户uid
+   * @api {post} /api/block/remove 取消黑名单
+   * @apiName removeBlock
+   * @apiGroup Social
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 用户uid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 取消黑名单
+   *
+   * @apiUse ResponseResultSuccess
    */
   removeBlock: function(uid) {
     $.ajax({
