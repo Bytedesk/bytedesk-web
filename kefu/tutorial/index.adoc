@@ -1,0 +1,24 @@
+= 客服开发指南
+bytedesk(c) 2019 jackning
+Version 1.1, 2019-01-26
+
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:sectnums:
+:toc: left
+:toclevels: 4
+:toc-title: IM从0到1
+:experimental:
+:description: 打造企业级即时通讯系统
+:keywords: 微服务 SpringBoot SpringCloud
+:imagesdir: ./img
+:sectlinks:
+:operation-curl-request-title: Example request
+:operation-http-response-title: Example response
+
+从零开始构建一套基于Web客服客户端
+
+== 写在前面
+
+
