@@ -6,6 +6,7 @@ var layim = {
    * 
    */
   initUI: function() {
+    console.log('initLayUI');
     layui.use(['layer', 'form', 'element'], () => {
       data.layer = layui.layer
       data.form = layui.form

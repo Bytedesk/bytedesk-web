@@ -96,7 +96,7 @@ var stompapi = {
         // TODO: 会话关闭，添加按钮方便用户点击重新请求会话
         data.isThreadClosed = true;
       } else if (messageObject.type === "notification_preview") {
-        if (!messageObject.user.visitor) {
+        if (messageObject.user.username !== data.username) {
           data.inputTipVisible = true;
           utils.toggleInputTip(true);
           setTimeout(function () {

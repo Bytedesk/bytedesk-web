@@ -627,45 +627,45 @@ var httpapi = {
    * @apiUse ResponseResultSuccess
    */
   loadMoreMessages: function () {
-    $.ajax({
-      url: data.HTTP_HOST +
-      "/api/messages/user?access_token=" +
-      data.passport.token.access_token,
-      type: "get",
-      data: {
-        uid: data.uid,
-        page: data.page,
-        size: 100,
-        client: data.client
-      },
-      success:function(response){
-        console.log(response.data);
-        if (response.status_code === 200) {
-          //
-          for (var i = 0; i < response.data.content.length; i++) {
-            var message = response.data.content[i];
-            //
-            var contains = false;
-            for (var j = 0; j < data.messages.length; j++) {
-              var msg = data.messages[j];
-              if (msg.id === message.id) {
-                contains = true;
-              }
-            }
-            if (!contains) {
-              data.messages.push(message);
-            }
-          }
-          utils.scrollToBottom();
-        } else {
-          alert(response.message);
-        }
-      },
-      error: function(error) {
-        console.log(error);
-        alert(error);
-      }
-    });
+    // $.ajax({
+    //   url: data.HTTP_HOST +
+    //   "/api/messages/user?access_token=" +
+    //   data.passport.token.access_token,
+    //   type: "get",
+    //   data: {
+    //     uid: data.uid,
+    //     page: data.page,
+    //     size: 100,
+    //     client: data.client
+    //   },
+    //   success:function(response){
+    //     console.log(response.data);
+    //     if (response.status_code === 200) {
+    //       //
+    //       for (var i = 0; i < response.data.content.length; i++) {
+    //         var message = response.data.content[i];
+    //         //
+    //         var contains = false;
+    //         for (var j = 0; j < data.messages.length; j++) {
+    //           var msg = data.messages[j];
+    //           if (msg.id === message.id) {
+    //             contains = true;
+    //           }
+    //         }
+    //         if (!contains) {
+    //           data.messages.push(message);
+    //         }
+    //       }
+    //       utils.scrollToBottom();
+    //     } else {
+    //       alert(response.message);
+    //     }
+    //   },
+    //   error: function(error) {
+    //     console.log(error);
+    //     alert(error);
+    //   }
+    // });
   },
   /**
    * @api {get} /api/answer/init 加载常见问题

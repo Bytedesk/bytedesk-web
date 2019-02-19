@@ -7,20 +7,20 @@ var kefu = {
    */
   created: function() {
     // 单独窗口形式
-    // data.adminUid = utils.getUrlParam("uid");
-    // data.workGroupWid = utils.getUrlParam("wid");
-    // data.subDomain = window.location.host.split(".").length > 2
-    // ? window.location.host.split(".")[0]
-    // : "";
-    // data.type = utils.getUrlParam("type");
-    // data.agentUid = utils.getUrlParam("aid");
+    data.adminUid = utils.getUrlParam("uid");
+    data.workGroupWid = utils.getUrlParam("wid");
+    data.subDomain = window.location.host.split(".").length > 2
+    ? window.location.host.split(".")[0]
+    : "";
+    data.type = utils.getUrlParam("type");
+    data.agentUid = utils.getUrlParam("aid");
     //
     // 嵌入窗口形式
-    data.adminUid = localStorage.adminUid;
-    data.workGroupWid = localStorage.workGroupWid;
-    data.subDomain = localStorage.subDomain;
-    data.type = localStorage.type;
-    data.agentUid = localStorage.agentUid;
+    // data.adminUid = localStorage.adminUid;
+    // data.workGroupWid = localStorage.workGroupWid;
+    // data.subDomain = localStorage.subDomain;
+    // data.type = localStorage.type;
+    // data.agentUid = localStorage.agentUid;
     //
     data.uid = localStorage.uid;
     data.username = localStorage.username;

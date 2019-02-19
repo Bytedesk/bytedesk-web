@@ -97,7 +97,7 @@ var utils = {
   },
   //
   is_self: function(message) {
-    return message.user.visitor;
+    return message.user.username === data.username;
   },
   // 发送状态
   is_sending: function(message) {
@@ -476,6 +476,25 @@ var utils = {
       s4()
     );
   },
+  //
+  isMobile: function() { 
+		function Android() {
+			return navigator.userAgent.match(/Android/i);
+		}
+		function BlackBerry() {
+			return navigator.userAgent.match(/BlackBerry/i);
+		}
+		function iOS() {
+			return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+		}
+		function Opera() {
+			return navigator.userAgent.match(/Opera Mini/i);
+		}
+		function Windows() {
+			return navigator.userAgent.match(/IEMobile/i);
+		}
+		return Android() || BlackBerry() || iOS() || Opera() || Windows();
+	},
   //
   emotionClicked: function(emotionText) {
     console.log('imageclicked:'+emotionText);
