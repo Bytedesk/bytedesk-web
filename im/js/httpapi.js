@@ -44,7 +44,7 @@ var httpapi = {
    * @api {post} /visitor/api/register/user 注册
    * @apiName register
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission none
    * 
    * @apiParam {String} username 用户名
@@ -79,10 +79,62 @@ var httpapi = {
     });
   },
   /**
+   * @api {post} /visitor/api/register/user/uid 自定义用户名生成访客账号, 自定义uid
+   * @apiName registerUserUid
+   * @apiGroup User
+   * @apiVersion 1.4.9
+   * @apiPermission none
+   * 
+   * @apiParam {String} username 用户名
+   * @apiParam {String} nickname 昵称
+   * @apiParam {String} uid 用户唯一标示
+   * @apiParam {String} password 密码
+   * @apiUse SubDomainClientParam
+   * 
+   * @apiDescription 开发者在需要跟自己业务系统账号对接的情况下，
+   * 可以通过自定义用户名生成访客账号
+   *
+   * @apiUse UserResultSuccess
+   */
+  registerUid: function (username, nickname, uid, password) {
+    //
+    $.ajax({
+      url: data.HTTP_HOST + "/visitor/api/register/user/uid",
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({ 
+        username: username,
+        nickname: nickname,
+        uid: uid,
+        password: password,
+        subDomain: data.subDomain,
+        client: data.client
+      }),
+      success:function(response){
+        // 登录
+        data.uid = response.data.uid;
+        data.username = response.data.username;
+        data.password = data.username;
+        data.nickname = response.data.nickname;
+        // 本地存储
+        localStorage.uid = data.uid;
+        localStorage.username = data.username;
+        localStorage.password = data.password;
+        // 登录
+        httpapi.login();
+      },
+      error: function(error) {
+        //Do Something to handle error
+        console.log(error);
+      }
+    });
+  },
+  /**
    * @api {post} /oauth/token 登录
    * @apiName login
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission none
    * 
    * @apiHeader {String} Authorization 值固定写死为: 'Basic Y2xpZW50OnNlY3JldA=='
@@ -120,7 +172,7 @@ var httpapi = {
    * @api {post} /oauth/token 调用授权接口
    * @apiName doLogin
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission none
    * 
    * @apiHeader {String} Authorization 值固定写死为: 'Basic Y2xpZW50OnNlY3JldA=='
@@ -180,7 +232,7 @@ var httpapi = {
    * @api {post} /api/user/init 初始化加载基本信息
    * @apiName init
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -260,7 +312,7 @@ var httpapi = {
    * @api {post} /api/user/logout 退出登录
    * @apiName logout
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -297,7 +349,7 @@ var httpapi = {
    * @api {get} /api/messages/user 加载客服会话访客聊天记录
    * @apiName getMessages
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -333,7 +385,7 @@ var httpapi = {
    * @api {get} /api/messages/contact 加载一对一联系人消息
    * @apiName getContactMessages
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -370,7 +422,7 @@ var httpapi = {
    * @api {get} /api/messages/group 加载群组聊天记录
    * @apiName getGroupMessages
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -407,7 +459,7 @@ var httpapi = {
    * @api {get} /api/user/contacts 获取客服全部联系人
    * @apiName getContacts
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -442,7 +494,7 @@ var httpapi = {
    * @api {get} /api/user/contacts 获取全部群组
    * @apiName getGroups
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -476,7 +528,7 @@ var httpapi = {
    * @api {get} /api/group/detail 获取群组详情
    * @apiName getGroupDetail
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -510,7 +562,7 @@ var httpapi = {
    * @api {get} /api/group/members 获取群组全部成员
    * @apiName getContacts
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -544,7 +596,7 @@ var httpapi = {
    * @api {post} /api/group/create 创建群组
    * @apiName createGroup
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -582,7 +634,7 @@ var httpapi = {
    * @api {post} /api/group/update/nickname 更新群组: 群名称等
    * @apiName updateGroupNickname
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -620,7 +672,7 @@ var httpapi = {
    * @api {post} /api/group/create 更新群组公告
    * @apiName updateGroupAnnouncement
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -658,7 +710,7 @@ var httpapi = {
    * @api {post} /api/group/update/description 更新群组简介
    * @apiName updateGroupDescription
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -696,7 +748,7 @@ var httpapi = {
    * @api {post} /api/group/invite 邀请/直接拉入群
    * @apiName createGroup
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -734,7 +786,7 @@ var httpapi = {
    * @api {post} /api/group/apply 主动申请入群
    * @apiName applyGroup
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -770,7 +822,7 @@ var httpapi = {
    * @api {post} /api/group/apply/approve 主动申请入群：同意
    * @apiName applyGroupApprove
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -806,7 +858,7 @@ var httpapi = {
    * @api {post} /api/group/apply/deny 主动申请入群:拒绝
    * @apiName applyGroupDeny
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -842,7 +894,7 @@ var httpapi = {
    * @api {post} /api/group/kick 踢人
    * @apiName kickGroupMember
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -880,7 +932,7 @@ var httpapi = {
    * @api {post} /api/group/mute 禁言
    * @apiName muteGroupMember
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -918,7 +970,7 @@ var httpapi = {
    * @api {post} /api/group/transfer 移交群组
    * @apiName transferGroup
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -956,7 +1008,7 @@ var httpapi = {
    * @api {post} /api/group/transfer/approve 移交群组：同意
    * @apiName transferGroupApprove
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -992,7 +1044,7 @@ var httpapi = {
    * @api {post} /api/group/transfer/deny 移交群组: 拒绝
    * @apiName transferGroupDeny
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1028,7 +1080,7 @@ var httpapi = {
    * @api {post} /api/group/withdraw 退出群组
    * @apiName withdrawGroup
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1064,7 +1116,7 @@ var httpapi = {
    * @api {post} /api/group/dismiss 解散群组
    * @apiName dismissGroup
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1100,7 +1152,7 @@ var httpapi = {
    * @api {get} /api/group/filter 搜索过滤群组
    * @apiName filterGroup
    * @apiGroup Group
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1134,7 +1186,7 @@ var httpapi = {
    * @api {get} /api/user/follows 获取关注
    * @apiName getFollows
    * @apiGroup Social
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1171,7 +1223,7 @@ var httpapi = {
    * @api {get} /api/user/fans 获取粉丝
    * @apiName getMessages
    * @apiGroup Social
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1208,7 +1260,7 @@ var httpapi = {
    * @api {get} /api/user/friends 获取好友
    * @apiName getFriends
    * @apiGroup Social
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1244,7 +1296,7 @@ var httpapi = {
    * @api {post} /api/group/withdraw 添加关注
    * @apiName addFollow
    * @apiGroup Social
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1280,7 +1332,7 @@ var httpapi = {
    * @api {post} /api/user/unfollow 取消关注
    * @apiName unFollow
    * @apiGroup Social
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1313,10 +1365,86 @@ var httpapi = {
   },
 
   /**
+   * @api {post} /api/user/friend/add 添加好友
+   * @apiName addFriend
+   * @apiGroup Social
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 用户唯一uid
+   * @apiParam {String} notify 是否通知对方TODO，默认设置为true
+   * @apiParam {String} approve 是否需要对方同意TODO，默认设置为false
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 添加好友
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  addFriend: function(uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/friend/add?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        uid: uid,
+        notify: true,
+        approve: false,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("add friend success: ", response);
+      },
+      error: function(error) {
+        console.log("add friend error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/user/friend/remove 删除好友
+   * @apiName removeFriend
+   * @apiGroup Social
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 用户唯一uid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 删除好友
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  removeFriend: function(uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/friend/remove?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        uid: uid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("remove friend success: ", response);
+      },
+      error: function(error) {
+        console.log("remove friend error: ", error);
+      }
+    });
+  },
+
+  /**
    * @api {get} /api/user/isfollowed 判断是否关注
    * @apiName isFollowed
    * @apiGroup Social
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1350,7 +1478,7 @@ var httpapi = {
    * @api {get} /api/user/relation 判断好友关系
    * @apiName getBlocks
    * @apiGroup Social
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1384,7 +1512,7 @@ var httpapi = {
    * @api {get} /api/messages/user 分页获取拉黑访客
    * @apiName getBlocks
    * @apiGroup Social
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1420,7 +1548,7 @@ var httpapi = {
    * @api {post} /api/block/add 添加黑名单
    * @apiName addBlock
    * @apiGroup Social
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1458,7 +1586,7 @@ var httpapi = {
    * @api {post} /api/block/remove 取消黑名单
    * @apiName removeBlock
    * @apiGroup Social
-   * @apiVersion 1.4.7
+   * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌

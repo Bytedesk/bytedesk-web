@@ -62,13 +62,13 @@ var kefu = {
       } else {
         // 保存自定义用户名到服务器
         // console.log("save username 1");
-        // httpapi.saveUsername();
+        // httpapi.registerUser();
         httpapi.requestUsername();
       }
     } else if (utils.getUrlParam("username")) {
       // 保存自定义用户名到服务器
       // console.log("save username 2");
-      // httpapi.saveUsername();
+      // httpapi.registerUser();
       httpapi.requestUsername();
     } else {
       httpapi.requestUsername();

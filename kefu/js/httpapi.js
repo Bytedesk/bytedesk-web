@@ -91,7 +91,7 @@ var httpapi = {
   },
   /**
    * @api {post} /visitor/api/register/user 自定义用户名生成访客账号
-   * @apiName saveUsername
+   * @apiName registerUser
    * @apiGroup User
    * @apiVersion 1.4.7
    * @apiPermission none
@@ -106,7 +106,7 @@ var httpapi = {
    *
    * @apiUse UserResultSuccess
    */
-  saveUsername: function () {
+  registerUser: function () {
     //
     var username = utils.getUrlParam("username");
     var nickname =
@@ -124,6 +124,58 @@ var httpapi = {
         username: username,
         nickname: nickname,
         password: username, // 用户名作为默认密码
+        subDomain: data.subDomain,
+        client: data.client
+      }),
+      success:function(response){
+        // 登录
+        data.uid = response.data.uid;
+        data.username = response.data.username;
+        data.password = data.username;
+        data.nickname = response.data.nickname;
+        // 本地存储
+        localStorage.uid = data.uid;
+        localStorage.username = data.username;
+        localStorage.password = data.password;
+        // 登录
+        httpapi.login();
+      },
+      error: function(error) {
+        //Do Something to handle error
+        console.log(error);
+      }
+    });
+  },
+  /**
+   * @api {post} /visitor/api/register/user/uid 自定义用户名生成访客账号, 自定义uid
+   * @apiName registerUserUid
+   * @apiGroup User
+   * @apiVersion 1.4.7
+   * @apiPermission none
+   * 
+   * @apiParam {String} username 用户名
+   * @apiParam {String} nickname 昵称
+   * @apiParam {String} uid 用户唯一标示
+   * @apiParam {String} password 密码
+   * @apiUse SubDomainClientParam
+   * 
+   * @apiDescription 开发者在需要跟自己业务系统账号对接的情况下，
+   * 可以通过自定义用户名生成访客账号
+   *
+   * @apiUse UserResultSuccess
+   */
+  registerUserUid: function (username, nickname, uid, password) {
+    //
+    $.ajax({
+      url: data.HTTP_HOST + "/visitor/api/register/user/uid",
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({ 
+        username: username,
+        nickname: nickname,
+        uid: uid,
+        password: password,
         subDomain: data.subDomain,
         client: data.client
       }),

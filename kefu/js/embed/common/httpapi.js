@@ -91,7 +91,7 @@ var httpapi = {
   },
   /**
    * @api {post} /visitor/api/register/user 自定义用户名生成访客账号
-   * @apiName saveUsername
+   * @apiName registerUser
    * @apiGroup User
    * @apiVersion 1.4.7
    * @apiPermission none
@@ -106,7 +106,7 @@ var httpapi = {
    *
    * @apiUse UserResultSuccess
    */
-  saveUsername: function () {
+  registerUser: function () {
     //
     var username = utils.getUrlParam("username");
     var nickname =
