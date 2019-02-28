@@ -856,7 +856,43 @@ var httpapi = {
   },
 
   /**
-   * @api {post} /api/group/apply 主动申请入群
+   * @api {post} /api/group/join 主动申请入群，不需要审核
+   * @apiName joinGroup
+   * @apiGroup Group
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 主动申请入群, 不需要审核
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  joinGroup: function(gid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/apply?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("apply group success: ", response);
+      },
+      error: function(error) {
+        console.log("apply group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/group/apply 主动申请入群，需要审核
    * @apiName applyGroup
    * @apiGroup Group
    * @apiVersion 1.4.9
@@ -866,7 +902,7 @@ var httpapi = {
    * @apiParam {String} gid 群组唯一gid
    * @apiParam {String} client 固定写死为 'web'
    * 
-   * @apiDescription 主动申请入群
+   * @apiDescription 主动申请入群，需要审核
    *
    * @apiUse ResponseResultSuccess
    */
