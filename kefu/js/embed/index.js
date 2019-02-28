@@ -71,7 +71,7 @@
 
   // 样式表
   var floatCss = document.createElement('link');
-  floatCss.setAttribute('href','//127.0.0.1:8887/webchat/kefu/css/embed.css');
+  floatCss.setAttribute('href','/kefu/css/embed.css');
   floatCss.setAttribute('rel','stylesheet');
   floatCss.setAttribute('type','text/css');
   document.getElementsByTagName("head")[0].appendChild(floatCss);
@@ -85,13 +85,13 @@
     '//cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.0.0/sockjs.min.js',
     '//cdn.bytedesk.com/js/vendor/stomp/1.2/stomp.min.js',
     // 自定义的js
-    '//127.0.0.1:8887/webchat/kefu/js/embed/common/data.js',
-    '//127.0.0.1:8887/webchat/kefu/js/embed/common/utils.js',
-    '//127.0.0.1:8887/webchat/kefu/js/embed/common/httpapi.js',
-    '//127.0.0.1:8887/webchat/kefu/js/embed/common/stompapi.js',
-    '//127.0.0.1:8887/webchat/kefu/js/embed/icon.js',
-    '//127.0.0.1:8887/webchat/kefu/js/embed/html.js',
-    '//127.0.0.1:8887/webchat/kefu/js/embed/ready.js'
+    '/kefu/js/embed/common/data.js',
+    '/kefu/js/embed/common/utils.js',
+    '/kefu/js/embed/common/httpapi.js',
+    '/kefu/js/embed/common/stompapi.js',
+    '/kefu/js/embed/icon.js',
+    '/kefu/js/embed/html.js',
+    '/kefu/js/embed/ready.js'
   ];
   loadJsList(vendorJs);
 
