@@ -255,6 +255,79 @@ var httpapi = {
       }
     });
   },
+
+  /**
+   * @api {post} /api/user/nickname 设置、修改用户昵称
+   * @apiName setNickname
+   * @apiGroup User
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} nickname 用户新昵称
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 设置、修改用户昵称
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  setNickname: function(nickname) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/nickname?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        nickname: nickname,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("set nickname success: ", response);
+      },
+      error: function(error) {
+        console.log("set nickname error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/user/avatar 设置、修改用户头像
+   * @apiName setAvatar
+   * @apiGroup User
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} avatar 用户新头像
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 设置、修改用户头像
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  setAvatar: function(avatar) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/avatar?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        avatar: avatar,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("set avatar success: ", response);
+      },
+      error: function(error) {
+        console.log("set avatar error: ", error);
+      }
+    });
+  },
+
   /**
    * 获取设备指纹
    */
