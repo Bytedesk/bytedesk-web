@@ -87,6 +87,7 @@ var httpapi = {
    * 
    * @apiParam {String} username 用户名
    * @apiParam {String} nickname 昵称
+   * @apiParam {String} avatar 头像
    * @apiParam {String} uid 用户唯一标示
    * @apiParam {String} password 密码
    * @apiUse SubDomainClientParam
@@ -96,7 +97,7 @@ var httpapi = {
    *
    * @apiUse UserResultSuccess
    */
-  registerUid: function (username, nickname, uid, password) {
+  registerUid: function (username, nickname, avatar, uid, password) {
     //
     $.ajax({
       url: data.HTTP_HOST + "/visitor/api/register/user/uid",
@@ -106,6 +107,7 @@ var httpapi = {
       data: JSON.stringify({ 
         username: username,
         nickname: nickname,
+        avatar: avatar,
         uid: uid,
         password: password,
         subDomain: data.subDomain,
