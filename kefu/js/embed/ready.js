@@ -4,44 +4,44 @@
  * @author www.bytedesk.com
  * @date 2018/11/12
  */
-var kefu = {
+var bd_kfe_kefu = {
   //
   created: function() {
     console.log('created');
     // 嵌入窗口形式
-    data.adminUid = window.adminUid;
-    data.workGroupWid = window.workGroupWid;
-    data.subDomain = window.subDomain;
-    data.type = window.type;
-    data.agentUid = window.agentUid;
+    bd_kfe_data.adminUid = window.adminUid;
+    bd_kfe_data.workGroupWid = window.workGroupWid;
+    bd_kfe_data.subDomain = window.subDomain;
+    bd_kfe_data.type = window.type;
+    bd_kfe_data.agentUid = window.agentUid;
     //
-    data.uid = localStorage.uid;
-    data.username = localStorage.username;
-    data.password = localStorage.password;
-    if (data.password === undefined || data.password === null) {
-      data.password = data.username;
+    bd_kfe_data.uid = localStorage.bd_kfe_uid;
+    bd_kfe_data.username = localStorage.bd_kfe_username;
+    bd_kfe_data.password = localStorage.bd_kfe_password;
+    if (bd_kfe_data.password === undefined || bd_kfe_data.password === null) {
+      bd_kfe_data.password = bd_kfe_data.username;
     }
-    var tokenLocal = localStorage.getItem(data.token);
+    var tokenLocal = localStorage.getItem(bd_kfe_data.token);
     if (tokenLocal != null) {
-      data.passport.token = JSON.parse(tokenLocal);
+      bd_kfe_data.passport.token = JSON.parse(tokenLocal);
     }
     // TODO: 获取浏览器信息，提交给服务器
     console.log(
-      "adminUid: " + data.adminUid + 
-      " workGroupWid: " + data.workGroupWid + 
-      " subDomain: " + data.subDomain
+      "adminUid: " + bd_kfe_data.adminUid + 
+      " workGroupWid: " + bd_kfe_data.workGroupWid + 
+      " subDomain: " + bd_kfe_data.subDomain
     );
   },
   mounted: function() {
     console.log('mounted');
     if (
-      data.passport.token.access_token !== null &&
-      data.passport.token.access_token !== undefined &&
-      data.passport.token.access_token !== ""
+      bd_kfe_data.passport.token.access_token !== null &&
+      bd_kfe_data.passport.token.access_token !== undefined &&
+      bd_kfe_data.passport.token.access_token !== ""
     ) {
-      httpapi.login();
+      bd_kfe_httpapi.login();
     } else {
-      httpapi.requestUsername();
+      bd_kfe_httpapi.requestUsername();
     }
   }
 };
@@ -72,13 +72,13 @@ var kefu = {
     console.log("upload:", $(this).val(), $(this));
     //
     var formdata = new FormData();
-    formdata.append("file_name", utils.guid());
-    formdata.append("username", data.username);
+    formdata.append("file_name", bd_kfe_utils.guid());
+    formdata.append("username", bd_kfe_data.username);
     formdata.append("file", $('input[id=imagefile]')[0].files[0]);
-    formdata.append("client", data.client);
+    formdata.append("client", bd_kfe_data.client);
     //
     $.ajax({
-      url: data.HTTP_HOST + "/visitor/api/upload/image",
+      url: bd_kfe_data.HTTP_HOST + "/visitor/api/upload/image",
       contentType: false,
       cache: false,
       processData: false,
@@ -88,7 +88,7 @@ var kefu = {
       success:function(response){
         console.log('upload response:', response.data)
         var imageUrl = response.data;
-        stompapi.sendImageMessage(imageUrl);
+        bd_kfe_stompapi.sendImageMessage(imageUrl);
       },
       error: function(error) {
         console.log(error);
@@ -97,32 +97,32 @@ var kefu = {
   });
   //
   $('#byteDesk-start').click(function(){
-    if (utils.isMobile()) {
+    if (bd_kfe_utils.isMobile()) {
       console.log('is mobile browser');
-      window.open('http://www.xiaper.com');
+      window.open('https://www.bytedesk.com');
     } else {
       console.log('is pc browser');
       document.getElementById("byteDesk-app-wrapper").style.display = '';
       document.getElementById("byteDesk-start").style.display = 'none';
       // TODO: 判断是否处于会话状态，如果没有，则请求会话
-      if (data.thread.id === 0) {
-        httpapi.requestThread();
+      if (bd_kfe_data.thread.id === 0) {
+        bd_kfe_httpapi.requestThread();
       }
     }
   });
   $('#byteDesk-max').click(function(){
     // console.log('max');
-    window.open(data.URL_ROOT_PATH + 'pc.html?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph')
+    window.open(bd_kfe_data.URL_ROOT_PATH + 'pc.html?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph')
   });
   $('#byteDesk-close').click(function(){
     document.getElementById("byteDesk-app-wrapper").style.display = 'none';
     document.getElementById("byteDesk-start").style.display = '';
   });
   $('#byteDesk-input-emoji').click(function(){
-    utils.switchEmotion();
+    bd_kfe_utils.switchEmotion();
   });
   $('#byteDesk-upload-image').click(function(){
-    utils.showUploadDialog();
+    bd_kfe_utils.showUploadDialog();
   });
   $('#byteDesk-message-rate').click(function(){
     console.log('rate')
@@ -139,9 +139,9 @@ var kefu = {
   });
   $('#byteDesk-input-pc-send').click(function(){
     console.log('send text message');
-    stompapi.sendTextMessage();
+    bd_kfe_stompapi.sendTextMessage();
   });
   //
-  kefu.created();
-  kefu.mounted();
+  bd_kfe_kefu.created();
+  bd_kfe_kefu.mounted();
 })();
