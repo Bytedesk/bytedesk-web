@@ -821,7 +821,7 @@ var httpapi = {
 
   /**
    * @api {post} /api/group/invite 邀请/直接拉入群
-   * @apiName createGroup
+   * @apiName inviteGroup
    * @apiGroup Group
    * @apiVersion 1.4.9
    * @apiPermission afterLogin
