@@ -457,7 +457,7 @@ var httpapi = {
   },
 
   /**
-   * @api {get} /api/messages/contact 加载一对一联系人消息
+   * @api {get} /api/messages/contact 加载单聊聊天记录
    * @apiName getContactMessages
    * @apiGroup User
    * @apiVersion 1.4.9
@@ -468,7 +468,7 @@ var httpapi = {
    * @apiUse PageSizeClientParam
    * @apiParam {String} client 固定写死为 'web'
    * 
-   * @apiDescription 加载一对一联系人消息
+   * @apiDescription 加载单聊聊天记录
    *
    * @apiUse ResponseResultSuccess
    */
@@ -820,8 +820,8 @@ var httpapi = {
   },
 
   /**
-   * @api {post} /api/group/invite 邀请/直接拉入群
-   * @apiName inviteGroup
+   * @api {post} /api/group/invite 邀请一个人/直接拉入群
+   * @apiName inviteToGroup
    * @apiGroup Group
    * @apiVersion 1.4.9
    * @apiPermission afterLogin
@@ -831,11 +831,11 @@ var httpapi = {
    * @apiParam {String} gid 群组唯一gid
    * @apiParam {String} client 固定写死为 'web'
    * 
-   * @apiDescription 邀请/直接拉入群
+   * @apiDescription 邀请/直接拉入群，仅支持一个人
    *
    * @apiUse ResponseResultSuccess
    */
-  inviteGroup: function(uid, gid) {
+  inviteToGroup: function(uid, gid) {
     $.ajax({
       url: data.HTTP_HOST +
       "/api/group/invite?access_token=" +
@@ -846,6 +846,44 @@ var httpapi = {
       data: JSON.stringify({
         gid: gid,
         uid: uid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("invite group success: ", response);
+      },
+      error: function(error) {
+        console.log("invite group error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/group/invite/list 邀请多人/直接拉入群
+   * @apiName inviteListToGroup
+   * @apiGroup Group
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uidList 被邀请人uid数组，格式如：[111, 222, 333]
+   * @apiParam {String} gid 群组唯一gid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 邀请/直接拉入群，支持多个人
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  inviteListToGroup: function(uidList, gid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/group/invite/list?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        uidList: uidList,
         client: data.client
       }),
       success:function(response){
