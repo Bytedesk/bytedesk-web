@@ -676,6 +676,7 @@ var httpapi = {
    * 
    * @apiParam {String} access_token 访问令牌
    * @apiParam {String} nickname 群组昵称
+   * @apiParam {String} type 群组类型
    * @apiParam {String} selectedContacts 群组成员uid数组，如 [1111, 2222, 3333]
    * @apiParam {String} client 固定写死为 'web'
    * 
@@ -683,7 +684,7 @@ var httpapi = {
    *
    * @apiUse ResponseResultSuccess
    */
-  createGroup: function(nickname, selectedContacts) {
+  createGroup: function(nickname, type, selectedContacts) {
     $.ajax({
       url: data.HTTP_HOST +
       "/api/group/create?access_token=" +
@@ -693,6 +694,7 @@ var httpapi = {
       type: "post",
       data: JSON.stringify({
         nickname: nickname,
+        type: type,
         selectedContacts: selectedContacts,
         client: data.client
       }),
