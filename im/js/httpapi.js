@@ -17,6 +17,11 @@
  * 社交关系相关接口
  */
 /**
+ * @apiDefine Thread 会话
+ *
+ * 会话相关接口
+ */
+/**
  * @apiDefine SubDomainClientParam
  * @apiParam {String} subDomain 企业号，测试可填写 'vip'，上线请填写真实企业号
  * @apiParam {String} client 固定写死为 'web'
@@ -1444,7 +1449,7 @@ var httpapi = {
   },
 
   /**
-   * @api {post} /api/group/withdraw 添加关注
+   * @api {post} /api/user/follow 添加关注
    * @apiName addFollow
    * @apiGroup Social
    * @apiVersion 1.4.9
@@ -1763,6 +1768,290 @@ var httpapi = {
       },
       error: function(error) {
         console.log("isfollowed error:", error);
+      }
+    });
+  },
+
+  /**
+   * @api {get} /api/thread/get 加载会话列表
+   * @apiName getThreads
+   * @apiGroup Thread
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 加载会话列表
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  getThreads: function(uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/get?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        client: data.client
+      },
+      success:function(response){
+        console.log("get threads success:", response);
+      },
+      error: function(error) {
+        console.log("get thread error:", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/thread/mark/top 置顶会话
+   * @apiName markThreadTop
+   * @apiGroup Thread
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 置顶会话
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  markThreadTop: function(tid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/mark/top?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        tid: tid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("mark thread top success: ", response);
+      },
+      error: function(error) {
+        console.log("mark thread top error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/thread/unmark/top 取消置顶会话
+   * @apiName unmarkThreadTop
+   * @apiGroup Thread
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 取消置顶会话
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  unmarkThreadTop: function(tid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/unmark/top?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        tid: tid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("unmark thread top success: ", response);
+      },
+      error: function(error) {
+        console.log("unmark thread top error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/thread/mark/nodisturb 设置会话免打扰
+   * @apiName markThreadNoDisturb
+   * @apiGroup Thread
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 设置会话免打扰
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  markThreadNoDisturb: function(tid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/mark/nodisturb?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        tid: tid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("mark thread nodisturb success: ", response);
+      },
+      error: function(error) {
+        console.log("mark thread nodisturb error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/thread/unmark/nodisturb 取消会话免打扰
+   * @apiName unmarkThreadNoDisturb
+   * @apiGroup Thread
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 取消会话免打扰
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  unmarkThreadNoDisturb: function(tid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/unmark/nodisturb?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        tid: tid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("mark thread nodisturb success: ", response);
+      },
+      error: function(error) {
+        console.log("mark thread nodisturb error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/thread/mark/unread 标记未读会话
+   * @apiName markThreadUnread
+   * @apiGroup Thread
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 标记未读会话
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  markThreadUnread: function(tid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/mark/unread?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        tid: tid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("mark thread unread success: ", response);
+      },
+      error: function(error) {
+        console.log("mark thread unread error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/thread/unmark/unread 取消标记未读会话
+   * @apiName unmarkThreadUnread
+   * @apiGroup Thread
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 取消标记未读会话
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  unmarkThreadUnread: function(tid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/unmark/unread?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        tid: tid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("unmark thread unread success: ", response);
+      },
+      error: function(error) {
+        console.log("unmark thread unread error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/thread/unmark/deleted 标记会话已删除
+   * @apiName markThreadDeleted
+   * @apiGroup Thread
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 标记会话已删除
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  markThreadDeleted: function(tid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/unmark/deleted?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        tid: tid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("unmark thread deleted success: ", response);
+      },
+      error: function(error) {
+        console.log("unmark thread deleted error: ", error);
       }
     });
   }
