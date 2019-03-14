@@ -478,10 +478,11 @@ var httpapi = {
       }
     });
   },
+
   /**
    * @api {get} /api/thread/request 请求会话
    * @apiName requestThread
-   * @apiGroup User
+   * @apiGroup Thread
    * @apiVersion 1.4.7
    * @apiPermission afterLogin
    * 
@@ -591,6 +592,7 @@ var httpapi = {
     // 请求指纹
     httpapi.fingerPrint2();
   },
+
   /**
    * @api {get} /api/answer/init 请求机器人问答
    * @apiName requestRobot
@@ -612,6 +614,7 @@ var httpapi = {
     console.log("自助答疑");
     httpapi.initAnswer();
   },
+  
   /**
    * @api {get} /api/rate/do 满意度评价
    * @apiName rate
@@ -680,6 +683,7 @@ var httpapi = {
       }
     });
   },
+
   /**
    * @api {get} /api/thread/visitor/close 关闭当前窗口
    * @apiName closeWebPage
@@ -735,6 +739,46 @@ var httpapi = {
       }
     });
   },
+
+  /**
+   * @api {get} /api/thread/update/current 设置当前会话
+   * @apiName updateCurrentThread
+   * @apiGroup Thread
+   * @apiVersion 1.4.7
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} preTid 当前会话tid
+   * @apiParam {String} tid 新会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 设置当前会话
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  updateCurrentThread: function (preTid, tid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/update/current?access_token=" +
+      data.passport.token.access_token,
+      type: "post",
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      data: JSON.stringify({
+        preTid: preTid,
+        tid: tid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("update current thread: ", response.data);
+      },
+      error: function(error) {
+        console.log(error);
+        alert(error);
+      }
+    });
+  },
+
   /**
    * @api {get} /api/messages/user 加载更多聊天记录
    * @apiName loadMoreMessages
