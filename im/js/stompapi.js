@@ -1,33 +1,118 @@
 /**
- * 
+ * bytedesk.com
+ */
+/**
+ * @apiDefine Message 消息
+ *
+ * 发送消息相关接口
+ */
+/**
+ * @apiDefine ResponseResultSuccess
+ * @apiSuccess {String} message 返回提示
+ * @apiSuccess {Number} status_code 状态码
+ * @apiSuccess {String} data 返回内容
  */
 var stompapi = {
   /**
-   * 发送同步消息
+   * @api {post} /api/v2/messages/send 同步发送文本消息
+   * @apiName sendTextMessageSync
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} id 当sesstionType == 'thread'的时候填写会话 tid，当为 'contact'的时候为用户uid，当为'group'的时候，为群组gid
+   * @apiParam {String} content 内容
+   * @apiParam {String} sesstionType，有三种类型：'thread' 代表客服会话, 'contact'代表单聊, 'group'代表群聊
+   * 
+   * @apiDescription
+   * 客服会话：stompapi.send('xxx', 'hello world', 'thread')
+   * 单聊：stompapi.send('xxx', 'hello world', 'contact')
+   * 群聊：stompapi.send('xxxx', 'hello world', 'group')
+   *
+   * @apiUse ResponseResultSuccess
    */
-  sendTextMessageSync: function (content) {
-    stompapi.sendMessageSync("text", content);
+  sendTextMessageSync: function (id, content, sessionType) {
+    stompapi.sendMessageSync(id, "text", content, sessionType);
   },
-  sendImageMessageSync: function (content) {
-    stompapi.sendMessageSync("image", content);
+  /**
+   * @api {post} /api/v2/messages/send 同步发送图片消息
+   * @apiName sendImageMessageSync
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} id 当sesstionType == 'thread'的时候填写会话 tid，当为 'contact'的时候为用户uid，当为'group'的时候，为群组gid
+   * @apiParam {String} content 图片URL
+   * @apiParam {String} sesstionType，有三种类型：'thread' 代表客服会话, 'contact'代表单聊, 'group'代表群聊
+   * 
+   * @apiDescription
+   * 客服会话：stompapi.send('xxx', 'hello world', 'thread')
+   * 单聊：stompapi.send('xxx', 'hello world', 'contact')
+   * 群聊：stompapi.send('xxxx', 'hello world', 'group')
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  sendImageMessageSync: function (id, content, sessionType) {
+    stompapi.sendMessageSync(id, "image", content, sessionType);
   },
-  sendMessageSync: function (type, content) {
+  /**
+   * @api {post} /api/v2/messages/send 同步发送商品消息
+   * @apiName sendCommodityMessageSync
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} id 当sesstionType == 'thread'的时候填写会话 tid，当为 'contact'的时候为用户uid，当为'group'的时候，为群组gid
+   * @apiParam {String} content 可自定义为json字符串
+   * @apiParam {String} sesstionType，有三种类型：'thread' 代表客服会话, 'contact'代表单聊, 'group'代表群聊
+   * 
+   * @apiDescription 实例：var contentObject = { 'type': 'commodity', 'title': '商品标题', 'content': '商品详情', 'price': '¥9.99', 'url': 'https://item.m.jd.com/product/12172344.html', 'imageUrl': 'https://m.360buyimg.com/mobilecms/s750x750_jfs/t4483/332/2284794111/122812/4bf353/58ed7f42Nf16d6b20.jpg!q80.dpg' }
+   * var content = JSON.stringfy(contentObject)
+   * stompapi.sendCommodityMessageSync('xxx', content, 'contact')
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  sendCommodityMessageSync: function (id, content, sessionType) {
+    stompapi.sendMessageSync(id, "commodity", content, sessionType);
+  },
+  /**
+   * @api {post} /api/v2/messages/send 同步发送消息
+   * @apiName sendMessageSync
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} id 当sesstionType == 'thread'的时候填写会话 tid，当为 'contact'的时候为用户uid，当为'group'的时候，为群组gid
+   * @apiParam {String} type 消息类型，如：文字消息为 'text', 图片消息为 'image', 商品消息为 'commodity'
+   * @apiParam {String} content 消息内容
+   * @apiParam {String} sesstionType，有三种类型：'thread' 代表客服会话, 'contact'代表单聊, 'group'代表群聊
+   * 
+   * @apiDescription
+   * 客服会话：stompapi.send('xxx', 'text', 'hello world', 'thread')
+   * 单聊：stompapi.send('xxx', 'image', 'hello world', 'contact')
+   * 群聊：stompapi.send('xxxx', 'commodity', 'hello world', 'group')
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  sendMessageSync: function (id, type, content, sessionType) {
     //
-    var localId = utils.guid();
     $.ajax({
       url: data.HTTP_HOST +
-      "/api/messages/send?access_token=" +
+      "/api/v2/messages/send?access_token=" +
       data.passport.token.access_token,
       type: "post",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify({
-        tid: data.thread.tid,
+        tid: id,
         type: type,
         content: content,
+        username: data.username,
         status: "sending",
-        localId: localId,
-        sessionType: "thread",
+        localId: utils.guid(),
+        sessionType: sessionType,
+        voiceLength: 0,
+        format: "amr",
         client: data.client
       }),
       success:function(response){
@@ -42,8 +127,16 @@ var stompapi = {
     });
   },
   /**
-   * 必须添加前缀 '/topic/'
-   * @param topic
+   * @api {} 长连接订阅主题
+   * @apiName subscribeTopic
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} topic 订阅主题
+   * 
+   * @apiDescription 用户登录成功之后必须订阅相关主题才能接收到消息。
+   * 其中：客服会话主题格式为：'thread.xxxx'，单聊主题格式为：'contact.xxx'，群聊主题格式为：'group.xxx'
    */
   subscribeTopic: function (topic) {
     // 防止重复订阅
@@ -125,6 +218,18 @@ var stompapi = {
       })
     );
   },
+  /**
+   * @api {} 发送消息回执
+   * @apiName sendReceiptMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} mid 消息mid
+   * @apiParam {String} status 消息状态
+   * 
+   * @apiDescription 发送消息回执
+   */
   sendReceiptMessage: function (mid, status) {
     // 收到消息后，向服务器发送回执
     data.stompClient.send(
@@ -139,8 +244,15 @@ var stompapi = {
     );
   },
   /**
-   * 发送联系人文本信息
-   * var payload = { uid: '' content: '' }
+   * @api {} 发送单聊文本消息
+   * @apiName sendContactTextMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
+   * 
+   * @apiDescription 发送单聊文本消息
    */
   sendContactTextMessage: function(payload) {
     var uid = payload.uid
@@ -154,8 +266,15 @@ var stompapi = {
   },
 
   /**
-   * 发送联系人图片消息
-   * var payload = { uid: '' content: '' }
+   * @api {} 发送单聊图片消息
+   * @apiName sendContactImageMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
+   * 
+   * @apiDescription 发送单聊图片消息
    */
   sendContactImageMessage: function(payload){
     var uid = payload.uid
@@ -169,7 +288,15 @@ var stompapi = {
   },
 
   /**
-   * 发送联系人文件消息
+   * @api {} 发送单聊文件消息
+   * @apiName sendContactFileMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
+   * 
+   * @apiDescription 发送单聊文件消息
    */
   sendContactFileMessage: function(payload) {
     var uid = payload.uid
@@ -185,8 +312,15 @@ var stompapi = {
   },
 
   /**
-   * 发送自定义消息
-   * var payload = { uid: '' content: '' }
+   * @api {} 发送单聊自定义类型消息
+   * @apiName sendContactFileMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
+   * 
+   * @apiDescription 发送单聊自定义类型消息
    */
   sendContactCustomMessage: function(payload){
     var uid = payload.uid
@@ -200,8 +334,15 @@ var stompapi = {
   },
 
   /**
-   * 发送群组文本信息
-   * var payload = { uid: '' content: '' }
+   * @api {} 发送群聊文本消息
+   * @apiName sendGroupTextMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
+   * 
+   * @apiDescription 发送群聊文本消息
    */
   sendGroupTextMessage: function(payload) {
     var uid = payload.uid
@@ -215,8 +356,15 @@ var stompapi = {
   },
 
   /**
-   * 发送群组图片消息
-   * var payload = { uid: '' content: '' }
+   * @api {} 发送群聊图片消息
+   * @apiName sendGroupImageMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
+   * 
+   * @apiDescription 发送群聊图片消息
    */
   sendGroupImageMessage: function(payload) {
     var uid = payload.uid
@@ -230,7 +378,15 @@ var stompapi = {
   },
 
   /**
-   * 发送群组文件消息
+   * @api {} 发送群聊文件消息
+   * @apiName sendGroupFileMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
+   * 
+   * @apiDescription 发送群聊文件消息
    */
   sendGroupFileMessage: function(payload) {
     var uid = payload.uid
@@ -246,8 +402,15 @@ var stompapi = {
   },
 
   /**
-   * 发送自定义消息
-   * var payload = { uid: '' content: '' }
+   * @api {} 发送群聊自定义类型消息
+   * @apiName sendGroupCustomMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
+   * 
+   * @apiDescription 发送群聊自定义类型消息
    */
   sendGroupCustomMessage: function(payload) {
     var uid = payload.uid
@@ -259,8 +422,15 @@ var stompapi = {
       'localId': utils.guid(),
       'client': data.client}))
   },
+  
   /**
-   * 建立长连接
+   * @api {} 建立长连接
+   * @apiName byteDeskConnect
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission none
+   * 
+   * @apiDescription 建立长连接
    */
   byteDeskConnect: function () {
     console.log('start stomp connection');
