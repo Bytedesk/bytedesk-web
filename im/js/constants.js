@@ -13,6 +13,10 @@ var constants = {
   MESSAGE_TYPE_VIDEO: 'video',
   // 自定义消息类型
   MESSAGE_TYPE_CUSTOM: 'custom',
+  // 红包
+  MESSAGE_TYPE_RED_PACKET: 'red_packet',
+  // 商品
+  MESSAGE_TYPE_COMMODITY: 'commodity',
   // 短视频消息类型
   MESSAGE_TYPE_SHORT_VIDEO: 'shortvideo',
   // 位置消息类型

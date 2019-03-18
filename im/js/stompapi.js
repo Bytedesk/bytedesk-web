@@ -135,7 +135,7 @@ var stompapi = {
    * 
    * @apiParam {String} topic 订阅主题
    * 
-   * @apiDescription 用户登录成功之后必须订阅相关主题才能接收到消息。
+   * @apiDescription 用户登录成功之后必须订阅相关主题才能接收到消息。长连接形式，不支持http请求。
    * 其中：客服会话主题格式为：'thread.xxxx'，单聊主题格式为：'contact.xxx'，群聊主题格式为：'group.xxx'
    */
   subscribeTopic: function (topic) {
@@ -228,7 +228,7 @@ var stompapi = {
    * @apiParam {String} mid 消息mid
    * @apiParam {String} status 消息状态
    * 
-   * @apiDescription 发送消息回执
+   * @apiDescription 发送消息回执。长连接形式，不支持http请求
    */
   sendReceiptMessage: function (mid, status) {
     // 收到消息后，向服务器发送回执
@@ -252,7 +252,7 @@ var stompapi = {
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
    * 
-   * @apiDescription 发送单聊文本消息
+   * @apiDescription 发送单聊文本消息。长连接形式，不支持http请求
    */
   sendContactTextMessage: function(payload) {
     var uid = payload.uid
@@ -274,7 +274,7 @@ var stompapi = {
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
    * 
-   * @apiDescription 发送单聊图片消息
+   * @apiDescription 发送单聊图片消息。长连接形式，不支持http请求。
    */
   sendContactImageMessage: function(payload){
     var uid = payload.uid
@@ -296,7 +296,7 @@ var stompapi = {
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
    * 
-   * @apiDescription 发送单聊文件消息
+   * @apiDescription 发送单聊文件消息。长连接形式，不支持http请求。
    */
   sendContactFileMessage: function(payload) {
     var uid = payload.uid
@@ -313,14 +313,14 @@ var stompapi = {
 
   /**
    * @api {} 发送单聊自定义类型消息
-   * @apiName sendContactFileMessage
+   * @apiName sendContactCustomMessage
    * @apiGroup Message
    * @apiVersion 1.4.9
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
    * 
-   * @apiDescription 发送单聊自定义类型消息
+   * @apiDescription 发送单聊自定义类型消息。长连接形式，不支持http请求。
    */
   sendContactCustomMessage: function(payload){
     var uid = payload.uid
@@ -328,6 +328,32 @@ var stompapi = {
     var topic = 'contact.' + uid
     data.stompClient.send('/app/' + topic, {}, JSON.stringify({
       'type': constants.MESSAGE_TYPE_CUSTOM,
+      'content': content,
+      'localId': utils.guid(),
+      'client': data.client}))
+  },
+
+  /**
+   * @api {} 发送单聊商品消息
+   * @apiName sendContactCommodityMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
+   * 实例：var contentObject = { 'type': 'commodity', 'title': '商品标题', 'content': '商品详情', 'price': '¥9.99', 'url': 'https://item.m.jd.com/product/12172344.html', 'imageUrl': 'https://m.360buyimg.com/mobilecms/s750x750_jfs/t4483/332/2284794111/122812/4bf353/58ed7f42Nf16d6b20.jpg!q80.dpg' }
+   * var content = JSON.stringfy(contentObject)
+   * var payload = { uid: '', content: content}
+   * stompapi.sendContactCommodityMessage(payload)
+   * 
+   * @apiDescription 发送群聊商品消息。长连接形式，不支持http请求。
+   */
+  sendContactCommodityMessage: function(payload) {
+    var uid = payload.uid
+    var content = payload.content
+    var topic = 'contact.' + uid
+    data.stompClient.send('/app/' + topic, {}, JSON.stringify({
+      'type': constants.MESSAGE_TYPE_COMMODITY,
       'content': content,
       'localId': utils.guid(),
       'client': data.client}))
@@ -342,7 +368,7 @@ var stompapi = {
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
    * 
-   * @apiDescription 发送群聊文本消息
+   * @apiDescription 发送群聊文本消息。长连接形式，不支持http请求。
    */
   sendGroupTextMessage: function(payload) {
     var uid = payload.uid
@@ -364,7 +390,7 @@ var stompapi = {
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
    * 
-   * @apiDescription 发送群聊图片消息
+   * @apiDescription 发送群聊图片消息。长连接形式，不支持http请求。
    */
   sendGroupImageMessage: function(payload) {
     var uid = payload.uid
@@ -386,7 +412,7 @@ var stompapi = {
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
    * 
-   * @apiDescription 发送群聊文件消息
+   * @apiDescription 发送群聊文件消息。长连接形式，不支持http请求。
    */
   sendGroupFileMessage: function(payload) {
     var uid = payload.uid
@@ -410,7 +436,7 @@ var stompapi = {
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
    * 
-   * @apiDescription 发送群聊自定义类型消息
+   * @apiDescription 发送群聊自定义类型消息。长连接形式，不支持http请求。
    */
   sendGroupCustomMessage: function(payload) {
     var uid = payload.uid
@@ -418,6 +444,32 @@ var stompapi = {
     var topic = 'group.' + uid
     data.stompClient.send('/app/' + topic, {}, JSON.stringify({
       'type': constants.MESSAGE_TYPE_CUSTOM,
+      'content': content,
+      'localId': utils.guid(),
+      'client': data.client}))
+  },
+
+  /**
+   * @api {} 发送群聊商品消息
+   * @apiName sendGroupCommodityMessage
+   * @apiGroup Message
+   * @apiVersion 1.4.9
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
+   * 实例：var contentObject = { 'type': 'commodity', 'title': '商品标题', 'content': '商品详情', 'price': '¥9.99', 'url': 'https://item.m.jd.com/product/12172344.html', 'imageUrl': 'https://m.360buyimg.com/mobilecms/s750x750_jfs/t4483/332/2284794111/122812/4bf353/58ed7f42Nf16d6b20.jpg!q80.dpg' }
+   * var content = JSON.stringfy(contentObject)
+   * var payload = { uid: '', content: content}
+   * stompapi.sendGroupCommodityMessage(payload)
+   * 
+   * @apiDescription 发送群聊商品消息。长连接形式，不支持http请求。
+   */
+  sendGroupCommodityMessage: function(payload) {
+    var uid = payload.uid
+    var content = payload.content
+    var topic = 'group.' + uid
+    data.stompClient.send('/app/' + topic, {}, JSON.stringify({
+      'type': constants.MESSAGE_TYPE_COMMODITY,
       'content': content,
       'localId': utils.guid(),
       'client': data.client}))
@@ -430,7 +482,7 @@ var stompapi = {
    * @apiVersion 1.4.9
    * @apiPermission none
    * 
-   * @apiDescription 建立长连接
+   * @apiDescription 建立长连接。长连接形式，不支持http请求。
    */
   byteDeskConnect: function () {
     console.log('start stomp connection');

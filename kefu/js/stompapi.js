@@ -320,7 +320,7 @@ var stompapi = {
    * @apiVersion 1.4.9
    * @apiPermission none
    * 
-   * @apiDescription 建立长连接
+   * @apiDescription 建立长连接。长连接形式，不支持http请求。
    */
   byteDeskConnect: function () {
     console.log('start stomp connection');
