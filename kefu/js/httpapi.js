@@ -150,7 +150,7 @@ var httpapi = {
    * @api {post} /visitor/api/register/user/uid 自定义用户名生成访客账号, 自定义uid
    * @apiName registerUserUid
    * @apiGroup User
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiParam {String} username 用户名
@@ -262,7 +262,7 @@ var httpapi = {
    * @api {post} /api/user/nickname 设置、修改用户昵称
    * @apiName setNickname
    * @apiGroup User
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -298,7 +298,7 @@ var httpapi = {
    * @api {post} /api/user/avatar 设置、修改用户头像
    * @apiName setAvatar
    * @apiGroup User
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌

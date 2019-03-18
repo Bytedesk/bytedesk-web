@@ -49,7 +49,7 @@ var httpapi = {
    * @api {post} /visitor/api/register/user 注册
    * @apiName register
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiParam {String} username 用户名
@@ -87,7 +87,7 @@ var httpapi = {
    * @api {post} /visitor/api/register/user/uid 自定义用户名生成访客账号, 自定义uid
    * @apiName registerUserUid
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiParam {String} username 用户名
@@ -141,7 +141,7 @@ var httpapi = {
    * @api {post} /oauth/token 登录
    * @apiName login
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiHeader {String} Authorization 值固定写死为: 'Basic Y2xpZW50OnNlY3JldA=='
@@ -179,7 +179,7 @@ var httpapi = {
    * @api {post} /oauth/token 调用授权接口
    * @apiName doLogin
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiHeader {String} Authorization 值固定写死为: 'Basic Y2xpZW50OnNlY3JldA=='
@@ -240,7 +240,7 @@ var httpapi = {
    * @api {get} /api/user/init 初始化加载基本信息
    * @apiName init
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -320,7 +320,7 @@ var httpapi = {
    * @api {get} /api/user/profile 加载用户个人资料
    * @apiName userProfile
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -357,7 +357,7 @@ var httpapi = {
    * @api {get} /api/user/detail 加载用户个人资料
    * @apiName userDetail
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -396,7 +396,7 @@ var httpapi = {
    * @api {post} /api/user/logout 退出登录
    * @apiName logout
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -433,7 +433,7 @@ var httpapi = {
    * @api {post} /api/user/nickname 设置、修改用户昵称
    * @apiName setNickname
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -469,7 +469,7 @@ var httpapi = {
    * @api {post} /api/user/avatar 设置、修改用户头像
    * @apiName setAvatar
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -505,7 +505,7 @@ var httpapi = {
    * @api {get} /api/messages/user 加载客服会话访客聊天记录
    * @apiName getMessages
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -541,7 +541,7 @@ var httpapi = {
    * @api {get} /api/messages/contact 加载单聊聊天记录
    * @apiName getContactMessages
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -578,7 +578,7 @@ var httpapi = {
    * @api {get} /api/messages/group 加载群组聊天记录
    * @apiName getGroupMessages
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -615,7 +615,7 @@ var httpapi = {
    * @api {get} /api/user/contacts 获取客服全部联系人
    * @apiName getContacts
    * @apiGroup User
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -650,7 +650,7 @@ var httpapi = {
    * @api {get} /api/user/contacts 获取全部群组
    * @apiName getGroups
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -684,7 +684,7 @@ var httpapi = {
    * @api {get} /api/group/detail 获取群组详情
    * @apiName getGroupDetail
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -718,7 +718,7 @@ var httpapi = {
    * @api {get} /api/group/members 获取群组全部成员
    * @apiName getContacts
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -752,7 +752,7 @@ var httpapi = {
    * @api {post} /api/group/create 创建群组
    * @apiName createGroup
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -792,7 +792,7 @@ var httpapi = {
    * @api {post} /api/group/update/nickname 更新群组: 群名称等
    * @apiName updateGroupNickname
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -830,7 +830,7 @@ var httpapi = {
    * @api {post} /api/group/create 更新群组公告
    * @apiName updateGroupAnnouncement
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -868,7 +868,7 @@ var httpapi = {
    * @api {post} /api/group/update/description 更新群组简介
    * @apiName updateGroupDescription
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -906,7 +906,7 @@ var httpapi = {
    * @api {post} /api/group/invite 邀请一个人/直接拉入群
    * @apiName inviteToGroup
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -944,7 +944,7 @@ var httpapi = {
    * @api {post} /api/group/invite/list 邀请多人/直接拉入群
    * @apiName inviteListToGroup
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -982,7 +982,7 @@ var httpapi = {
    * @api {post} /api/group/join 主动申请入群，不需要审核
    * @apiName joinGroup
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1018,7 +1018,7 @@ var httpapi = {
    * @api {post} /api/group/apply 主动申请入群，需要审核
    * @apiName applyGroup
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1054,7 +1054,7 @@ var httpapi = {
    * @api {post} /api/group/apply/approve 主动申请入群：同意
    * @apiName applyGroupApprove
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1090,7 +1090,7 @@ var httpapi = {
    * @api {post} /api/group/apply/deny 主动申请入群:拒绝
    * @apiName applyGroupDeny
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1126,7 +1126,7 @@ var httpapi = {
    * @api {post} /api/group/kick 踢人
    * @apiName kickGroupMember
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1164,7 +1164,7 @@ var httpapi = {
    * @api {post} /api/group/mute 禁言
    * @apiName muteGroupMember
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1202,7 +1202,7 @@ var httpapi = {
    * @api {post} /api/group/transfer 移交群组
    * @apiName transferGroup
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1240,7 +1240,7 @@ var httpapi = {
    * @api {post} /api/group/transfer/approve 移交群组：同意
    * @apiName transferGroupApprove
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1276,7 +1276,7 @@ var httpapi = {
    * @api {post} /api/group/transfer/deny 移交群组: 拒绝
    * @apiName transferGroupDeny
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1312,7 +1312,7 @@ var httpapi = {
    * @api {post} /api/group/withdraw 退出群组
    * @apiName withdrawGroup
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1348,7 +1348,7 @@ var httpapi = {
    * @api {post} /api/group/dismiss 解散群组
    * @apiName dismissGroup
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1384,7 +1384,7 @@ var httpapi = {
    * @api {get} /api/group/filter 搜索过滤群组
    * @apiName filterGroup
    * @apiGroup Group
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1418,7 +1418,7 @@ var httpapi = {
    * @api {get} /api/user/follows 获取关注
    * @apiName getFollows
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1455,7 +1455,7 @@ var httpapi = {
    * @api {get} /api/user/fans 获取粉丝
    * @apiName getMessages
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1492,7 +1492,7 @@ var httpapi = {
    * @api {get} /api/user/friends 获取好友
    * @apiName getFriends
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1528,7 +1528,7 @@ var httpapi = {
    * @api {post} /api/user/follow 添加关注
    * @apiName addFollow
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1564,7 +1564,7 @@ var httpapi = {
    * @api {post} /api/user/unfollow 取消关注
    * @apiName unFollow
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1600,7 +1600,7 @@ var httpapi = {
    * @api {post} /api/user/friend/add 添加好友
    * @apiName addFriend
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1640,7 +1640,7 @@ var httpapi = {
    * @api {post} /api/user/friend/remove 删除好友
    * @apiName removeFriend
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1676,7 +1676,7 @@ var httpapi = {
    * @api {get} /api/user/isfollowed 判断是否关注
    * @apiName isFollowed
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1710,7 +1710,7 @@ var httpapi = {
    * @api {get} /api/user/relation 判断好友关系
    * @apiName getRelation
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1744,7 +1744,7 @@ var httpapi = {
    * @api {get} /api/user/shield 判断自己是否已经屏蔽对方
    * @apiName isShield
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1778,7 +1778,7 @@ var httpapi = {
    * @api {get} /api/user/shielded 判断自己是否已经被对方屏蔽
    * @apiName isShield
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1812,7 +1812,7 @@ var httpapi = {
    * @api {post} /api/user/shield 屏蔽对方，则对方无法给自己发送消息。但自己仍然可以给对方发送消息
    * @apiName shield
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1846,7 +1846,7 @@ var httpapi = {
    * @api {post} /api/user/unshield 取消屏蔽
    * @apiName unshield
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1880,7 +1880,7 @@ var httpapi = {
    * @api {get} /api/messages/user 分页获取拉黑访客
    * @apiName getBlocks
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1916,7 +1916,7 @@ var httpapi = {
    * @api {post} /api/block/add 添加黑名单
    * @apiName addBlock
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1954,7 +1954,7 @@ var httpapi = {
    * @api {post} /api/block/remove 取消黑名单
    * @apiName removeBlock
    * @apiGroup Social
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1988,7 +1988,7 @@ var httpapi = {
    * @api {get} /api/thread/get 加载会话列表
    * @apiName getThreads
    * @apiGroup Thread
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -2020,7 +2020,7 @@ var httpapi = {
    * @api {post} /api/thread/mark/top 置顶会话
    * @apiName markThreadTop
    * @apiGroup Thread
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -2056,7 +2056,7 @@ var httpapi = {
    * @api {post} /api/thread/unmark/top 取消置顶会话
    * @apiName unmarkThreadTop
    * @apiGroup Thread
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -2092,7 +2092,7 @@ var httpapi = {
    * @api {post} /api/thread/mark/nodisturb 设置会话免打扰
    * @apiName markThreadNoDisturb
    * @apiGroup Thread
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -2128,7 +2128,7 @@ var httpapi = {
    * @api {post} /api/thread/unmark/nodisturb 取消会话免打扰
    * @apiName unmarkThreadNoDisturb
    * @apiGroup Thread
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -2164,7 +2164,7 @@ var httpapi = {
    * @api {post} /api/thread/mark/unread 标记未读会话
    * @apiName markThreadUnread
    * @apiGroup Thread
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -2200,7 +2200,7 @@ var httpapi = {
    * @api {post} /api/thread/unmark/unread 取消标记未读会话
    * @apiName unmarkThreadUnread
    * @apiGroup Thread
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -2236,7 +2236,7 @@ var httpapi = {
    * @api {post} /api/thread/unmark/deleted 标记会话已删除
    * @apiName markThreadDeleted
    * @apiGroup Thread
-   * @apiVersion 1.5.5
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌

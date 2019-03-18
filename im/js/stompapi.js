@@ -17,7 +17,7 @@ var stompapi = {
    * @api {post} /api/v2/messages/send 同步发送文本消息
    * @apiName sendTextMessageSync
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} id 当sesstionType == 'thread'的时候填写会话 tid，当为 'contact'的时候为用户uid，当为'group'的时候，为群组gid
@@ -38,7 +38,7 @@ var stompapi = {
    * @api {post} /api/v2/messages/send 同步发送图片消息
    * @apiName sendImageMessageSync
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} id 当sesstionType == 'thread'的时候填写会话 tid，当为 'contact'的时候为用户uid，当为'group'的时候，为群组gid
@@ -59,7 +59,7 @@ var stompapi = {
    * @api {post} /api/v2/messages/send 同步发送商品消息
    * @apiName sendCommodityMessageSync
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} id 当sesstionType == 'thread'的时候填写会话 tid，当为 'contact'的时候为用户uid，当为'group'的时候，为群组gid
@@ -79,7 +79,7 @@ var stompapi = {
    * @api {post} /api/v2/messages/send 同步发送消息
    * @apiName sendMessageSync
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} id 当sesstionType == 'thread'的时候填写会话 tid，当为 'contact'的时候为用户uid，当为'group'的时候，为群组gid
@@ -130,7 +130,7 @@ var stompapi = {
    * @api {} 长连接订阅主题
    * @apiName subscribeTopic
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} topic 订阅主题
@@ -222,7 +222,7 @@ var stompapi = {
    * @api {} 发送消息回执
    * @apiName sendReceiptMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} mid 消息mid
@@ -247,7 +247,7 @@ var stompapi = {
    * @api {} 发送单聊文本消息
    * @apiName sendContactTextMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
@@ -269,7 +269,7 @@ var stompapi = {
    * @api {} 发送单聊图片消息
    * @apiName sendContactImageMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
@@ -291,7 +291,7 @@ var stompapi = {
    * @api {} 发送单聊文件消息
    * @apiName sendContactFileMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
@@ -315,7 +315,7 @@ var stompapi = {
    * @api {} 发送单聊自定义类型消息
    * @apiName sendContactCustomMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
@@ -337,7 +337,7 @@ var stompapi = {
    * @api {} 发送单聊商品消息
    * @apiName sendContactCommodityMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
@@ -363,7 +363,7 @@ var stompapi = {
    * @api {} 发送群聊文本消息
    * @apiName sendGroupTextMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
@@ -385,7 +385,7 @@ var stompapi = {
    * @api {} 发送群聊图片消息
    * @apiName sendGroupImageMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
@@ -407,7 +407,7 @@ var stompapi = {
    * @api {} 发送群聊文件消息
    * @apiName sendGroupFileMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
@@ -431,7 +431,7 @@ var stompapi = {
    * @api {} 发送群聊自定义类型消息
    * @apiName sendGroupCustomMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
@@ -453,7 +453,7 @@ var stompapi = {
    * @api {} 发送群聊商品消息
    * @apiName sendGroupCommodityMessage
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} payload，格式为 var payload = { uid: '', content: '' }
@@ -479,7 +479,7 @@ var stompapi = {
    * @api {} 建立长连接
    * @apiName byteDeskConnect
    * @apiGroup Message
-   * @apiVersion 1.4.9
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiDescription 建立长连接。长连接形式，不支持http请求。
