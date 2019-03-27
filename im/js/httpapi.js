@@ -22,6 +22,11 @@
  * 会话相关接口
  */
 /**
+ * @apiDefine Message 消息
+ *
+ * 消息相关接口
+ */
+/**
  * @apiDefine SubDomainClientParam
  * @apiParam {String} subDomain 企业号，测试可填写 'vip'，上线请填写真实企业号
  * @apiParam {String} client 固定写死为 'web'
@@ -1776,7 +1781,7 @@ var httpapi = {
 
   /**
    * @api {get} /api/user/shielded 判断自己是否已经被对方屏蔽
-   * @apiName isShield
+   * @apiName isShielded
    * @apiGroup Social
    * @apiVersion 1.5.6
    * @apiPermission afterLogin
@@ -2233,7 +2238,7 @@ var httpapi = {
   },
 
   /**
-   * @api {post} /api/thread/unmark/deleted 标记会话已删除
+   * @api {post} /api/thread/mark/deleted 标记会话已删除
    * @apiName markThreadDeleted
    * @apiGroup Thread
    * @apiVersion 1.5.6
@@ -2250,7 +2255,7 @@ var httpapi = {
   markThreadDeleted: function(tid) {
     $.ajax({
       url: data.HTTP_HOST +
-      "/api/thread/unmark/deleted?access_token=" +
+      "/api/thread/mark/deleted?access_token=" +
       data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
@@ -2260,10 +2265,118 @@ var httpapi = {
         client: data.client
       }),
       success:function(response){
-        console.log("unmark thread deleted success: ", response);
+        console.log("mark thread deleted success: ", response);
       },
       error: function(error) {
-        console.log("unmark thread deleted error: ", error);
+        console.log("mark thread deleted error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/messages/mark/clear/thread 清空客服会话聊天记录
+   * @apiName markClearThreadMessages
+   * @apiGroup Message
+   * @apiVersion 1.5.6
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} tid 会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 清空客服会话聊天记录
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  markClearThreadMessages: function(tid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/messages/mark/clear/thread?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        tid: tid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("clear thread messages success: ", response);
+      },
+      error: function(error) {
+        console.log("clear thread messageserror: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/messages/mark/clear/contact 清空单聊聊天记录
+   * @apiName markClearContactMessages
+   * @apiGroup Message
+   * @apiVersion 1.5.6
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 用户uid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 清空单聊聊天记录
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  markClearContactMessages: function(uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/messages/mark/clear/contact?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        uid: uid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("clear contact messages success: ", response);
+      },
+      error: function(error) {
+        console.log("clear contact messages error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/messages/mark/clear/group 清空群聊聊天记录
+   * @apiName markClearGroupMessages
+   * @apiGroup Message
+   * @apiVersion 1.5.6
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} gid 群组gid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 清空群聊聊天记录
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  markClearGroupMessages: function(gid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/messages/mark/clear/group?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        gid: gid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("clear group messages success: ", response);
+      },
+      error: function(error) {
+        console.log("clear group messages error: ", error);
       }
     });
   }
