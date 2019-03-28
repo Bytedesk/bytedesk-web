@@ -1213,6 +1213,7 @@ var httpapi = {
    * @apiParam {String} access_token 访问令牌
    * @apiParam {String} gid 群组唯一gid
    * @apiParam {String} uid 被移交用户uid
+   * @apiParam {Boolean} need_approve 是否需要对方同意。是：true; 否：false
    * @apiParam {String} client 固定写死为 'web'
    * 
    * @apiDescription 移交群组
@@ -1230,6 +1231,7 @@ var httpapi = {
       data: JSON.stringify({
         gid: gid,
         uid: uid,
+        need_approve: false,
         client: data.client
       }),
       success:function(response){
