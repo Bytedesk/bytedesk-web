@@ -3,10 +3,10 @@
  */
 var bd_kfe_data = {
   //
-  // HTTP_HOST: "http://127.0.0.1:8000",
-  // STOMP_HOST: "http://127.0.0.1:8000",
-  HTTP_HOST: "https://api.bytedesk.com",
-  STOMP_HOST: "https://stomp.bytedesk.com",
+  HTTP_HOST: "http://127.0.0.1:8000",
+  STOMP_HOST: "http://127.0.0.1:8000",
+  // HTTP_HOST: "https://api.bytedesk.com",
+  // STOMP_HOST: "https://stomp.bytedesk.com",
   URL_ROOT_PATH: "/kefu/",
   //
   imageDialogVisible: false,

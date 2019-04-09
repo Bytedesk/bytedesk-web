@@ -12,6 +12,16 @@
  * 群组相关接口
  */
 /**
+ * @apiDefine Robot 机器人
+ *
+ * 机器人相关接口
+ */
+/**
+ * @apiDefine Thread 会话
+ *
+ * 会话相关接口
+ */
+/**
  * @apiDefine SubDomainClientParam
  * @apiParam {String} subDomain 企业号，测试可填写 'vip'，上线请填写真实企业号
  * @apiParam {String} client 固定写死为 'web'
@@ -594,19 +604,19 @@ var httpapi = {
   },
 
   /**
-   * @api {get} /api/answer/init 请求机器人问答
+   * @api {get} /api/answer/init 初始化智能问答
    * @apiName requestRobot
-   * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiGroup Robot
+   * @apiVersion 1.4.8
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
    * @apiParam {String} wId 工作组唯一wid
    * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
-   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效, 当 type === 'workGroup' 时，可设置为空 ''
    * @apiParam {String} client 固定写死为 'web'
    * 
-   * @apiDescription 加载常见问题
+   * @apiDescription 初始化智能问答
    *
    * @apiUse ResponseResultSuccess
    */
@@ -839,7 +849,7 @@ var httpapi = {
     // });
   },
   /**
-   * @api {get} /api/answer/init 加载常见问题
+   * @api {get} /api/answer/init 初始化智能问答
    * @apiName initAnswer
    * @apiGroup User
    * @apiVersion 1.4.7
@@ -848,10 +858,10 @@ var httpapi = {
    * @apiParam {String} access_token 访问令牌
    * @apiParam {String} wId 工作组唯一wid
    * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
-   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效, 当 type === 'workGroup' 时，可设置为空 ''
    * @apiParam {String} client 固定写死为 'web'
    * 
-   * @apiDescription 加载常见问题
+   * @apiDescription 初始化智能问答
    *
    * @apiUse ResponseResultSuccess
    */
@@ -883,10 +893,58 @@ var httpapi = {
       }
     });
   },
+
+  /**
+   * @api {get} /api/v2/answer/init 初始化智能问答V2
+   * @apiName initAnswerV2
+   * @apiGroup Robot
+   * @apiVersion 1.4.8
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wid 工作组唯一wid, 当 type === 'appointed' 时，可设置为空 ''
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} aid 指定客服uid, 只有当type === 'appointed'时有效, 当 type === 'workGroup' 时，可设置为空 ''
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 初始化智能问答V2
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  initAnswerV2: function (type, wid, aid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/v2/answer/init?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        type: type,
+        wid: wid,
+        aid: aid,
+        client: data.client
+      },
+      success:function(response){
+        console.log("query answer success:", response.data);
+        if (response.status_code === 200) {
+          //
+          var queryMessage = response.data;
+          //
+          utils.pushToMessageArray(queryMessage);
+          utils.scrollToBottom();
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function(error) {
+        console.log("query answers error:", error);
+      }
+    });
+  },
+
   /**
    * @api {get} /api/answer/top 获取热门问题
    * @apiName getTopAnswers
-   * @apiGroup User
+   * @apiGroup Robot
    * @apiVersion 1.4.7
    * @apiPermission afterLogin
    * 
@@ -926,7 +984,7 @@ var httpapi = {
   /**
    * @api {get} /api/answer/query 根据问题qid请求智能问答答案
    * @apiName getAnswer
-   * @apiGroup User
+   * @apiGroup Robot
    * @apiVersion 1.4.7
    * @apiPermission afterLogin
    * 
@@ -975,7 +1033,7 @@ var httpapi = {
   /**
    * @api {get} /api/answer/message 输入内容，请求智能答案
    * @apiName messageAnswer
-   * @apiGroup User
+   * @apiGroup Robot
    * @apiVersion 1.4.7
    * @apiPermission afterLogin
    * 
@@ -999,6 +1057,60 @@ var httpapi = {
       data: {
         uid: data.adminUid,
         tid: data.thread.tid,
+        content: content,
+        client: data.client
+      },
+      success:function(response){
+        console.log("query answer success:", response.data);
+        if (
+          response.status_code === 200 ||
+          response.status_code === 201
+        ) {
+          //
+          var queryMessage = response.data.query;
+          var replyMessage = response.data.reply;
+          //
+          utils.pushToMessageArray(queryMessage);
+          utils.pushToMessageArray(replyMessage);
+          utils.scrollToBottom();
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function(error) {
+        console.log("query answers error:", error);
+      }
+    });
+  },
+  /**
+   * @api {get} /api/v2/answer/message 输入内容，请求智能答案V2
+   * @apiName messageAnswerV2
+   * @apiGroup Robot
+   * @apiVersion 1.4.8
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wid 工作组唯一wid, 当 type === 'appointed' 时，可设置为空 ''
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} aid 指定客服uid, 只有当type === 'appointed'时有效, 当 type === 'workGroup' 时，可设置为空 ''
+   * @apiParam {String} content 内容
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 输入内容，请求智能答案V2
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  messageAnswerV2: function (type, wid, aid, content) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/v2/answer/message?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      type: "get",
+      data: {
+        type: type,
+        wid: wid,
+        aid: aid,
         content: content,
         client: data.client
       },
@@ -1077,8 +1189,8 @@ var httpapi = {
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
-   * @apiParam {String} wId 工作组唯一wid
-   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效 
+   * @apiParam {String} wId 工作组唯一wid, 可为空
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效, 可为空
    * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
    * @apiParam {String} mobile 手机
    * @apiParam {String} email 邮箱
@@ -1126,6 +1238,71 @@ var httpapi = {
       }
     });
   },
+
+  /**
+   * @api {post} /api/v2/leavemsg/save/dxz 留言v2
+   * @apiName leaveMessageV2
+   * @apiGroup User
+   * @apiVersion 1.4.8
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wId 工作组唯一wid, 可为空
+   * @apiParam {String} aId 指定坐席 客服uid, 只有当type === 'appointed'时有效, 可为空
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} mobile 手机
+   * @apiParam {String} email 邮箱
+   * @apiParam {String} nickname 昵称
+   * @apiParam {String} location 所属区域
+   * @apiParam {String} country 意向国家
+   * @apiParam {String} content 留言内容
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 留言
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  leaveMessageV2: function () {
+    var mobile = $("#leavemsgmobile").val();
+    var email = $("#leavemsgemail").val();
+    var content = $("#leavemsgcontent").val();
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/v2/leavemsg/save/dxz?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        uid: data.adminUid,
+        wid: data.workGroupWid,
+        aid: data.agentUid,
+        type: data.type,
+        mobile: mobile,
+        email: email,
+        nickname: "昵称",
+        location: "所属区域",
+        country: "意向国家",
+        content: content,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("leave message: ", response.data);
+        if (response.status_code === 200) {
+          alert("留言成功");
+          $("#byteDesk-chat").show();
+          $("#byteDesk-leave").hide();
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function(error) {
+        console.log(error);
+        alert("留言失败");
+      }
+    });
+  },
+
   /**
    * @api {get} /api/thread/questionnaire 选择问卷答案
    * @apiName chooseQuestionnaire
