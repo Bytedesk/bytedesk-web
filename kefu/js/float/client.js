@@ -309,7 +309,6 @@
         },
         computed: {
             showEmoji () {
-                // !this.disabled &&
                 return this.show_emoji
             },
             disabled () {
@@ -822,6 +821,8 @@
                         bytedeskapp.messages.push(message);
                         // 1. 保存thread
                         bytedeskapp.thread = message.thread;
+                        // 2. 订阅会话消息
+                        bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                     } else if (response.data.status_code === -1) {
                         // access token invalid
                         bytedeskapp.login();
