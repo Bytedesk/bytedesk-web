@@ -806,16 +806,22 @@
                         bytedeskapp.messages.push(message);
                         // 1. 保存thread
                         bytedeskapp.thread = message.thread;
+                        // 2. 订阅会话消息
+                        bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                     } else if (response.data.status_code === 203) {
                         // 当前非工作时间，请自助查询或留言
                         bytedeskapp.messages.push(message);
                         // 1. 保存thread
                         bytedeskapp.thread = message.thread;
+                        // 2. 订阅会话消息
+                        bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                     } else if (response.data.status_code === 204) {
                         // 当前无客服在线，请自助查询或留言
                         bytedeskapp.messages.push(message);
                         // 1. 保存thread
                         bytedeskapp.thread = message.thread;
+                        // 2. 订阅会话消息
+                        bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                     } else if (response.data.status_code === 205) {
                         // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
                         bytedeskapp.messages.push(message);
