@@ -1719,7 +1719,7 @@
                 for (let i = this.messages.length - 1; i >= 0; i--) {
                     const msg = this.messages[i];
                     // 根据localId替换本地消息，也即更新本地消息状态
-                    if (msg.localId === message.localId) {
+                    if (msg.mid === message.mid) {
                         this.messages.splice(i, 1)
                         this.messages.push(message)
                         contains = true
