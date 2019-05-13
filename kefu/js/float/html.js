@@ -122,7 +122,7 @@
         '                                            <span>{{ message.content }}</span>\n' +
         '                                            <span v-for="item in message.workGroups" :key="item.id">\n' +
         '                                                <br/>\n' +
-        '                                                <span style="color:#007bff; cursor: pointer;" @click="chooseWorkGroup(item.wid)">{{ item.nickname }}</span>\n' +
+        '                                                <span style="color:#007bff; cursor: pointer;" @click="chooseWorkGroup(item.wid, item.nickname)">{{ item.nickname }}</span>\n' +
         '                                            </span>\n' +
         '                                        </div>\n' +
         '                                        <div v-if="is_type_image(message)" class="byteDesk-text">\n' +

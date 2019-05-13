@@ -126,6 +126,9 @@
                 answers: [],
                 isRobot: false,
                 //
+                isLiuXue: false,
+                questionnaireItemItems: Object,
+                //
                 emotionBaseUrl: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/emojis/gif/',
                 // 表情
                 emotionMap: {
@@ -461,7 +464,7 @@
                 { scrollTop: $("#byteDesk-message-ul")[0].scrollHeight },
                 "slow"
                 );
-                // let vm = this
+                // var vm = this
                 // this.$nextTick(() => {
                 //     const ul = vm.$refs.list
                 //     if (ul != null) {
@@ -496,7 +499,7 @@
                 if (result.status_code === 200) {
                     // this.uploadedImageList.push({name: file.name, url: result.data});
                     // 发送消息
-                    let imageUrl = result.data;
+                    var imageUrl = result.data;
                     this.sendImageMessage(imageUrl);
                 }
                 else {
@@ -516,7 +519,7 @@
                     this.$message.error('上传头像图片大小不能超过 2MB!');
                 }
                 // 设置文件名
-                let filename = moment(new Date()).format('YYYYMMDDHHmmss');
+                var filename = moment(new Date()).format('YYYYMMDDHHmmss');
                 if (file.type === 'image/jpeg') {
                     this.upload_data.file_name = filename + '.jpg';
                 }
@@ -857,7 +860,7 @@
                 //     }
                 // }).then(response => {
                 //     console.log('message:', response.data);
-                //     let message = response.data.data;
+                //     var message = response.data.data;
                 //     if (response.data.status_code === 200) {
                 //         //
                 //         bytedeskapp.pushToMessageArray(message);;
@@ -876,7 +879,7 @@
 
                 //     } else if (response.data.status_code === 201) {
                 //         // 继续之前会话
-                //         let thread = response.data.data;
+                //         var thread = response.data.data;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = thread;
                 //         // 2. 订阅会话消息
@@ -944,7 +947,7 @@
                     },
                     success:function(response){
                         console.log("message:", response);
-                        let message = response.data;
+                        var message = response.data;
                         if (response.status_code === 200) {
                             //
                             bytedeskapp.pushToMessageArray(message);;
@@ -963,7 +966,7 @@
 
                         } else if (response.status_code === 201) {
                             // 继续之前会话
-                            let thread = response.data;
+                            var thread = response.data;
                             // 1. 保存thread
                             bytedeskapp.thread = thread;
                             // 2. 订阅会话消息
@@ -999,6 +1002,8 @@
                             // 2. 订阅会话消息
                             bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                         } else if (response.status_code === 205) {
+                            //
+                            bytedeskapp.questionnaireItemItems = message.questionnaire.questionnaireItems[0].questionnaireItemItems
                             // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
                             bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
@@ -1087,7 +1092,7 @@
                 //     if (response.data.status_code === 200)  {
                 //         //
                 //         response.data.data.content.forEach(message => {
-                //             let contains = bytedeskapp.messages.some(msg => {
+                //             var contains = bytedeskapp.messages.some(msg => {
                 //                 return msg.id === message.id
                 //             });
                 //             if (!contains) {
@@ -1118,7 +1123,7 @@
                 //     console.log("query answer success:",response.data);
                 //     if (response.data.status_code === 200)  {
                 //         //
-                //         let queryMessage = response.data.data;
+                //         var queryMessage = response.data.data;
                 //         //
                 //         bytedeskapp.messages.push(queryMessage);
                 //         bytedeskapp.scrollToBottom()
@@ -1143,7 +1148,7 @@
                         console.log("query answer success:", response);
                         if (response.status_code === 200)  {
                             //
-                            let queryMessage = response.data;
+                            var queryMessage = response.data;
                             //
                             bytedeskapp.messages.push(queryMessage);
                             bytedeskapp.scrollToBottom()
@@ -1211,8 +1216,8 @@
                 //     console.log("query answer success:",response.data);
                 //     if (response.data.status_code === 200)  {
                 //         //
-                //         let queryMessage = response.data.data.query;
-                //         let replyMessage = response.data.data.reply;
+                //         var queryMessage = response.data.data.query;
+                //         var replyMessage = response.data.data.reply;
                 //         //
                 //         bytedeskapp.messages.push(queryMessage);
                 //         bytedeskapp.messages.push(replyMessage);
@@ -1241,8 +1246,8 @@
                         console.log("query answer success:", response);
                         if (response.status_code === 200)  {
                             //
-                            let queryMessage = response.data.query;
-                            let replyMessage = response.data.reply;
+                            var queryMessage = response.data.query;
+                            var replyMessage = response.data.reply;
                             //
                             bytedeskapp.messages.push(queryMessage);
                             bytedeskapp.messages.push(replyMessage);
@@ -1272,8 +1277,8 @@
                 //     if (response.data.status_code === 200 ||
                 //         response.data.status_code === 201)  {
                 //         //
-                //         let queryMessage = response.data.data.query;
-                //         let replyMessage = response.data.data.reply;
+                //         var queryMessage = response.data.data.query;
+                //         var replyMessage = response.data.data.reply;
                 //         //
                 //         bytedeskapp.messages.push(queryMessage);
                 //         bytedeskapp.messages.push(replyMessage);
@@ -1302,8 +1307,8 @@
                         if (response.status_code === 200 ||
                             response.status_code === 201)  {
                             //
-                            let queryMessage = response.data.query;
-                            let replyMessage = response.data.reply;
+                            var queryMessage = response.data.query;
+                            var replyMessage = response.data.reply;
                             //
                             bytedeskapp.messages.push(queryMessage);
                             bytedeskapp.messages.push(replyMessage);
@@ -1432,6 +1437,43 @@
              */
             chooseQuestionnaire(itemQid) {
                 console.log(itemQid);
+                // 留学: 意向国家 qid = '201810061551181'
+                // 移民：意向国家 qid = '201810061551183'
+                // 语培：意向类别 qid = '201810061551182'
+                // 其他：意向类别 qid = '201810061551184'
+                // 院校：意向院校 qid = '201810061551185'
+
+                if (itemQid === '201810061551181') {
+                    this.isLiuXue = true
+                } else {
+                    this.isLiuXue = false
+                }
+                //
+                var workGroups = []
+                for (var i = 0; i < this.questionnaireItemItems.length; i++) {
+                    var item = this.questionnaireItemItems[i]
+                    if (item.qid === itemQid) {
+                        workGroups = item.workGroups
+                    }
+                }
+                //
+                var message =  {
+                    mid: this.guid(),
+                    type: 'workGroup',
+                    content: '选择工作组',
+                    workGroups: workGroups,
+                    createdAt: this.currentTimestamp(),
+                    status: 'stored',
+                    user: {
+                        uid: this.uid,
+                        username: this.username,
+                        nickname: this.username,
+                        avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/chrome_default_avatar.png',
+                        visitor: false
+                    }
+                }
+                this.pushToMessageArray(message)
+
                 // axios.get(this.HTTP_HOST + '/api/thread/questionnaire?access_token=' + this.passport.token.access_token, {
                 //     params:{
                 //         'tId': this.thread.tid,
@@ -1444,7 +1486,7 @@
                 //     if (response.data.status_code === 200 ||
                 //         response.data.status_code === 201)  {
                 //         //
-                //         let message = response.data.data;
+                //         var message = response.data.data;
                 //         // 添加消息
                 //         bytedeskapp.pushToMessageArray(message);;
                 //         // 滚动到底部
@@ -1456,35 +1498,36 @@
                 // .catch(function (error) {
                 //     console.log("choose questionnaire error:",error);
                 // });
-                $.ajax({
-                    url: this.HTTP_HOST +
-                    "/api/thread/questionnaire?access_token=" +
-                    this.passport.token.access_token,
-                    contentType: "application/json; charset=utf-8",
-                    type: "get",
-                    data: {
-                      tId: this.thread.tid,
-                      itemQid: itemQid,
-                      client: this.client
-                    },
-                    success:function(response){
-                        console.log("choose questionnaire success:", response);
-                        if (response.status_code === 200 ||
-                            response.status_code === 201)  {
-                            //
-                            let message = response.data;
-                            // 添加消息
-                            bytedeskapp.pushToMessageArray(message);;
-                            // 滚动到底部
-                            bytedeskapp.scrollToBottom()
-                        } else {
-                            this.$message.warning(response.message)
-                        }
-                    },
-                    error: function(error) {
-                      console.log("choose questionnaire error:", error);
-                    }
-                  });
+
+                // $.ajax({
+                //     url: this.HTTP_HOST +
+                //     "/api/thread/questionnaire?access_token=" +
+                //     this.passport.token.access_token,
+                //     contentType: "application/json; charset=utf-8",
+                //     type: "get",
+                //     data: {
+                //     tId: this.thread.tid,
+                //     itemQid: itemQid,
+                //     client: this.client
+                //     },
+                //     success:function(response){
+                //         console.log("choose questionnaire success:", response);
+                //         if (response.status_code === 200 ||
+                //             response.status_code === 201)  {
+                //             //
+                //             var message = response.data;
+                //             // 添加消息
+                //             bytedeskapp.pushToMessageArray(message);;
+                //             // 滚动到底部
+                //             bytedeskapp.scrollToBottom()
+                //         } else {
+                //             this.$message.warning(response.message)
+                //         }
+                //     },
+                //     error: function(error) {
+                //     console.log("choose questionnaire error:", error);
+                //     }
+                // });
             },
             /**
              * 选择要留学国家
@@ -1503,7 +1546,7 @@
                 //     if (response.data.status_code === 200 ||
                 //         response.data.status_code === 201)  {
                 //         //
-                //         let message = response.data.data;
+                //         var message = response.data.data;
                 //         // 添加消息
                 //         bytedeskapp.pushToMessageArray(message);;
                 //         // 滚动到底部
@@ -1532,7 +1575,7 @@
                         if (response.status_code === 200 ||
                             response.status_code === 201)  {
                             //
-                            let message = response.data;
+                            var message = response.data;
                             // 添加消息
                             bytedeskapp.pushToMessageArray(message);
                             // 滚动到底部
@@ -1549,7 +1592,8 @@
             /**
              * 选择工作组
              */
-            chooseWorkGroup(wId) {
+            chooseWorkGroup(wId, workGroupNickname) {
+                console.log(wId, workGroupNickname);
                 // axios.get(this.HTTP_HOST + '/api/thread/workGroup?access_token=' + this.passport.token.access_token, {
                 //     params:{
                 //         'tId': this.thread.tid,
@@ -1559,7 +1603,7 @@
                 // })
                 // .then(function (response) {
                 //     console.log("choose workGroup success:",response.data);
-                //     let message = response.data.data;
+                //     var message = response.data.data;
                 //     if (response.data.status_code === 200) {
                 //         //
                 //         bytedeskapp.pushToMessageArray(message);;
@@ -1578,7 +1622,7 @@
 
                 //     } else if (response.data.status_code === 201) {
                 //         // 继续之前会话
-                //         let thread = response.data.data;
+                //         var thread = response.data.data;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = thread;
                 //         // 2. 订阅会话消息
@@ -1625,98 +1669,199 @@
                 // .catch(function (error) {
                 //     console.log("choose workGroup error:",error);
                 // });
-                $.ajax({
-                    url: this.HTTP_HOST +
-                    "/api/thread/choose/workGroup?access_token=" +
-                    this.passport.token.access_token,
-                    contentType: "application/json; charset=utf-8",
-                    type: "get",
-                    data: {
-                      tId: this.thread.tid,
-                      wId: wId,
-                      client: this.client
-                    },
-                    success:function(response){
-                        console.log("choose workGroup success:",response);
-                        let message = response.data;
-                        if (response.status_code === 200) {
+
+                if (this.isLiuXue) {
+                    console.log('is liuxue')
+                    //
+                    $.ajax({
+                        url: this.HTTP_HOST +
+                        "/api/thread/choose/workGroup/liuxue?access_token=" +
+                        this.passport.token.access_token,
+                        contentType: "application/json; charset=utf-8",
+                        type: "get",
+                        data: {
+                          wId: wId,
+                          nickname: workGroupNickname,
+                          client: this.client
+                        },
+                        success:function(response){
+                            console.log("choose workGroup Liuxue success:",response);
+                            var message = response.data;
+                            if (response.status_code === 200) {
+                                //
+                                bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                                // 2. 订阅会话消息
+                                bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
+                                // 3. 加载聊天记录
+                                bytedeskapp.loadMoreMessages();
+                                // 4. 头像、标题、描述
+                                if (message.thread.agent) {
+                                    bytedeskapp.avatar = message.thread.agent.avatar;
+                                    bytedeskapp.title = message.thread.agent.nickname;
+                                    bytedeskapp.description = message.thread.agent.description;
+                                }
+        
+                            } else if (response.status_code === 201) {
+                                // 继续之前会话
+                                var thread = response.data;
+                                // 1. 保存thread
+                                bytedeskapp.thread = thread;
+                                // 2. 订阅会话消息
+                                bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
+                                // 3. 加载聊天记录
+                                bytedeskapp.loadMoreMessages();
+                                // 4. 头像、标题、描述
+                                if (thread.agent) {
+                                    bytedeskapp.avatar = thread.agent.avatar;
+                                    bytedeskapp.title = thread.agent.nickname;
+                                    bytedeskapp.description = thread.agent.description;
+                                }
+        
+                            } else if (response.status_code === 202) {
+                                // 排队
+                                bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                            } else if (response.status_code === 203) {
+                                // 当前非工作时间，请自助查询或留言
+                                bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                            } else if (response.status_code === 204) {
+                                // 当前无客服在线，请自助查询或留言
+                                bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                            } else if (response.status_code === 205) {
+                                // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
+                                bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                            } else if (response.status_code === -1) {
+                                // access token invalid
+                                bytedeskapp.login();
+                            } else if (response.status_code === -2) {
+                                // sid 或 wid 错误
+                                this.$message.error('siteId或者工作组id错误');
+                            }
                             //
-                            bytedeskapp.pushToMessageArray(message);;
-                            // 1. 保存thread
-                            bytedeskapp.thread = message.thread;
-                            // 2. 订阅会话消息
-                            bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
-                            // 3. 加载聊天记录
-                            bytedeskapp.loadMoreMessages();
-                            // 4. 头像、标题、描述
-                            if (message.thread.agent) {
-                                bytedeskapp.avatar = message.thread.agent.avatar;
-                                bytedeskapp.title = message.thread.agent.nickname;
-                                bytedeskapp.description = message.thread.agent.description;
-                            }
-    
-                        } else if (response.status_code === 201) {
-                            // 继续之前会话
-                            let thread = response.data;
-                            // 1. 保存thread
-                            bytedeskapp.thread = thread;
-                            // 2. 订阅会话消息
-                            bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
-                            // 3. 加载聊天记录
-                            bytedeskapp.loadMoreMessages();
-                            // 4. 头像、标题、描述
-                            if (thread.agent) {
-                                bytedeskapp.avatar = thread.agent.avatar;
-                                bytedeskapp.title = thread.agent.nickname;
-                                bytedeskapp.description = thread.agent.description;
-                            }
-    
-                        } else if (response.status_code === 202) {
-                            // 排队
-                            bytedeskapp.pushToMessageArray(message);;
-                            // 1. 保存thread
-                            bytedeskapp.thread = message.thread;
-                        } else if (response.status_code === 203) {
-                            // 当前非工作时间，请自助查询或留言
-                            bytedeskapp.pushToMessageArray(message);;
-                            // 1. 保存thread
-                            bytedeskapp.thread = message.thread;
-                        } else if (response.status_code === 204) {
-                            // 当前无客服在线，请自助查询或留言
-                            bytedeskapp.pushToMessageArray(message);;
-                            // 1. 保存thread
-                            bytedeskapp.thread = message.thread;
-                        } else if (response.status_code === 205) {
-                            // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
-                            bytedeskapp.pushToMessageArray(message);;
-                            // 1. 保存thread
-                            bytedeskapp.thread = message.thread;
-                        } else if (response.status_code === -1) {
-                            // access token invalid
-                            bytedeskapp.login();
-                        } else if (response.status_code === -2) {
-                            // sid 或 wid 错误
-                            this.$message.error('siteId或者工作组id错误');
+                            bytedeskapp.scrollToBottom()
+                        },
+                        error: function(error) {
+                          console.log("choose workGroup error:", error);
                         }
-                        //
-                        bytedeskapp.scrollToBottom()
-                    },
-                    error: function(error) {
-                      console.log("choose workGroup error:", error);
-                    }
-                });
+                    });
+                } else {
+                    console.log('is not liuxue')
+                    //
+                    $.ajax({
+                        url: this.HTTP_HOST +
+                        "/api/thread/choose/workGroup?access_token=" +
+                        this.passport.token.access_token,
+                        contentType: "application/json; charset=utf-8",
+                        type: "get",
+                        data: {
+                          tId: this.thread.tid,
+                          wId: wId,
+                          client: this.client
+                        },
+                        success:function(response){
+                            console.log("choose workGroup success:",response);
+                            var message = response.data;
+                            if (response.status_code === 200) {
+                                //
+                                bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                                // 2. 订阅会话消息
+                                bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
+                                // 3. 加载聊天记录
+                                bytedeskapp.loadMoreMessages();
+                                // 4. 头像、标题、描述
+                                if (message.thread.agent) {
+                                    bytedeskapp.avatar = message.thread.agent.avatar;
+                                    bytedeskapp.title = message.thread.agent.nickname;
+                                    bytedeskapp.description = message.thread.agent.description;
+                                }
+        
+                            } else if (response.status_code === 201) {
+                                // 继续之前会话
+                                var thread = response.data;
+                                // 1. 保存thread
+                                bytedeskapp.thread = thread;
+                                // 2. 订阅会话消息
+                                bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
+                                // 3. 加载聊天记录
+                                bytedeskapp.loadMoreMessages();
+                                // 4. 头像、标题、描述
+                                if (thread.agent) {
+                                    bytedeskapp.avatar = thread.agent.avatar;
+                                    bytedeskapp.title = thread.agent.nickname;
+                                    bytedeskapp.description = thread.agent.description;
+                                }
+        
+                            } else if (response.status_code === 202) {
+                                // 排队
+                                bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                            } else if (response.status_code === 203) {
+                                // 当前非工作时间，请自助查询或留言
+                                bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                            } else if (response.status_code === 204) {
+                                // 当前无客服在线，请自助查询或留言
+                                bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                            } else if (response.status_code === 205) {
+                                // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
+                                bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                            } else if (response.status_code === -1) {
+                                // access token invalid
+                                bytedeskapp.login();
+                            } else if (response.status_code === -2) {
+                                // sid 或 wid 错误
+                                this.$message.error('siteId或者工作组id错误');
+                            }
+                            //
+                            bytedeskapp.scrollToBottom()
+                        },
+                        error: function(error) {
+                          console.log("choose workGroup error:", error);
+                        }
+                    });
+                }
+
+                
             },
             /**
              *
              */
+            guid() {
+                function s4 () {
+                    return Math.floor((1 + Math.random()) * 0x10000)
+                        .toString(16)
+                        .substring(1)
+                }
+                return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
+            },
+            currentTimestamp () {
+                return moment().format('YYYY-MM-DD HH:mm:ss')
+            },
             pushToMessageArray(message) {
                 if (message.status === 'sending') {
                     this.messages.push(message);
                     return
                 }
                 //
-                let contains = false
-                for (let i = this.messages.length - 1; i >= 0; i--) {
+                var contains = false
+                for (var i = this.messages.length - 1; i >= 0; i--) {
                     const msg = this.messages[i];
                     // 根据localId替换本地消息，也即更新本地消息状态
                     if (msg.mid === message.mid) {
@@ -1771,6 +1916,7 @@
                         // }).then(action => {
                         //     console.log('then:', action)
                         // })
+
                     } else if (messageObject.type === 'notification_queue') {
                         // 排队
                     } else if (messageObject.type === 'notification_queue_accept') {
@@ -1868,7 +2014,7 @@
                     bytedeskapp.isConnected = true;
                     // 获取 websocket 连接的 sessionId
                     // FIXME: Uncaught TypeError: Cannot read property '1' of null
-                    let sessionUrl = /\/([^\/]+)\/websocket/.exec(socket._transport.url)
+                    var sessionUrl = /\/([^\/]+)\/websocket/.exec(socket._transport.url)
                     if (sessionUrl != null) {
                         bytedeskapp.sessionId = /\/([^\/]+)\/websocket/.exec(socket._transport.url)[1];
                     }
