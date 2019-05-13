@@ -85,6 +85,7 @@
 
     // 第三方库
     var vendorJs = [
+        '//cdn.bootcss.com/jquery/1.9.1/jquery.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/UAParser.js/0.7.18/ua-parser.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/1.8.0/fingerprint2.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js',
@@ -92,7 +93,7 @@
         '//cdn.bytedesk.com/js/vendor/stomp/1.2/stomp.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/element-ui/2.4.0/index.js',
-        '//cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js',
+        // '//cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js',
         // 自定义的js
         './js/float/medium.js',
         './js/float/html.js',

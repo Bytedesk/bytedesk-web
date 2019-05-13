@@ -22,6 +22,11 @@
  * 会话相关接口
  */
 /**
+ * @apiDefine WorkGroup 工作组
+ *
+ * 工作组相关接口
+ */
+/**
  * @apiDefine SubDomainClientParam
  * @apiParam {String} subDomain 企业号，测试可填写 'vip'，上线请填写真实企业号
  * @apiParam {String} client 固定写死为 'web'
@@ -48,7 +53,7 @@ var httpapi = {
    * @api {get} /visitor/api/username 生成默认访客账号
    * @apiName requestUsername
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiUse SubDomainClientParam
@@ -103,7 +108,7 @@ var httpapi = {
    * @api {post} /visitor/api/register/user 自定义用户名生成访客账号
    * @apiName registerUser
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiParam {String} username 用户名
@@ -214,7 +219,7 @@ var httpapi = {
    * @api {post} /oauth/token 登录
    * @apiName login
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiHeader {String} Authorization 值固定写死为: 'Basic Y2xpZW50OnNlY3JldA=='
@@ -493,7 +498,7 @@ var httpapi = {
    * @api {get} /api/thread/request 请求会话
    * @apiName requestThread
    * @apiGroup Thread
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -629,7 +634,7 @@ var httpapi = {
    * @api {get} /api/rate/do 满意度评价
    * @apiName rate
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -698,7 +703,7 @@ var httpapi = {
    * @api {get} /api/thread/visitor/close 关闭当前窗口
    * @apiName closeWebPage
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -754,7 +759,7 @@ var httpapi = {
    * @api {get} /api/thread/update/current 设置当前会话
    * @apiName updateCurrentThread
    * @apiGroup Thread
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -793,7 +798,7 @@ var httpapi = {
    * @api {get} /api/messages/user 加载更多聊天记录
    * @apiName loadMoreMessages
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -852,7 +857,7 @@ var httpapi = {
    * @api {get} /api/answer/init 初始化智能问答
    * @apiName initAnswer
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -945,7 +950,7 @@ var httpapi = {
    * @api {get} /api/answer/top 获取热门问题
    * @apiName getTopAnswers
    * @apiGroup Robot
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -985,7 +990,7 @@ var httpapi = {
    * @api {get} /api/answer/query 根据问题qid请求智能问答答案
    * @apiName getAnswer
    * @apiGroup Robot
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1034,7 +1039,7 @@ var httpapi = {
    * @api {get} /api/answer/message 输入内容，请求智能答案
    * @apiName messageAnswer
    * @apiGroup Robot
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1140,7 +1145,7 @@ var httpapi = {
    * @api {post} /api/thread/request 评价智能问答结果(TODO，未上线)
    * @apiName rateAnswer
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1185,7 +1190,7 @@ var httpapi = {
    * @api {post} /api/leavemsg/save 留言
    * @apiName leaveMessage
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1307,7 +1312,7 @@ var httpapi = {
    * @api {get} /api/thread/questionnaire 选择问卷答案
    * @apiName chooseQuestionnaire
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1362,7 +1367,7 @@ var httpapi = {
    * @api {get} /api/thread/country 选择要留学国家
    * @apiName chooseCountry
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1412,7 +1417,7 @@ var httpapi = {
    * @api {get} /api/thread/choose/workGroup 选择工作组
    * @apiName chooseWorkGroup
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1515,6 +1520,86 @@ var httpapi = {
       },
       error: function(error) {
         console.log("choose workGroup error:", error);
+      }
+    });
+  },
+  /**
+   * @api {get} /api/status/workGroup 获取工作组当前在线状态
+   * @apiName getWorkGroupStatus
+   * @apiGroup WorkGroup
+   * @apiVersion 1.5.6
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wid 工作组唯一wid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 只要工作组内至少有一个客服在线，则返回为online，否则为offline
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  getWorkGroupStatus: function (wid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/status/workGroup?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      type: "get",
+      data: {
+        wid: wid,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get workGroup status success:", response.data);
+        if (response.status_code === 200) {
+          var status = response.data.status;
+          console.log('status:' + status)
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function(error) {
+        console.log("get workGroup status error:", error);
+      }
+    });
+  },
+  /**
+   * @api {get} /api/status/agent 获取用户当前在线状态
+   * @apiName getUserStatus
+   * @apiGroup User
+   * @apiVersion 1.5.6
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} uid 用户唯一uid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 在线返回为online，否则为offline
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  getUserStatus: function (uid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/status/agent?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      type: "get",
+      data: {
+        uid: uid,
+        client: data.client
+      },
+      success:function(response){
+        console.log("get user status success:", response.data);
+        if (response.status_code === 200) {
+          var status = response.data.status;
+          console.log('status:' + status)
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function(error) {
+        console.log("get user status error:", error);
       }
     });
   }

@@ -83,7 +83,7 @@
         '                        <!--消息记录pc-->\n' +
         '                        <div id="byteDesk-message-pc">\n' +
         '\n' +
-        '                            <ul class="byteDesk-message-ul" ref="list">\n' +
+        '                            <ul id="byteDesk-message-ul" class="byteDesk-message-ul" ref="list">\n' +
         '\n' +
         '                                <!--<div v-if="thread.tid !== 0 && !thread.last" class="byteDesk-pullrefresh" @click="loadMoreMessages()">更多聊天记录</div>-->\n' +
         '                                <li v-for="message in messages" :key="message.mid">\n' +
