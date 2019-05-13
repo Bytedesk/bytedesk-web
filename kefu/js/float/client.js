@@ -860,7 +860,7 @@
                 //     let message = response.data.data;
                 //     if (response.data.status_code === 200) {
                 //         //
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = message.thread;
                 //         // 2. 订阅会话消息
@@ -892,28 +892,28 @@
 
                 //     } else if (response.data.status_code === 202) {
                 //         // 排队
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = message.thread;
                 //         // 2. 订阅会话消息
                 //         bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                 //     } else if (response.data.status_code === 203) {
                 //         // 当前非工作时间，请自助查询或留言
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = message.thread;
                 //         // 2. 订阅会话消息
                 //         bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                 //     } else if (response.data.status_code === 204) {
                 //         // 当前无客服在线，请自助查询或留言
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = message.thread;
                 //         // 2. 订阅会话消息
                 //         bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                 //     } else if (response.data.status_code === 205) {
                 //         // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = message.thread;
                 //         // 2. 订阅会话消息
@@ -947,7 +947,7 @@
                         let message = response.data;
                         if (response.status_code === 200) {
                             //
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                             // 2. 订阅会话消息
@@ -979,28 +979,28 @@
 
                         } else if (response.status_code === 202) {
                             // 排队
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                             // 2. 订阅会话消息
                             bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                         } else if (response.status_code === 203) {
                             // 当前非工作时间，请自助查询或留言
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                             // 2. 订阅会话消息
                             bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                         } else if (response.status_code === 204) {
                             // 当前无客服在线，请自助查询或留言
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                             // 2. 订阅会话消息
                             bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                         } else if (response.status_code === 205) {
                             // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                             // 2. 订阅会话消息
@@ -1364,8 +1364,45 @@
              * 留言
              */
             leaveMessage() {
-                this.$refs['leaveMessageForm'].validate((valid) => {
-                    if (valid) {
+                if (this.leaveMessageForm.mobile.trim().length() > 0 && this.leaveMessageForm.content.trim().length() > 0) {
+                    $.ajax({
+                        url: this.HTTP_HOST +
+                        "/api/leavemsg/save?access_token=" +
+                        this.passport.token.access_token,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        type: "post",
+                        data: JSON.stringify({
+                          uid: this.adminUid,
+                          wid: this.workGroupWid,
+                          aid: this.agentUid,
+                          type: this.type,
+                          mobile: this.leaveMessageForm.mobile,
+                          email: this.leaveMessageForm.email,
+                          content: this.leaveMessageForm.content,
+                          client: this.client
+                        }),
+                        success:function(response){
+                          console.log("leave message: ", response);
+                          if (response.status_code === 200) {
+                            alert("留言成功");
+                            if (response.status_code === 200) {
+                                this.$message({ message: '留言成功', type: 'success'});
+                            } else {
+                                this.$message.error(response.message);
+                            }
+                          } else {
+                            alert(response.message);
+                          }
+                        },
+                        error: function(error) {
+                          console.log(error);
+                          alert("留言失败");
+                        }
+                      });
+                }
+                // this.$refs['leaveMessageForm'].validate((valid) => {
+                //     if (valid) {
                         // axios.post(this.HTTP_HOST + "/api/leavemsg/save?access_token=" + bytedeskapp.passport.token.access_token, {
                         //     uid: this.adminUid,
                         //     mobile: this.leaveMessageForm.mobile,
@@ -1383,46 +1420,11 @@
                         //     console.log(error);
                         //     this.$message.error('留言失败');
                         // });
-                        $.ajax({
-                            url: this.HTTP_HOST +
-                            "/api/leavemsg/save?access_token=" +
-                            this.passport.token.access_token,
-                            contentType: "application/json; charset=utf-8",
-                            dataType: "json",
-                            type: "post",
-                            data: JSON.stringify({
-                              uid: this.adminUid,
-                              wid: this.workGroupWid,
-                              aid: this.agentUid,
-                              type: this.type,
-                              mobile: this.leaveMessageForm.mobile,
-                              email: this.leaveMessageForm.email,
-                              content: this.leaveMessageForm.content,
-                              client: this.client
-                            }),
-                            success:function(response){
-                              console.log("leave message: ", response);
-                              if (response.status_code === 200) {
-                                alert("留言成功");
-                                if (response.status_code === 200) {
-                                    this.$message({ message: '留言成功', type: 'success'});
-                                } else {
-                                    this.$message.error(response.message);
-                                }
-                              } else {
-                                alert(response.message);
-                              }
-                            },
-                            error: function(error) {
-                              console.log(error);
-                              alert("留言失败");
-                            }
-                          });
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
+                    // } else {
+                    //     console.log('error submit!!');
+                    //     return false;
+                    // }
+                // });
                 
             },
             /**
@@ -1444,7 +1446,7 @@
                 //         //
                 //         let message = response.data.data;
                 //         // 添加消息
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 滚动到底部
                 //         bytedeskapp.scrollToBottom()
                 //     } else {
@@ -1472,7 +1474,7 @@
                             //
                             let message = response.data;
                             // 添加消息
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 滚动到底部
                             bytedeskapp.scrollToBottom()
                         } else {
@@ -1503,7 +1505,7 @@
                 //         //
                 //         let message = response.data.data;
                 //         // 添加消息
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 滚动到底部
                 //         bytedeskapp.scrollToBottom()
                 //     } else {
@@ -1532,7 +1534,7 @@
                             //
                             let message = response.data;
                             // 添加消息
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);
                             // 滚动到底部
                             bytedeskapp.scrollToBottom()
                         } else {
@@ -1560,7 +1562,7 @@
                 //     let message = response.data.data;
                 //     if (response.data.status_code === 200) {
                 //         //
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = message.thread;
                 //         // 2. 订阅会话消息
@@ -1592,22 +1594,22 @@
 
                 //     } else if (response.data.status_code === 202) {
                 //         // 排队
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = message.thread;
                 //     } else if (response.data.status_code === 203) {
                 //         // 当前非工作时间，请自助查询或留言
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = message.thread;
                 //     } else if (response.data.status_code === 204) {
                 //         // 当前无客服在线，请自助查询或留言
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = message.thread;
                 //     } else if (response.data.status_code === 205) {
                 //         // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
-                //         bytedeskapp.messages.push(message);
+                //         bytedeskapp.pushToMessageArray(message);;
                 //         // 1. 保存thread
                 //         bytedeskapp.thread = message.thread;
                 //     } else if (response.data.status_code === -1) {
@@ -1639,7 +1641,7 @@
                         let message = response.data;
                         if (response.status_code === 200) {
                             //
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                             // 2. 订阅会话消息
@@ -1671,22 +1673,22 @@
     
                         } else if (response.status_code === 202) {
                             // 排队
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                         } else if (response.status_code === 203) {
                             // 当前非工作时间，请自助查询或留言
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                         } else if (response.status_code === 204) {
                             // 当前无客服在线，请自助查询或留言
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                         } else if (response.status_code === 205) {
                             // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
-                            bytedeskapp.messages.push(message);
+                            bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                         } else if (response.status_code === -1) {
@@ -1707,12 +1709,24 @@
             /**
              *
              */
-            pushMessage(messageObject) {
-                let contains = bytedeskapp.messages.some(message  =>  {
-                    return message.id === messageObject.id
-                })
+            pushToMessageArray(message) {
+                if (message.status === 'sending') {
+                    this.messages.push(message);
+                    return
+                }
+                //
+                let contains = false
+                for (let i = this.messages.length - 1; i >= 0; i--) {
+                    const msg = this.messages[i];
+                    // 根据localId替换本地消息，也即更新本地消息状态
+                    if (msg.localId === message.localId) {
+                        this.messages.splice(i, 1)
+                        this.messages.push(message)
+                        contains = true
+                    }
+                }
                 if (!contains) {
-                    bytedeskapp.messages.push(messageObject);
+                    this.messages.push(message)
                 }
             },
             /**
@@ -1734,29 +1748,29 @@
                         // TODO: 检查是否已经有进行中会话，如果已经存在，则返回
 
                         // 当前不存在进行中会话
-                        bytedeskapp.$msgbox({
-                            title: '邀请会话',
-                            message: '客服邀请您参加会话',
-                            showCancelButton: true,
-                            confirmButtonText: '接受',
-                            cancelButtonText: '拒绝',
-                            beforeClose: (action, instance, done) => {
-                                console.log('beforeClose:', action)
-                                if (action === 'confirm') {
-                                    instance.confirmButtonLoading = true;
-                                    instance.confirmButtonText = '接入中...';
-                                    //
-                                    bytedeskapp.acceptInviteBrowse()
-                                } else {
-                                    bytedeskapp.rejectInviteBrowse()
-                                }
-                                //
-                                instance.confirmButtonLoading = false;
-                                done()
-                            }
-                        }).then(action => {
-                            console.log('then:', action)
-                        })
+                        // bytedeskapp.$msgbox({
+                        //     title: '邀请会话',
+                        //     message: '客服邀请您参加会话',
+                        //     showCancelButton: true,
+                        //     confirmButtonText: '接受',
+                        //     cancelButtonText: '拒绝',
+                        //     beforeClose: (action, instance, done) => {
+                        //         console.log('beforeClose:', action)
+                        //         if (action === 'confirm') {
+                        //             instance.confirmButtonLoading = true;
+                        //             instance.confirmButtonText = '接入中...';
+                        //             //
+                        //             bytedeskapp.acceptInviteBrowse()
+                        //         } else {
+                        //             bytedeskapp.rejectInviteBrowse()
+                        //         }
+                        //         //
+                        //         instance.confirmButtonLoading = false;
+                        //         done()
+                        //     }
+                        // }).then(action => {
+                        //     console.log('then:', action)
+                        // })
                     } else if (messageObject.type === 'notification_queue') {
                         // 排队
                     } else if (messageObject.type === 'notification_queue_accept') {
@@ -1771,7 +1785,7 @@
 
                     if (messageObject.type !== 'notification_preview') {
                         bytedeskapp.isRobot = false;
-                        bytedeskapp.pushMessage(messageObject);
+                        bytedeskapp.pushToMessageArray(messageObject);
                         bytedeskapp.scrollToBottom();
                     } else {
                         // TODO: 监听客服端输入状态
