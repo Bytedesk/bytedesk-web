@@ -106,6 +106,9 @@ var bd_kfe_data = {
   isThreadStarted: false,
   isThreadClosed: false,
   //
+  isLiuXue: false,
+  questionnaireItemItems: Object,
+  //
   emotionBaseUrl: "https://chainsnow.oss-cn-shenzhen.aliyuncs.com/emojis/gif/",
   // 表情
   emotionMap: {
