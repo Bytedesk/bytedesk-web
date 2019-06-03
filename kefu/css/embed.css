@@ -101,8 +101,8 @@
   position: fixed;
   bottom:15px;
   right: 10px;
-  width: 350px;
-  height: 500px;
+  width: 400px;
+  height: 580px;
   color: white;
   border: 1px solid #e4e7ed;
   border-radius: 10px;
@@ -176,7 +176,7 @@
 
 #byteDesk-message-pc {
   width: 100%;
-  height: 340px;
+  height: 410px;
   overflow-y: scroll;
   background-color: white;
 }
@@ -460,7 +460,7 @@
   color: gray;
   text-align: center;
   font-size: 12px;
-  margin-top: -6px;
+  margin-top: 0px;
   width: 100%;
 }
 

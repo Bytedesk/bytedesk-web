@@ -699,7 +699,8 @@
             },
             computed: {
                 showEmoji () {
-                    return !this.disabled && this.show_emoji
+                    // return !this.disabled && this.show_emoji
+                    return this.show_emoji
                 },
                 disabled () {
                     return this.thread.tid === ''

@@ -18,7 +18,7 @@
                 // STOMP_HOST: "http://127.0.0.1:8000",
                 HTTP_HOST: 'https://api.bytedesk.com',
                 STOMP_HOST: 'https://stomp.bytedesk.com',
-
+                //
                 imageDialogVisible: false,
                 currentImageUrl: '',
                 currentVoiceUrl: '',
@@ -1010,7 +1010,14 @@
                             bytedeskapp.thread = message.thread;
                             // 2. 订阅会话消息
                             bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
-                        } else if (response.status_code === -1) {
+                        } else if (response.status_code === 206) {
+                            // 当前无客服在线，请自助查询或留言
+                            bytedeskapp.pushToMessageArray(message);;
+                            // 1. 保存thread
+                            bytedeskapp.thread = message.thread;
+                            // 2. 订阅会话消息
+                            bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
+                          } else if (response.status_code === -1) {
                             // access token invalid
                             bytedeskapp.login();
                         } else if (response.status_code === -2) {
@@ -1837,8 +1844,6 @@
                         }
                     });
                 }
-
-                
             },
             /**
              *

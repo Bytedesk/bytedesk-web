@@ -272,12 +272,14 @@ var bd_kfe_utils = {
           "</div>";
       } else if (bd_kfe_utils.is_type_robot(message)) {
         console.log("robot:", message.content);
-        // var question = "";
-        // for (var i = 0; i < message.answers.length; i++) {
-        //   var answer = message.answers[i];
-        //   question += "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.getAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
-        // }
-        content += "<div class='byteDesk-text'>" + message.content + "</div>";
+        //
+        var question = "";
+        for (var j = 0; j < message.answers.length; j++) {
+          var answer = message.answers[j];
+          question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='httpapi.getAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
+        }
+        //
+        content += "<div class='text'>" + message.content  + question+ "</div>";
       } else if (bd_kfe_utils.is_type_questionnaire(message)) {
         var questionnaire = "";
         for (

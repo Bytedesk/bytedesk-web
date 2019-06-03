@@ -453,6 +453,11 @@ var bd_kfe_httpapi = {
           bd_kfe_utils.pushToMessageArray(message);
           // 1. 保存thread
           bd_kfe_data.thread = message.thread;
+        }else if (response.status_code === 206) {
+          // 返回机器人初始欢迎语 + 欢迎问题列表
+          bd_kfe_utils.pushToMessageArray(message);
+          // 1. 保存thread
+          bd_kfe_data.thread = message.thread;
         } else if (response.status_code === -1) {
           bd_kfe_httpapi.login();
         } else if (response.status_code === -2) {
