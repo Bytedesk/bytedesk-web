@@ -114,7 +114,7 @@
         '</div>' + // byteDesk-input-pc
       '</div>' + // byteDesk-main
       '<div id="byteDesk-rate">' +
-        '<span id="byteDesk-rate-close" style="cursor: pointer; color: gray;"><i class="iconfont icon-close"></i>开发中...</span>' +
+        '<span id="byteDesk-rate-close" style="cursor: pointer; color: gray;"><i class="iconfont icon-close"></i>查看httpapi.js文件rate相关接口</span>' +
       '</div>' + // byteDesk-rate 评价
       '<div id="byteDesk-leave">' +
         '<span id="byteDesk-leave-close" style="cursor: pointer; color: gray;"><i class="iconfont icon-close"></i></span>' +

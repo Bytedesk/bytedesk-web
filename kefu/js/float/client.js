@@ -18,7 +18,7 @@
                 // STOMP_HOST: "http://127.0.0.1:8000",
                 HTTP_HOST: 'https://api.bytedesk.com',
                 STOMP_HOST: 'https://stomp.bytedesk.com',
-                //
+
                 imageDialogVisible: false,
                 currentImageUrl: '',
                 currentVoiceUrl: '',
@@ -1068,9 +1068,9 @@
                     type: "post",
                     data: JSON.stringify({
                       tid: this.thread.tid,
-                      score: this.rateScore + "", // 考虑到兼容ios客户端，需要转换为字符串
+                      score: this.rateScore,
                       note: this.rateContent,
-                      invite: this.isInviteRate ? "1" : "0", // 考虑到兼容ios客户端，需要转换为字符串
+                      invite: this.isInviteRate,
                       client: this.client
                     }),
                     success:function(response){

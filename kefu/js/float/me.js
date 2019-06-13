@@ -85,7 +85,7 @@
 
     // 第三方库
     var vendorJs = [
-        '//cdn.bootcss.com/jquery/1.9.1/jquery.min.js',
+        '//cdn.bytedesk.com/js/vendor/jquery/1.9.1/jquery.min.js',
         '//cdn.bytedesk.com/js/vendor/uaparser/0.7.18/ua-parser.min.js',
         '//cdn.bytedesk.com/js/vendor/fingerprintjs2/1.8.0/fingerprint2.min.js',
         '//cdn.bytedesk.com/js/vendor/moment/2.22.1/moment.min.js',

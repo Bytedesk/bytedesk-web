@@ -546,14 +546,14 @@ var bd_kfe_httpapi = {
       dataType: "json",
       type: "post",
       data: JSON.stringify({
-        uid: bd_kfe_data.adminUid,
-        wid: bd_kfe_data.workGroupWid,
-        aid: bd_kfe_data.agentUid,
-        type: bd_kfe_data.type,
+        // uid: bd_kfe_data.adminUid,
+        // wid: bd_kfe_data.workGroupWid,
+        // aid: bd_kfe_data.agentUid,
+        // type: bd_kfe_data.type,
         tid: bd_kfe_data.thread.tid,
-        score: bd_kfe_data.rateScore + "", // 考虑到兼容ios客户端，需要转换为字符串
+        score: bd_kfe_data.rateScore,
         note: bd_kfe_data.rateContent,
-        invite: bd_kfe_data.isInviteRate ? "1" : "0", // 考虑到兼容ios客户端，需要转换为字符串
+        invite: bd_kfe_data.isInviteRate,
         client: bd_kfe_data.client
       }),
       success:function(response){

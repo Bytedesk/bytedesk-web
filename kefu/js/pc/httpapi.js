@@ -675,14 +675,14 @@ var httpapi = {
       dataType: "json",
       type: "post",
       data: JSON.stringify({
-        uid: data.adminUid,
-        wid: data.workGroupWid,
-        aid: data.agentUid,
-        type: data.type,
+        // uid: data.adminUid,
+        // wid: data.workGroupWid,
+        // aid: data.agentUid,
+        // type: data.type,
         tid: data.thread.tid,
-        score: data.rateScore + "", // 考虑到兼容ios客户端，需要转换为字符串
+        score: data.rateScore,
         note: data.rateContent,
-        invite: data.isInviteRate ? "1" : "0", // 考虑到兼容ios客户端，需要转换为字符串
+        invite: data.isInviteRate,
         client: data.client
       }),
       success:function(response){
