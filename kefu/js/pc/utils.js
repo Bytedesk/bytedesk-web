@@ -262,8 +262,11 @@ var utils = {
           question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='httpapi.getAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
         }
         //
-        content += "<div class='text'>" + message.content  + question+ "</div>";
-        
+        content +=
+          "<div class='text'>" +
+          "<span>" + message.content + "</span>" +
+          question +
+          "</div>";
       } else if (utils.is_type_questionnaire(message)) {
         var questionnaire = "";
         for (var i = 0; i < message.questionnaire.questionnaireItems[0].questionnaireItemItems.length; i++) {

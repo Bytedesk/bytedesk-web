@@ -1511,6 +1511,11 @@ var httpapi = {
           utils.pushToMessageArray(message);
           // 1. 保存thread
           data.thread = message.thread;
+        } else if (response.status_code === 206) {
+          // 返回机器人初始欢迎语 + 欢迎问题列表
+          utils.pushToMessageArray(message);
+          // 1. 保存thread
+          data.thread = message.thread;
         } else if (response.status_code === -1) {
           // access token invalid
           httpapi.login();
@@ -1618,6 +1623,11 @@ var httpapi = {
           data.thread = message.thread;
         } else if (response.status_code === 205) {
           // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
+          utils.pushToMessageArray(message);
+          // 1. 保存thread
+          data.thread = message.thread;
+        } else if (response.status_code === 206) {
+          // 返回机器人初始欢迎语 + 欢迎问题列表
           utils.pushToMessageArray(message);
           // 1. 保存thread
           data.thread = message.thread;

@@ -1245,22 +1245,24 @@
 
                         } else if (response.data.status_code === 204) {
                             // 当前无客服在线，请自助查询或留言
-                            //
                             app.pushToMessageArray(message);
                             // 1. 保存thread
                             app.thread = message.thread;
-
                             // 4. 设置窗口左上角标题
                             if (app.thread.appointed) {
                                 app.title = app.thread.agent.nickname
                             } else {
                                 app.title = app.thread.workGroup.nickname;
                             }
-
                             // TODO: 显示留言界面
                             app.switchLeaveMessage();
                         } else if (response.data.status_code === 205) {
                             // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
+                            app.pushToMessageArray(message);
+                            // 1. 保存thread
+                            app.thread = message.thread;
+                        } else if (response.data.status_code === 206) {
+                            // 返回机器人初始欢迎语 + 欢迎问题列表
                             app.pushToMessageArray(message);
                             // 1. 保存thread
                             app.thread = message.thread;
@@ -1679,6 +1681,11 @@
                             app.thread = message.thread;
                         } else if (response.data.status_code === 205) {
                             // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
+                            app.pushToMessageArray(message);
+                            // 1. 保存thread
+                            app.thread = message.thread;
+                        } else if (response.data.status_code === 206) {
+                            // 返回机器人初始欢迎语 + 欢迎问题列表
                             app.pushToMessageArray(message);
                             // 1. 保存thread
                             app.thread = message.thread;

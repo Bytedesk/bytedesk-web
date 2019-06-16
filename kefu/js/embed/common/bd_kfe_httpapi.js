@@ -453,7 +453,7 @@ var bd_kfe_httpapi = {
           bd_kfe_utils.pushToMessageArray(message);
           // 1. 保存thread
           bd_kfe_data.thread = message.thread;
-        }else if (response.status_code === 206) {
+        } else if (response.status_code === 206) {
           // 返回机器人初始欢迎语 + 欢迎问题列表
           bd_kfe_utils.pushToMessageArray(message);
           // 1. 保存thread
@@ -783,7 +783,7 @@ var bd_kfe_httpapi = {
    * @apiParam {String} access_token 访问令牌
    * @apiParam {String} uid 管理员uid
    * @apiParam {String} tid 会话tid
-   * @apiParam {String} aId 问题aid
+   * @apiParam {String} aid 问题aid
    * @apiParam {String} client 固定写死为 'web'
    * 
    * @apiDescription 请求会话
@@ -1216,6 +1216,11 @@ var bd_kfe_httpapi = {
             bd_kfe_utils.pushToMessageArray(message);
             // 1. 保存thread
             bd_kfe_data.thread = message.thread;
+          }  else if (response.status_code === 206) {
+            // 返回机器人初始欢迎语 + 欢迎问题列表
+            bd_kfe_utils.pushToMessageArray(message);
+            // 1. 保存thread
+            bd_kfe_data.thread = message.thread;
           } else if (response.status_code === -1) {
             // access token invalid
             bd_kfe_httpapi.login();
@@ -1324,6 +1329,11 @@ var bd_kfe_httpapi = {
           bd_kfe_data.thread = message.thread;
         } else if (response.status_code === 205) {
           // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
+          bd_kfe_utils.pushToMessageArray(message);
+          // 1. 保存thread
+          bd_kfe_data.thread = message.thread;
+        } else if (response.status_code === 206) {
+          // 返回机器人初始欢迎语 + 欢迎问题列表
           bd_kfe_utils.pushToMessageArray(message);
           // 1. 保存thread
           bd_kfe_data.thread = message.thread;

@@ -1011,13 +1011,13 @@
                             // 2. 订阅会话消息
                             bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                         } else if (response.status_code === 206) {
-                            // 当前无客服在线，请自助查询或留言
+                            // 返回机器人初始欢迎语 + 欢迎问题列表
                             bytedeskapp.pushToMessageArray(message);;
                             // 1. 保存thread
                             bytedeskapp.thread = message.thread;
                             // 2. 订阅会话消息
                             bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
-                          } else if (response.status_code === -1) {
+                        } else if (response.status_code === -1) {
                             // access token invalid
                             bytedeskapp.login();
                         } else if (response.status_code === -2) {
@@ -1746,6 +1746,11 @@
                                 bytedeskapp.pushToMessageArray(message);;
                                 // 1. 保存thread
                                 bytedeskapp.thread = message.thread;
+                            } else if (response.status_code === 206) {
+                                // 返回机器人初始欢迎语 + 欢迎问题列表
+                                bytedeskapp.pushToMessageArray(message);
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
                             } else if (response.status_code === -1) {
                                 // access token invalid
                                 bytedeskapp.login();
@@ -1827,6 +1832,11 @@
                             } else if (response.status_code === 205) {
                                 // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
                                 bytedeskapp.pushToMessageArray(message);;
+                                // 1. 保存thread
+                                bytedeskapp.thread = message.thread;
+                            } else if (response.status_code === 206) {
+                                // 返回机器人初始欢迎语 + 欢迎问题列表
+                                bytedeskapp.pushToMessageArray(message);
                                 // 1. 保存thread
                                 bytedeskapp.thread = message.thread;
                             } else if (response.status_code === -1) {

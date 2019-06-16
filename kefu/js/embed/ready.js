@@ -99,7 +99,7 @@ var bd_kfe_kefu = {
   $('#byteDesk-start').click(function(){
     if (bd_kfe_utils.isMobile()) {
       console.log('is mobile browser');
-      window.open('https://www.bytedesk.com');
+      window.open(bd_kfe_data.URL_ROOT_PATH + 'mobile.html?uid=' + window.adminUid + '&wid=' + window.workGroupWid + '&type=' + window.type + '&aid=' + window.agentUid + '&ph=ph');
     } else {
       console.log('is pc browser');
       document.getElementById("byteDesk-app-wrapper").style.display = '';
@@ -111,8 +111,7 @@ var bd_kfe_kefu = {
     }
   });
   $('#byteDesk-max').click(function(){
-    // console.log('max');
-    window.open(bd_kfe_data.URL_ROOT_PATH + 'pc.html?uid=201808221551193&wid=201807171659201&type=workGroup&aid=&ph=ph')
+    window.open(bd_kfe_data.URL_ROOT_PATH + 'pc.html?uid=' + window.adminUid + '&wid=' + window.workGroupWid + '&type=' + window.type + '&aid=' + window.agentUid + '&ph=ph');
   });
   $('#byteDesk-close').click(function(){
     document.getElementById("byteDesk-app-wrapper").style.display = 'none';
@@ -125,7 +124,8 @@ var bd_kfe_kefu = {
     bd_kfe_utils.showUploadDialog();
   });
   $('#byteDesk-message-rate').click(function(){
-    console.log('rate')
+    console.log('rate');
+    // TODO: 接口已经提供，有待实现评价界面
     $('#byteDesk-rate').show();
     $('#byteDesk-main').hide();
   });

@@ -272,27 +272,22 @@ var bd_kfe_utils = {
           "</div>";
       } else if (bd_kfe_utils.is_type_robot(message)) {
         console.log("robot:", message.content);
-        //
+        // TODO: 添加 ‘有帮助’ 和 ‘无帮助’
         var question = "";
         for (var j = 0; j < message.answers.length; j++) {
           var answer = message.answers[j];
-          question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='httpapi.getAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
+          question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.getAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
         }
         //
-        content += "<div class='text'>" + message.content  + question+ "</div>";
+        content +=
+          "<div class='byteDesk-text'>" +
+          "<span>" + message.content + "</span>" +
+          question +
+          "</div>";
       } else if (bd_kfe_utils.is_type_questionnaire(message)) {
         var questionnaire = "";
-        for (
-          var i = 0;
-          i <
-          message.questionnaire.questionnaireItems[0].questionnaireItemItems
-            .length;
-          i++
-        ) {
-          var item =
-            message.questionnaire.questionnaireItems[0].questionnaireItemItems[
-              i
-            ];
+        for (var i = 0; i < message.questionnaire.questionnaireItems[0].questionnaireItemItems.length; i++) {
+          var item = message.questionnaire.questionnaireItems[0].questionnaireItemItems[i];
           questionnaire +=
             "<br/><span style='color: #007bff; cursor: pointer;' onclick='bd_kfe_httpapi.chooseQuestionnaire(" +
             item.qid +

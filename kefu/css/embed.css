@@ -224,7 +224,7 @@
 #byteDesk-input-pc{
   height: 110px;
   background-color: ivory;
-  overflow-y: scroll;
+  overflow: hidden;
 }
 
 .el-textarea {
