@@ -199,21 +199,21 @@ var bd_kfe_utils = {
     // }
     if (message.status === 'sending') {
       bd_kfe_data.messages.push(message);
-      return
+      return;
     }
     //
-    var contains = false
+    var contains = false;
     for (var i = bd_kfe_data.messages.length - 1; i >= 0; i--) {
-      const msg = bd_kfe_data.messages[i];
+      var msg = bd_kfe_data.messages[i];
       // 根据localId替换本地消息，也即更新本地消息状态
       if (msg.mid === message.mid) {
-        bd_kfe_data.messages.splice(i, 1)
-        bd_kfe_data.messages.push(message)
-        contains = true
+        bd_kfe_data.messages.splice(i, 1);
+        bd_kfe_data.messages.push(message);
+        contains = true;
       }
     }
     if (!contains) {
-      bd_kfe_data.messages.push(message)
+      bd_kfe_data.messages.push(message);
     } else {
       return;
     }

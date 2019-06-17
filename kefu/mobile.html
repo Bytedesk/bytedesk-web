@@ -1667,6 +1667,8 @@
                             app.pushToMessageArray(message);
                             // 1. 保存thread
                             app.thread = message.thread;
+                            // 2. 订阅会话消息
+                            app.subscribeTopic(app.threadTopic);
                             // 防止重复点击
                             app.isThreadStarted = true
                         } else if (response.data.status_code === 203) {

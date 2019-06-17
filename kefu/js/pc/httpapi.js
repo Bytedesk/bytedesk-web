@@ -1494,6 +1494,8 @@ var httpapi = {
           utils.pushToMessageArray(message);
           // 1. 保存thread
           data.thread = message.thread;
+          // 2. 订阅会话消息
+          stompapi.subscribeTopic(data.threadTopic());
           // 防止重复点击
           data.isThreadStarted = true;
         } else if (response.status_code === 203) {

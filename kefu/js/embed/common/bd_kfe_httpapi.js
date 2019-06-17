@@ -1006,17 +1006,17 @@ var bd_kfe_httpapi = {
     }
     //
     if (itemQid === '201810061551181') {
-      bd_kfe_data.isLiuXue = true
+      bd_kfe_data.isLiuXue = true;
     } else {
-      bd_kfe_data.isLiuXue = false
+      bd_kfe_data.isLiuXue = false;
     }
     //
-    var workGroups = []
+    var workGroups = [];
     for (var i = 0; i < bd_kfe_data.questionnaireItemItems.length; i++) {
-        var item = bd_kfe_data.questionnaireItemItems[i]
+        var item = bd_kfe_data.questionnaireItemItems[i];
         if (item.qid == itemQid) {
-          console.log('qid:' + item.qid + ' == ' + itemQid)
-          workGroups = item.workGroups
+          console.log('qid:' + item.qid + ' == ' + itemQid);
+          workGroups = item.workGroups;
           break;
         }
     }
@@ -1035,8 +1035,8 @@ var bd_kfe_httpapi = {
             avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png',
             visitor: false
         }
-    }
-    bd_kfe_utils.pushToMessageArray(message)
+    };
+    bd_kfe_utils.pushToMessageArray(message);
     // $.ajax({
     //   url: bd_kfe_data.HTTP_HOST +
     //   "/api/thread/questionnaire?access_token=" +
@@ -1143,7 +1143,7 @@ var bd_kfe_httpapi = {
       return;
     }
     if (bd_kfe_data.isLiuXue) {
-      console.log('is liuxue')
+      console.log('is liuxue');
       bd_kfe_httpapi.chooseWorkGroupLiuXue(wId, workGroupNickname);
     } else {
       $.ajax({
@@ -1199,6 +1199,8 @@ var bd_kfe_httpapi = {
             bd_kfe_utils.pushToMessageArray(message);
             // 1. 保存thread
             bd_kfe_data.thread = message.thread;
+            // 2. 订阅会话消息
+            bd_kfe_stompapi.subscribeTopic(bd_kfe_data.threadTopic());
             // 防止重复点击
             bd_kfe_data.isThreadStarted = true;
           } else if (response.status_code === 203) {

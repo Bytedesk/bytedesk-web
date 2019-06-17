@@ -98,8 +98,6 @@
                 workGroupWid: '',
                 subDomain: '',
                 client: 'web',
-                // 聊天记录
-                messages: [],
                 thread: {
                     id: 0,
                     tid: ''
@@ -358,7 +356,7 @@
                 this.showLeaveMessage = true;
             },
             switchRobot () {
-                console.log('robot')
+                console.log('robot');
                 this.showLeaveMessage = false;
                 this.isRobot = true;
                 this.requestRobot();
@@ -1473,8 +1471,8 @@
                     status: 'stored',
                     user: {
                         uid: this.uid,
-                        username: this.username,
-                        nickname: this.username,
+                        username: '系统用户',
+                        nickname: '系统通知',
                         avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/chrome_default_avatar.png',
                         visitor: false
                     }
@@ -1731,6 +1729,8 @@
                                 bytedeskapp.pushToMessageArray(message);;
                                 // 1. 保存thread
                                 bytedeskapp.thread = message.thread;
+                                // 2. 订阅会话消息
+                                bytedeskapp.subscribeTopic(bytedeskapp.threadTopic);
                             } else if (response.status_code === 203) {
                                 // 当前非工作时间，请自助查询或留言
                                 bytedeskapp.pushToMessageArray(message);;
