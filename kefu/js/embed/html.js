@@ -114,7 +114,22 @@
         '</div>' + // byteDesk-input-pc
       '</div>' + // byteDesk-main
       '<div id="byteDesk-rate">' +
-        '<span id="byteDesk-rate-close" style="cursor: pointer; color: gray;"><i class="iconfont icon-close"></i>查看httpapi.js文件rate相关接口</span>' +
+        '<p>感谢您的咨询，请为本次服务进行评价：</p>' +
+            '<div id="ratestar">' +
+              '<img id="ratestar1" style="cursor: pointer;" src="/assets/img/rate/ratestar_selected.png" onclick="bd_kfe_utils.rateStarChoose(1)">' +
+              '<img id="ratestar2" style="cursor: pointer;" src="/assets/img/rate/ratestar_selected.png" onclick="bd_kfe_utils.rateStarChoose(2)">' +
+              '<img id="ratestar3" style="cursor: pointer;" src="/assets/img/rate/ratestar_selected.png" onclick="bd_kfe_utils.rateStarChoose(3)">' +
+              '<img id="ratestar4" style="cursor: pointer;" src="/assets/img/rate/ratestar_selected.png" onclick="bd_kfe_utils.rateStarChoose(4)">' +
+              '<img id="ratestar5" style="cursor: pointer;" src="/assets/img/rate/ratestar_selected.png" onclick="bd_kfe_utils.rateStarChoose(5)">' +
+            '</div>' +
+            '<div id="ratescore"></div>' +
+            '<p>附言:</p>' +
+            '<div id="suggest" class="suggestarea">' +
+              '<textarea id="suggestcontent" style="width: 48%; height: 66px;"></textarea>' +
+            '</div>' +
+            '<div class="rate-button" onclick="bd_kfe_httpapi.rate()">提交</div>' +
+            '<div class="rate-button" onclick="bd_kfe_utils.hideRate()">取消</div>' +
+        // '<span id="byteDesk-rate-close" style="cursor: pointer; color: gray;"><i class="iconfont icon-close"></i>查看httpapi.js文件rate相关接口</span>' +
       '</div>' + // byteDesk-rate 评价
       '<div id="byteDesk-leave">' +
         '<span id="byteDesk-leave-close" style="cursor: pointer; color: gray;"><i class="iconfont icon-close"></i></span>' +

@@ -57,7 +57,7 @@ var bd_kfe_utils = {
   },
   hideRate: function() {
     bd_kfe_data.rateDialogVisible = false;
-    $("#byteDesk-chat").show();
+    $("#byteDesk-main").show();
     $("#byteDesk-rate").hide();
   },
   showUploadDialog: function() {
@@ -409,56 +409,56 @@ var bd_kfe_utils = {
   //
   rateStarChoose: function(index) {
     if (index == 1) {
-      if ($("#ratestar1").attr("src") == "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png") {
-        $("#ratestar2").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_unselected.png");
-        $("#ratestar3").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_unselected.png");
-        $("#ratestar4").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_unselected.png");
-        $("#ratestar5").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_unselected.png");
+      if ($("#ratestar1").attr("src") == "/assets/img/rate/ratestar_selected.png") {
+        $("#ratestar2").attr("src", "/assets/img/rate/ratestar_unselected.png");
+        $("#ratestar3").attr("src", "/assets/img/rate/ratestar_unselected.png");
+        $("#ratestar4").attr("src", "/assets/img/rate/ratestar_unselected.png");
+        $("#ratestar5").attr("src", "/assets/img/rate/ratestar_unselected.png");
       } else {
-        $("#ratestar1").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
+        $("#ratestar1").attr("src", "/assets/img/rate/ratestar_selected.png");
       }
       $("#ratescore").text("恶劣");
       bd_kfe_data.rateScore = 1;
     } else if (index == 2) {
-      if ($("#ratestar2").attr("src") == "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png") {
-        $("#ratestar3").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_unselected.png");
-        $("#ratestar4").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_unselected.png");
-        $("#ratestar5").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_unselected.png");
+      if ($("#ratestar2").attr("src") == "/assets/img/rate/ratestar_selected.png") {
+        $("#ratestar3").attr("src", "/assets/img/rate/ratestar_unselected.png");
+        $("#ratestar4").attr("src", "/assets/img/rate/ratestar_unselected.png");
+        $("#ratestar5").attr("src", "/assets/img/rate/ratestar_unselected.png");
       } else {
-        $("#ratestar1").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
-        $("#ratestar2").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
+        $("#ratestar1").attr("src", "/assets/img/rate/ratestar_selected.png");
+        $("#ratestar2").attr("src", "/assets/img/rate/ratestar_selected.png");
       }
       $("#ratescore").text("较差");
       bd_kfe_data.rateScore = 2;
     } else if (index == 3) {
-      if ($("#ratestar3").attr("src") == "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png") {
-        $("#ratestar4").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_unselected.png");
-        $("#ratestar5").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_unselected.png");
+      if ($("#ratestar3").attr("src") == "/assets/img/rate/ratestar_selected.png") {
+        $("#ratestar4").attr("src", "/assets/img/rate/ratestar_unselected.png");
+        $("#ratestar5").attr("src", "/assets/img/rate/ratestar_unselected.png");
       } else {
-        $("#ratestar2").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
-        $("#ratestar3").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
+        $("#ratestar2").attr("src", "/assets/img/rate/ratestar_selected.png");
+        $("#ratestar3").attr("src", "/assets/img/rate/ratestar_selected.png");
       }
       $("#ratescore").text("一般");
       bd_kfe_data.rateScore = 3;
     } else if (index == 4) {
-      if ($("#ratestar4").attr("src") == "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png") {
-        $("#ratestar5").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_unselected.png");
+      if ($("#ratestar4").attr("src") == "/assets/img/rate/ratestar_selected.png") {
+        $("#ratestar5").attr("src", "/assets/img/rate/ratestar_unselected.png");
       } else {
-        $("#ratestar1").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
-        $("#ratestar2").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
-        $("#ratestar3").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
-        $("#ratestar4").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
+        $("#ratestar1").attr("src", "/assets/img/rate/ratestar_selected.png");
+        $("#ratestar2").attr("src", "/assets/img/rate/ratestar_selected.png");
+        $("#ratestar3").attr("src", "/assets/img/rate/ratestar_selected.png");
+        $("#ratestar4").attr("src", "/assets/img/rate/ratestar_selected.png");
       }
       $("#ratescore").text("较好");
       bd_kfe_data.rateScore = 4;
     } else if (index == 5) {
-      if ($("#ratestar5").attr("src") == "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png") {
+      if ($("#ratestar5").attr("src") == "/assets/img/rate/ratestar_selected.png") {
       } else {
-        $("#ratestar1").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
-        $("#ratestar2").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
-        $("#ratestar3").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
-        $("#ratestar4").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
-        $("#ratestar5").attr("src", "//127.0.0.1:8887/webchat/kefu/img/rate/ratestar_selected.png");
+        $("#ratestar1").attr("src", "/assets/img/rate/ratestar_selected.png");
+        $("#ratestar2").attr("src", "/assets/img/rate/ratestar_selected.png");
+        $("#ratestar3").attr("src", "/assets/img/rate/ratestar_selected.png");
+        $("#ratestar4").attr("src", "/assets/img/rate/ratestar_selected.png");
+        $("#ratestar5").attr("src", "/assets/img/rate/ratestar_selected.png");
       }
       $("#ratescore").text("非常满意");
       bd_kfe_data.rateScore = 5;
@@ -642,7 +642,7 @@ var bd_kfe_utils = {
       for (i = 0; i < matchresult.length; i++) {
         result = result.replace(
           matchresult[i],
-          "<img height='25px' width='25px' src = '//127.0.0.1:8887/webchat/kefu/img/emo/" +
+          "<img height='25px' width='25px' src = '/assets/img/emo/" +
             emotionMap[matchresult[i]] +
             "'>"
         );

@@ -453,6 +453,7 @@ body {
     height: 100%;
     width: calc(100% - 235px);
     color: black;
+    text-align: center;
 }
 
 #byteDesk-right {
@@ -486,9 +487,9 @@ body {
 }
 
 .rate-button {
-    width: 100px;
+    /* width: 100px;
     border: 1px solid gray; 
-    border-radius: 5px; 
+    border-radius: 5px;  */
     cursor: pointer;
     text-align: center;
 }

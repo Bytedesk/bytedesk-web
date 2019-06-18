@@ -187,6 +187,8 @@
   width: 100%;
   border-radius: 10px;
   display: none;
+  color: black;
+  text-align: center;
 }
 
 #byteDesk-leave {
@@ -337,7 +339,7 @@
 
 #byteDesk-input-pc-send {
   position: absolute;
-  bottom: 35px;
+  bottom: 45px;
   right: 20px;
 }
 
@@ -460,7 +462,7 @@
   color: gray;
   text-align: center;
   font-size: 12px;
-  margin-top: 0px;
+  margin-top: 5px;
   width: 100%;
 }
 
@@ -506,3 +508,10 @@
   height: 100px;
 }
 
+.rate-button {
+  /* width: 100px;
+  border: 1px solid gray; 
+  border-radius: 5px;  */
+  cursor: pointer;
+  text-align: center;
+}
