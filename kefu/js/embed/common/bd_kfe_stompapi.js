@@ -139,6 +139,10 @@ var bd_kfe_stompapi = {
    * 输入框变化
    */
   onInputChange: function () {
+    // 机器人对话的时候，无需发送输入状态
+    if (bd_kfe_data.isRobot) {
+      return;
+    }
     var content = $.trim($("#byteDesk-input-textarea").val());
     bd_kfe_data.stompClient.send(
       "/app/" + bd_kfe_data.threadTopic(),
@@ -154,7 +158,7 @@ var bd_kfe_stompapi = {
    * 发送消息
    */
   sendTextMessage: function () {
-    //
+    // 获取输入框内值
     var content = $.trim($("#byteDesk-input-textarea").val());
     if (content.length === 0) {
       return;
@@ -177,19 +181,19 @@ var bd_kfe_stompapi = {
         'content': content, 
         'client': bd_kfe_data.client
       }));
+      // 清空消息预知
+      bd_kfe_data.stompClient.send(
+        "/app/" + bd_kfe_data.threadTopic(),
+        {},
+        JSON.stringify({
+          type: "notification_preview",
+          content: "",
+          client: bd_kfe_data.client
+        })
+      );
     }
     // 清空输入框
     $("#byteDesk-input-textarea").val("");
-    // 清空消息预知
-    bd_kfe_data.stompClient.send(
-      "/app/" + bd_kfe_data.threadTopic(),
-      {},
-      JSON.stringify({
-        type: "notification_preview",
-        content: "",
-        client: bd_kfe_data.client
-      })
-    );
   },
   sendImageMessage: function (imageUrl) {
     //

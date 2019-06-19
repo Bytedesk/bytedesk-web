@@ -447,7 +447,7 @@ var bd_kfe_httpapi = {
           // TODO: 显示留言界面
           // bd_kfe_utils.switchLeaveMessage();
         } else if (response.status_code === 205) {
-          //
+          // 前置选择
           bd_kfe_data.questionnaireItemItems = message.questionnaire.questionnaireItems[0].questionnaireItemItems;
           // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
           bd_kfe_utils.pushToMessageArray(message);
@@ -458,6 +458,8 @@ var bd_kfe_httpapi = {
           bd_kfe_utils.pushToMessageArray(message);
           // 1. 保存thread
           bd_kfe_data.thread = message.thread;
+          // 2. 设置当前状态为机器人问答
+          bd_kfe_data.isRobot = true;
         } else if (response.status_code === -1) {
           bd_kfe_httpapi.login();
         } else if (response.status_code === -2) {
@@ -791,6 +793,11 @@ var bd_kfe_httpapi = {
    * @apiUse ResponseResultSuccess
    */
   getAnswer: function (aid) {
+    // 可以限制在会话结束之后，不允许请求答案
+    // if (bd_kfe_data.isThreadClosed) {
+    //   alert("会话已经结束");
+    //   return;
+    // }
     $.ajax({
       url: bd_kfe_data.HTTP_HOST +
       "/api/answer/query?access_token=" +
@@ -865,6 +872,60 @@ var bd_kfe_httpapi = {
           bd_kfe_utils.pushToMessageArray(queryMessage);
           bd_kfe_utils.pushToMessageArray(replyMessage);
           bd_kfe_utils.scrollToBottom();
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function(error) {
+        console.log("query answers error:", error);
+      }
+    });
+  },
+  /**
+   * @api {get} /api/v2/answer/message 输入内容，请求智能答案V2
+   * @apiName messageAnswerV2
+   * @apiGroup Robot
+   * @apiVersion 1.4.8
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wid 工作组唯一wid, 当 type === 'appointed' 时，可设置为空 ''
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} aid 指定客服uid, 只有当type === 'appointed'时有效, 当 type === 'workGroup' 时，可设置为空 ''
+   * @apiParam {String} content 内容
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 输入内容，请求智能答案V2
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  messageAnswerV2: function (type, wid, aid, content) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/v2/answer/message?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      type: "get",
+      data: {
+        type: type,
+        wid: wid,
+        aid: aid,
+        content: content,
+        client: data.client
+      },
+      success:function(response){
+        console.log("query answer success:", response.data);
+        if (
+          response.status_code === 200 ||
+          response.status_code === 201
+        ) {
+          //
+          var queryMessage = response.data.query;
+          var replyMessage = response.data.reply;
+          //
+          utils.pushToMessageArray(queryMessage);
+          utils.pushToMessageArray(replyMessage);
+          utils.scrollToBottom();
         } else {
           alert(response.message);
         }

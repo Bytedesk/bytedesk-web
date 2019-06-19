@@ -185,18 +185,7 @@ var bd_kfe_utils = {
   },
   //
   pushToMessageArray: function(message) {
-    // var contains = false;
-    // for (var i = 0; i < bd_kfe_data.messages.length; i++) {
-    //   var msg = bd_kfe_data.messages[i];
-    //   if (msg.id === message.id) {
-    //     contains = true;
-    //   }
-    // }
-    // if (!contains) {
-    //   bd_kfe_data.messages.push(message);
-    // } else {
-    //   return;
-    // }
+    // 本地发送的消息
     if (message.status === 'sending') {
       bd_kfe_data.messages.push(message);
       return;
@@ -391,7 +380,7 @@ var bd_kfe_utils = {
   //
   onKeyUp: function(event) {
     var key = event.keyCode || window.event.keyCode;
-    console.log("onKeyUp:", key);
+    // console.log("onKeyUp:", key);
     if (key === 13) {
       bd_kfe_stompapi.sendTextMessage();
     }
@@ -514,7 +503,7 @@ var bd_kfe_utils = {
     var originalText = $("#byteDesk-input-textarea").val();
     $("#byteDesk-input-textarea").val(originalText + emotionText);
     $("#byteDesk-input-emoji-box").hide();
-    bd_kfe_data.show_emoji = false
+    bd_kfe_data.show_emoji = false;
   },
   processEmotion: function(body) {
     var emotionMap = {

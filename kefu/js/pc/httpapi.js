@@ -1009,6 +1009,11 @@ var httpapi = {
    * @apiUse ResponseResultSuccess
    */
   getAnswer: function (aid) {
+    // 可以限制在会话结束之后，不允许请求答案
+    // if (data.isThreadClosed) {
+    //   alert("会话已经结束");
+    //   return;
+    // }
     $.ajax({
       url: data.HTTP_HOST +
       "/api/answer/query?access_token=" +
