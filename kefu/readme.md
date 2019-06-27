@@ -11,3 +11,11 @@
 
 - [Docsify指南](https://docsify.js.org/#/zh-cn/quickstart)
 - 预览：docsify serve docs
+
+## 文件夹说明
+
+- index.html 入口文件，演示 右下角嵌入对话窗口（窄）
+- float.html 右下角对话窗口（宽）
+- mobile.html 兼容手机对话窗口
+- pc.html 电脑浏览器对话窗口
+- buy.html 电商对话窗口

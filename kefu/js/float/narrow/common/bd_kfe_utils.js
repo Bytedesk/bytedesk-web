@@ -148,7 +148,7 @@ var bd_kfe_utils = {
     return (
       message.type !== "notification_preview" &&
       message.type !== "notification_thread" &&
-      message.type !== "notification_auto_close" &&
+      // message.type !== "notification_auto_close" &&
       message.type.startsWith("notification")
     );
   },
@@ -218,6 +218,15 @@ var bd_kfe_utils = {
           "</span>" +
           "</p></li>"
       );
+      // 会话关闭之后，在系统提示语后面添加 ‘人工客服’，方便访客可以重新发起会话
+      if (message.type === 'notification_auto_close' || 
+        message.type === 'notification_agent_close') {
+          $("#byteDesk-message-ul").append(
+            "<li><p class='byteDesk-timestamp'>" +
+              "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread()'>联系客服</span>" +
+            "</p></li>"
+          );
+      }
     } else {
       //
       var content =
@@ -260,7 +269,7 @@ var bd_kfe_utils = {
           "')\"/>" +
           "</div>";
       } else if (bd_kfe_utils.is_type_robot(message)) {
-        console.log("robot:", message.content);
+        // console.log("robot:", message.content);
         // TODO: 添加 ‘有帮助’ 和 ‘无帮助’
         var question = "";
         for (var j = 0; j < message.answers.length; j++) {
@@ -329,7 +338,7 @@ var bd_kfe_utils = {
           "</span>" +
           workGroup +
           "</div>";
-      }
+      } 
       //
       if (bd_kfe_utils.is_self(message)) {
         $("#byteDesk-message-ul").append(
@@ -340,6 +349,104 @@ var bd_kfe_utils = {
       }
     }
     //
+    bd_kfe_utils.scrollToBottom();
+  },
+  // 收到机器人正确答案
+  pushRightAnswerToMessageArray: function(message) {
+    // 本地发送的消息
+    if (message.status === 'sending') {
+      bd_kfe_data.messages.push(message);
+      return;
+    }
+    //
+    var contains = false;
+    for (var i = bd_kfe_data.messages.length - 1; i >= 0; i--) {
+      var msg = bd_kfe_data.messages[i];
+      // 根据localId替换本地消息，也即更新本地消息状态
+      if (msg.mid === message.mid) {
+        bd_kfe_data.messages.splice(i, 1);
+        bd_kfe_data.messages.push(message);
+        contains = true;
+      }
+    }
+    if (!contains) {
+      bd_kfe_data.messages.push(message);
+    } else {
+      return;
+    }
+    //
+    var content = "<p class='byteDesk-timestamp'><span>" + message.createdAt + "</span><br/></p>";
+    content += "<img class='byteDesk-avatar' width='30' height='30' src='" + message.user.avatar + "'/>";
+    if (!bd_kfe_utils.is_self(message)) {
+      content += "<div class='byteDesk-nickname'>" + message.user.nickname + "</div>";
+    }
+    // TODO: 添加 ‘有帮助’ 和 ‘无帮助’
+    var question = "";
+    for (var j = 0; j < message.answers.length; j++) {
+      var answer = message.answers[j];
+      question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.getAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
+    }
+    //
+    var isHelpfull = "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.rateAnswer(" + message.answer.aid + "," + message.mid + ",true)'>有帮助</span>" + 
+      "<span style='color:#007bff; cursor: pointer; margin-left: 5px;' onclick='bd_kfe_httpapi.rateAnswer(" + message.answer.aid + "," + message.mid + ",false)'>无帮助</span>";
+    //
+    content +=
+      "<div class='byteDesk-text'>" +
+      "<span>" + message.content + "</span>" +
+      question + isHelpfull +
+      "</div>";
+    //
+    $("#byteDesk-message-ul").append("<li><div class='other'>" + content + "</div></li>");
+    bd_kfe_utils.scrollToBottom();
+  },
+  // 未匹配到机器人答案
+  pushNoAnswerToMessageArray: function(message) {
+    // 本地发送的消息
+    if (message.status === 'sending') {
+      bd_kfe_data.messages.push(message);
+      return;
+    }
+    //
+    var contains = false;
+    for (var i = bd_kfe_data.messages.length - 1; i >= 0; i--) {
+      var msg = bd_kfe_data.messages[i];
+      // 根据localId替换本地消息，也即更新本地消息状态
+      if (msg.mid === message.mid) {
+        bd_kfe_data.messages.splice(i, 1);
+        bd_kfe_data.messages.push(message);
+        contains = true;
+      }
+    }
+    if (!contains) {
+      bd_kfe_data.messages.push(message);
+    } else {
+      return;
+    }
+    //
+    var content = "<p class='byteDesk-timestamp'><span>" + message.createdAt + "</span><br/></p>";
+    content +=
+      "<img class='byteDesk-avatar' width='30' height='30' src='" +
+      message.user.avatar +
+      "'/>";
+    if (!bd_kfe_utils.is_self(message)) {
+      content += "<div class='byteDesk-nickname'>" + message.user.nickname + "</div>";
+    }
+    // TODO: 回答内容中添加 '人工客服' 字样，访客点击可直接联系人工客服
+    var question = "";
+    for (var j = 0; j < message.answers.length; j++) {
+      var answer = message.answers[j];
+      question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.getAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
+    }
+    //
+    var contactAgent = "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestAgent()'>人工客服</span>";
+    //
+    content +=
+      "<div class='byteDesk-text'>" +
+      "<span>" + message.content + "</span>" +
+      question + contactAgent +
+      "</div>";
+    //
+    $("#byteDesk-message-ul").append("<li><div class='other'>" + content + "</div></li>");
     bd_kfe_utils.scrollToBottom();
   },
   //

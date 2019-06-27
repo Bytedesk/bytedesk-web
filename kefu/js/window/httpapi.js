@@ -12,6 +12,21 @@
  * 群组相关接口
  */
 /**
+ * @apiDefine Robot 机器人
+ *
+ * 机器人相关接口
+ */
+/**
+ * @apiDefine Thread 会话
+ *
+ * 会话相关接口
+ */
+/**
+ * @apiDefine WorkGroup 工作组
+ *
+ * 工作组相关接口
+ */
+/**
  * @apiDefine SubDomainClientParam
  * @apiParam {String} subDomain 企业号，测试可填写 'vip'，上线请填写真实企业号
  * @apiParam {String} client 固定写死为 'web'
@@ -33,12 +48,12 @@
  *
  * 社交关系相关接口
  */
-var bd_kfe_httpapi = {
+var httpapi = {
   /**
    * @api {get} /visitor/api/username 生成默认访客账号
    * @apiName requestUsername
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiUse SubDomainClientParam
@@ -52,35 +67,35 @@ var bd_kfe_httpapi = {
    */
   requestUsername: function () {
     //
-    bd_kfe_data.username = localStorage.bd_kfe_username;
-    bd_kfe_data.password = localStorage.bd_kfe_password;
-    if (bd_kfe_data.username) {
-      if (bd_kfe_data.password == null) {
-        bd_kfe_data.password = bd_kfe_data.username;
+    data.username = localStorage.username;
+    data.password = localStorage.password;
+    if (data.username) {
+      if (data.password == null) {
+        data.password = data.username;
       }
-      bd_kfe_httpapi.login();
+      httpapi.login();
     } else {
       //
       $.ajax({
-        url: bd_kfe_data.HTTP_HOST + "/visitor/api/username",
+        url: data.HTTP_HOST + "/visitor/api/username",
         contentType: "application/json; charset=utf-8",
         type: "get",
         data: { 
-          subDomain: bd_kfe_data.subDomain,
-          client: bd_kfe_data.client
+          subDomain: data.subDomain,
+          client: data.client
         },
         success:function(response){
           // 登录
-          bd_kfe_data.uid = response.data.uid;
-          bd_kfe_data.username = response.data.username;
-          bd_kfe_data.password = bd_kfe_data.username;
-          bd_kfe_data.nickname = response.data.nickname;
+          data.uid = response.data.uid;
+          data.username = response.data.username;
+          data.password = data.username;
+          data.nickname = response.data.nickname;
           // 本地存储
-          localStorage.bd_kfe_uid = bd_kfe_data.uid;
-          localStorage.bd_kfe_username = bd_kfe_data.username;
-          localStorage.bd_kfe_password = bd_kfe_data.password;
+          localStorage.uid = data.uid;
+          localStorage.username = data.username;
+          localStorage.password = data.password;
           // 登录
-          bd_kfe_httpapi.login();
+          httpapi.login();
         },
         error: function(error) {
           //Do Something to handle error
@@ -93,7 +108,7 @@ var bd_kfe_httpapi = {
    * @api {post} /visitor/api/register/user 自定义用户名生成访客账号
    * @apiName registerUser
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiParam {String} username 用户名
@@ -108,15 +123,15 @@ var bd_kfe_httpapi = {
    */
   registerUser: function () {
     //
-    var username = bd_kfe_utils.getUrlParam("username");
+    var username = utils.getUrlParam("username");
     var nickname =
-      bd_kfe_utils.getUrlParam("nickname") == null
+      utils.getUrlParam("nickname") == null
         ? username
-        : bd_kfe_utils.getUrlParam("username");
+        : utils.getUrlParam("username");
     console.log("username self:", username, nickname);
     //
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST + "/visitor/api/register/user",
+      url: data.HTTP_HOST + "/visitor/api/register/user",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       type: "post",
@@ -124,21 +139,75 @@ var bd_kfe_httpapi = {
         username: username,
         nickname: nickname,
         password: username, // 用户名作为默认密码
-        subDomain: bd_kfe_data.subDomain,
-        client: bd_kfe_data.client
+        subDomain: data.subDomain,
+        client: data.client
       }),
       success:function(response){
         // 登录
-        bd_kfe_data.uid = response.data.uid;
-        bd_kfe_data.username = response.data.username;
-        bd_kfe_data.password = bd_kfe_data.username;
-        bd_kfe_data.nickname = response.data.nickname;
+        data.uid = response.data.uid;
+        data.username = response.data.username;
+        data.password = data.username;
+        data.nickname = response.data.nickname;
         // 本地存储
-        localStorage.bd_kfe_uid = bd_kfe_data.uid;
-        localStorage.bd_kfe_username = bd_kfe_data.username;
-        localStorage.bd_kfe_password = bd_kfe_data.password;
+        localStorage.uid = data.uid;
+        localStorage.username = data.username;
+        localStorage.password = data.password;
         // 登录
-        bd_kfe_httpapi.login();
+        httpapi.login();
+      },
+      error: function(error) {
+        //Do Something to handle error
+        console.log(error);
+      }
+    });
+  },
+  /**
+   * @api {post} /visitor/api/register/user/uid 自定义用户名生成访客账号, 自定义uid
+   * @apiName registerUserUid
+   * @apiGroup User
+   * @apiVersion 1.5.6
+   * @apiPermission none
+   * 
+   * @apiParam {String} username 用户名
+   * @apiParam {String} nickname 昵称
+   * @apiParam {String} avatar 头像
+   * @apiParam {String} uid 用户唯一标示
+   * @apiParam {String} password 密码
+   * @apiUse SubDomainClientParam
+   * 
+   * @apiDescription 开发者在需要跟自己业务系统账号对接的情况下，
+   * 可以通过自定义用户名生成访客账号
+   *
+   * @apiUse UserResultSuccess
+   */
+  registerUid: function (username, nickname, avatar, uid, password) {
+    //
+    $.ajax({
+      url: data.HTTP_HOST + "/visitor/api/register/user/uid",
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({ 
+        username: username,
+        nickname: nickname,
+        avatar: avatar,
+        uid: uid,
+        password: password,
+        subDomain: data.subDomain,
+        client: data.client
+      }),
+      success:function(response){
+        // 登录
+        data.uid = response.data.uid;
+        data.username = response.data.username;
+        data.password = data.username;
+        data.nickname = response.data.nickname;
+        // 本地存储
+        localStorage.uid = data.uid;
+        localStorage.username = data.username;
+        localStorage.password = data.password;
+        // 登录
+        httpapi.login();
       },
       error: function(error) {
         //Do Something to handle error
@@ -150,7 +219,7 @@ var bd_kfe_httpapi = {
    * @api {post} /oauth/token 登录
    * @apiName login
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission none
    * 
    * @apiHeader {String} Authorization 值固定写死为: 'Basic Y2xpZW50OnNlY3JldA=='
@@ -168,14 +237,14 @@ var bd_kfe_httpapi = {
    * @apiSuccess {String} token_type 固定值：'bearer'
    */
   login: function () {
-    console.log('do login: ', bd_kfe_data.username, bd_kfe_data.password);
+    console.log('do login: ', data.username, data.password);
     //
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST + "/oauth/token",
+      url: data.HTTP_HOST + "/oauth/token",
       type: "post",
       data: { 
-        "username": bd_kfe_data.username,
-        "password": bd_kfe_data.password,
+        "username": data.username,
+        "password": data.password,
         "grant_type": "password",
         "scope": "all"
       },
@@ -185,15 +254,17 @@ var bd_kfe_httpapi = {
       success:function(response){
         console.log("login success: ", response);
         // 本地存储，
-        bd_kfe_data.passport.token = response;
+        data.passport.token = response;
         // 本地存储
-        localStorage.bd_kfe_username = bd_kfe_data.username;
-        localStorage.bd_kfe_password = bd_kfe_data.password;
-        localStorage.bd_kfe_subDomain = bd_kfe_data.subDomain;
+        localStorage.username = data.username;
+        localStorage.password = data.password;
+        localStorage.subDomain = data.subDomain;
         // localStorage 存储
-        localStorage.setItem(bd_kfe_data.token, JSON.stringify(response));
-        // 建立长连接
-        bd_kfe_stompapi.byteDeskConnect();
+        localStorage.setItem(data.token, JSON.stringify(response));
+        // 请求会话
+        httpapi.requestThread();
+        // 加载常见问题
+        httpapi.getTopAnswers();
       },
       error: function(error) {
         //Do Something to handle error
@@ -201,6 +272,79 @@ var bd_kfe_httpapi = {
       }
     });
   },
+
+  /**
+   * @api {post} /api/user/nickname 设置、修改用户昵称
+   * @apiName setNickname
+   * @apiGroup User
+   * @apiVersion 1.5.6
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} nickname 用户新昵称
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 设置、修改用户昵称
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  setNickname: function(nickname) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/nickname?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        nickname: nickname,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("set nickname success: ", response);
+      },
+      error: function(error) {
+        console.log("set nickname error: ", error);
+      }
+    });
+  },
+
+  /**
+   * @api {post} /api/user/avatar 设置、修改用户头像
+   * @apiName setAvatar
+   * @apiGroup User
+   * @apiVersion 1.5.6
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} avatar 用户新头像
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 设置、修改用户头像
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  setAvatar: function(avatar) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/user/avatar?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        avatar: avatar,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("set avatar success: ", response);
+      },
+      error: function(error) {
+        console.log("set avatar error: ", error);
+      }
+    });
+  },
+
   /**
    * 获取设备指纹
    */
@@ -229,9 +373,9 @@ var bd_kfe_httpapi = {
     //     params.append(key, value.toString());
     //   }
     //   $.ajax({
-    //     url: bd_kfe_data.HTTP_HOST +
+    //     url: data.HTTP_HOST +
     //     "/api/fingerprint2/browser?access_token=" +
-    //     bd_kfe_data.passport.token.access_token,
+    //     data.passport.token.access_token,
     //     type: "post",
     //     data: params,
     //     success:function(response){
@@ -256,17 +400,17 @@ var bd_kfe_httpapi = {
     url = url.endsWith("#") ? url.substring(0, url.length - 1) : url;
     //
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/browse/notify?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       type: "post",
       data: JSON.stringify({
-        adminUid: bd_kfe_data.adminUid,
-        workGroupWid: bd_kfe_data.workGroupWid,
-        client: bd_kfe_data.client,
-        sessionId: bd_kfe_data.sessionId,
+        adminUid: data.adminUid,
+        workGroupWid: data.workGroupWid,
+        client: data.client,
+        sessionId: data.sessionId,
         referrer: encodeURI(document.referrer),
         url: encodeURI(url),
         title: encodeURI(document.title),
@@ -285,15 +429,15 @@ var bd_kfe_httpapi = {
   acceptInviteBrowse: function () {
     //
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/browse/invite/accept?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       type: "post",
       data: JSON.stringify({
-        biid: bd_kfe_data.browseInviteBIid,
-        client: bd_kfe_data.client
+        biid: data.browseInviteBIid,
+        client: data.client
       }),
       success:function(response){
         console.log("browse invite accept:", response.data);
@@ -307,15 +451,15 @@ var bd_kfe_httpapi = {
   rejectInviteBrowse: function () {
     //
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/browse/invite/reject?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       type: "post",
       data: JSON.stringify({
-        biid: bd_kfe_data.browseInviteBIid,
-          client: bd_kfe_data.client
+        biid: data.browseInviteBIid,
+          client: data.client
       }),
       success:function(response){
         console.log("browse invite reject:", response.data);
@@ -329,17 +473,17 @@ var bd_kfe_httpapi = {
    * 断开重连之后更新session id
    */
   updateSessionId: function () {
-    // console.log('session id:', bd_kfe_data.sessionId, ' pre session id:', bd_kfe_data.preSessionId);
+    // console.log('session id:', data.sessionId, ' pre session id:', data.preSessionId);
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/browse/update/sessionId?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       type: "post",
       data: JSON.stringify({
-        sessionId: bd_kfe_data.sessionId,
-        preSessionId: bd_kfe_data.preSessionId
+        sessionId: data.sessionId,
+        preSessionId: data.preSessionId
       }),
       success:function(response){
         console.log("update session id:", response.data);
@@ -349,11 +493,12 @@ var bd_kfe_httpapi = {
       }
     });
   },
+
   /**
    * @api {get} /api/thread/request 请求会话
    * @apiName requestThread
-   * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiGroup Thread
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -367,152 +512,134 @@ var bd_kfe_httpapi = {
    * @apiUse ResponseResultSuccess
    */
   requestThread: function () {
-    console.log('start request thread')
+    console.log('start request thread');
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/thread/request",
       contentType: "application/json; charset=utf-8",
       type: "get",
       data: {
-        access_token: bd_kfe_data.passport.token.access_token,
-        wId: bd_kfe_data.workGroupWid,
-        type: bd_kfe_data.type,
-        aId: bd_kfe_data.agentUid,
-        client: bd_kfe_data.client
+        access_token: data.passport.token.access_token,
+        wId: data.workGroupWid,
+        type: data.type,
+        aId: data.agentUid,
+        client: data.client
       },
       success:function(response){
-        console.log("message:", response);
+        console.log("message:", response.data);
         var message = response.data;
         if (response.status_code === 200) {
           //
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
           // 3. 加载聊天记录
-          // bd_kfe_httpapi.loadMoreMessages();
+          httpapi.loadMoreMessages();
           // 4. 设置窗口左上角标题
-          if (bd_kfe_data.thread.appointed) {
-            bd_kfe_data.title = bd_kfe_data.thread.agent.nickname;
+          if (data.thread.appointed) {
+            data.title = data.thread.agent.nickname;
           } else {
-            bd_kfe_data.title = bd_kfe_data.thread.workGroup.nickname;
+            data.title = data.thread.workGroup.nickname;
           }
-          //
-          $('#byteDesk-agent-avatar').attr('src', bd_kfe_data.thread.agent.avatar)
-          $('#byteDesk-agent-nickname').text(bd_kfe_data.thread.agent.nickname)
-          $('#byteDesk-agent-description').text(bd_kfe_data.thread.agent.description)
         } else if (response.status_code === 201) {
           message.content = "继续之前会话";
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
           // 3. 加载聊天记录
-          // bd_kfe_httpapi.loadMoreMessages();
+          httpapi.loadMoreMessages();
           // 4. 头像、标题、描述
-          if (bd_kfe_data.thread.appointed) {
-            bd_kfe_data.title = bd_kfe_data.thread.agent.nickname;
+          if (data.thread.appointed) {
+            data.title = data.thread.agent.nickname;
           } else {
-            bd_kfe_data.title = bd_kfe_data.thread.workGroup.nickname;
+            data.title = data.thread.workGroup.nickname;
           }
-          //
-          $('#byteDesk-agent-avatar').attr('src', bd_kfe_data.thread.agent.avatar)
-          $('#byteDesk-agent-nickname').text(bd_kfe_data.thread.agent.nickname)
-          $('#byteDesk-agent-description').text(bd_kfe_data.thread.agent.description)
         } else if (response.status_code === 202) {
           // 排队
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
         } else if (response.status_code === 203) {
           // 当前非工作时间，请自助查询或留言
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
           // 4. 设置窗口左上角标题
-          if (bd_kfe_data.thread.appointed) {
-            bd_kfe_data.title = bd_kfe_data.thread.agent.nickname;
+          if (data.thread.appointed) {
+            data.title = data.thread.agent.nickname;
           } else {
-            bd_kfe_data.title = bd_kfe_data.thread.workGroup.nickname;
+            data.title = data.thread.workGroup.nickname;
           }
         } else if (response.status_code === 204) {
           // 当前无客服在线，请自助查询或留言
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
           // 4. 设置窗口左上角标题
-          if (bd_kfe_data.thread.appointed) {
-            bd_kfe_data.title = bd_kfe_data.thread.agent.nickname;
+          if (data.thread.appointed) {
+            data.title = data.thread.agent.nickname;
           } else {
-            bd_kfe_data.title = bd_kfe_data.thread.workGroup.nickname;
+            data.title = data.thread.workGroup.nickname;
           }
           // TODO: 显示留言界面
-          // bd_kfe_utils.switchLeaveMessage();
+          utils.switchLeaveMessage();
         } else if (response.status_code === 205) {
-          // 前置选择
-          bd_kfe_data.questionnaireItemItems = message.questionnaire.questionnaireItems[0].questionnaireItemItems;
           // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
         } else if (response.status_code === 206) {
           // 返回机器人初始欢迎语 + 欢迎问题列表
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
-          // 2. 设置当前状态为机器人问答
-          bd_kfe_data.isRobot = true;
+          data.thread = message.thread;
         } else if (response.status_code === -1) {
-          bd_kfe_httpapi.login();
+          httpapi.login();
         } else if (response.status_code === -2) {
           // sid 或 wid 错误
           alert("siteId或者工作组id错误");
         } else if (response.status_code === -3) {
           alert("您已经被禁言");
         }
-        bd_kfe_utils.scrollToBottom();
+        utils.scrollToBottom();
         // 建立长连接
-        // bd_kfe_stompapi.byteDeskConnect();
-        // 订阅会话消息，处理断开重连的情况
-        if (
-          bd_kfe_data.thread.tid !== null &&
-          bd_kfe_data.thread.tid !== undefined &&
-          bd_kfe_data.thread.tid !== ""
-        ) {
-          bd_kfe_stompapi.subscribeTopic(bd_kfe_data.threadTopic());
-        }
+        stompapi.byteDeskConnect();
       },
       error: function(error) {
         console.log(error);
       }
     });
     // 请求指纹
-    bd_kfe_httpapi.fingerPrint2();
+    httpapi.fingerPrint2();
   },
+
   /**
-   * @api {get} /api/answer/init 请求机器人问答
+   * @api {get} /api/answer/init 初始化智能问答
    * @apiName requestRobot
-   * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiGroup Robot
+   * @apiVersion 1.4.8
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
    * @apiParam {String} wId 工作组唯一wid
    * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
-   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效, 当 type === 'workGroup' 时，可设置为空 ''
    * @apiParam {String} client 固定写死为 'web'
    * 
-   * @apiDescription 加载常见问题
+   * @apiDescription 初始化智能问答
    *
    * @apiUse ResponseResultSuccess
    */
   requestRobot: function () {
     console.log("自助答疑");
-    bd_kfe_httpapi.initAnswer();
+    httpapi.initAnswer();
   },
+  
   /**
    * @api {get} /api/rate/do 满意度评价
    * @apiName rate
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -532,35 +659,35 @@ var bd_kfe_httpapi = {
    */
   rate: function () {
     // 隐藏满意度评价dialog
-    bd_kfe_data.rateDialogVisible = false;
+    data.rateDialogVisible = false;
     // 判断是否已经评价过，避免重复评价
-    if (bd_kfe_data.isRated) {
+    if (data.isRated) {
       alert("不能重复评价");
       return;
     }
-    bd_kfe_data.rateContent = $("#suggestcontent").val();
+    data.rateContent = $("#suggestcontent").val();
     //
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/rate/do?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       type: "post",
       data: JSON.stringify({
-        // uid: bd_kfe_data.adminUid,
-        // wid: bd_kfe_data.workGroupWid,
-        // aid: bd_kfe_data.agentUid,
-        // type: bd_kfe_data.type,
-        tid: bd_kfe_data.thread.tid,
-        score: bd_kfe_data.rateScore,
-        note: bd_kfe_data.rateContent,
-        invite: bd_kfe_data.isInviteRate,
-        client: bd_kfe_data.client
+        // uid: data.adminUid,
+        // wid: data.workGroupWid,
+        // aid: data.agentUid,
+        // type: data.type,
+        tid: data.thread.tid,
+        score: data.rateScore,
+        note: data.rateContent,
+        invite: data.isInviteRate,
+        client: data.client
       }),
       success:function(response){
         console.log("rate: ", response.data);
-        bd_kfe_data.isRated = true;
+        data.isRated = true;
         //
         if (response.status_code === 200) {
           alert("评价成功");
@@ -576,11 +703,12 @@ var bd_kfe_httpapi = {
       }
     });
   },
+
   /**
    * @api {get} /api/thread/visitor/close 关闭当前窗口
    * @apiName closeWebPage
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -593,15 +721,15 @@ var bd_kfe_httpapi = {
    */
   closeWebPage: function () {
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/thread/visitor/close?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       type: "post",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       data: JSON.stringify({
-        tid: bd_kfe_data.thread.tid,
-        client: bd_kfe_data.client
+        tid: data.thread.tid,
+        client: data.client
       }),
       success:function(response){
         console.log("close thread: ", response.data);
@@ -631,11 +759,51 @@ var bd_kfe_httpapi = {
       }
     });
   },
+
+  /**
+   * @api {get} /api/thread/update/current 设置当前会话
+   * @apiName updateCurrentThread
+   * @apiGroup Thread
+   * @apiVersion 1.5.6
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} preTid 当前会话tid
+   * @apiParam {String} tid 新会话tid
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 设置当前会话
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  updateCurrentThread: function (preTid, tid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/update/current?access_token=" +
+      data.passport.token.access_token,
+      type: "post",
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      data: JSON.stringify({
+        preTid: preTid,
+        tid: tid,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("update current thread: ", response.data);
+      },
+      error: function(error) {
+        console.log(error);
+        alert(error);
+      }
+    });
+  },
+
   /**
    * @api {get} /api/messages/user 加载更多聊天记录
    * @apiName loadMoreMessages
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -650,73 +818,73 @@ var bd_kfe_httpapi = {
    * @apiUse ResponseResultSuccess
    */
   loadMoreMessages: function () {
-    $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
-      "/api/messages/user?access_token=" +
-      bd_kfe_data.passport.token.access_token,
-      type: "get",
-      data: {
-        uid: bd_kfe_data.uid,
-        page: bd_kfe_data.page,
-        size: 100,
-        client: bd_kfe_data.client
-      },
-      success:function(response){
-        console.log(response.data);
-        if (response.status_code === 200) {
-          //
-          for (var i = 0; i < response.data.content.length; i++) {
-            var message = response.data.content[i];
-            //
-            var contains = false;
-            for (var j = 0; j < bd_kfe_data.messages.length; j++) {
-              var msg = bd_kfe_data.messages[j];
-              if (msg.id === message.id) {
-                contains = true;
-              }
-            }
-            if (!contains) {
-              bd_kfe_data.messages.push(message);
-            }
-          }
-          bd_kfe_utils.scrollToBottom();
-        } else {
-          alert(response.message);
-        }
-      },
-      error: function(error) {
-        console.log(error);
-        alert(error);
-      }
-    });
+    // $.ajax({
+    //   url: data.HTTP_HOST +
+    //   "/api/messages/user?access_token=" +
+    //   data.passport.token.access_token,
+    //   type: "get",
+    //   data: {
+    //     uid: data.uid,
+    //     page: data.page,
+    //     size: 100,
+    //     client: data.client
+    //   },
+    //   success:function(response){
+    //     console.log(response.data);
+    //     if (response.status_code === 200) {
+    //       //
+    //       for (var i = 0; i < response.data.content.length; i++) {
+    //         var message = response.data.content[i];
+    //         //
+    //         var contains = false;
+    //         for (var j = 0; j < data.messages.length; j++) {
+    //           var msg = data.messages[j];
+    //           if (msg.id === message.id) {
+    //             contains = true;
+    //           }
+    //         }
+    //         if (!contains) {
+    //           data.messages.push(message);
+    //         }
+    //       }
+    //       utils.scrollToBottom();
+    //     } else {
+    //       alert(response.message);
+    //     }
+    //   },
+    //   error: function(error) {
+    //     console.log(error);
+    //     alert(error);
+    //   }
+    // });
   },
   /**
-   * @api {get} /api/answer/init 加载常见问题
+   * @api {get} /api/answer/init 初始化智能问答
    * @apiName initAnswer
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
    * @apiParam {String} wId 工作组唯一wid
    * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
-   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效, 当 type === 'workGroup' 时，可设置为空 ''
    * @apiParam {String} client 固定写死为 'web'
    * 
-   * @apiDescription 加载常见问题
+   * @apiDescription 初始化智能问答
    *
    * @apiUse ResponseResultSuccess
    */
   initAnswer: function () {
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/answer/init?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       type: "get",
       data: {
-        uid: bd_kfe_data.adminUid,
-        tid: bd_kfe_data.thread.tid,
-        client: bd_kfe_data.client
+        uid: data.adminUid,
+        tid: data.thread.tid,
+        client: data.client
       },
       success:function(response){
         console.log("query answer success:", response.data);
@@ -724,8 +892,8 @@ var bd_kfe_httpapi = {
           //
           var queryMessage = response.data;
           //
-          bd_kfe_utils.pushToMessageArray(queryMessage);
-          bd_kfe_utils.scrollToBottom();
+          utils.pushToMessageArray(queryMessage);
+          utils.scrollToBottom();
         } else {
           alert(response.message);
         }
@@ -735,11 +903,59 @@ var bd_kfe_httpapi = {
       }
     });
   },
+
+  /**
+   * @api {get} /api/v2/answer/init 初始化智能问答V2
+   * @apiName initAnswerV2
+   * @apiGroup Robot
+   * @apiVersion 1.4.8
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wid 工作组唯一wid, 当 type === 'appointed' 时，可设置为空 ''
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} aid 指定客服uid, 只有当type === 'appointed'时有效, 当 type === 'workGroup' 时，可设置为空 ''
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 初始化智能问答V2
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  initAnswerV2: function (type, wid, aid) {
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/v2/answer/init?access_token=" +
+      data.passport.token.access_token,
+      type: "get",
+      data: {
+        type: type,
+        wid: wid,
+        aid: aid,
+        client: data.client
+      },
+      success:function(response){
+        console.log("query answer success:", response.data);
+        if (response.status_code === 200) {
+          //
+          var queryMessage = response.data;
+          //
+          utils.pushToMessageArray(queryMessage);
+          utils.scrollToBottom();
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function(error) {
+        console.log("query answers error:", error);
+      }
+    });
+  },
+
   /**
    * @api {get} /api/answer/top 获取热门问题
    * @apiName getTopAnswers
-   * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiGroup Robot
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -752,20 +968,20 @@ var bd_kfe_httpapi = {
    */
   getTopAnswers: function () {
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/answer/top?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       type: "get",
       data: {
-        uid: bd_kfe_data.adminUid,
-        client: bd_kfe_data.client
+        uid: data.adminUid,
+        client: data.client
       },
       success:function(response){
         console.log("fetch answers success:", response.data);
         if (response.status_code === 200) {
-          bd_kfe_data.answers = response.data;
-          bd_kfe_utils.pushAnswers(bd_kfe_data.answers.content);
+          data.answers = response.data;
+          utils.pushAnswers(data.answers.content);
         } else {
           alert(response.message);
         }
@@ -778,14 +994,14 @@ var bd_kfe_httpapi = {
   /**
    * @api {get} /api/answer/query 根据问题qid请求智能问答答案
    * @apiName getAnswer
-   * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiGroup Robot
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
    * @apiParam {String} uid 管理员uid
    * @apiParam {String} tid 会话tid
-   * @apiParam {String} aid 问题aid
+   * @apiParam {String} aId 问题aid
    * @apiParam {String} client 固定写死为 'web'
    * 
    * @apiDescription 请求会话
@@ -794,21 +1010,21 @@ var bd_kfe_httpapi = {
    */
   getAnswer: function (aid) {
     // 可以限制在会话结束之后，不允许请求答案
-    // if (bd_kfe_data.isThreadClosed) {
+    // if (data.isThreadClosed) {
     //   alert("会话已经结束");
     //   return;
     // }
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/answer/query?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       type: "get",
       data: {
-        uid: bd_kfe_data.adminUid,
-        tid: bd_kfe_data.thread.tid,
+        uid: data.adminUid,
+        tid: data.thread.tid,
         aid: aid,
-        client: bd_kfe_data.client
+        client: data.client
       },
       success:function(response){
         console.log("query answer success:", response.data);
@@ -817,9 +1033,9 @@ var bd_kfe_httpapi = {
           var queryMessage = response.data.query;
           var replyMessage = response.data.reply;
           //
-          bd_kfe_utils.pushToMessageArray(queryMessage);
-          bd_kfe_utils.pushToMessageArray(replyMessage);
-          bd_kfe_utils.scrollToBottom();
+          utils.pushToMessageArray(queryMessage);
+          utils.pushToMessageArray(replyMessage);
+          utils.scrollToBottom();
         } else {
           alert(response.message);
         }
@@ -832,8 +1048,8 @@ var bd_kfe_httpapi = {
   /**
    * @api {get} /api/answer/message 输入内容，请求智能答案
    * @apiName messageAnswer
-   * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiGroup Robot
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -848,30 +1064,39 @@ var bd_kfe_httpapi = {
    */
   messageAnswer: function (content) {
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/answer/message?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       type: "get",
       data: {
-        uid: bd_kfe_data.adminUid,
-        tid: bd_kfe_data.thread.tid,
+        uid: data.adminUid,
+        tid: data.thread.tid,
         content: content,
-        client: bd_kfe_data.client
+        client: data.client
       },
       success:function(response){
         console.log("query answer success:", response.data);
-        if (
-          response.status_code === 200 ||
-          response.status_code === 201
-        ) {
-          //
+        if (response.status_code === 200) {
+          // 正确匹配到答案
           var queryMessage = response.data.query;
           var replyMessage = response.data.reply;
           //
-          bd_kfe_utils.pushToMessageArray(queryMessage);
-          bd_kfe_utils.pushToMessageArray(replyMessage);
-          bd_kfe_utils.scrollToBottom();
+          // TODO: 答案中添加 '有帮助'、'无帮助'，访客点击可反馈答案是否有用
+          //
+          utils.pushToMessageArray(queryMessage);
+          utils.pushToMessageArray(replyMessage);
+          utils.scrollToBottom();
+        } else if (response.status_code === 201) {
+          // 未匹配到答案
+          var queryMessage = response.data.query;
+          var replyMessage = response.data.reply;
+          //
+          // TODO: 回答内容中添加 '人工客服' 字样，访客点击可直接联系人工客服
+          //
+          utils.pushToMessageArray(queryMessage);
+          utils.pushToMessageArray(replyMessage);
+          utils.scrollToBottom();
         } else {
           alert(response.message);
         }
@@ -915,13 +1140,22 @@ var bd_kfe_httpapi = {
       },
       success:function(response){
         console.log("query answer success:", response.data);
-        if (
-          response.status_code === 200 ||
-          response.status_code === 201
-        ) {
-          //
+        if (response.status_code === 200) {
+          // 正确匹配到答案
           var queryMessage = response.data.query;
           var replyMessage = response.data.reply;
+          //
+          // TODO: 答案中添加 '有帮助'、'无帮助'，访客点击可反馈答案是否有用
+          //
+          utils.pushToMessageArray(queryMessage);
+          utils.pushToMessageArray(replyMessage);
+          utils.scrollToBottom();
+        } else if (response.status_code === 201) {
+          // 未匹配到答案
+          var queryMessage = response.data.query;
+          var replyMessage = response.data.reply;
+          //
+          // TODO: 回答内容中添加 '人工客服' 字样，访客点击可直接联系人工客服
           //
           utils.pushToMessageArray(queryMessage);
           utils.pushToMessageArray(replyMessage);
@@ -939,7 +1173,7 @@ var bd_kfe_httpapi = {
    * @api {post} /api/thread/request 评价智能问答结果(TODO，未上线)
    * @apiName rateAnswer
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -955,17 +1189,17 @@ var bd_kfe_httpapi = {
   rateAnswer: function (rate) {
     //
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/answer/rate?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       type: "post",
       data: JSON.stringify({
-        uid: bd_kfe_data.adminUid,
-        aid: bd_kfe_data.aid,
+        uid: data.adminUid,
+        aid: data.aid,
         rate: rate,
-        client: bd_kfe_data.client
+        client: data.client
       }),
       success:function(response){
         console.log("success:", response.data);
@@ -984,12 +1218,12 @@ var bd_kfe_httpapi = {
    * @api {post} /api/leavemsg/save 留言
    * @apiName leaveMessage
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
-   * @apiParam {String} wId 工作组唯一wid
-   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效 
+   * @apiParam {String} wId 工作组唯一wid, 可为空
+   * @apiParam {String} aId 指定客服uid, 只有当type === 'appointed'时有效, 可为空
    * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
    * @apiParam {String} mobile 手机
    * @apiParam {String} email 邮箱
@@ -1005,21 +1239,21 @@ var bd_kfe_httpapi = {
     var email = $("#leavemsgemail").val();
     var content = $("#leavemsgcontent").val();
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/leavemsg/save?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       type: "post",
       data: JSON.stringify({
-        uid: bd_kfe_data.adminUid,
-        wid: bd_kfe_data.workGroupWid,
-        aid: bd_kfe_data.agentUid,
-        type: bd_kfe_data.type,
+        uid: data.adminUid,
+        wid: data.workGroupWid,
+        aid: data.agentUid,
+        type: data.type,
         mobile: mobile,
         email: email,
         content: content,
-        client: bd_kfe_data.client
+        client: data.client
       }),
       success:function(response){
         console.log("leave message: ", response.data);
@@ -1037,11 +1271,76 @@ var bd_kfe_httpapi = {
       }
     });
   },
+
+  /**
+   * @api {post} /api/v2/leavemsg/save/dxz 留言v2
+   * @apiName leaveMessageV2
+   * @apiGroup User
+   * @apiVersion 1.4.8
+   * @apiPermission afterLogin
+   * 
+   * @apiParam {String} access_token 访问令牌
+   * @apiParam {String} wId 工作组唯一wid, 可为空
+   * @apiParam {String} aId 指定坐席 客服uid, 只有当type === 'appointed'时有效, 可为空
+   * @apiParam {String} type 区分工作组会话 'workGroup'、指定坐席会话 'appointed'
+   * @apiParam {String} mobile 手机
+   * @apiParam {String} email 邮箱
+   * @apiParam {String} nickname 昵称
+   * @apiParam {String} location 所属区域
+   * @apiParam {String} country 意向国家
+   * @apiParam {String} content 留言内容
+   * @apiParam {String} client 固定写死为 'web'
+   * 
+   * @apiDescription 留言
+   *
+   * @apiUse ResponseResultSuccess
+   */
+  leaveMessageV2: function () {
+    var mobile = $("#leavemsgmobile").val();
+    var email = $("#leavemsgemail").val();
+    var content = $("#leavemsgcontent").val();
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/v2/leavemsg/save/dxz?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      type: "post",
+      data: JSON.stringify({
+        uid: data.adminUid,
+        wid: data.workGroupWid,
+        aid: data.agentUid,
+        type: data.type,
+        mobile: mobile,
+        email: email,
+        nickname: "昵称",
+        location: "所属区域",
+        country: "意向国家",
+        content: content,
+        client: data.client
+      }),
+      success:function(response){
+        console.log("leave message: ", response.data);
+        if (response.status_code === 200) {
+          alert("留言成功");
+          $("#byteDesk-chat").show();
+          $("#byteDesk-leave").hide();
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function(error) {
+        console.log(error);
+        alert("留言失败");
+      }
+    });
+  },
+
   /**
    * @api {get} /api/thread/questionnaire 选择问卷答案
    * @apiName chooseQuestionnaire
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1055,86 +1354,48 @@ var bd_kfe_httpapi = {
    */
   chooseQuestionnaire: function (itemQid) {
     console.log("choose questionnaire: " + itemQid);
-    // 留学: 意向国家 qid = '201810061551181'
-    // 移民：意向国家 qid = '201810061551183'
-    // 语培：意向类别 qid = '201810061551182'
-    // 其他：意向类别 qid = '201810061551184'
-    // 院校：意向院校 qid = '201810061551185'
     // 只允许同时进行一个会话
-    if (bd_kfe_data.isThreadStarted) {
+    if (data.isThreadStarted) {
       alert("不能重复请求");
       return;
     }
-    //
-    if (itemQid === '201810061551181') {
-      bd_kfe_data.isLiuXue = true;
-    } else {
-      bd_kfe_data.isLiuXue = false;
-    }
-    //
-    var workGroups = [];
-    for (var i = 0; i < bd_kfe_data.questionnaireItemItems.length; i++) {
-        var item = bd_kfe_data.questionnaireItemItems[i];
-        if (item.qid == itemQid) {
-          console.log('qid:' + item.qid + ' == ' + itemQid);
-          workGroups = item.workGroups;
-          break;
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/questionnaire?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      type: "get",
+      data: {
+        tId: data.thread.tid,
+        itemQid: itemQid,
+        client: data.client
+      },
+      success:function(response){
+        console.log("choose questionnaire success:", response.data);
+        if (
+          response.status_code === 200 ||
+          response.status_code === 201
+        ) {
+          //
+          var message = response.data;
+          // 添加消息
+          utils.pushToMessageArray(message);
+          // 滚动到底部
+          utils.scrollToBottom();
+        } else {
+          alert(response.message);
         }
-    }
-    //
-    var message =  {
-        mid: bd_kfe_utils.guid(),
-        type: 'workGroup',
-        content: '选择工作组',
-        workGroups: workGroups,
-        createdAt: bd_kfe_utils.currentTimestamp(),
-        status: 'stored',
-        user: {
-            uid: 'uid',
-            username: '系统用户',
-            nickname: '系统通知',
-            avatar: 'https://chainsnow.oss-cn-shenzhen.aliyuncs.com/avatars/admin_default_avatar.png',
-            visitor: false
-        }
-    };
-    bd_kfe_utils.pushToMessageArray(message);
-    // $.ajax({
-    //   url: bd_kfe_data.HTTP_HOST +
-    //   "/api/thread/questionnaire?access_token=" +
-    //   bd_kfe_data.passport.token.access_token,
-    //   contentType: "application/json; charset=utf-8",
-    //   type: "get",
-    //   data: {
-    //     tId: bd_kfe_data.thread.tid,
-    //     itemQid: itemQid,
-    //     client: bd_kfe_data.client
-    //   },
-    //   success:function(response){
-    //     console.log("choose questionnaire success:", response.data);
-    //     if (
-    //       response.status_code === 200 ||
-    //       response.status_code === 201
-    //     ) {
-    //       //
-    //       var message = response.data;
-    //       // 添加消息
-    //       bd_kfe_utils.pushToMessageArray(message);
-    //       // 滚动到底部
-    //       bd_kfe_utils.scrollToBottom();
-    //     } else {
-    //       alert(response.message);
-    //     }
-    //   },
-    //   error: function(error) {
-    //     console.log("choose questionnaire error:", error);
-    //   }
-    // });
+      },
+      error: function(error) {
+        console.log("choose questionnaire error:", error);
+      }
+    });
   },
   /**
    * @api {get} /api/thread/country 选择要留学国家
    * @apiName chooseCountry
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1148,16 +1409,16 @@ var bd_kfe_httpapi = {
    */
   chooseCountry: function (companyCid, countryCid) {
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/thread/country?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       type: "get",
       data: {
-        tId: bd_kfe_data.thread.tid,
+        tId: data.thread.tid,
         companyCid: companyCid,
         countryCid: countryCid,
-        client: bd_kfe_data.client
+        client: data.client
       },
       success:function(response){
         console.log("choose country success:", response.data);
@@ -1168,9 +1429,9 @@ var bd_kfe_httpapi = {
           //
           var message = response.data;
           // 添加消息
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 滚动到底部
-          bd_kfe_utils.scrollToBottom();
+          utils.scrollToBottom();
         } else {
           alert(response.message);
         }
@@ -1184,7 +1445,7 @@ var bd_kfe_httpapi = {
    * @api {get} /api/thread/choose/workGroup 选择工作组
    * @apiName chooseWorkGroup
    * @apiGroup User
-   * @apiVersion 1.4.7
+   * @apiVersion 1.5.6
    * @apiPermission afterLogin
    * 
    * @apiParam {String} access_token 访问令牌
@@ -1196,111 +1457,106 @@ var bd_kfe_httpapi = {
    *
    * @apiUse ResponseResultSuccess
    */
-  chooseWorkGroup: function (wId, workGroupNickname) {
-    console.log("choose workgroup:", wId, workGroupNickname);
+  chooseWorkGroup: function (wId) {
+    console.log("choose workgroup:", wId);
     // 只允许同时进行一个会话
-    if (bd_kfe_data.isThreadStarted) {
+    if (data.isThreadStarted) {
       alert("不能重复请求");
       return;
     }
-    if (bd_kfe_data.isLiuXue) {
-      console.log('is liuxue');
-      bd_kfe_httpapi.chooseWorkGroupLiuXue(wId, workGroupNickname);
-    } else {
-      $.ajax({
-        url: bd_kfe_data.HTTP_HOST +
-        "/api/thread/choose/workGroup?access_token=" +
-        bd_kfe_data.passport.token.access_token,
-        contentType: "application/json; charset=utf-8",
-        type: "get",
-        data: {
-          tId: bd_kfe_data.thread.tid,
-          wId: wId,
-          client: bd_kfe_data.client
-        },
-        success:function(response){
-          console.log("choose workGroup success:", response.data);
-          var message = response.data;
-          if (response.status_code === 200) {
-            //
-            bd_kfe_utils.pushToMessageArray(message);
-            // 1. 保存thread
-            bd_kfe_data.thread = message.thread;
-            // 2. 订阅会话消息
-            bd_kfe_stompapi.subscribeTopic(bd_kfe_data.threadTopic());
-            // 3. 加载聊天记录
-            bd_kfe_httpapi.loadMoreMessages();
-            // 4. 头像、标题、描述
-            if (bd_kfe_data.thread.appointed) {
-              bd_kfe_data.title = bd_kfe_data.thread.agent.nickname;
-            } else {
-              bd_kfe_data.title = bd_kfe_data.thread.workGroup.nickname;
-            }
-            // 防止重复点击
-            bd_kfe_data.isThreadStarted = true;
-          } else if (response.status_code === 201) {
-            // message.content = '继续之前会话';
-            bd_kfe_utils.pushToMessageArray(message);
-            // 1. 保存thread
-            bd_kfe_data.thread = message.thread;
-            // 2. 订阅会话消息
-            bd_kfe_stompapi.subscribeTopic(bd_kfe_data.threadTopic());
-            // 3. 加载聊天记录
-            bd_kfe_httpapi.loadMoreMessages();
-            // 4. 头像、标题、描述
-            if (bd_kfe_data.thread.appointed) {
-              bd_kfe_data.title = bd_kfe_data.thread.agent.nickname;
-            } else {
-              bd_kfe_data.title = bd_kfe_data.thread.workGroup.nickname;
-            }
-            // 防止重复点击
-            bd_kfe_data.isThreadStarted = true;
-          } else if (response.status_code === 202) {
-            // 排队
-            bd_kfe_utils.pushToMessageArray(message);
-            // 1. 保存thread
-            bd_kfe_data.thread = message.thread;
-            // 2. 订阅会话消息
-            bd_kfe_stompapi.subscribeTopic(bd_kfe_data.threadTopic());
-            // 防止重复点击
-            bd_kfe_data.isThreadStarted = true;
-          } else if (response.status_code === 203) {
-            // 当前非工作时间，请自助查询或留言
-            bd_kfe_utils.pushToMessageArray(message);
-            // 1. 保存thread
-            bd_kfe_data.thread = message.thread;
-          } else if (response.status_code === 204) {
-            // 当前无客服在线，请自助查询或留言
-            bd_kfe_utils.pushToMessageArray(message);
-            // 1. 保存thread
-            bd_kfe_data.thread = message.thread;
-          } else if (response.status_code === 205) {
-            // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
-            bd_kfe_utils.pushToMessageArray(message);
-            // 1. 保存thread
-            bd_kfe_data.thread = message.thread;
-          }  else if (response.status_code === 206) {
-            // 返回机器人初始欢迎语 + 欢迎问题列表
-            bd_kfe_utils.pushToMessageArray(message);
-            // 1. 保存thread
-            bd_kfe_data.thread = message.thread;
-          } else if (response.status_code === -1) {
-            // access token invalid
-            bd_kfe_httpapi.login();
-          } else if (response.status_code === -2) {
-            // sid 或 wid 错误
-            alert("siteId或者工作组id错误");
-          } else if (response.status_code === -3) {
-            alert("您已经被禁言");
-          }
+    $.ajax({
+      url: data.HTTP_HOST +
+      "/api/thread/choose/workGroup?access_token=" +
+      data.passport.token.access_token,
+      contentType: "application/json; charset=utf-8",
+      type: "get",
+      data: {
+        tId: data.thread.tid,
+        wId: wId,
+        client: data.client
+      },
+      success:function(response){
+        console.log("choose workGroup success:", response.data);
+        var message = response.data;
+        if (response.status_code === 200) {
           //
-          bd_kfe_utils.scrollToBottom();
-        },
-        error: function(error) {
-          console.log("choose workGroup error:", error);
+          utils.pushToMessageArray(message);
+          // 1. 保存thread
+          data.thread = message.thread;
+          // 2. 订阅会话消息
+          stompapi.subscribeTopic(data.threadTopic());
+          // 3. 加载聊天记录
+          httpapi.loadMoreMessages();
+          // 4. 头像、标题、描述
+          if (data.thread.appointed) {
+            data.title = data.thread.agent.nickname;
+          } else {
+            data.title = data.thread.workGroup.nickname;
+          }
+          // 防止重复点击
+          data.isThreadStarted = true;
+        } else if (response.status_code === 201) {
+          // message.content = '继续之前会话';
+          utils.pushToMessageArray(message);
+          // 1. 保存thread
+          data.thread = message.thread;
+          // 2. 订阅会话消息
+          stompapi.subscribeTopic(data.threadTopic());
+          // 3. 加载聊天记录
+          httpapi.loadMoreMessages();
+          // 4. 头像、标题、描述
+          if (data.thread.appointed) {
+            data.title = data.thread.agent.nickname;
+          } else {
+            data.title = data.thread.workGroup.nickname;
+          }
+          // 防止重复点击
+          data.isThreadStarted = true;
+        } else if (response.status_code === 202) {
+          // 排队
+          utils.pushToMessageArray(message);
+          // 1. 保存thread
+          data.thread = message.thread;
+          // 2. 订阅会话消息
+          stompapi.subscribeTopic(data.threadTopic());
+          // 防止重复点击
+          data.isThreadStarted = true;
+        } else if (response.status_code === 203) {
+          // 当前非工作时间，请自助查询或留言
+          utils.pushToMessageArray(message);
+          // 1. 保存thread
+          data.thread = message.thread;
+        } else if (response.status_code === 204) {
+          // 当前无客服在线，请自助查询或留言
+          utils.pushToMessageArray(message);
+          // 1. 保存thread
+          data.thread = message.thread;
+        } else if (response.status_code === 205) {
+          // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
+          utils.pushToMessageArray(message);
+          // 1. 保存thread
+          data.thread = message.thread;
+        } else if (response.status_code === 206) {
+          // 返回机器人初始欢迎语 + 欢迎问题列表
+          utils.pushToMessageArray(message);
+          // 1. 保存thread
+          data.thread = message.thread;
+        } else if (response.status_code === -1) {
+          // access token invalid
+          httpapi.login();
+        } else if (response.status_code === -2) {
+          // sid 或 wid 错误
+          alert("siteId或者工作组id错误");
+        } else if (response.status_code === -3) {
+          alert("您已经被禁言");
         }
-      });
-    }
+        //
+        utils.scrollToBottom();
+      },
+      error: function(error) {
+        console.log("choose workGroup error:", error);
+      }
+    });
   },
   /**
    * @api {get} /api/thread/choose/workGroup/liuxue 选择留学工作组
@@ -1321,85 +1577,85 @@ var bd_kfe_httpapi = {
   chooseWorkGroupLiuXue: function (wId, workGroupNickname) {
     console.log("choose workgroup liuxue:", wId, workGroupNickname);
     // 只允许同时进行一个会话
-    if (bd_kfe_data.isThreadStarted) {
+    if (data.isThreadStarted) {
       alert("不能重复请求");
       return;
     }
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/thread/choose/workGroup/liuxue?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       type: "get",
       data: {
         wId: wId,
         nickname: workGroupNickname,
-        client: bd_kfe_data.client
+        client: data.client
       },
       success:function(response){
         console.log("choose workGroup Liuxue success:", response.data);
         var message = response.data;
         if (response.status_code === 200) {
           //
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
           // 2. 订阅会话消息
-          bd_kfe_stompapi.subscribeTopic(bd_kfe_data.threadTopic());
+          bd_kfe_stompapi.subscribeTopic(data.threadTopic());
           // 3. 加载聊天记录
           bd_kfe_httpapi.loadMoreMessages();
           // 4. 头像、标题、描述
-          if (bd_kfe_data.thread.appointed) {
-            bd_kfe_data.title = bd_kfe_data.thread.agent.nickname;
+          if (data.thread.appointed) {
+            data.title = data.thread.agent.nickname;
           } else {
-            bd_kfe_data.title = bd_kfe_data.thread.workGroup.nickname;
+            data.title = data.thread.workGroup.nickname;
           }
           // 防止重复点击
-          bd_kfe_data.isThreadStarted = true;
+          data.isThreadStarted = true;
         } else if (response.status_code === 201) {
           // message.content = '继续之前会话';
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
           // 2. 订阅会话消息
-          bd_kfe_stompapi.subscribeTopic(bd_kfe_data.threadTopic());
+          bd_kfe_stompapi.subscribeTopic(data.threadTopic());
           // 3. 加载聊天记录
           bd_kfe_httpapi.loadMoreMessages();
           // 4. 头像、标题、描述
-          if (bd_kfe_data.thread.appointed) {
-            bd_kfe_data.title = bd_kfe_data.thread.agent.nickname;
+          if (data.thread.appointed) {
+            data.title = data.thread.agent.nickname;
           } else {
-            bd_kfe_data.title = bd_kfe_data.thread.workGroup.nickname;
+            data.title = data.thread.workGroup.nickname;
           }
           // 防止重复点击
-          bd_kfe_data.isThreadStarted = true;
+          data.isThreadStarted = true;
         } else if (response.status_code === 202) {
           // 排队
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
           // 防止重复点击
-          bd_kfe_data.isThreadStarted = true;
+          data.isThreadStarted = true;
         } else if (response.status_code === 203) {
           // 当前非工作时间，请自助查询或留言
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
         } else if (response.status_code === 204) {
           // 当前无客服在线，请自助查询或留言
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
         } else if (response.status_code === 205) {
           // 插入业务路由，相当于咨询前提问问卷（选择 或 填写表单）
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
         } else if (response.status_code === 206) {
           // 返回机器人初始欢迎语 + 欢迎问题列表
-          bd_kfe_utils.pushToMessageArray(message);
+          utils.pushToMessageArray(message);
           // 1. 保存thread
-          bd_kfe_data.thread = message.thread;
+          data.thread = message.thread;
         } else if (response.status_code === -1) {
           // access token invalid
           bd_kfe_httpapi.login();
@@ -1410,7 +1666,7 @@ var bd_kfe_httpapi = {
           alert("您已经被禁言");
         }
         //
-        bd_kfe_utils.scrollToBottom();
+        utils.scrollToBottom();
       },
       error: function(error) {
         console.log("choose workGroup error:", error);
@@ -1434,14 +1690,14 @@ var bd_kfe_httpapi = {
    */
   getWorkGroupStatus: function (wid) {
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/status/workGroup?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       type: "get",
       data: {
         wid: wid,
-        client: bd_kfe_data.client
+        client: data.client
       },
       success:function(response){
         console.log("get workGroup status success:", response.data);
@@ -1474,14 +1730,14 @@ var bd_kfe_httpapi = {
    */
   getUserStatus: function (uid) {
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST +
+      url: data.HTTP_HOST +
       "/api/status/agent?access_token=" +
-      bd_kfe_data.passport.token.access_token,
+      data.passport.token.access_token,
       contentType: "application/json; charset=utf-8",
       type: "get",
       data: {
         uid: uid,
-        client: bd_kfe_data.client
+        client: data.client
       },
       success:function(response){
         console.log("get user status success:", response.data);

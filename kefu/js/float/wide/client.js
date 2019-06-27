@@ -1309,11 +1309,22 @@
                     },
                     success:function(response){
                         console.log("query answer success:", response);
-                        if (response.status_code === 200 ||
-                            response.status_code === 201)  {
-                            //
+                        if (response.status_code === 200)  {
+                            // 正确匹配到答案
                             var queryMessage = response.data.query;
                             var replyMessage = response.data.reply;
+                            //
+                            // TODO: 答案中添加 '有帮助'、'无帮助'，访客点击可反馈答案是否有用
+                            //
+                            bytedeskapp.messages.push(queryMessage);
+                            bytedeskapp.messages.push(replyMessage);
+                            bytedeskapp.scrollToBottom()
+                        } else if (response.status_code === 201)  {
+                            // 未匹配到答案
+                            var queryMessage = response.data.query;
+                            var replyMessage = response.data.reply;
+                            //
+                            // TODO: 回答内容中添加 '人工客服' 字样，访客点击可直接联系人工客服
                             //
                             bytedeskapp.messages.push(queryMessage);
                             bytedeskapp.messages.push(replyMessage);

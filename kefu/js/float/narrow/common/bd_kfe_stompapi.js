@@ -64,12 +64,17 @@ var bd_kfe_stompapi = {
         (messageObject.type === "text" ||
           messageObject.type === "image" ||
           messageObject.type === "file") &&
-        messageObject.user.uid !== bd_kfe_data.uid
+        messageObject.user.uid !== bd_kfe_data.uid // 区分非当前用户发送的消息
       ) {
         //
         var mid = messageObject.mid;
         // 发送消息回执：消息送达
         bd_kfe_stompapi.sendReceiptMessage(mid, "received");
+        // 设置左上角头像为客服头像 和 昵称
+        // TODO: 优化协议，避免每次收到消息都设置
+        $('#byteDesk-agent-avatar').attr('src', message.user.avatar);
+        $('#byteDesk-agent-nickname').text(message.user.nickname);
+        $('#byteDesk-agent-description').text(message.user.description);
       } else if (messageObject.type === "notification_browse_invite") {
         bd_kfe_data.browseInviteBIid = messageObject.browseInvite.bIid;
         // 客服邀请您参加会话
@@ -82,6 +87,8 @@ var bd_kfe_stompapi = {
         bd_kfe_data.thread = messageObject.thread;
         // 2. 订阅会话消息
         bd_kfe_stompapi.subscribeTopic(bd_kfe_data.threadTopic());
+        // 防止会话超时自动关闭，重新标记本地打开会话
+        bd_kfe_data.isThreadClosed = false;
       } else if (messageObject.type === "notification_invite_rate") {
         // 邀请评价
         bd_kfe_data.rateDialogVisible = true;

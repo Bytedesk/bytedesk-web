@@ -64,7 +64,7 @@
 
     // 样式表
     var floatCss = document.createElement('link');
-    floatCss.setAttribute('href','//cdn.bytedesk.com/css/float.css');
+    floatCss.setAttribute('href','//cdn.bytedesk.com/css/wide.css');
     floatCss.setAttribute('rel','stylesheet');
     floatCss.setAttribute('type','text/css');
     document.getElementsByTagName("head")[0].appendChild(floatCss);
@@ -95,9 +95,9 @@
         '//cdn.bytedesk.com/js/vendor/elementui/2.4.0/index.js',
         // '//cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js',
         // 自定义的js
-        './js/float/medium.js',
-        './js/float/html.js',
-        './js/float/client.js'
+        './js/float/wide/medium.js',
+        './js/float/wide/html.js',
+        './js/float/wide/client.js'
     ];
     loadJsList(vendorJs);
 
