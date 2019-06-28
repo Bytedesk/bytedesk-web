@@ -64,7 +64,7 @@ var bd_kfe_kefu = {
         returnValue = true;
       }
       return returnValue;
-    }
+    };
   }
   // 屏幕宽度小于340的时候，隐藏右侧栏
   // console.log("window width: " + $(window).width())
@@ -99,7 +99,7 @@ var bd_kfe_kefu = {
   $('#byteDesk-start').click(function(){
     if (bd_kfe_utils.isMobile()) {
       console.log('is mobile browser');
-      window.open(bd_kfe_data.URL_ROOT_PATH + 'mobile.html?uid=' + window.adminUid + '&wid=' + window.workGroupWid + '&type=' + window.type + '&aid=' + window.agentUid + '&ph=ph');
+      window.open(bd_kfe_data.URL_ROOT_PATH + 'chatvue.html?uid=' + window.adminUid + '&wid=' + window.workGroupWid + '&type=' + window.type + '&aid=' + window.agentUid + '&ph=ph');
     } else {
       console.log('is pc browser');
       document.getElementById("byteDesk-app-wrapper").style.display = '';
@@ -111,7 +111,7 @@ var bd_kfe_kefu = {
     }
   });
   $('#byteDesk-max').click(function(){
-    window.open(bd_kfe_data.URL_ROOT_PATH + 'pc.html?uid=' + window.adminUid + '&wid=' + window.workGroupWid + '&type=' + window.type + '&aid=' + window.agentUid + '&ph=ph');
+    window.open(bd_kfe_data.URL_ROOT_PATH + 'chatjq.html?uid=' + window.adminUid + '&wid=' + window.workGroupWid + '&type=' + window.type + '&aid=' + window.agentUid + '&ph=ph');
   });
   $('#byteDesk-close').click(function(){
     document.getElementById("byteDesk-app-wrapper").style.display = 'none';

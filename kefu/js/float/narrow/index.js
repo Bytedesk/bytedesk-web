@@ -5,7 +5,6 @@
  * @date 2018/10/15
  */
 (function () {
-
   /**
    * https://github.com/ChenShenhai/blog/issues/8
    *
@@ -14,7 +13,6 @@
    * @private
    */
   var _index = 0;
-
   /**
    * 加载js文件
    * @name loadJs
@@ -25,7 +23,6 @@
       var _script = document.createElement('script');
       _script.src = url;
       callback = callback || function(){};
-
       if(navigator.userAgent.indexOf("MSIE") > 0) {
           _script.onreadystatechange = function () {
               //
@@ -34,34 +31,29 @@
                   this.onload = this.onreadystatechange = null;
                   this.parentNode.removeChild(this);
               }
-          }
+          };
       } else {
           _script.onload = function() {
               callback();
               this.onload = this.onreadystatechange = null;
               this.parentNode.removeChild(this);
-          }
+          };
       }
-
       document.getElementsByTagName('head')[0].appendChild(_script);
   }
-
   /**
    * 加载js文件列表
    * @name loadJsList
    * @param {Array} arr
    */
   function loadJsList() {
-
       if( _index < vendorJs.length ) {
-
           loadJs(vendorJs[_index], function() {
               _index ++;
               loadJsList(vendorJs);
-          })
+          });
       }
   }
-
   //
   var alicdnCss = document.createElement('link');
   alicdnCss.setAttribute('href','//at.alicdn.com/t/font_761687_3ir3qjqv9ft.css');

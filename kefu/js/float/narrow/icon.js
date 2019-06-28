@@ -7,9 +7,7 @@
 (function () {
   //
   var contentHtml = '<div id="byteDesk-start" class="byteDesk-start-medium" style="display: none;">\n' +
-      '            <div class="byteDesk-start-medium-div">\n' +
-      '                <i class="iconfont icon-agent" style="font-size: 22px;"></i>\n' +
-      '            </div>\n' +
+      '               <img src="/assets/img/icon/chat.png" style="height:25px; width:25px; margin-top: 13px;"/>' +
       '        </div>';
   //
   var byteDesk = document.getElementById('byteDesk');

@@ -60,10 +60,7 @@ var bd_kfe_stompapi = {
     bd_kfe_data.stompClient.subscribe("/topic/" + topic, function (message) {
       // console.log('message :', message, 'body:', message.body);
       var messageObject = JSON.parse(message.body);
-      if (
-        (messageObject.type === "text" ||
-          messageObject.type === "image" ||
-          messageObject.type === "file") &&
+      if ((messageObject.type === "text" || messageObject.type === "image" || messageObject.type === "file") &&
         messageObject.user.uid !== bd_kfe_data.uid // 区分非当前用户发送的消息
       ) {
         //
@@ -72,9 +69,9 @@ var bd_kfe_stompapi = {
         bd_kfe_stompapi.sendReceiptMessage(mid, "received");
         // 设置左上角头像为客服头像 和 昵称
         // TODO: 优化协议，避免每次收到消息都设置
-        $('#byteDesk-agent-avatar').attr('src', message.user.avatar);
-        $('#byteDesk-agent-nickname').text(message.user.nickname);
-        $('#byteDesk-agent-description').text(message.user.description);
+        // $('#byteDesk-agent-avatar').attr('src', messageObject.user.avatar);
+        // $('#byteDesk-agent-nickname').text(messageObject.user.nickname);
+        // $('#byteDesk-agent-description').text(messageObject.user.description);
       } else if (messageObject.type === "notification_browse_invite") {
         bd_kfe_data.browseInviteBIid = messageObject.browseInvite.bIid;
         // 客服邀请您参加会话

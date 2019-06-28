@@ -274,7 +274,7 @@ var bd_kfe_utils = {
         var question = "";
         for (var j = 0; j < message.answers.length; j++) {
           var answer = message.answers[j];
-          question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.getAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
+          question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
         }
         //
         content +=
@@ -384,7 +384,7 @@ var bd_kfe_utils = {
     var question = "";
     for (var j = 0; j < message.answers.length; j++) {
       var answer = message.answers[j];
-      question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.getAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
+      question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
     }
     //
     var isHelpfull = "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.rateAnswer(" + message.answer.aid + "," + message.mid + ",true)'>有帮助</span>" + 
@@ -435,7 +435,7 @@ var bd_kfe_utils = {
     var question = "";
     for (var j = 0; j < message.answers.length; j++) {
       var answer = message.answers[j];
-      question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.getAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
+      question += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ")'>" + answer.question + "</span>";
     }
     //
     var contactAgent = "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestAgent()'>人工客服</span>";
@@ -462,7 +462,7 @@ var bd_kfe_utils = {
     for (var i = 0; i < answers.length; i++) {
       var answer = answers[i];
       content +=
-        "<li class='byteDesk-question' onclick='bd_kfe_httpapi.getAnswer(" +
+        "<li class='byteDesk-question' onclick='bd_kfe_httpapi.queryAnswer(" +
         answer.aid +
         ")'>" +
         answer.question +

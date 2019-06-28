@@ -29,7 +29,7 @@ var kefu = {
       data.password = data.username;
     }
     var tokenLocal = localStorage.getItem(data.token);
-    if (tokenLocal != null) {
+    if (!tokenLocal) {
       data.passport.token = JSON.parse(tokenLocal);
     }
     // TODO: 获取浏览器信息，提交给服务器

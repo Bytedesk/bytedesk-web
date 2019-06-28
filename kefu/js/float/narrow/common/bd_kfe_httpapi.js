@@ -951,7 +951,7 @@ var bd_kfe_httpapi = {
   },
   /**
    * @api {get} /api/answer/query 根据问题qid请求智能问答答案
-   * @apiName getAnswer
+   * @apiName queryAnswer
    * @apiGroup User
    * @apiVersion 1.4.7
    * @apiPermission afterLogin
@@ -966,7 +966,7 @@ var bd_kfe_httpapi = {
    *
    * @apiUse ResponseResultSuccess
    */
-  getAnswer: function (aid) {
+  queryAnswer: function (aid) {
     // 可以限制在会话结束之后，不允许请求答案
     // if (bd_kfe_data.isThreadClosed) {
     //   alert("会话已经结束");
@@ -979,7 +979,6 @@ var bd_kfe_httpapi = {
       contentType: "application/json; charset=utf-8",
       type: "get",
       data: {
-        uid: bd_kfe_data.adminUid,
         tid: bd_kfe_data.thread.tid,
         aid: aid,
         client: bd_kfe_data.client
