@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, height=device-height, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+    <!-- TODO: 显示当前工作组昵称 -->
+    <title>在线客服</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_761687_xivxue5rikg.css" />
+    <link rel="stylesheet" href="./css/vendor/mintui/2.2.13/style.css">
+    <link rel="stylesheet" href="./js/vuephotopreview/skin.css">
+    <link rel="stylesheet" href="./css/chatmintui.min.css">
+</head>
+
+<body>
+
+    <div id="app-wrapper" style="display: none;">
+        <div id="app">
+            <a v-if="!hideNav" :href="backUrl" class="page-back router-link-active"><em
+                    class="mintui mintui-back"></em></a>
+            <div v-if="!hideNav" class="page-badge">
+                <div class="page-title" v-if="!isInputingVisible">{{ title }}</div>
+                <div class="page-title" v-if="isInputingVisible">{{ $t("typing") }}</div>
+            </div>
+            <div class="page-content">
+                <div class="page-message" v-if="showMessage">
+                    <ul class="message-ul" ref="listm">
+                        <li v-if="showTopTip"><span class='toptip'>{{ topTip }}</span></li>
+                        <!-- <div v-if="loadMoreVisible" class="pullrefresh" @click="loadMoreMessages()">历史聊天记录</div> -->
+                        <li v-for="message in messages" :key="message.id">
+
+                            <p class="timestamp">
+                                <!-- | datetime -->
+                                <span>{{ message.createdAt }}</span><br />
+                            <div v-if="is_type_commodity(message)" id="goods" class="goods-info">
+                                <div class="goods-pic"><img id="goods-pic" alt="" width="50px" height="50px"
+                                        :src="jsonObject(message.content).imageUrl"></div>
+                                <div class="goods-desc">
+                                    <div id="goods-name" class="goods-name">{{ jsonObject(message.content).title }}
+                                    </div>
+                                    <div class="goods-more">
+                                        <div id="goods-price" class="goods-price">
+                                            ￥{{ jsonObject(message.content).price }}</div>
+                                        <div id="goods-sendlink" class="goods-sendlink"
+                                            @click="sendCommodityMessageSync()">{{ $t("sendLink") }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span v-else-if="is_type_notification_agent_close(message)" class="timestamp">
+                                <span style="width: 100%;">{{ $t("agentCloseThread") }}</span>
+                                <p style='color:#007bff;' @click="manulRequestThread()">{{ $t("contactAgent") }}</p>
+                            </span>
+                            <span v-else-if="is_type_notification_visitor_close(message)" class="timestamp">
+                                <span style="width: 100%;">{{ $t("visitorCloseThread") }}</span>
+                                <p style='color:#007bff;' @click="manulRequestThread()">{{ $t("contactAgent") }}</p>
+                            </span>
+                            <span v-else-if="is_type_notification_auto_close(message)" class="timestamp">
+                                <span style="width: 100%;">{{ $t("autoCloseThread") }}</span>
+                                <p style='color:#007bff;' @click="manulRequestThread()">{{ $t("contactAgent") }}</p>
+                            </span>
+                            <span v-else-if="is_type_notification_thread_reentry(message)" class="timestamp">
+                                <span style="width: 100%;">{{ $t("continueChat") }}</span>
+                            </span>
+                            <span v-else-if="is_type_notification_offline(message)" class="timestamp">
+                                <span style="width: 100%;">{{ $t("agentOffline") }}</span>
+                            </span>
+                            <span v-else-if="is_type_notification_invite_rate(message)" class="timestamp">
+                                <span style="width: 100%;">{{ $t("inviteRate") }}</span>
+                            </span>
+                            <span v-else-if="is_type_notification_rate_result(message)" class="timestamp">
+                                <span style="width: 100%;">{{ $t("rateResult") }}</span>
+                            </span>
+                            <span v-else-if="is_type_notification(message)" class="timestamp">
+                                <span style="width: 100%;">{{ message.content }}</span>
+                            </span>
+                            </p>
+
+                            <div v-if="!is_type_notification(message)" :class="{ self: is_self(message) }">
+                                <img v-if="show_header" class="avatar-mobile" width="30" height="30"
+                                    :src="message.user.avatar" alt="image" />
+                                <div v-if="!is_self(message)" class="nickname">{{ message.user.nickname }}</div>
+                                <!-- <div v-if="!is_self(message) && !is_type_thread(message)" class="nickname">{{ message.user.nickname }}</div> -->
+                                <!-- <div v-if="!is_self(message) && is_type_thread(message)" class="nickname">{{ $t("systemUser") }}</div> -->
+                                <div v-if="is_type_text(message)" class="text-mobile"
+                                    v-html="replaceFace(message.content)"></div>
+                                <div v-if="is_type_robot(message)" class="text-mobile">
+                                    <span v-html="message.content"></span>
+                                    <span v-for="item in message.answers" :key="item.id">
+                                        <p style="color:#007bff; cursor: pointer;" @click="queryAnswer(item.aid)">
+                                            {{ item.question }}</p>
+                                    </span>
+                                    <span v-if="message.user.uid !== uid" style='color:#007bff; cursor: pointer;'
+                                        @click="requestAgent()">{{ $t("agentChat") }}</span>
+                                </div>
+                                <div v-if="is_type_questionnaire(message)" class="text-mobile">
+                                    <span>{{ message.questionnaire.questionnaireItems[0].title }}</span>
+                                    <span
+                                        v-for="item in message.questionnaire.questionnaireItems[0].questionnaireItemItems"
+                                        :key="item.id">
+                                        <br />
+                                        <span style="color:#007bff; cursor: pointer;"
+                                            @click="chooseQuestionnaire(item.qid)">{{ item.content }}</span>
+                                    </span>
+                                </div>
+                                <div v-if="is_type_company(message)" class="text-mobile">
+                                    <span>{{ message.content }}</span>
+                                    <span v-for="item in message.company.countries" :key="item.id">
+                                        <br />
+                                        <span style="color:#007bff; cursor: pointer;"
+                                            @click="chooseCountry(message.company.cid, item.cid)">{{ item.name }}</span>
+                                    </span>
+                                </div>
+                                <div v-if="is_type_workGroup(message)" class="text-mobile">
+                                    <span>{{ message.content }}</span>
+                                    <span v-for="item in message.workGroups" :key="item.id">
+                                        <br />
+                                        <span style="color:#007bff; cursor: pointer;"
+                                            @click="chooseWorkGroup(item.wid)">{{ item.nickname }}</span>
+                                    </span>
+                                </div>
+                                <div v-if="is_type_image(message)" class="text-mobile">
+                                    <img :src="message.imageUrl" preview="2"
+                                        style="padding-top: 10px; padding-bottom: 10px; width: 100px; height: 100px;" />
+                                </div>
+                                <div v-if="is_type_file(message)" class="text">
+                                    <img src="https://www.bytedesk.com/img/input/file_selected.png" alt="[文件]"
+                                        style="padding-top: 10px; padding-bottom: 10px; width: 25px; height: 20px;"
+                                        @click="fileClicked(message.fileUrl)" />
+                                    <span><a :href="message.fileUrl" target="_blank">{{ $t("viewFile") }}</a></span>
+                                </div>
+                                <div v-if="is_type_voice(message)" class="text">
+                                    <img src="https://www.bytedesk.com/img/input/voice_received.png" alt="[语音]"
+                                        style="padding-top: 10px; padding-bottom: 10px; width: 25px; height: 20px;"
+                                        @click="voiceClicked(message.voiceUrl)" />
+                                </div>
+                                <div class="status" v-if="is_self(message)">
+                                    <i v-if="is_sending(message)" class="fa fa-spinner fa-spin"
+                                        style="font-size:12px"></i>
+                                    <i v-if="is_stored(message)" class="fa fa-times-circle" style="font-size:10px"></i>
+                                    <i v-if="is_received(message)"
+                                        style="font-size:10px; margin-right: 5px;">{{ $t("arrived") }}</i>
+                                    <i v-if="is_read(message)"
+                                        style="font-size:10px; margin-right: 5px;">{{ $t("readed") }}</i>
+                                    <i v-if="is_error(message)" class="fa fa-times-circle" style="font-size:12px"></i>
+                                    <!-- <i v-if="can_recall(message)" class="el-icon-delete" @click="textClicked(message)"></i> -->
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="page-leavemsg" v-if="showLeaveMessage">
+                    <p style="font-size: 10px; color: gray;">{{ leaveMessageTip }}</p>
+                    <mt-field :label="mobileTip" :placeholder="inputMobileTip" type="tel" v-model="mobile"></mt-field>
+                    <mt-field :label="leaveWordTip" :placeholder="leaveContentTip" type="textarea" rows="3"
+                        v-model="content"></mt-field>
+                    <mt-button size="large" type="primary" @click="leaveMessage()">{{ $t("submit") }}</mt-button>
+                </div>
+                <div class="page-form" v-if="showForm">
+                    <!-- <p style="font-size: 10px; color: gray;">{{ leaveMessageTip }}</p> -->
+                    <mt-field v-if="showRealname" :label="nameTip" :placeholder="inputNameTip" v-model="realname">
+                    </mt-field>
+                    <mt-field v-if="showMobile" :label="mobileTip" :placeholder="inputMobileTip" type="tel"
+                        v-model="mobile"></mt-field>
+                    <mt-field v-if="showEmail" :label="emailTip" :placeholder="inputEmailTip" v-model="email">
+                    </mt-field>
+                    <mt-field v-if="showAge" :label="ageTip" :placeholder="inputAgeTip" v-model="age"></mt-field>
+                    <mt-field v-if="showJob" :label="jobTip" :placeholder="inputJobTip" v-model="job"></mt-field>
+                    <!-- <mt-field v-if="showContent" label="附言" placeholder="请输入附言" type="textarea" rows="3" v-model="content"></mt-field> -->
+                    <!-- <mt-button size="large" @click="cancelForm()">取消</mt-button> -->
+                    <mt-button size="large" type="primary" @click="submitForm()">{{ $t("submit") }}</mt-button>
+                </div>
+                <div class="page-rate" v-if="showRate">
+                    <mt-radio :title="pleaseRateTip" v-model="rateValue"
+                        :options="[veryGoodTip, goodTip, averageTip, notGoodTip, badTip]">
+                    </mt-radio>
+                    <mt-field :label="rateTip" :placeholder="rateContentTip" type="textarea" rows="3"
+                        v-model="rateContent"></mt-field>
+                    <mt-button size="large" type="primary" @click="rate()">{{ $t("rate") }}</mt-button>
+                </div>
+            </div>
+
+            <div class="page-footer" v-if="showInputBar">
+                <input type="file" id="imagefile" style="display: none;" @change="uploadChange" />
+                <li id="page-upload-image" class="iconfont icon-image" @click="upload"></li>
+                <mt-field v-model="inputContent" :placeholder="pleaseInputTip"
+                    style="float: left; width: calc(100% - 105px);" @input="onInputChange"
+                    @keyup.enter.native="onKeyUp"></mt-field>
+                <mt-button style="margin-left: 5px;" @click="sendTextMessage" :disabled="sendButtonDisabled">
+                    {{ $t("send") }}</mt-button>
+            </div>
+        </div>
+    </div>
+
+    <script src='./js/vendor/jquery/1.9.1/jquery.min.js'></script>
+    <script src="./js/vendor/sockjs/1.1.4/sockjs.min.js"></script>
+    <script src="./js/vendor/stomp/1.2/stomp.min.js"></script>
+    <script src="./js/vendor/vue/2.5.16/vue.min.js"></script>
+    <script src="./js/vendor/mintui/2.2.13/index.js"></script>
+    <script src="./js/vendor/i18n/8.21.1/vue-i18n.min.js"></script>
+    <script src="./js/vendor/lodash/4.17.20/lodash.min.js"></script>
+    <script src="./js/vuephotopreview/vue-photo-preview.js"></script>
+    <script src="./js/float/narrow/common/bd_kfe_device.min.js"></script>
+    <script src="./js/chatmintui.min.js?v=1220"></script>
+    <!-- <script src="./js/chatmintui.js?v=1201"></script> -->
+
+    <script>
+        // https://my.oschina.net/u/4396841/blog/3429707
+        $("input,select,textarea").blur(function () {
+            setTimeout(function () {
+                var scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
+                window.scrollTo(0, Math.max(scrollHeight - 1, 0));
+            }, 100);
+        });
+    </script>
+
+</body>
+
+</html>
