@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 10:53:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 09:49:13
+ * @LastEditTime: 2024-06-14 09:56:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,7 @@
 -->
 # bytedesk web chat float demo
 
-## chatfloat demo
+bytedesk.com web lib for customer service chat widget
 
 ```js
 <script src="./index.js"></script>
