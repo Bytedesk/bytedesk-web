@@ -7,6 +7,8 @@
         chatUrl: '/chat?t=1&sid=default_wg_uid&',
         buttonPosition: 'right',
         buttonBackgroundColor: 'blue',
+        iframeWidth: 400,
+        iframeHeight: 600,
         iframeMargins: { right: 20, bottom: 20, left: 20 },
         buttonMargins: { right: 20, bottom: 20, left: 20 },
         showButton: true,
@@ -45,6 +47,8 @@
 
         button.addEventListener('click', function () {
             if (settings.showIframe) {
+                // 在点击事件中动态加载iframe内容
+                loadIframe();
                 showFloatWindow();
             }
         });
@@ -55,8 +59,8 @@
         iframeContainer.style.left = settings.buttonPosition === 'left' ? settings.iframeMargins.left + 'px' : '';
         iframeContainer.style.right = settings.buttonPosition === 'right' ? settings.iframeMargins.right + 'px' : '';
         iframeContainer.style.bottom = settings.iframeMargins.bottom + 'px';
-        iframeContainer.style.width = '400px';
-        iframeContainer.style.height = '600px';
+        iframeContainer.style.width = settings.iframeWidth + 'px';
+        iframeContainer.style.height = settings.iframeHeight + 'px';
         iframeContainer.style.display = 'none'; // 初始隐藏
         iframeContainer.style.backgroundColor = 'white';
         iframeContainer.style.zIndex = 1000;
@@ -64,14 +68,14 @@
         iframeContainer.style.boxShadow = '5px 5px 10px 0px rgba(0,0,0,0.5)';
 
         // 创建iframe
-        var iframe = document.createElement('iframe');
-        iframe.src = settings.chatUrl;
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.borderWidth = '2px';
-        iframe.style.borderColor = '#ddd';
-        iframe.style.borderStyle = 'solid';
-        iframe.style.borderRadius = '2%';
+        // var iframe = document.createElement('iframe');
+        // iframe.src = settings.chatUrl;
+        // iframe.style.width = '100%';
+        // iframe.style.height = '100%';
+        // iframe.style.borderWidth = '2px';
+        // iframe.style.borderColor = '#ddd';
+        // iframe.style.borderStyle = 'solid';
+        // iframe.style.borderRadius = '2%';
 
         // 创建关闭按钮
         var closeButton = document.createElement('button');
@@ -93,8 +97,21 @@
         // 将元素添加到页面中
         element.appendChild(button);
         var iframeContainerElement = element.appendChild(iframeContainer);
-        iframeContainerElement.appendChild(iframe);
+        // iframeContainerElement.appendChild(iframe);
         iframeContainerElement.appendChild(closeButton);
+
+        // 动态创建并加载iframe的函数
+        function loadIframe() {
+            var iframe = document.createElement('iframe');
+            iframe.src = settings.chatUrl;
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.borderWidth = '2px';
+            iframe.style.borderColor = '#ddd';
+            iframe.style.borderStyle = 'solid';
+            iframe.style.borderRadius = '2%';
+            iframeContainerElement.appendChild(iframe);
+        }
 
         // 显示或隐藏漂浮窗口的函数
         function showFloatWindow() {
