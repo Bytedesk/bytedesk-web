@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 10:53:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-14 09:46:04
+ * @LastEditTime: 2024-06-14 09:45:37
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,12 +22,12 @@
     // init chatfloat, and init params
     window.ChatFloat({
         chatUrl: 'http://localhost:9006/chat?t=1&sid=default_wg_uid&', // custom chat url
-        //buttonPosition: 'right', // botton position：left or right
-        //buttonBackgroundColor: 'blue', // button background color
-        //iframeMargins: { right: 20, bottom: 20, left: 20 }, // iframe margins
-        //buttonMargins: { right: 20, bottom: 20, left: 20 }, // button margins
-        //showButton: true, // show button or not
-        //showIframe: true // show iframe or not
+        //buttonPosition: 'right', // 按钮位置：left or right
+        //buttonBackgroundColor: 'blue', // 按钮背景色
+        //iframeMargins: { right: 20, bottom: 20, left: 20 }, // 聊天窗口边距
+        //buttonMargins: { right: 20, bottom: 20, left: 20 }, // 按钮边距
+        //showButton: true, // 是否显示按钮
+        //showIframe: true // 是否显示聊天窗口
     });
 </script>
 ```
@@ -42,18 +42,18 @@
     $(document).ready(function () {
         $('#bytedesk-float-chat').ChatFloat({
             chatUrl: 'http://localhost:9006/chat?t=1&sid=default_wg_uid&',
-            //buttonPosition: 'right', // botton position：left or right
-            //buttonBackgroundColor: 'blue', // button background color
-            //iframeMargins: { right: 20, bottom: 20, left: 20 }, // iframe margins
-            //buttonMargins: { right: 20, bottom: 20, left: 20 }, // button margins
-            //showButton: true, // show button or not
-            //showIframe: true // show iframe or not
+            //buttonPosition: 'right', // 按钮位置：left or right
+            //buttonBackgroundColor: 'blue', // 按钮背景色
+            //iframeMargins: { right: 20, bottom: 20, left: 20 }, // 聊天窗口边距
+            //buttonMargins: { right: 20, bottom: 20, left: 20 }, // 按钮边距
+            //showButton: true, // 是否显示按钮
+            //showIframe: true // 是否显示聊天窗口
         });
     });
 </script>
 ```
 
-## Example
+## 示例
 
 | button-color |  button-left | button-margin | iframe-margin |
 | :----------: | :----------: | :----------:  | :----------: |
