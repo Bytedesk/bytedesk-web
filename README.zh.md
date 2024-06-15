@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 10:53:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-15 11:22:36
+ * @LastEditTime: 2024-06-15 11:24:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,8 @@ bytedesk.com web lib 客服聊天插件
 
 - [English](./README.md)
 - [中文](./README.zh.md)
+
+## chatfloat demo
 
 ```js
 <script src="./index.js"></script>

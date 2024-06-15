@@ -21,6 +21,8 @@ bytedesk.com web lib for customer service chat widget
 - [English](./README.md)
 - [中文](./README.zh.md)
 
+## chatfloat demo
+
 ```js
 <script src="./index.js"></script>
 <script>
