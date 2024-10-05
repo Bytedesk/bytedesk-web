@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 10:53:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-06-15 11:22:46
+ * @LastEditTime: 2024-10-05 21:24:51
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -70,17 +70,54 @@ bytedesk.com web lib for customer service chat widget
 | :----------: | :----------: | :----------:  | :----------: | :----------: |
 | <img src="./image/button-color.png" width="250"> | <img src="./image/button-left.png" width="250"> | <img src="./image/button-margin.png" width="250"> | <img src="./image/iframe-margin.png" width="250"> | <img src="./image/iframe-width.png" width="250"> |
 
-## More
 
-- [Server](https://github.com/Bytedesk/bytedesk)
-- [iOS-oc](https://github.com/Bytedesk/bytedesk-oc)
+## Chat SDK
+
+<!-- - [iOS-oc](./visitor/oc)
+- [iOS-swift](./visitor/swift)
+- [Android](./visitor/android)
+- [Flutter](./visitor/flutter)
+- [React](./visitor/react)
+- [React-native](./visitor/react-native)
+- [UniApp](./visitor/uniapp)
+- [Web](./visitor/web) -->
+<!-- - [iOS-oc](https://github.com/Bytedesk/bytedesk-oc) -->
+<!-- - [React-native](https://github.com/bytedesk/bytedesk-react-native) -->
+<!-- - [Vue](https://github.com/bytedesk/bytedesk-vue) -->
+<!-- - [Browser-Extension](https://github.com/Bytedesk/bytedesk-browser-extention) -->
+<!-- - [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin) -->
 - [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
 - [Android](https://github.com/bytedesk/bytedesk-android)
 - [Flutter](https://github.com/bytedesk/bytedesk-flutter)
-- [Vue](https://github.com/bytedesk/bytedesk-vue)
 - [React](https://github.com/bytedesk/bytedesk-react)
-- [React-native](https://github.com/bytedesk/bytedesk-react-native)
 - [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
 - [Web](https://github.com/bytedesk/bytedesk-web)
-- [Browser-Extension](https://github.com/Bytedesk/bytedesk-browser-extention)
-- [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin)
+
+## Download Client
+
+- [Windows](https://www.weiyuai.cn/download.html)
+- [Mac](https://www.weiyuai.cn/download.html)
+- [Linux](https://www.weiyuai.cn/download.html)
+- [Android](https://www.weiyuai.cn/download.html)
+- [IOS](https://www.weiyuai.cn/download.html)
+
+## Dev Stack
+
+<!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server -->
+- [springboot-3.x for im server](https://github.com/Bytedesk/bytedesk)
+- [python for ai](https://github.com/Bytedesk/bytedesk-ai)
+- [react for web](https://github.com/Bytedesk/bytedesk-react)
+- [flutter for ios&android](https://github.com/Bytedesk/bytedesk-mobile)
+- [electron for windows&mac&linux](https://github.com/Bytedesk/bytedesk-desktop)
+
+## Contact
+
+- [Email](mailto:270580156@qq.com)
+- [Wechat](./image/wechat.png)
+
+## License
+
+- support business usage
+- must not remove trademark && logo info
+- selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+- 仅支持企业内部员工自用，销售、二次销售或者部署SaaS方式销售需要获得授权，请勿用于非法用途。
