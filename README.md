@@ -73,25 +73,14 @@ bytedesk.com web lib for customer service chat widget
 
 ## Chat SDK
 
-<!-- - [iOS-oc](./visitor/oc)
-- [iOS-swift](./visitor/swift)
-- [Android](./visitor/android)
-- [Flutter](./visitor/flutter)
-- [React](./visitor/react)
-- [React-native](./visitor/react-native)
-- [UniApp](./visitor/uniapp)
-- [Web](./visitor/web) -->
-<!-- - [iOS-oc](https://github.com/Bytedesk/bytedesk-oc) -->
-<!-- - [React-native](https://github.com/bytedesk/bytedesk-react-native) -->
-<!-- - [Vue](https://github.com/bytedesk/bytedesk-vue) -->
-<!-- - [Browser-Extension](https://github.com/Bytedesk/bytedesk-browser-extention) -->
-<!-- - [Vscode-plugin](https://github.com/bytedesk/bytedesk-vscode-plugin) -->
-- [iOS-swift](https://github.com/Bytedesk/bytedesk-swift)
-- [Android](https://github.com/bytedesk/bytedesk-android)
-- [Flutter](https://github.com/bytedesk/bytedesk-flutter)
-- [React](https://github.com/bytedesk/bytedesk-react)
-- [UniApp](https://github.com/bytedesk/bytedesk-uniapp)
-- [Web](https://github.com/bytedesk/bytedesk-web)
+| Project     | Description           | Forks          | Stars             |
+|-------------|-----------------------|----------------|-------------------|
+| [iOS-swift](https://github.com/bytedesk/bytedesk-swift) | iOS swift  | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-swift) | ![GitHub Repo stars](https://img.shields.io/github/stars/Bytedesk/bytedesk-swift)                 |
+| [Android](https://github.com/bytedesk/bytedesk-android) | Android | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-android) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-android)  |
+| [Flutter](https://github.com/bytedesk/bytedesk-flutter) | Flutter | ![GitHub forks](https://img.shields.io/github/bytedesk/bytedesk-flutter)| ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-flutter) |
+| [React](https://github.com/bytedesk/bytedesk-react) | React | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-react) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-react) |
+| [UniApp](https://github.com/bytedesk/bytedesk-uniapp) | Uniapp | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-uniapp) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-uniapp) |
+| [Web/Vue](https://github.com/bytedesk/bytedesk-web) | Web/Vue | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-web) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-web) |
 
 ## Download Client
 
