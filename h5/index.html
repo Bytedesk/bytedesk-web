@@ -88,7 +88,7 @@
                                 <span style='color:#ff0000; cursor: pointer; width: 100%;' @click="requestAgent()">{{
                                     $t("agentChat") }}</span>
                             </span> -->
-                            <span v-else-if="is_type_notification(message)" class="timestamp">
+                            <span if="is_type_notification(message)" class="timestamp">
                                 <span style="width: 100%;">{{ message.content }}</span>
                             </span>
                             </p>

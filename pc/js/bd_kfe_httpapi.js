@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2022-03-10 14:53:39
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-25 12:41:44
+ * @LastEditTime: 2024-10-25 14:45:39
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -100,6 +100,10 @@ var bd_kfe_httpapi = {
       // 1. 保存thread
       bd_kfe_data.thread = message.thread;
     } 
+    $('#bytedesk_agent_avatar').attr('src', message.user.avatar);
+    $('#bytedesk_agent_nickname').text(message.user.nickname);
+    // $('#bytedesk_agent_description').text(message.user.description);
+
     bd_kfe_utils.scrollToBottom();
     // 建立长连接
     bd_kfe_stompapi.byteDeskConnect();

@@ -99,7 +99,7 @@ const messages = {
         "i18n.robot.nickname": "DefaultRobot",
         "i18n.robot.description": "Default Robot Description",
         "i18n.robot.noreply": "Answer Not Found",
-        "i18n.robot.agent.assistant.nickname": "DefaultAsistant",
+        "i18n.robot.agent.assistant.nickname": "DefaultAssistant",
         "i18n.llm.prompt":
             "You are a smart and helpful artificial intelligence, capable of providing useful, detailed, and polite answers to human questions.",
         "i18n.agent.nickname": "DefaultAgent",
@@ -322,6 +322,7 @@ var app = new Vue({
             navbar: "1", // 是否显示导航，默认显示，0：隐藏
             theme: "system", // 颜色主题: light/dark/system，默认: system
             // 
+            title: "微语",
             // 
             HTTP_CLIENT: 'web_h5',
             PLATFORM: "weiyuai",
@@ -882,7 +883,7 @@ var app = new Vue({
             if (this.isInputingVisible) {
                 return this.$t("typing")
             } else {
-                return this.agentNickname
+                return this.title
             }
         },
         disabled() {
@@ -1355,13 +1356,15 @@ var app = new Vue({
             this.insertMessage = message
             //
             if (response.code === 200) {
-
+                // 
                 app.pushToMessageArray(message);
                 // 1. 保存thread
                 app.thread = message.thread;
             }
             // 设置窗口标题
-            // document.title = app.agentNickname;
+            app.title = message.user.nickname;
+            document.title = app.title;
+            // 
             app.scrollToBottom();
             // 建立长连接
             app.byteDeskConnect();

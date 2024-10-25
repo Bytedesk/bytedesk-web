@@ -305,151 +305,61 @@ class ByteDesk {
         if (this.isMobile()) {
             // h5
             this.chatUrl = (lang === 'cn' ? this.h5BaseUrl : this.h5BaseUrlEn) +
-                '?sub=' + obj.subDomain +
-                // '&uid=' + obj.adminUid +
-                '&wid=' + obj.workGroupWid +
-                '&type=' + obj.type +
-                '&aid=' + obj.agentUid +
-                '&history=' + this.config.history +
-                '&lang=' + lang +
-                '&color=' + encodeURIComponent(this.config.color) +
-                '&background=' + encodeURIComponent(this.config.background) +
-                // '&websiteurl=' + encodeURIComponent(this.websiteUrl) +
-                // '&websitetitle=' + encodeURIComponent(this.websiteTitle) +
-                // '&refererurl=' + encodeURIComponent(this.refererUrl) +
-                '&v2robot=' + this.config.v2robot +
-                (this.config.selfuser === "1" ? ('&selfuser=' + this.config.selfuser +
-                    '&username=' + encodeURIComponent(this.config.username) +
-                    '&nickname=' + encodeURIComponent(this.config.nickname) +
-                    '&avatar=' + encodeURIComponent(this.config.avatar)) : "") +
-                (this.config.goods === "1" ? ('&goods=' + this.config.goods +
-                    '&goods_id=' + this.config.goods_id +
-                    '&goods_title=' + encodeURIComponent(this.config.goods_title) +
-                    '&goods_content=' + encodeURIComponent(this.config.goods_content) +
-                    '&goods_price=' + encodeURIComponent(this.config.goods_price) +
-                    '&goods_url=' + encodeURIComponent(this.config.goods_url) +
-                    '&goods_imageUrl=' + encodeURIComponent(this.config.goods_imageUrl) +
-                    '&goods_categoryCode=' + this.config.goods_categoryCode) : "") +
-                (this.config.postscript !== '' ? ('&postscript=' + encodeURIComponent(this.config.postscript)) : '') +
-                '&isembed=1&closable=1&preload=0&p'
+                '?org=' + obj.org + 
+                '&t=' + obj.t + 
+                '&sid=' + obj.sid + 
+                '&lang=' + obj.lang + 
+                '&ref=' + obj.ref + 
+                '&navbar=' + obj.navbar + 
+                '&theme=' + obj.theme + '&'
             this.chatUrlPreload = (lang === 'cn' ? this.h5BaseUrl : this.h5BaseUrlEn) +
-                '?sub=' + obj.subDomain +
-                // '&uid=' + obj.adminUid +
-                '&wid=' + obj.workGroupWid +
-                '&type=' + obj.type +
-                '&aid=' + obj.agentUid +
-                '&history=' + this.config.history +
-                '&lang=' + lang +
-                '&color=' + encodeURIComponent(this.config.color) +
-                '&background=' + encodeURIComponent(this.config.background) +
-                // '&websiteurl=' + encodeURIComponent(this.websiteUrl) +
-                // '&websitetitle=' + encodeURIComponent(this.websiteTitle) +
-                // '&refererurl=' + encodeURIComponent(this.refererUrl) +
-                '&v2robot=' + this.config.v2robot +
-                (this.config.selfuser === "1" ? ('&selfuser=' + this.config.selfuser +
-                    '&username=' + encodeURIComponent(this.config.username) +
-                    '&nickname=' + encodeURIComponent(this.config.nickname) +
-                    '&avatar=' + encodeURIComponent(this.config.avatar)) : "") +
-                (this.config.goods === "1" ? ('&goods=' + this.config.goods +
-                    '&goods_id=' + this.config.goods_id +
-                    '&goods_title=' + encodeURIComponent(this.config.goods_title) +
-                    '&goods_content=' + encodeURIComponent(this.config.goods_content) +
-                    '&goods_price=' + encodeURIComponent(this.config.goods_price) +
-                    '&goods_url=' + encodeURIComponent(this.config.goods_url) +
-                    '&goods_imageUrl=' + encodeURIComponent(this.config.goods_imageUrl) +
-                    '&goods_categoryCode=' + this.config.goods_categoryCode) : "") +
-                (this.config.postscript !== '' ? ('&postscript=' + encodeURIComponent(this.config.postscript)) : '') +
-                '&isembed=1&closable=1&preload=1&p'
+                '?org=' + obj.org + 
+                '&t=' + obj.t + 
+                '&sid=' + obj.sid + 
+                '&lang=' + obj.lang + 
+                '&ref=' + obj.ref + 
+                '&navbar=' + obj.navbar + 
+                '&theme=' + obj.theme + '&'
         } else {
             // console.log('postscript:', this.config.postscript)
             // pc
             this.chatUrl = (lang === 'cn' ? this.pcBaseUrl : this.pcBaseUrlEn) +
-                '?sub=' + obj.subDomain +
-                '&uid=' + obj.adminUid +
-                '&wid=' + obj.workGroupWid +
-                '&type=' + obj.type +
-                '&aid=' + obj.agentUid +
-                '&history=' + this.config.history +
-                '&lang=' + lang +
+                '?org=' + obj.org + 
+                '&t=' + obj.t + 
+                '&sid=' + obj.sid + 
+                '&lang=' + obj.lang + 
+                '&ref=' + obj.ref + 
+                '&navbar=' + obj.navbar + 
+                '&theme=' + obj.theme + 
                 '&color=' + encodeURIComponent(this.config.color) +
                 '&background=' + encodeURIComponent(this.config.background) +
-                '&column=' + (obj.column === 'two' ? '2' : '1') +
                 '&websiteurl=' + encodeURIComponent(this.websiteUrl) +
                 '&websitetitle=' + encodeURIComponent(this.websiteTitle) +
                 '&refererurl=' + encodeURIComponent(this.refererUrl) +
-                '&v2robot=' + this.config.v2robot +
-                (this.config.selfuser === "1" ? ('&selfuser=' + this.config.selfuser +
-                    '&username=' + encodeURIComponent(this.config.username) +
-                    '&nickname=' + encodeURIComponent(this.config.nickname) +
-                    '&avatar=' + encodeURIComponent(this.config.avatar)) : "") +
-                (this.config.goods === "1" ? ('&goods=' + this.config.goods +
-                    '&goods_id=' + this.config.goods_id +
-                    '&goods_title=' + encodeURIComponent(this.config.goods_title) +
-                    '&goods_content=' + encodeURIComponent(this.config.goods_content) +
-                    '&goods_price=' + encodeURIComponent(this.config.goods_price) +
-                    '&goods_url=' + encodeURIComponent(this.config.goods_url) +
-                    '&goods_imageUrl=' + encodeURIComponent(this.config.goods_imageUrl) +
-                    '&goods_categoryCode=' + this.config.goods_categoryCode) : "") +
-                (this.config.postscript !== '' ? ('&postscript=' + encodeURIComponent(this.config.postscript)) : '') +
-                '&closable=1&preload=0&p'
+                '&column=' + (obj.column === 'two' ? '2' : '1') + '&'
             this.chatMaxUrl = (lang === 'cn' ? this.pcBaseUrl : this.pcBaseUrlEn) +
-                '?sub=' + obj.subDomain +
-                '&uid=' + obj.adminUid +
-                '&wid=' + obj.workGroupWid +
-                '&type=' + obj.type +
-                '&aid=' + obj.agentUid +
-                '&history=' + this.config.history +
-                '&lang=' + lang +
-                '&color=' + encodeURIComponent(this.config.color) +
-                '&background=' + encodeURIComponent(this.config.background) +
-                '&column=2' +
-                '&websiteurl=' + encodeURIComponent(this.websiteUrl) +
-                '&websitetitle=' + encodeURIComponent(this.websiteTitle) +
-                '&refererurl=' + encodeURIComponent(this.refererUrl) +
-                '&v2robot=' + this.config.v2robot +
-                (this.config.selfuser === "1" ? ('&selfuser=' + this.config.selfuser +
-                    '&username=' + encodeURIComponent(this.config.username) +
-                    '&nickname=' + encodeURIComponent(this.config.nickname) +
-                    '&avatar=' + encodeURIComponent(this.config.avatar)) : "") +
-                (this.config.goods === "1" ? ('&goods=' + this.config.goods +
-                    '&goods_id=' + this.config.goods_id +
-                    '&goods_title=' + encodeURIComponent(this.config.goods_title) +
-                    '&goods_content=' + encodeURIComponent(this.config.goods_content) +
-                    '&goods_price=' + encodeURIComponent(this.config.goods_price) +
-                    '&goods_url=' + encodeURIComponent(this.config.goods_url) +
-                    '&goods_imageUrl=' + encodeURIComponent(this.config.goods_imageUrl) +
-                    '&goods_categoryCode=' + this.config.goods_categoryCode) : "") +
-                (this.config.postscript !== '' ? ('&postscript=' + encodeURIComponent(this.config.postscript)) : '') +
-                '&closable=0&preload=0&p'
+                '?org=' + obj.org + 
+                '&t=' + obj.t + 
+                '&sid=' + obj.sid + 
+                '&lang=' + obj.lang + 
+                '&ref=' + obj.ref + 
+                '&navbar=' + obj.navbar + 
+                '&theme=' + obj.theme + 
+                '&column=2&'
             this.chatUrlPreload = (lang === 'cn' ? this.pcBaseUrl : this.pcBaseUrlEn) +
-                '?sub=' + obj.subDomain +
-                '&uid=' + obj.adminUid +
-                '&wid=' + obj.workGroupWid +
-                '&type=' + obj.type +
-                '&aid=' + obj.agentUid +
-                '&history=' + this.config.history +
-                '&lang=' + lang +
+                '?org=' + obj.org + 
+                '&t=' + obj.t + 
+                '&sid=' + obj.sid + 
+                '&lang=' + obj.lang + 
+                '&ref=' + obj.ref + 
+                '&navbar=' + obj.navbar + 
+                '&theme=' + obj.theme + 
                 '&color=' + encodeURIComponent(this.config.color) +
                 '&background=' + encodeURIComponent(this.config.background) +
-                '&column=' + (obj.column === 'two' ? '2' : '1') +
                 '&websiteurl=' + encodeURIComponent(this.websiteUrl) +
                 '&websitetitle=' + encodeURIComponent(this.websiteTitle) +
                 '&refererurl=' + encodeURIComponent(this.refererUrl) +
-                '&v2robot=' + this.config.v2robot +
-                (this.config.selfuser === "1" ? ('&selfuser=' + this.config.selfuser +
-                    '&username=' + encodeURIComponent(this.config.username) +
-                    '&nickname=' + encodeURIComponent(this.config.nickname) +
-                    '&avatar=' + encodeURIComponent(this.config.avatar)) : "") +
-                (this.config.goods === "1" ? ('&goods=' + this.config.goods +
-                    '&goods_id=' + this.config.goods_id +
-                    '&goods_title=' + encodeURIComponent(this.config.goods_title) +
-                    '&goods_content=' + encodeURIComponent(this.config.goods_content) +
-                    '&goods_price=' + encodeURIComponent(this.config.goods_price) +
-                    '&goods_url=' + encodeURIComponent(this.config.goods_url) +
-                    '&goods_imageUrl=' + encodeURIComponent(this.config.goods_imageUrl) +
-                    '&goods_categoryCode=' + this.config.goods_categoryCode) : "") +
-                (this.config.postscript !== '' ? ('&postscript=' + encodeURIComponent(this.config.postscript)) : '') +
-                '&closable=1&preload=1&p'
+                '&column=' + (obj.column === 'two' ? '2' : '1') + '&'
         }
         // console.log('chaturl:', this.chatUrl)
         let app = this

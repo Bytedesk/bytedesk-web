@@ -270,12 +270,12 @@ var bd_kfe_utils = {
       bd_kfe_data.messages.push(message);
     } else {
       // 如果最后一条为系统结束提示，再来一条系统结束提示 则忽略
-      if (bd_kfe_data.messages.length > 0) {
-        var msg = bd_kfe_data.messages[bd_kfe_data.messages.length - 1];
-        if (bd_kfe_utils.is_type_close(msg) && bd_kfe_utils.is_type_close(message)) {
-          return
-        }
-      }
+      // if (bd_kfe_data.messages.length > 0) {
+      //   var msg = bd_kfe_data.messages[bd_kfe_data.messages.length - 1];
+      //   if (bd_kfe_utils.is_type_close(msg) && bd_kfe_utils.is_type_close(message)) {
+      //     return
+      //   }
+      // }
       // 根据uid判断是否已经存在此条消息
       for (var i = bd_kfe_data.messages.length - 1; i >= 0; i--) {
         var msg = bd_kfe_data.messages[i];
