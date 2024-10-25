@@ -39,30 +39,13 @@
             return null; //返回参数值
         }
         //
-        var sub = getUrlParam('sub')
-        var uid = getUrlParam('uid')
-        var wid = getUrlParam('wid')
-        var type = getUrlParam('type')
-        var aid = getUrlParam('aid')
-        var showhistory = getUrlParam('history')
+        var org = getUrlParam('org')
+        var t = getUrlParam('t')
+        var sid = getUrlParam('sid')
         var lang = getUrlParam('lang')
-        var color = getUrlParam('color')
-        var background = getUrlParam('background')
-        var column = getUrlParam('column')
-        var v2robot = getUrlParam('v2robot') === null ? "0" : getUrlParam("v2robot")
-        var selfuser = getUrlParam("selfuser")
-        var username = getUrlParam("username")
-        var nickname = getUrlParam("nickname")
-        var avatar = getUrlParam("avatar")
-        var goods = getUrlParam('goods')
-        var goods_id = getUrlParam('goods_id')
-        var goods_title = getUrlParam('goods_title')
-        var goods_content = getUrlParam('goods_content')
-        var goods_price = getUrlParam('goods_price')
-        var goods_url = getUrlParam('goods_url')
-        var goods_imageUrl = getUrlParam('goods_imageUrl')
-        var goods_categoryCode = getUrlParam('goods_categoryCode')
-        var postscript = getUrlParam('postscript')
+        var ref = getUrlParam('ref')
+        var navbar = getUrlParam('navbar')
+        var theme = getUrlParam('theme')
         //
         var websiteUrl = window.location.href
         var websiteTitle = document.title
@@ -74,33 +57,13 @@
             index = 'indexen'
             document.title = 'Live Chat'
         }
-        var src = './' + index + '.html?sub=' + sub + 
-                '&uid=' + uid + 
-                '&wid=' + wid + 
-                '&type=' + type + 
-                '&aid=' + aid + 
-                '&history=' + showhistory + 
+        var src = './' + index + '.html?org=' + org + 
+                '&t=' + t + 
+                '&sid=' + sid + 
                 '&lang=' + lang + 
-                '&color=' + encodeURIComponent(color) + 
-                '&background=' + encodeURIComponent(background) + '&column=' + column + 
-                '&websiteurl=' + encodeURIComponent(websiteUrl) +
-                '&websitetitle=' + encodeURIComponent(websiteTitle) +
-                '&refererurl=' + encodeURIComponent(refererUrl) +
-                '&v2robot=' + v2robot +
-                '&selfuser=' + selfuser +
-                '&username=' + encodeURIComponent(username) +
-                '&nickname=' + encodeURIComponent(nickname) +
-                '&avatar=' + encodeURIComponent(avatar) +
-                (goods === '1' ? ('&goods=1' +
-                '&goods_id=' + goods_id +
-                '&goods_title=' + encodeURIComponent(goods_title) +
-                '&goods_content=' + encodeURIComponent(goods_content) +
-                '&goods_price=' + encodeURIComponent(goods_price) +
-                '&goods_url=' + encodeURIComponent(goods_url) +
-                '&goods_imageUrl=' + encodeURIComponent(goods_imageUrl) +
-                '&goods_categoryCode=' + encodeURIComponent(goods_categoryCode) ) : '') +
-                (postscript ? ('&postscript=' + encodeURIComponent(postscript)) : '' )  +
-                '&closable=0&preload=0&p'
+                '&ref=' + ref + 
+                '&navbar=' + navbar + 
+                '&theme=' + theme + '&'
         // console.log('urll:', src)
         document.getElementById('iframePanel').setAttribute('src', src)
         // document.getElementById('byteDesk-iframe').setAttribute('src', '../meilele')

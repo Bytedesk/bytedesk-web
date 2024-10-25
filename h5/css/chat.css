@@ -11,6 +11,7 @@ a {
 li {
   display: list-item;
   text-align: -webkit-match-parent;
+  text-align: match-parent;
 }
 .page-back {
   display: inline-block;

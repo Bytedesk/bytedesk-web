@@ -38,11 +38,11 @@ class ByteDesk {
         this.refererUrl = ''
         // 测试环境
         this.isProduction = false
-        this.h5BaseUrl = 'http://127.0.0.1:8887/chat/h5/index.html'
-        this.h5BaseUrlEn = 'http://127.0.0.1:8887/chat/h5/indexen.html'
-        this.pcBaseUrl = 'http://127.0.0.1:8887/chat/pc/index.html'
-        this.pcBaseUrlEn = 'http://127.0.0.1:8887/chat/pc/indexen.html'
-        this.httpHost = "http://127.0.0.1:8000"
+        this.h5BaseUrl = '/h5/index.html'
+        this.h5BaseUrlEn = '/h5/indexen.html'
+        this.pcBaseUrl = '/pc/index.html'
+        this.pcBaseUrlEn = '/pc/indexen.html'
+        // this.httpHost = "http://127.0.0.1:8000"
         // 线上环境
         // this.isProduction = true
         // this.h5BaseUrl = 'https://h5.kefux.com/chat/h5/index.html'
@@ -66,7 +66,7 @@ class ByteDesk {
     addCss() {
         const stylesheet = document.createElement('link');
         stylesheet.setAttribute('rel', 'stylesheet');
-        stylesheet.setAttribute('href', this.isProduction ? `https://cdn.kefux.com/chat/pc/css/custom.min.css` : `http://127.0.0.1:8887/chat/pc/css/custom.css`);
+        stylesheet.setAttribute('href', this.isProduction ? `https://cdn.kefux.com/chat/pc/css/custom.min.css` : `/pc/css/custom.css`);
         document.head.appendChild(stylesheet);
     }
 

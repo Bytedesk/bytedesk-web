@@ -39,10 +39,10 @@
                     <ul class="message-ul" ref="listm">
                         <li v-if="showTopTip"><span class='toptip' v-html="topTip"></span></li>
                         <div v-if="loadMoreVisible" class="pullrefresh" @click="loadMoreMessages()">{{ $t('moreHistory') }}</div>
-                        <li v-for="message in messages" :key="message.id">
+                        <li v-for="message in messages" :key="message.uid">
                             <p class="timestamp">
                                 <span>{{ message.createdAt }}</span><br />
-                            <div v-if="is_type_commodity(message)" id="goods" class="goods-info">
+                            <!-- <div v-if="is_type_commodity(message)" id="goods" class="goods-info">
                                 <div class="goods-pic">
                                     <img id="goods-pic" alt="" width="50px" height="50px"
                                         :src="jsonObject(message.content).imageUrl" />
@@ -58,8 +58,8 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <span v-else-if="is_type_notification_agent_close(message)" class="timestamp">
+                            </div> -->
+                            <!-- <span v-else-if="is_type_notification_agent_close(message)" class="timestamp">
                                 <span style="width: 100%;">{{ message.content }}</span>
                                 <p style='color:#007bff;' @click="manulRequestThread()">{{ $t("contactAgent") }}</p>
                             </span>
@@ -87,7 +87,7 @@
                                 <span style="width: 100%;">{{ message.content }}</span>
                                 <span style='color:#ff0000; cursor: pointer; width: 100%;' @click="requestAgent()">{{
                                     $t("agentChat") }}</span>
-                            </span>
+                            </span> -->
                             <span v-else-if="is_type_notification(message)" class="timestamp">
                                 <span style="width: 100%;">{{ message.content }}</span>
                             </span>
@@ -107,7 +107,7 @@
                                             item.question }}</span><br />
                                     </span>
                                 </div>
-                                <div v-else-if="is_type_robot(message)" class="text-mobile">
+                                <!-- <div v-else-if="is_type_robot(message)" class="text-mobile">
                                     <span v-if="message.content.length > 0" v-html="message.content"></span>
                                     <br v-if="message.content.length > 0 && message.answers && message.answers.length > 0" />
                                     <span v-for="item in message.answers" :key="item.id">
@@ -116,17 +116,16 @@
                                     </span>
                                     <span v-if="message.user.uid !== uid" style='color:#ff0000; cursor: pointer;'
                                         @click="requestAgent()">{{ $t("agentChat") }}</span>
-                                </div>
-                                <div v-else-if="is_type_robot_v2(message)" class="text-mobile">
+                                </div> -->
+                                <!-- <div v-else-if="is_type_robot_v2(message)" class="text-mobile">
                                     <span v-if="message.content.length > 0" v-html="message.content"></span>
                                     <br v-if="message.content.length > 0 && message.categories && message.categories.length > 0" />
                                     <span v-for="item in message.categories" :key="item.id">
                                         <span style="color:#007bff; cursor: pointer;" @click="queryCategory(item)">{{
                                             item.name }}</span><br />
                                     </span>
-                                </div>
-                                <div v-else-if="is_type_robot_result(message)" class="text-mobile">
-                                    <!-- 注：不能使用长按，否则会导致‘有帮助’和‘无帮助’评价无法使用 -->
+                                </div> -->
+                                <!-- <div v-else-if="is_type_robot_result(message)" class="text-mobile">
                                     <span v-html="message.content"></span>
                                     <br />
                                     <span v-if="message.user.uid !== uid" style='color:#007bff; cursor: pointer;'
@@ -134,12 +133,12 @@
                                     <span v-if="message.user.uid !== uid"
                                         style="color:#007bff; cursor: pointer; margin-left: 10px;"
                                         @click="rateAnswerHelpless(message.answer.aid, message.mid)">{{ $t('helpless') }}</span>
-                                </div>
+                                </div> -->
                                 <!-- <div v-if="is_type_robot_result(message)" class='robot-rate'>
                                     <p class='robot-rate-agree'><i class='iconfont icon-agree'></i></p>
                                     <p class='robot-rate-disagree'><i class='iconfont icon-disagree'></i></p>
                                 </div> -->
-                                <div v-else-if="is_type_robot_result_not_found(message)" class="text-mobile">
+                                <!-- <div v-else-if="is_type_robot_result_not_found(message)" class="text-mobile">
                                     <span v-html="message.content"></span>
                                     <br v-if="message.content.length > 0 && message.answers && message.answers.length > 0" />
                                     <span v-for="item in message.answers" :key="item.id">
@@ -148,8 +147,8 @@
                                     </span>
                                     <span style='color:#ff0000; cursor: pointer; width: 100%;' @click="requestAgent()">{{
                                         $t("agentChat") }}</span>
-                                </div>
-                                <div v-else-if="is_type_questionnaire(message)" class="text-mobile">
+                                </div> -->
+                                <!-- <div v-else-if="is_type_questionnaire(message)" class="text-mobile">
                                     <span>{{ message.questionnaire.questionnaireItems[0].title }}</span>
                                     <span
                                         v-for="item in message.questionnaire.questionnaireItems[0].questionnaireItemItems"
@@ -158,94 +157,93 @@
                                         <span style="color:#007bff; cursor: pointer;"
                                             @click="chooseQuestionnaire(item.qid)">{{ item.content }}</span>
                                     </span>
-                                </div>
-                                <div v-else-if="is_type_company(message)" class="text-mobile">
+                                </div> -->
+                                <!-- <div v-else-if="is_type_company(message)" class="text-mobile">
                                     <span>{{ message.content }}</span>
                                     <span v-for="item in message.company.countries" :key="item.id">
                                         <br />
                                         <span style="color:#007bff; cursor: pointer;"
                                             @click="chooseCountry(message.company.cid, item.cid)">{{ item.name }}</span>
                                     </span>
-                                </div>
-                                <div v-else-if="is_type_workGroup(message)" class="text-mobile">
+                                </div> -->
+                                <!-- <div v-else-if="is_type_workGroup(message)" class="text-mobile">
                                     <span>{{ message.content }}</span>
                                     <span v-for="item in message.workGroups" :key="item.id">
                                         <br />
                                         <span style="color:#007bff; cursor: pointer;"
                                             @click="chooseWorkGroup(item.wid)">{{ item.nickname }}</span>
                                     </span>
-                                </div>
+                                </div> -->
                                 <div v-else-if="is_type_image(message)" class="text-mobile">
-                                    <img :src="message.imageUrl" preview="2"
+                                    <img :src="message.content" preview="2"
                                         style="padding-top: 10px; width: 100px; height: 100px; cursor: pointer;" />
                                 </div>
                                 <div v-else-if="is_type_file(message)" class="text">
-                                    <span style="color:#007bff; cursor: pointer;"><a :href="message.fileUrl" target="_blank">{{ $t("viewFile") }}</a></span>
+                                    <span style="color:#007bff; cursor: pointer;">
+                                        <a :href="message.content" target="_blank">{{ $t("viewFile") }}</a>
+                                    </span>
                                 </div>
                                 <div v-else-if="is_type_voice(message)" class="text">
                                     <audio controls>
-                                        <source :src="message.voiceUrl" type="audio/ogg">
-                                        <source :src="message.voiceUrl" type="audio/mpeg">
+                                        <source :src="message.content" type="audio/ogg">
+                                        <source :src="message.content" type="audio/mpeg">
                                         Your browser does not support the audio element.
                                     </audio>
                                 </div>
                                 <div v-else-if="is_type_video(message)" class="video">
                                     <video width="200" height="200" controls>
-                                        <source :src="message.videoOrShortUrl" type="video/mp4">
-                                        <source :src="message.videoOrShortUrl" type="video/ogg">
+                                        <source :src="message.content" type="video/mp4">
+                                        <source :src="message.content" type="video/ogg">
                                         Your browser does not support the video tag.
                                     </video>
                                 </div>
-                                <div v-else-if="is_type_card(message)" class="text">
+                                <!-- <div v-else-if="is_type_card(message)" class="text">
                                     <span style="color:#007bff; cursor: pointer;">
                                         <a :href="JSON.parse(message.content).content" target="_blank">{{ JSON.parse(message.content).name }}</a>
                                     </span>
-                                </div>
-                                <div v-else-if="is_type_form_request(message)" class="text-mobile">
+                                </div> -->
+                                <!-- <div v-else-if="is_type_form_request(message)" class="text-mobile">
                                     <span>{{ $t('requestForm')}}</span>
-                                </div>
-                                <div v-else-if="is_type_form_result(message)" class="text-mobile">
+                                </div> -->
+                                <!-- <div v-else-if="is_type_form_result(message)" class="text-mobile">
                                     <div>{{ $t("name") + ": "+ JSON.parse(message.content).form.realname }}</div>
                                     <div>{{ $t("mobile") + ": " + JSON.parse(message.content).form.mobile }}</div>
                                     <div>{{ $t("email") + ": " + JSON.parse(message.content).form.email }}</div>
                                     <div>{{ $t("age") + ": " + JSON.parse(message.content).form.age }}</div>
                                     <div>{{ $t("job") + ": " + JSON.parse(message.content).form.job }}</div>
-                                </div>
-                                <span v-else-if="is_type_notification_thread_reentry(message)" class="text-mobile">
-                                    <!-- <span>{{ $t('continueChat')}} </span> -->
+                                </div> -->
+                                <!-- <span v-else-if="is_type_notification_thread_reentry(message)" class="text-mobile">
                                     <span>{{ message.content }}</span>
                                     <br v-if="message.content.length > 0 && message.answers && message.answers.length > 0" />
                                     <span v-for="item in message.answers" :key="item.id">
                                         <span style="color:#007bff; cursor: pointer;" @click="queryAnswer(item)">{{
                                             item.question }}</span><br />
                                     </span>
-                                </span>
-                                <span v-else-if="is_type_notification_offline(message)" class="text-mobile">
-                                    <!-- <span>{{ $t('agentOffline')}} </span> -->
+                                </span> -->
+                                <!-- <span v-else-if="is_type_notification_offline(message)" class="text-mobile">
                                     <span>{{ message.content }}</span>
                                     <br v-if="message.content.length > 0 && message.answers && message.answers.length > 0" />
                                     <span v-for="item in message.answers" :key="item.id">
                                         <span style="color:#007bff; cursor: pointer;" @click="queryAnswer(item)">{{
                                             item.question }}</span><br />
                                     </span>
-                                </span>
-                                <span v-else-if="is_type_notification_non_working_time(message)" class="text-mobile">
-                                    <!-- <span>{{ $t('nonWorkingTime')}} </span> -->
+                                </span> -->
+                                <!-- <span v-else-if="is_type_notification_non_working_time(message)" class="text-mobile">
                                     <span>{{ message.content }}</span>
                                     <br v-if="message.content.length > 0 && message.answers && message.answers.length > 0" />
                                     <span v-for="item in message.answers" :key="item.id">
                                         <span style="color:#007bff; cursor: pointer;" @click="queryAnswer(item)">{{
                                             item.question }}</span><br />
                                     </span>
-                                </span>
-                                <span v-else-if="is_type_notification_queue(message)" class="text-mobile">
+                                </span> -->
+                                <!-- <span v-else-if="is_type_notification_queue(message)" class="text-mobile">
                                     <span>{{ $t('queuing')}} </span>
                                     <br v-if="message.content.length > 0 && message.answers && message.answers.length > 0" />
                                     <span v-for="item in message.answers" :key="item.id">
                                         <span style="color:#007bff; cursor: pointer;" @click="queryAnswer(item)">{{
                                             item.question }}</span><br />
                                     </span>
-                                </span>
+                                </span> -->
                                 <span v-else class="text-mobile">
                                     <span v-html="message.content"></span>
                                 </span>
@@ -374,7 +372,7 @@
     <!-- BetterScroll 是一款重点解决移动端（已支持 PC）各种滚动场景需求的插件 https://better-scroll.github.io/docs/zh-CN/guide/how-to-install.html -->
     <!-- <script src="https://unpkg.com/@better-scroll/core@latest/dist/core.min.js"></script> -->
     <!-- <script src="./js/chatmintui.min.js?v=220614"></script> -->
-    <script src="./js/chat.js?v=221209"></script>
+    <script src="./js/chat.js?v=241025"></script>
 
     <script>
         // https://my.oschina.net/u/4396841/blog/3429707

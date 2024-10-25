@@ -4,7 +4,7 @@
 var bd_kfe_utils = {
   // 只有在调试模式才会输出
   log: function (content) {
-    if (!bd_kfe_data.IS_PRODUCTION) {
+    if (bd_kfe_data.IS_DEBUG) {
       bd_kfe_utils.printLog(content)
     }
   },
@@ -80,38 +80,38 @@ var bd_kfe_utils = {
   },
   showUploadImageDialog: function () {
     // bd_kfe_utils.printLog("show upload dialog");
-    if (bd_kfe_data.isRobot) {
-      alert("自助服务暂不支持图片");
-      return;
-    }
-    if (bd_kfe_data.isThreadClosed) {
-      alert("会话已经结束");
-      return;
-    }
+    // if (bd_kfe_data.isRobot) {
+    //   alert("自助服务暂不支持图片");
+    //   return;
+    // }
+    // if (bd_kfe_data.isThreadClosed) {
+    //   alert("会话已经结束");
+    //   return;
+    // }
     $('input[id=imagefile]').click();
   },
   showUploadVideoDialog: function () {
     // bd_kfe_utils.printLog("show upload dialog");
-    if (bd_kfe_data.isRobot) {
-      alert("自助服务暂不支持视频");
-      return;
-    }
-    if (bd_kfe_data.isThreadClosed) {
-      alert("会话已经结束");
-      return;
-    }
+    // if (bd_kfe_data.isRobot) {
+    //   alert("自助服务暂不支持视频");
+    //   return;
+    // }
+    // if (bd_kfe_data.isThreadClosed) {
+    //   alert("会话已经结束");
+    //   return;
+    // }
     $('input[id=videofile]').click();
   },
   showUploadFileDialog: function () {
     // bd_kfe_utils.printLog("show upload dialog");
-    if (bd_kfe_data.isRobot) {
-      alert("自助服务暂不支持图片");
-      return;
-    }
-    if (bd_kfe_data.isThreadClosed) {
-      alert("会话已经结束");
-      return;
-    }
+    // if (bd_kfe_data.isRobot) {
+    //   alert("自助服务暂不支持图片");
+    //   return;
+    // }
+    // if (bd_kfe_data.isThreadClosed) {
+    //   alert("会话已经结束");
+    //   return;
+    // }
     $('input[id=filefile]').click();
   },
   clearMessages: function () {
@@ -147,132 +147,45 @@ var bd_kfe_utils = {
   },
   // 发送状态
   is_sending: function (message) {
-    return message.status === "sending";
+    return message.status === bd_kfe_data.MESSAGE_STATUS_SENDING;
   },
   is_stored: function (message) {
-    return message.status === "stored";
+    return message.status === bd_kfe_data.MESSAGE_STATUS_SUCCESS;
   },
   is_received: function (message) {
-    return message.status === "received";
+    return message.status === bd_kfe_data.MESSAGE_STATUS_DELIVERED;
   },
   is_error: function (message) {
-    return message.status === "error";
+    return message.status === bd_kfe_data.MESSAGE_STATUS_ERROR;
   },
   is_read: function (message) {
-    return message.status === "readCount";
+    return message.status === bd_kfe_data.MESSAGE_STATUS_READ;
   },
   // 消息类型
   is_type_text: function (message) {
-    return (
-      message.type === "text" ||
-      message.type === "notification_thread" ||
-      message.type === "notification_auto_close"
-    );
+    return message.type === bd_kfe_data.MESSAGE_TYPE_WELCOME
+				|| message.type === bd_kfe_data.MESSAGE_TYPE_TEXT
   },
   is_type_robot: function (message) {
     return message.type === "robot";
   },
-  is_type_robot_v2(message) {
-    return message.type === 'robotv2'
-  },
-  is_type_robot_result(message) {
-    return message.type === 'robot_result'
-  },
-  is_type_robot_result_not_found(message) {
-    return message.type === 'robot_result_not_found'
-  },
   is_type_image: function (message) {
-    return message.type === "image";
+    return message.type === bd_kfe_data.MESSAGE_TYPE_IMAGE;
   },
   is_type_file: function (message) {
-    return message.type === "file";
+    return message.type === bd_kfe_data.MESSAGE_TYPE_FILE;
   },
   is_type_voice: function (message) {
-    return message.type === "voice";
+    return message.type === bd_kfe_data.MESSAGE_TYPE_AUDIO;
   },
   is_type_video: function (message) {
-    return message.type === "video" || message.type === 'shortvideo';
-  },
-  is_type_card(message) {
-    return message.type === 'card'
-  },
-  is_type_commodity: function (message) {
-    return message.type === 'commodity';
-  },
-  is_type_questionnaire: function (message) {
-    return message.type === "questionnaire";
-  },
-  is_type_company: function (message) {
-    return message.type === "company";
-  },
-  is_type_workGroup: function (message) {
-    return message.type === "workGroup";
-  },
-  is_type_form_request: function (message) {
-    return message.type === "notification_form_request";
-  },
-  is_type_form_result: function (message) {
-    return message.type === "notification_form_result";
+    return message.type === bd_kfe_data.MESSAGE_TYPE_VIDEO;
   },
   is_type_notification: function (message) {
-    return (
-      message.type !== "notification_preview" &&
-      message.type !== "notification_thread" &&
-      message.type !== "notification_form_request" &&
-      message.type !== "notification_form_result" &&
-      message.type !== 'notification_thread_reentry' &&
-      message.type !== 'notification_offline' &&
-      message.type !== 'notification_non_working_time' &&
-      message.type !== 'notification_queue' &&
-      // message.type !== "notification_auto_close" &&
-      message.type.startsWith("notification")
-    );
-  },
-  is_type_close: function (message) {
-    return message.type === 'notification_auto_close'
-      || message.type === 'notification_agent_close'
-  },
-  is_type_notification_agent_close: function (message) {
-    return message.type === 'notification_agent_close'
-  },
-  is_type_notification_visitor_close: function (message) {
-    return message.type === 'notification_visitor_close'
-  },
-  is_type_notification_auto_close: function (message) {
-    return message.type === 'notification_auto_close'
-  },
-  is_type_notification_connect: function (message) {
-    return message.type === 'notification_connect'
-  },
-  is_type_notification_disconnect: function (message) {
-    return message.type === 'notification_disconnect'
-  },
-  is_type_notification_thread_reentry: function (message) {
-    return message.type === 'notification_thread_reentry'
-  },
-  is_type_notification_offline: function (message) {
-    return message.type === 'notification_offline'
-  },
-  is_type_notification_non_working_time: function (message) {
-    return message.type === 'notification_non_working_time'
-  },
-  is_type_notification_queue: function (message) {
-    return message.type === 'notification_queue'
-  },
-  is_type_notification_queue_accept: function (message) {
-    return message.type === 'notification_queue_accept'
-  },
-  is_type_notification_invite_rate: function (message) {
-    return message.type === 'notification_invite_rate'
-  },
-  is_type_notification_rate_result: function (message) {
-    return message.type === 'notification_rate_result'
-  },
-  is_type_notification_rate_helpful: function (message) {
-    return message.type === 'notification_rate_helpful'
-  },
-  is_type_notification_rate_helpless: function (message) {
-    return message.type === 'notification_rate_helpless'
+    return message.type === bd_kfe_data.MESSAGE_TYPE_SYSTEM 
+            || message.type === bd_kfe_data.MESSAGE_TYPE_CONTINUE 
+            || message.type === bd_kfe_data.MESSAGE_TYPE_AUTO_CLOSED 
+            || message.type === bd_kfe_data.MESSAGE_TYPE_AGENT_CLOSED
   },
   // 识别链接, FIXME: 对于不带http(s)前缀的url，会被识别为子链接，点击链接无法跳出
   replaceUrl: function (content) {
@@ -322,9 +235,38 @@ var bd_kfe_utils = {
   },
   //
   pushToMessageArray: function (message, isPrepend = false) {
+    // 
+    if (bd_kfe_utils.is_self(message)) {
+      switch (message.type) {
+        case bd_kfe_data.MESSAGE_TYPE_READ:
+        case bd_kfe_data.MESSAGE_TYPE_DELIVERED:
+          console.log("receive receipt message:", message);
+          // this.updateMessageStatus(messageObject);
+          return;
+        case bd_kfe_data.MESSAGE_TYPE_TYPING:
+          // 通知界面显示typing
+          // emitter.emit(EVENT_BUS_MESSAGE_TYPE_TYPING);
+          return;
+        case bd_kfe_data.MESSAGE_TYPE_PROCESSING:
+          // 通知界面显示processing
+          // emitter.emit(EVENT_BUS_MESSAGE_TYPE_PROCESSING);
+          return;
+        case bd_kfe_data.MESSAGE_TYPE_PREVIEW:
+          return;
+        case bd_kfe_data.MESSAGE_TYPE_STREAM:
+          // emitter.emit(EVENT_BUS_MESSAGE_TYPE_STREAM);
+          break;
+        default:
+      }
+    } else {
+      if (bd_kfe_utils.shouldReturn(message)) {
+        return;
+      }
+    }
+
     // 本地发送的消息
     var contains = false;
-    if (message.status === 'sending') {
+    if (message.status === bd_kfe_data.MESSAGE_STATUS_SENDING) {
       bd_kfe_data.messages.push(message);
     } else {
       // 如果最后一条为系统结束提示，再来一条系统结束提示 则忽略
@@ -334,10 +276,10 @@ var bd_kfe_utils = {
           return
         }
       }
-      // 根据mid判断是否已经存在此条消息
+      // 根据uid判断是否已经存在此条消息
       for (var i = bd_kfe_data.messages.length - 1; i >= 0; i--) {
         var msg = bd_kfe_data.messages[i];
-        if (msg.mid === message.mid) {
+        if (msg.uid === message.uid) {
           bd_kfe_data.messages.splice(i, 1);
           bd_kfe_data.messages.push(message);
           contains = true;
@@ -349,257 +291,258 @@ var bd_kfe_utils = {
     } else {
       return;
     }
+    console.log('message type:', message.type, ' message.content:', message.content)
     // 
-    if (bd_kfe_utils.is_type_commodity(message)) {
-      var content = "<div id='goods' class='bytedesk_goods_info'>" +
-        "<div class='bytedesk_goods_pic'>" +
-        "<img id='bytedesk_goods_pic' width='50px' height='50px' src='" + JSON.parse(message.content).imageUrl + "'/>" +
-        "</div>" +
-        "<div class='bytedesk_goods_desc'>" +
-        "<div id='bytedesk_goods_name' class='bytedesk_goods_name'>" + JSON.parse(message.content).title + "</div>" +
-        "<div class='bytedesk_goods_more'>" +
-        "<div id='bytedesk_goods_price' class='bytedesk_goods_price'>￥" + JSON.parse(message.content).price + "</div>" +
-        "<div id='bytedesk_goods_sendlink' class='bytedesk_goods_sendlink' onclick='bd_kfe_stompapi.sendCommodityMessageSync()'>发送链接</div>" +
-        "</div>" +
-        "</div>" +
-        "</div>";
-      if (isPrepend) {
-        $("#bytedesk_message_li").prepend(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span>" +
-          message.createdAt +
-          "</span><br/>" +
-          "<span>" +
-          content +
-          "</span>" +
-          "</p></li>"
-        );
-      } else {
-        $("#bytedesk_message_li").append(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span>" +
-          message.createdAt +
-          "</span><br/>" +
-          "<span>" +
-          content +
-          "</span>" +
-          "</p></li>"
-        );
-      }
-    }
-    else if (bd_kfe_utils.is_type_notification_agent_close(message)) {
-      var langText = "联系客服"
-      var contentText = "客服关闭会话"
-      if (bd_kfe_data.lang === "en") {
-        langText = "Contact Agent"
-        contentText = "agent close thread"
-      }
-      if (isPrepend) {
-        $("#bytedesk_message_li").prepend(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
-          "<span>" +
-          contentText +
-          "</span>" +
-          "</p></li>"
-        );
-      } else {
-        $("#bytedesk_message_li").append(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
-          "<span>" +
-          contentText +
-          "</span>" +
-          "</p></li>"
-        );
-      }
-    }
-    else if (bd_kfe_utils.is_type_notification_visitor_close(message)) {
-      var langText = "联系客服"
-      var contentText = "访客关闭会话"
-      if (bd_kfe_data.lang === "en") {
-        langText = "Contact Agent"
-        contentText = "visitor close thread"
-      }
-      if (isPrepend) {
-        $("#bytedesk_message_li").prepend(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
-          "<span>" +
-          contentText +
-          "</span>" +
-          "</p></li>"
-        );
-      } else {
-        $("#bytedesk_message_li").append(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
-          "<span>" +
-          contentText +
-          "</span>" +
-          "</p></li>"
-        );
-      }
-    }
-    else if (bd_kfe_utils.is_type_notification_auto_close(message)) {
-      var langText = "联系客服"
-      var contentText = "长时间没有对话，系统自动关闭会话"
-      if (bd_kfe_data.lang === "en") {
-        langText = "Contact Agent"
-        contentText = "system close thread"
-      }
-      if (isPrepend) {
-        $("#bytedesk_message_li").prepend(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
-          "<span>" +
-          contentText +
-          "</span>" +
-          "</p></li>"
-        );
-      } else {
-        $("#bytedesk_message_li").append(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
-          "<span>" +
-          contentText +
-          "</span>" +
-          "</p></li>"
-        );
-      }
-    }
-    else if (bd_kfe_utils.is_type_notification_queue_accept(message)) {
-      var langText = "接入会话"
-      if (bd_kfe_data.lang === "en") {
-        langText = "start chat"
-      }
-      if (isPrepend) {
-        $("#bytedesk_message_li").prepend(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span>" +
-          message.createdAt +
-          "</span><br/>" +
-          "<span>" +
-          langText +
-          "</span>" +
-          "</p></li>"
-        );
-      } else {
-        $("#bytedesk_message_li").append(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span>" +
-          message.createdAt +
-          "</span><br/>" +
-          "<span>" +
-          langText +
-          "</span>" +
-          "</p></li>"
-        );
-      }
-    }
-    else if (bd_kfe_utils.is_type_notification_invite_rate(message)) {
-      var langText = "邀请评价"
-      if (bd_kfe_data.lang === "en") {
-        langText = "invite rate"
-      }
-      if (isPrepend) {
-        $("#bytedesk_message_li").prepend(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span>" +
-          message.createdAt +
-          "</span><br/>" +
-          "<span>" +
-          langText +
-          "</span>" +
-          "</p></li>"
-        );
-      } else {
-        $("#bytedesk_message_li").append(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span>" +
-          message.createdAt +
-          "</span><br/>" +
-          "<span>" +
-          langText +
-          "</span>" +
-          "</p></li>"
-        );
-      }
-    }
-    else if (bd_kfe_utils.is_type_notification_rate_result(message)) {
-      var langText = "已评价"
-      if (bd_kfe_data.lang === "en") {
-        langText = "rated"
-      }
-      if (isPrepend) {
-        $("#bytedesk_message_li").prepend(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span>" +
-          message.createdAt +
-          "</span><br/>" +
-          "<span>" +
-          langText +
-          "</span>" +
-          "</p></li>"
-        );
-      } else {
-        $("#bytedesk_message_li").append(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span>" +
-          message.createdAt +
-          "</span><br/>" +
-          "<span>" +
-          langText +
-          "</span>" +
-          "</p></li>"
-        );
-      }
-    }
-    else if (bd_kfe_utils.is_type_notification_rate_helpful(message)) {
-      if (isPrepend) {
-        $("#bytedesk_message_li").prepend(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span>" +
-          message.createdAt +
-          "</span><br/>" +
-          "<span>" +
-          message.content +
-          "</span>" +
-          "</p></li>"
-        );
-      } else {
-        $("#bytedesk_message_li").append(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span>" +
-          message.createdAt +
-          "</span><br/>" +
-          "<span>" +
-          message.content +
-          "</span>" +
-          "</p></li>"
-        );
-      }
-    }
-    else if (bd_kfe_utils.is_type_notification_rate_helpless(message)) {
-      var langText = "人工客服"
-      if (bd_kfe_data.lang === "en") {
-        langText = "Contact Agent"
-      }
-      if (isPrepend) {
-        $("#bytedesk_message_li").prepend(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestAgent()'>" + langText + "</span>" +
-          "</p></li>"
-        );
-      } else {
-        $("#bytedesk_message_li").append(
-          "<li><p class='bytedesk_timestamp'>" +
-          "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestAgent()'>" + langText + "</span>" +
-          "</p></li>"
-        );
-      }
-    }
-    else if (bd_kfe_utils.is_type_notification(message)) {
+    // if (bd_kfe_utils.is_type_commodity(message)) {
+    //   var content = "<div id='goods' class='bytedesk_goods_info'>" +
+    //     "<div class='bytedesk_goods_pic'>" +
+    //     "<img id='bytedesk_goods_pic' width='50px' height='50px' src='" + JSON.parse(message.content).imageUrl + "'/>" +
+    //     "</div>" +
+    //     "<div class='bytedesk_goods_desc'>" +
+    //     "<div id='bytedesk_goods_name' class='bytedesk_goods_name'>" + JSON.parse(message.content).title + "</div>" +
+    //     "<div class='bytedesk_goods_more'>" +
+    //     "<div id='bytedesk_goods_price' class='bytedesk_goods_price'>￥" + JSON.parse(message.content).price + "</div>" +
+    //     "<div id='bytedesk_goods_sendlink' class='bytedesk_goods_sendlink' onclick='bd_kfe_stompapi.sendCommodityMessageSync()'>发送链接</div>" +
+    //     "</div>" +
+    //     "</div>" +
+    //     "</div>";
+    //   if (isPrepend) {
+    //     $("#bytedesk_message_li").prepend(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span>" +
+    //       message.createdAt +
+    //       "</span><br/>" +
+    //       "<span>" +
+    //       content +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   } else {
+    //     $("#bytedesk_message_li").append(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span>" +
+    //       message.createdAt +
+    //       "</span><br/>" +
+    //       "<span>" +
+    //       content +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   }
+    // }
+    // else if (bd_kfe_utils.is_type_notification_agent_close(message)) {
+    //   var langText = "联系客服"
+    //   var contentText = "客服关闭会话"
+    //   if (bd_kfe_data.lang === "en") {
+    //     langText = "Contact Agent"
+    //     contentText = "agent close thread"
+    //   }
+    //   if (isPrepend) {
+    //     $("#bytedesk_message_li").prepend(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
+    //       "<span>" +
+    //       contentText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   } else {
+    //     $("#bytedesk_message_li").append(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
+    //       "<span>" +
+    //       contentText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   }
+    // }
+    // else if (bd_kfe_utils.is_type_notification_visitor_close(message)) {
+    //   var langText = "联系客服"
+    //   var contentText = "访客关闭会话"
+    //   if (bd_kfe_data.lang === "en") {
+    //     langText = "Contact Agent"
+    //     contentText = "visitor close thread"
+    //   }
+    //   if (isPrepend) {
+    //     $("#bytedesk_message_li").prepend(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
+    //       "<span>" +
+    //       contentText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   } else {
+    //     $("#bytedesk_message_li").append(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
+    //       "<span>" +
+    //       contentText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   }
+    // }
+    // else if (bd_kfe_utils.is_type_notification_auto_close(message)) {
+    //   var langText = "联系客服"
+    //   var contentText = "长时间没有对话，系统自动关闭会话"
+    //   if (bd_kfe_data.lang === "en") {
+    //     langText = "Contact Agent"
+    //     contentText = "system close thread"
+    //   }
+    //   if (isPrepend) {
+    //     $("#bytedesk_message_li").prepend(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
+    //       "<span>" +
+    //       contentText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   } else {
+    //     $("#bytedesk_message_li").append(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestThread(true)'>" + langText + "</span><br/>" +
+    //       "<span>" +
+    //       contentText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   }
+    // }
+    // else if (bd_kfe_utils.is_type_notification_queue_accept(message)) {
+    //   var langText = "接入会话"
+    //   if (bd_kfe_data.lang === "en") {
+    //     langText = "start chat"
+    //   }
+    //   if (isPrepend) {
+    //     $("#bytedesk_message_li").prepend(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span>" +
+    //       message.createdAt +
+    //       "</span><br/>" +
+    //       "<span>" +
+    //       langText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   } else {
+    //     $("#bytedesk_message_li").append(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span>" +
+    //       message.createdAt +
+    //       "</span><br/>" +
+    //       "<span>" +
+    //       langText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   }
+    // }
+    // else if (bd_kfe_utils.is_type_notification_invite_rate(message)) {
+    //   var langText = "邀请评价"
+    //   if (bd_kfe_data.lang === "en") {
+    //     langText = "invite rate"
+    //   }
+    //   if (isPrepend) {
+    //     $("#bytedesk_message_li").prepend(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span>" +
+    //       message.createdAt +
+    //       "</span><br/>" +
+    //       "<span>" +
+    //       langText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   } else {
+    //     $("#bytedesk_message_li").append(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span>" +
+    //       message.createdAt +
+    //       "</span><br/>" +
+    //       "<span>" +
+    //       langText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   }
+    // }
+    // else if (bd_kfe_utils.is_type_notification_rate_result(message)) {
+    //   var langText = "已评价"
+    //   if (bd_kfe_data.lang === "en") {
+    //     langText = "rated"
+    //   }
+    //   if (isPrepend) {
+    //     $("#bytedesk_message_li").prepend(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span>" +
+    //       message.createdAt +
+    //       "</span><br/>" +
+    //       "<span>" +
+    //       langText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   } else {
+    //     $("#bytedesk_message_li").append(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span>" +
+    //       message.createdAt +
+    //       "</span><br/>" +
+    //       "<span>" +
+    //       langText +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   }
+    // }
+    // else if (bd_kfe_utils.is_type_notification_rate_helpful(message)) {
+    //   if (isPrepend) {
+    //     $("#bytedesk_message_li").prepend(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span>" +
+    //       message.createdAt +
+    //       "</span><br/>" +
+    //       "<span>" +
+    //       message.content +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   } else {
+    //     $("#bytedesk_message_li").append(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span>" +
+    //       message.createdAt +
+    //       "</span><br/>" +
+    //       "<span>" +
+    //       message.content +
+    //       "</span>" +
+    //       "</p></li>"
+    //     );
+    //   }
+    // }
+    // else if (bd_kfe_utils.is_type_notification_rate_helpless(message)) {
+    //   var langText = "人工客服"
+    //   if (bd_kfe_data.lang === "en") {
+    //     langText = "Contact Agent"
+    //   }
+    //   if (isPrepend) {
+    //     $("#bytedesk_message_li").prepend(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestAgent()'>" + langText + "</span>" +
+    //       "</p></li>"
+    //     );
+    //   } else {
+    //     $("#bytedesk_message_li").append(
+    //       "<li><p class='bytedesk_timestamp'>" +
+    //       "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.requestAgent()'>" + langText + "</span>" +
+    //       "</p></li>"
+    //     );
+    //   }
+    // }
+    if (bd_kfe_utils.is_type_notification(message)) {
       if (isPrepend) {
         $("#bytedesk_message_li").prepend(
           "<li><p class='bytedesk_timestamp'>" +
@@ -636,244 +579,247 @@ var bd_kfe_utils = {
       //   content += "<div class='bytedesk_nickname'>" + message.user.nickname + "</div>";
       // }
       if (bd_kfe_utils.is_type_text(message)) {
-        var question = "";
-        if (message.answers != undefined) {
-          for (var j = 0; j < message.answers.length; j++) {
-            var answer = message.answers[j];
-            question += ("<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
-          }
-        }
+        // var question = "";
+        // if (message.answers != undefined) {
+        //   for (var j = 0; j < message.answers.length; j++) {
+        //     var answer = message.answers[j];
+        //     question += ("<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
+        //   }
+        // }
         // TODO: 点击消息内容，弹窗用户选择：复制消息内容 or 撤回消息(3分钟之内)
-        content += "<div class='bytedesk_text' id='content-" + message.mid + "'>" +
-          bd_kfe_utils.replaceFace(message.content) + question +
+        content += "<div class='bytedesk_text' id='content-" + message.uid + "'>" +
+          bd_kfe_utils.replaceFace(message.content) + // question +
           "</div>";
         if (bd_kfe_utils.is_self(message)) {
-          if (message.status === "received") {
+          if (bd_kfe_utils.is_received(message)) {
             var langText = "送达"
             if (bd_kfe_data.lang === "en") {
               langText = "received"
             }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
-          } else if (message.status === "read") {
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
+          } else if (bd_kfe_utils.is_read(message)) {
             var langText = "已读"
             if (bd_kfe_data.lang === "en") {
               langText = "read"
             }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
           } else {
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'></div>";
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'></div>";
           }
         }
       } else if (bd_kfe_utils.is_type_image(message)) {
         content +=
-          "<div class='bytedesk_image-bubble' id='content-" + message.mid + "'>" +
+          "<div class='bytedesk_image-bubble' id='content-" + message.uid + "'>" +
           "<img src='" +
-          message.imageUrl +
+          message.content +
           "' alt='[图片]' class='bytedesk_image' onclick=\"bd_kfe_utils.imageClicked('" +
-          encodeURI(message.imageUrl) +
+          encodeURI(message.content) +
           "')\"/>" +
           "</div>";
         if (bd_kfe_utils.is_self(message)) {
-          if (message.status === "received") {
+          if (bd_kfe_utils.is_received(message)) {
             var langText = "送达"
             if (bd_kfe_data.lang === "en") {
               langText = "received"
             }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
-          } else if (message.status === "read") {
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
+          } else if (bd_kfe_utils.is_read(message)) {
             var langText = "已读"
             if (bd_kfe_data.lang === "en") {
               langText = "read"
             }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
           } else {
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'></div>";
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'></div>";
           }
         }
       } else if (bd_kfe_utils.is_type_file(message)) {
         content +=
-          "<div class='bytedesk_text' id='content-" + message.mid + "'>" +
+          "<div class='bytedesk_text' id='content-" + message.uid + "'>" +
           "<span><a href='" +
-          encodeURI(message.fileUrl) +
+          encodeURI(message.content) +
           "' target='_blank'>查看文件</a></span >" +
           "</div>";
         if (bd_kfe_utils.is_self(message)) {
-          if (message.status === "received") {
+          if (bd_kfe_utils.is_received(message)) {
             var langText = "送达"
             if (bd_kfe_data.lang === "en") {
               langText = "received"
             }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
-          } else if (message.status === "read") {
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
+          } else if (bd_kfe_utils.is_read(message)) {
             var langText = "已读"
             if (bd_kfe_data.lang === "en") {
               langText = "read"
             }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
           } else {
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'></div>";
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'></div>";
           }
         }
       } else if (bd_kfe_utils.is_type_voice(message)) {
         content += "<audio controls>" +
-          "<source src=\"" + message.voiceUrl + "\" type = \"audio/ogg\">" +
-          "<source src=\"" + message.voiceUrl + "\" type=\"audio/mpeg\">" +
+          "<source src=\"" + message.content + "\" type = \"audio/ogg\">" +
+          "<source src=\"" + message.content + "\" type=\"audio/mpeg\">" +
           "Your browser does not support the audio element." +
           "</audio>";
         if (bd_kfe_utils.is_self(message)) {
-          if (message.status === "received") {
+          if (bd_kfe_utils.is_received(message)) {
             var langText = "送达"
             if (bd_kfe_data.lang === "en") {
               langText = "received"
             }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
-          } else if (message.status === "read") {
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
+          } else if (bd_kfe_utils.is_read(message)) {
             var langText = "已读"
             if (bd_kfe_data.lang === "en") {
               langText = "read"
             }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
           } else {
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'></div>";
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'></div>";
           }
         }
       } else if (bd_kfe_utils.is_type_video(message)) {
-        content += "<div class='bytedesk_video-bubble' id='content-" + message.mid + "'>" +
+        content += "<div class='bytedesk_video-bubble' id='content-" + message.uid + "'>" +
           "<video width=\"220\" height=\"200\" controls>" +
-          "<source src=\"" + message.videoOrShortUrl + "\" type = \"video/mp4\">" +
-          "<source src=\"" + message.videoOrShortUrl + "\" type=\"video/ogg\">" +
+          "<source src=\"" + message.content + "\" type = \"video/mp4\">" +
+          "<source src=\"" + message.content + "\" type=\"video/ogg\">" +
           "Your browser does not support the video tag." +
           "</video>" +
           "</div>";
         if (bd_kfe_utils.is_self(message)) {
-          if (message.status === "received") {
+          if (bd_kfe_utils.is_received(message)) {
             var langText = "送达"
             if (bd_kfe_data.lang === "en") {
               langText = "received"
             }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
-          } else if (message.status === "read") {
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
+          } else if (bd_kfe_utils.is_read(message)) {
             var langText = "已读"
             if (bd_kfe_data.lang === "en") {
               langText = "read"
             }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
           } else {
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'></div>";
+            content += "<div class='bytedesk_status' id='status-" + message.uid + "'></div>";
           }
         }
-      } else if (bd_kfe_utils.is_type_card(message)) {
-        content += "<div class='bytedesk_text' id='content-" + message.mid + "'>" +
-          "<a href=" + JSON.parse(message.content).content + " target=\"_blank\">" + JSON.parse(message.content).name + "</a>" +
-          "</div>";
-        if (bd_kfe_utils.is_self(message)) {
-          if (message.status === "received") {
-            var langText = "送达"
-            if (bd_kfe_data.lang === "en") {
-              langText = "received"
-            }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
-          } else if (message.status === "read") {
-            var langText = "已读"
-            if (bd_kfe_data.lang === "en") {
-              langText = "read"
-            }
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'>" + langText + "</div>";
-          } else {
-            content += "<div class='bytedesk_status' id='status-" + message.mid + "'></div>";
-          }
-        }
-      } else if (bd_kfe_utils.is_type_robot(message)) {
-        // bd_kfe_utils.printLog("robot:", message.content);
-        // TODO: 添加 ‘有帮助’ 和 ‘无帮助’
-        let flag = false
-        if (message.content !== undefined && message.content !== null && message.content.length > 0) {
-          flag = true
-        }
-        var question = "";
-        if (message.answers != undefined) {
-          for (var j = 0; j < message.answers.length; j++) {
-            var answer = message.answers[j];
-            question += ((flag ? "<br/>" : "") + "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
-          }
-        }
-        //
-        content +=
-          "<div class='bytedesk_text'>" +
-          (flag ? "<span>" + message.content + "</span>" : "") +
-          question +
-          "</div>";
-      } else if (bd_kfe_utils.is_type_robot_v2(message)) {
-        var categories = "";
-        if (message.categories != undefined) {
-          for (var j = 0; j < message.categories.length; j++) {
-            var category = message.categories[j];
-            categories += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryCategory(" + category.cid + ",\"" + category.name + "\")'>" + category.name + "</span>";
-          }
-        }
-        //
-        content +=
-          "<div class='bytedesk_text'>" +
-          "<span>" + message.content + "</span>" +
-          categories +
-          "</div>";
-      } else if (bd_kfe_utils.is_type_form_request(message)) {
-        content += "<div class='bytedesk_text' id='content-" + message.mid + "'>" +
-          "请求表单" +
-          "</div>";
-      } else if (bd_kfe_utils.is_type_form_result(message)) {
-        content += "<div class='bytedesk_text'>" +
-          "<div>姓名：" + JSON.parse(message.content).form.realname + "</div>" +
-          "<div>手机：" + JSON.parse(message.content).form.mobile + "</div>" +
-          "<div>邮箱：" + JSON.parse(message.content).form.email + "</div>" +
-          "<div>年龄：" + JSON.parse(message.content).form.age + "</div>" +
-          "<div>工作：" + JSON.parse(message.content).form.job + "</div>" +
-          "</div>";
-      } else if (bd_kfe_utils.is_type_notification_thread_reentry(message)) {
-        var question = "";
-        if (message.answers != undefined) {
-          for (var j = 0; j < message.answers.length; j++) {
-            var answer = message.answers[j];
-            question += ("<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
-          }
-        }
-        content += "<div class='bytedesk_text' id='content-" + message.mid + "'>" +
-          message.content + question +
-          "</div>";
-      } else if (bd_kfe_utils.is_type_notification_offline(message)) {
-        var question = "";
-        if (message.answers != undefined) {
-          for (var j = 0; j < message.answers.length; j++) {
-            var answer = message.answers[j];
-            question += ("<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
-          }
-        }
-        content += "<div class='bytedesk_text' id='content-" + message.mid + "'>" +
-          message.content + question +
-          "</div>";
-      } else if (bd_kfe_utils.is_type_notification_non_working_time(message)) {
-        var question = "";
-        if (message.answers != undefined) {
-          for (var j = 0; j < message.answers.length; j++) {
-            var answer = message.answers[j];
-            question += ("<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
-          }
-        }
-        content += "<div class='bytedesk_text' id='content-" + message.mid + "'>" +
-          message.content + question +
-          "</div>";
-      } else if (bd_kfe_utils.is_type_notification_queue(message)) {
-        var question = "";
-        if (message.answers != undefined) {
-          for (var j = 0; j < message.answers.length; j++) {
-            var answer = message.answers[j];
-            question += ("<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
-          }
-        }
-        content += "<div class='bytedesk_text' id='content-" + message.mid + "'>" +
-          message.content + question +
-          "</div>";
-      }
+      } 
+      // else if (bd_kfe_utils.is_type_card(message)) {
+      //   content += "<div class='bytedesk_text' id='content-" + message.uid + "'>" +
+      //     "<a href=" + JSON.parse(message.content).content + " target=\"_blank\">" + JSON.parse(message.content).name + "</a>" +
+      //     "</div>";
+      //   if (bd_kfe_utils.is_self(message)) {
+      //     if (bd_kfe_utils.is_received(message)) {
+      //       var langText = "送达"
+      //       if (bd_kfe_data.lang === "en") {
+      //         langText = "received"
+      //       }
+      //       content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
+      //     } else if (bd_kfe_utils.is_read(message)) {
+      //       var langText = "已读"
+      //       if (bd_kfe_data.lang === "en") {
+      //         langText = "read"
+      //       }
+      //       content += "<div class='bytedesk_status' id='status-" + message.uid + "'>" + langText + "</div>";
+      //     } else {
+      //       content += "<div class='bytedesk_status' id='status-" + message.uid + "'></div>";
+      //     }
+      //   }
+      // } 
+      // else if (bd_kfe_utils.is_type_robot(message)) {
+      //   // bd_kfe_utils.printLog("robot:", message.content);
+      //   // TODO: 添加 ‘有帮助’ 和 ‘无帮助’
+      //   let flag = false
+      //   if (message.content !== undefined && message.content !== null && message.content.length > 0) {
+      //     flag = true
+      //   }
+      //   var question = "";
+      //   if (message.answers != undefined) {
+      //     for (var j = 0; j < message.answers.length; j++) {
+      //       var answer = message.answers[j];
+      //       question += ((flag ? "<br/>" : "") + "<span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
+      //     }
+      //   }
+      //   //
+      //   content +=
+      //     "<div class='bytedesk_text'>" +
+      //     (flag ? "<span>" + message.content + "</span>" : "") +
+      //     question +
+      //     "</div>";
+      // } 
+      // else if (bd_kfe_utils.is_type_robot_v2(message)) {
+      //   var categories = "";
+      //   if (message.categories != undefined) {
+      //     for (var j = 0; j < message.categories.length; j++) {
+      //       var category = message.categories[j];
+      //       categories += "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryCategory(" + category.cid + ",\"" + category.name + "\")'>" + category.name + "</span>";
+      //     }
+      //   }
+      //   //
+      //   content +=
+      //     "<div class='bytedesk_text'>" +
+      //     "<span>" + message.content + "</span>" +
+      //     categories +
+      //     "</div>";
+      // } else if (bd_kfe_utils.is_type_form_request(message)) {
+      //   content += "<div class='bytedesk_text' id='content-" + message.uid + "'>" +
+      //     "请求表单" +
+      //     "</div>";
+      // } else if (bd_kfe_utils.is_type_form_result(message)) {
+      //   content += "<div class='bytedesk_text'>" +
+      //     "<div>姓名：" + JSON.parse(message.content).form.realname + "</div>" +
+      //     "<div>手机：" + JSON.parse(message.content).form.mobile + "</div>" +
+      //     "<div>邮箱：" + JSON.parse(message.content).form.email + "</div>" +
+      //     "<div>年龄：" + JSON.parse(message.content).form.age + "</div>" +
+      //     "<div>工作：" + JSON.parse(message.content).form.job + "</div>" +
+      //     "</div>";
+      // } else if (bd_kfe_utils.is_type_notification_thread_reentry(message)) {
+      //   var question = "";
+      //   if (message.answers != undefined) {
+      //     for (var j = 0; j < message.answers.length; j++) {
+      //       var answer = message.answers[j];
+      //       question += ("<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
+      //     }
+      //   }
+      //   content += "<div class='bytedesk_text' id='content-" + message.uid + "'>" +
+      //     message.content + question +
+      //     "</div>";
+      // } else if (bd_kfe_utils.is_type_notification_offline(message)) {
+      //   var question = "";
+      //   if (message.answers != undefined) {
+      //     for (var j = 0; j < message.answers.length; j++) {
+      //       var answer = message.answers[j];
+      //       question += ("<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
+      //     }
+      //   }
+      //   content += "<div class='bytedesk_text' id='content-" + message.uid + "'>" +
+      //     message.content + question +
+      //     "</div>";
+      // } else if (bd_kfe_utils.is_type_notification_non_working_time(message)) {
+      //   var question = "";
+      //   if (message.answers != undefined) {
+      //     for (var j = 0; j < message.answers.length; j++) {
+      //       var answer = message.answers[j];
+      //       question += ("<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
+      //     }
+      //   }
+      //   content += "<div class='bytedesk_text' id='content-" + message.uid + "'>" +
+      //     message.content + question +
+      //     "</div>";
+      // } else if (bd_kfe_utils.is_type_notification_queue(message)) {
+      //   var question = "";
+      //   if (message.answers != undefined) {
+      //     for (var j = 0; j < message.answers.length; j++) {
+      //       var answer = message.answers[j];
+      //       question += ("<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.queryAnswer(" + answer.aid + ",\"" + encodeURIComponent(answer.question) + "\"," + "\"" + encodeURIComponent(answer.answer) + "\")'>" + answer.question + "</span>");
+      //     }
+      //   }
+      //   content += "<div class='bytedesk_text' id='content-" + message.uid + "'>" +
+      //     message.content + question +
+      //     "</div>";
+      // }
       if (bd_kfe_utils.is_self(message)) {
         if (isPrepend) {
           $("#bytedesk_message_li").prepend("<li><div class='self'>" + content + "</div></li>");
@@ -882,9 +828,9 @@ var bd_kfe_utils = {
         }
       } else {
         if (isPrepend) {
-          $("#bytedesk_message_li").prepend("<li><div class='other' id='other" + message.mid + "'>" + content + "</div></li>");
+          $("#bytedesk_message_li").prepend("<li><div class='other' id='other" + message.uid + "'>" + content + "</div></li>");
         } else {
-          $("#bytedesk_message_li").append("<li><div class='other' id='other" + message.mid + "'>" + content + "</div></li>");
+          $("#bytedesk_message_li").append("<li><div class='other' id='other" + message.uid + "'>" + content + "</div></li>");
         }
       }
     }
@@ -905,7 +851,7 @@ var bd_kfe_utils = {
     for (var i = bd_kfe_data.messages.length - 1; i >= 0; i--) {
       var msg = bd_kfe_data.messages[i];
       // 根据localId替换本地消息，也即更新本地消息状态
-      if (msg.mid === message.mid) {
+      if (msg.uid === message.uid) {
         bd_kfe_data.messages.splice(i, 1);
         bd_kfe_data.messages.push(message);
         contains = true;
@@ -939,18 +885,18 @@ var bd_kfe_utils = {
       langHelpfullText = "Helpfull"
       langHelplessText = "Helpless"
     }
-    var isHelpfull = "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.rateAnswer(\"" + message.answer.aid + "\",\"" + message.mid + "\",true)'>" + langHelpfullText + "</span>" +
-      "<span style='color:#007bff; cursor: pointer; margin-left: 5px;' onclick='bd_kfe_httpapi.rateAnswer(\"" + message.answer.aid + "\",\"" + message.mid + "\",false)'>" + langHelplessText + "</span>";
+    var isHelpfull = "<br/><span style='color:#007bff; cursor: pointer;' onclick='bd_kfe_httpapi.rateAnswer(\"" + message.answer.aid + "\",\"" + message.uid + "\",true)'>" + langHelpfullText + "</span>" +
+      "<span style='color:#007bff; cursor: pointer; margin-left: 5px;' onclick='bd_kfe_httpapi.rateAnswer(\"" + message.answer.aid + "\",\"" + message.uid + "\",false)'>" + langHelplessText + "</span>";
     content +=
-      "<div class='bytedesk_text' id='content-" + message.mid + "'>" +
+      "<div class='bytedesk_text' id='content-" + message.uid + "'>" +
       (flag ? "<span>" + message.content + "</span>" : "") +
       question + isHelpfull +
       "</div>";
     //
     var rate = "";
     // "<div class='bytedesk_robot-rate'>" +
-    //   "<p class='bytedesk_robot-rate-agree' id='rate-" + message.mid + "'><i class='iconfont icon-agree'></i></p>" +
-    //   "<p class='bytedesk_robot-rate-disagree' id='rate-" + message.mid + "'><i class='iconfont icon-disagree'></i></p>" +
+    //   "<p class='bytedesk_robot-rate-agree' id='rate-" + message.uid + "'><i class='iconfont icon-agree'></i></p>" +
+    //   "<p class='bytedesk_robot-rate-disagree' id='rate-" + message.uid + "'><i class='iconfont icon-disagree'></i></p>" +
     // "</div>";
     //
     $("#bytedesk_message_li").append("<li><div class='other'>" + content + "</div>" + rate + "</li>");
@@ -968,7 +914,7 @@ var bd_kfe_utils = {
     for (var i = bd_kfe_data.messages.length - 1; i >= 0; i--) {
       var msg = bd_kfe_data.messages[i];
       // 根据localId替换本地消息，也即更新本地消息状态
-      if (msg.mid === message.mid) {
+      if (msg.uid === message.uid) {
         bd_kfe_data.messages.splice(i, 1);
         bd_kfe_data.messages.push(message);
         contains = true;
@@ -1017,6 +963,17 @@ var bd_kfe_utils = {
   },
   restoreBrowserTitle() {
     document.title = bd_kfe_data.browserTitle;
+  },
+  shouldReturn(message) {
+    if (
+      message.type === bd_kfe_data.MESSAGE_TYPE_READ ||
+      message.type === bd_kfe_data.MESSAGE_TYPE_DELIVERED ||
+      message.type === bd_kfe_data.MESSAGE_TYPE_TYPING ||
+      message.type === bd_kfe_data.MESSAGE_TYPE_PREVIEW
+    ) {
+      return true;
+    }
+    return false;
   },
   requestNotification() {
     // 如果浏览器支持通知，而且用户之前没有授权过通知或者拒绝过通知
@@ -1370,13 +1327,22 @@ var bd_kfe_utils = {
     //
     var filename = bd_kfe_utils.timeUuid() + "_" + bd_kfe_data.username + "_" + file.name;
     var formdata = new FormData();
-    formdata.append("file_name", filename);
-    formdata.append("username", bd_kfe_data.username);
+    // 
     formdata.append("file", file);
-    formdata.append("client", bd_kfe_data.client);
+    formdata.append("file_name", filename);
+    formdata.append("file_type", file.type);
+    formdata.append("is_avatar", "false");
+    formdata.append("kb_type", bd_kfe_data.UPLOAD_TYPE_CHAT);
+    //
+    formdata.append("visitor_uid", localStorage.getItem(bd_kfe_data.VISITOR_UID));
+    formdata.append("nickname", localStorage.getItem(bd_kfe_data.VISITOR_NICKNAME));
+    formdata.append("avatar", localStorage.getItem(bd_kfe_data.VISITOR_AVATAR));
+    //
+    formdata.append("org_uid", localStorage.getItem(bd_kfe_data.VISITOR_ORGUID));
+    formdata.append("client", bd_kfe_data.HTTP_CLIENT);
     //
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST + "/visitor/api/upload/video",
+      url: bd_kfe_data.UPLOAD_FILE_URL,
       contentType: false,
       cache: false,
       processData: false,
@@ -1396,17 +1362,26 @@ var bd_kfe_utils = {
   // 上传并发送文件
   uploadFile: function (file) {
     // TODO: 先在界面显示文件，并显示上传loading
-    // console.log('uploadFile:', file.name)
+    console.log('uploadFile:', file)
     //
     var filename = bd_kfe_utils.timeUuid() + "_" + bd_kfe_data.username + "_" + file.name;
     var formdata = new FormData();
-    formdata.append("file_name", filename);
-    formdata.append("username", bd_kfe_data.username);
+    // 
     formdata.append("file", file);
-    formdata.append("client", bd_kfe_data.client);
+    formdata.append("file_name", filename);
+    formdata.append("file_type", file.type);
+    formdata.append("is_avatar", "false");
+    formdata.append("kb_type", bd_kfe_data.UPLOAD_TYPE_CHAT);
+    //
+    formdata.append("visitor_uid", localStorage.getItem(bd_kfe_data.VISITOR_UID));
+    formdata.append("nickname", localStorage.getItem(bd_kfe_data.VISITOR_NICKNAME));
+    formdata.append("avatar", localStorage.getItem(bd_kfe_data.VISITOR_AVATAR));
+    //
+    formdata.append("org_uid", localStorage.getItem(bd_kfe_data.VISITOR_ORGUID));
+    formdata.append("client", bd_kfe_data.HTTP_CLIENT);
     //
     $.ajax({
-      url: bd_kfe_data.HTTP_HOST + "/visitor/api/upload/file",
+      url: bd_kfe_data.UPLOAD_FILE_URL,
       contentType: false,
       cache: false,
       processData: false,
@@ -1414,7 +1389,8 @@ var bd_kfe_utils = {
       type: "post",
       data: formdata,
       success: function (response) {
-        bd_kfe_utils.printLog('upload response:' + JSON.stringify(response.data))
+        // bd_kfe_utils.printLog('upload response:' + JSON.stringify(response.data))
+        console.log('upload response:', response)
         var fileUrl = response.data;
         if (file.type.startsWith("image")) {
           bd_kfe_stompapi.sendImageMessage(fileUrl);
@@ -1440,14 +1416,22 @@ var bd_kfe_utils = {
       //
       var filename = bd_kfe_utils.timeUuid() + "_" + bd_kfe_data.username + "_" + file.name;
       var formdata = new FormData();
+      // 
+      formdata.append("file", file);
       formdata.append("file_name", filename);
-      formdata.append("username", bd_kfe_data.username);
-      formdata.append("file", newFile);
-      // formdata.append("file", file);
-      formdata.append("client", bd_kfe_data.client);
+      formdata.append("file_type", file.type);
+      formdata.append("is_avatar", "false");
+      formdata.append("kb_type", bd_kfe_data.UPLOAD_TYPE_CHAT);
+      //
+      formdata.append("visitor_uid", localStorage.getItem(bd_kfe_data.VISITOR_UID));
+      formdata.append("nickname", localStorage.getItem(bd_kfe_data.VISITOR_NICKNAME));
+      formdata.append("avatar", localStorage.getItem(bd_kfe_data.VISITOR_AVATAR));
+      //
+      formdata.append("org_uid", localStorage.getItem(bd_kfe_data.VISITOR_ORGUID));
+      formdata.append("client", bd_kfe_data.HTTP_CLIENT);
       //
       $.ajax({
-        url: bd_kfe_data.HTTP_HOST + "/visitor/api/upload/image",
+        url: bd_kfe_data.UPLOAD_FILE_URL,
         contentType: false,
         cache: false,
         processData: false,
@@ -1561,7 +1545,7 @@ var bd_kfe_utils = {
       // type === 'event'
       var localId = bd_kfe_utils.guid();
       var message = {
-        mid: localId,
+        uid: localId,
         type: 'text',
         content: title,
         createdAt: bd_kfe_utils.currentTimestamp(),
@@ -1578,7 +1562,7 @@ var bd_kfe_utils = {
       //
       var localId2 = bd_kfe_utils.guid();
       var message2 = {
-        mid: localId2,
+        uid: localId2,
         type: 'text',
         content: content,
         createdAt: bd_kfe_utils.currentTimestamp(),
@@ -1600,7 +1584,7 @@ var bd_kfe_utils = {
     //
     var localId = bd_kfe_utils.guid();
     var message = {
-      mid: localId,
+      uid: localId,
       type: 'text',
       content: decodeURIComponent(question),
       createdAt: bd_kfe_utils.currentTimestamp(),
@@ -1617,7 +1601,7 @@ var bd_kfe_utils = {
     //
     var localId2 = bd_kfe_utils.guid();
     var message2 = {
-      mid: localId2,
+      uid: localId2,
       type: 'text',
       content: decodeURIComponent(answer),
       createdAt: bd_kfe_utils.currentTimestamp(),
@@ -1688,7 +1672,7 @@ var bd_kfe_utils = {
   //   document.body.removeChild(eleLink);
   // },
   printLog: function (content) {
-    if (!bd_kfe_data.IS_PRODUCTION) {
+    if (bd_kfe_data.IS_DEBUG) {
       console.log(content)
     }
   }

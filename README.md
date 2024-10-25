@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-02-28 10:53:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-10-05 21:24:51
+ * @LastEditTime: 2024-10-24 22:58:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -69,7 +69,6 @@ bytedesk.com web lib for customer service chat widget
 | custom button color |  custom button left | custom button margin | custom iframe margin | custom iframe width |
 | :----------: | :----------: | :----------:  | :----------: | :----------: |
 | <img src="./image/button-color.png" width="250"> | <img src="./image/button-left.png" width="250"> | <img src="./image/button-margin.png" width="250"> | <img src="./image/iframe-margin.png" width="250"> | <img src="./image/iframe-width.png" width="250"> |
-
 
 ## Chat SDK
 

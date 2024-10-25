@@ -7,6 +7,15 @@
 var bd_kfe_kefu = {
   //
   created: function () {
+    // 获取url参数
+    bd_kfe_data.org = bd_kfe_utils.getUrlParam("org");
+    bd_kfe_data.t = bd_kfe_utils.getUrlParam("t");
+    bd_kfe_data.sid = bd_kfe_utils.getUrlParam("sid");
+    bd_kfe_data.lang = bd_kfe_utils.getUrlParam("lang");
+    bd_kfe_data.ref = bd_kfe_utils.getUrlParam("ref");
+    bd_kfe_data.navbar = bd_kfe_utils.getUrlParam("navbar");
+    bd_kfe_data.theme = bd_kfe_utils.getUrlParam("theme");
+
     // 嵌入窗口形式
     bd_kfe_data.adminUid = bd_kfe_utils.getUrlParam("uid");
     bd_kfe_data.workGroupWid = bd_kfe_utils.getUrlParam("wid");
@@ -33,84 +42,86 @@ var bd_kfe_kefu = {
     }
   },
   mounted: function () {
+    // 
+    bd_kfe_httpapi.init()
     // 是否自定义用户名
-    bd_kfe_data.selfuser = bd_kfe_utils.getUrlParam("selfuser");
-    if (bd_kfe_data.selfuser === "1") {
-      // 之前未启用自定义用户名，初次启用自定义用户名
-      if (localStorage.bd_kfe_selfuser !== "1") {
-        // 初次启用自定义用户名
-        localStorage.bd_kfe_selfuser = "1";
-        // TODO: 调用自定义用户注册流程
-        bd_kfe_httpapi.registerUser()
-      } else {
-        // 之前已经启用了自定义用户名
-        // TODO: 判断用户名是否跟之前一样
-        bd_kfe_data.passport.token.access_token = localStorage.bd_kfe_access_token
-        // bd_kfe_utils.printLog('access_token:' + bd_kfe_data.passport.token.access_token)
-        bd_kfe_data.uid = localStorage.bd_kfe_uid;
-        bd_kfe_data.username = localStorage.bd_kfe_username;
-        bd_kfe_data.nickname = localStorage.bd_kfe_nickname;
-        bd_kfe_data.password = bd_kfe_data.username;
-        // 
-        var username = bd_kfe_utils.getUrlParam("username");
-        if (bd_kfe_data.username === username) {
-          // 同一个用户，直接调用登录流程
-          if (bd_kfe_data.passport.token.access_token !== null
-            && bd_kfe_data.passport.token.access_token !== undefined
-            && bd_kfe_data.passport.token.access_token !== '') {
-            // 本地存储有token，直接请求会话
-            // token非空，之前已经登录过，在requestThread中判断token是否过期
-            bd_kfe_httpapi.requestThread()
-          } else if (
-            bd_kfe_data.username !== null &&
-            bd_kfe_data.username !== undefined &&
-            bd_kfe_data.username !== ""
-          ) {
-            // 首次登录
-            bd_kfe_httpapi.login();
-          }
-        } else {
-          // 切换了用户名，重新调用注册流程
-          bd_kfe_httpapi.registerUser();
-        }
-      }
-    } else {
-      // 未启用自定义用户名
-      if (localStorage.bd_kfe_selfuser === "1") {
-        // 之前使用自定义用户名
-        // 标记使用非自定义用户名
-        localStorage.bd_kfe_selfuser = "0"; // 注意：不能提取到if之前
-        // 新注册匿名用户
-        bd_kfe_httpapi.requestUsername();
-      } else {
-        // 一直使用非自定义用户名
-        // 标记使用非自定义用户名
-        localStorage.bd_kfe_selfuser = "0"; // 注意：不能提取到if之前
-        // 匿名用户流程
-        bd_kfe_data.passport.token.access_token = localStorage.bd_kfe_access_token
-        // bd_kfe_utils.printLog('access_token:' + bd_kfe_data.passport.token.access_token)
-        bd_kfe_data.uid = localStorage.bd_kfe_uid;
-        bd_kfe_data.username = localStorage.bd_kfe_username;
-        bd_kfe_data.nickname = localStorage.bd_kfe_nickname;
-        bd_kfe_data.password = bd_kfe_data.username;
-        // 
-        if (bd_kfe_data.passport.token.access_token !== null
-          && bd_kfe_data.passport.token.access_token !== undefined
-          && bd_kfe_data.passport.token.access_token !== '') {
-          // 本地存储有token，直接请求会话
-          bd_kfe_httpapi.requestThread()
-        } else if (
-          bd_kfe_data.username !== null &&
-          bd_kfe_data.username !== undefined &&
-          bd_kfe_data.username !== ""
-        ) {
-          bd_kfe_httpapi.login();
-        } else {
-          bd_kfe_httpapi.requestUsername();
-        }
-      }
-    }
-    bd_kfe_httpapi.getBaseUrl();
+    // bd_kfe_data.selfuser = bd_kfe_utils.getUrlParam("selfuser");
+    // if (bd_kfe_data.selfuser === "1") {
+    //   // 之前未启用自定义用户名，初次启用自定义用户名
+    //   if (localStorage.bd_kfe_selfuser !== "1") {
+    //     // 初次启用自定义用户名
+    //     localStorage.bd_kfe_selfuser = "1";
+    //     // TODO: 调用自定义用户注册流程
+    //     bd_kfe_httpapi.registerUser()
+    //   } else {
+    //     // 之前已经启用了自定义用户名
+    //     // TODO: 判断用户名是否跟之前一样
+    //     bd_kfe_data.passport.token.access_token = localStorage.bd_kfe_access_token
+    //     // bd_kfe_utils.printLog('access_token:' + bd_kfe_data.passport.token.access_token)
+    //     bd_kfe_data.uid = localStorage.bd_kfe_uid;
+    //     bd_kfe_data.username = localStorage.bd_kfe_username;
+    //     bd_kfe_data.nickname = localStorage.bd_kfe_nickname;
+    //     bd_kfe_data.password = bd_kfe_data.username;
+    //     // 
+    //     var username = bd_kfe_utils.getUrlParam("username");
+    //     if (bd_kfe_data.username === username) {
+    //       // 同一个用户，直接调用登录流程
+    //       if (bd_kfe_data.passport.token.access_token !== null
+    //         && bd_kfe_data.passport.token.access_token !== undefined
+    //         && bd_kfe_data.passport.token.access_token !== '') {
+    //         // 本地存储有token，直接请求会话
+    //         // token非空，之前已经登录过，在requestThread中判断token是否过期
+    //         bd_kfe_httpapi.requestThread()
+    //       } else if (
+    //         bd_kfe_data.username !== null &&
+    //         bd_kfe_data.username !== undefined &&
+    //         bd_kfe_data.username !== ""
+    //       ) {
+    //         // 首次登录
+    //         bd_kfe_httpapi.login();
+    //       }
+    //     } else {
+    //       // 切换了用户名，重新调用注册流程
+    //       bd_kfe_httpapi.registerUser();
+    //     }
+    //   }
+    // } else {
+    //   // 未启用自定义用户名
+    //   if (localStorage.bd_kfe_selfuser === "1") {
+    //     // 之前使用自定义用户名
+    //     // 标记使用非自定义用户名
+    //     localStorage.bd_kfe_selfuser = "0"; // 注意：不能提取到if之前
+    //     // 新注册匿名用户
+    //     bd_kfe_httpapi.requestUsername();
+    //   } else {
+    //     // 一直使用非自定义用户名
+    //     // 标记使用非自定义用户名
+    //     localStorage.bd_kfe_selfuser = "0"; // 注意：不能提取到if之前
+    //     // 匿名用户流程
+    //     bd_kfe_data.passport.token.access_token = localStorage.bd_kfe_access_token
+    //     // bd_kfe_utils.printLog('access_token:' + bd_kfe_data.passport.token.access_token)
+    //     bd_kfe_data.uid = localStorage.bd_kfe_uid;
+    //     bd_kfe_data.username = localStorage.bd_kfe_username;
+    //     bd_kfe_data.nickname = localStorage.bd_kfe_nickname;
+    //     bd_kfe_data.password = bd_kfe_data.username;
+    //     // 
+    //     if (bd_kfe_data.passport.token.access_token !== null
+    //       && bd_kfe_data.passport.token.access_token !== undefined
+    //       && bd_kfe_data.passport.token.access_token !== '') {
+    //       // 本地存储有token，直接请求会话
+    //       bd_kfe_httpapi.requestThread()
+    //     } else if (
+    //       bd_kfe_data.username !== null &&
+    //       bd_kfe_data.username !== undefined &&
+    //       bd_kfe_data.username !== ""
+    //     ) {
+    //       bd_kfe_httpapi.login();
+    //     } else {
+    //       bd_kfe_httpapi.requestUsername();
+    //     }
+    //   }
+    // }
+    // bd_kfe_httpapi.getBaseUrl();
   }
 };
 
