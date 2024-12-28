@@ -1,0 +1,79 @@
+{
+  "name": "bytedesk-web",
+  "private": false,
+  "version": "1.0.1",
+  "type": "module",
+  "authors": [
+    "270580156@qq.com"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bytedesk/bytedesk-react.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bytedesk/bytedesk-react/issues"
+  },
+  "homepage": "https://github.com/bytedesk/bytedesk-react",
+  "keywords": [
+    "ai",
+    "chat",
+    "bot",
+    "chatbot",
+    "assistant",
+    "openai",
+    "chatgpt",
+    "react"
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/bytedesk-web.umd.js",
+  "module": "./dist/bytedesk-web.es.js",
+  "browser": "./dist/bytedesk-web.js",
+  "exports": {
+    ".": {
+      "import": "./dist/bytedesk-web.es.js",
+      "require": "./dist/bytedesk-web.umd.js",
+      "browser": "./dist/bytedesk-web.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --project tsconfig.json && vite build",
+    "preview": "vite preview",
+    "demo:react": "cd examples/react-demo && yarn install && yarn dev",
+    "demo:vue": "cd examples/vue-demo && yarn install && yarn dev",
+    "demo:svelte": "cd examples/svelte-demo && yarn install && yarn dev",
+    "demo:vanilla": "cd examples/vanilla-demo && yarn install && yarn dev",
+    "demo:javascript": "cd examples/javascript-demo && yarn install && yarn start"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-vue": "^4.0.0",
+    "svelte": "^4.0.0",
+    "vue": "^3.0.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "svelte": "^4.0.0",
+    "vue": "^3.0.0"
+  },
+  "license": "BUSL-1.1",
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
+  }
+}
