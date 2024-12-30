@@ -1,165 +1,112 @@
+<!--
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-12-28 21:09:12
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-12-30 15:08:46
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+-->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bytedesk JavaScript Demo (Global)</title>
-    <style>
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    <title>ByteDesk Web Global Demo</title>
+    <!-- 使用 bytedesk-web.js -->
+    <script type="application/javascript" src="/dist/bytedesk-web.js"></script>
+    <script>
+        // 等待 DOM 加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 配置
+            const config = {
+                theme: {
+                    primaryColor: '#2e88ff',
+                    secondaryColor: '#ffffff',
+                    textColor: '#333333',
+                    backgroundColor: '#ffffff',
+                    position: 'right',
+                    navbar: {
+                        backgroundColor: '#ffffff',
+                        textColor: '#333333'
+                    }
+                },
+                window: {
+                    title: 'Customer Service',
+                    width: 380,
+                    height: 640,
+                    position: 'right'
+                },
+                chatParams: {
+                    org: 'your_org_id', // 替换为您的组织ID
+                    t: '2',
+                    sid: 'your_sid'  // 替换为您的SID
+                },
+                bubbleConfig: {
+                    show: true,
+                    icon: '👋',
+                    title: 'Need help?',
+                    subtitle: 'Click to chat'
+                },
+                marginBottom: 20,
+                marginSide: 20
+            };
 
-        .demo-section {
-            margin-bottom: 30px;
-        }
+            // 初始化
+            const bytedesk = new BytedeskWeb(config);
+            bytedesk.init();
 
-        .code-container {
-            position: relative;
-            margin: 20px 0;
-        }
-
-        .code-block {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            font-family: monospace;
-            white-space: pre;
-            margin: 0;
-        }
-
-        .copy-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 8px 16px;
-            background: #2e88ff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .copy-button:hover {
-            background: #1a6cd1;
-        }
-
-        .demo-button {
-            padding: 10px 20px;
-            background: #2e88ff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .demo-button:hover {
-            background: #1a6cd1;
-        }
-    </style>
+            // 导出到全局以便控制按钮使用
+            window.bytedesk = bytedesk;
+        });
+    </script>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Bytedesk JavaScript Demo (Global)</h1>
-
-        <div class="demo-section">
-            <h2>Live Demo</h2>
-            <button id="chat-button-global" class="demo-button">Open Chat</button>
+    <div style="padding: 20px;">
+        <h1>ByteDesk Web Global Demo</h1>
+        <p>This demo shows how to use ByteDesk Web in global format.</p>
+        
+        <div style="margin: 20px 0;">
+            <button onclick="window.bytedesk?.showChat()">Open Chat</button>
+            <button onclick="window.bytedesk?.hideChat()">Close Chat</button>
         </div>
 
-        <div class="demo-section">
-            <h2>嵌入代码</h2>
-            <p>将以下代码复制到您的网页中即可使用聊天功能：</p>
+        <div style="margin-top: 40px;">
+            <h2>Installation</h2>
+            <pre><code>
+// Copy this code to your page
+&lt;script src="path/to/bytedesk-web.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  const config = {
+    theme: {
+      primaryColor: '#2e88ff',
+      position: 'right'
+    },
+    window: {
+      title: 'Customer Service',
+      width: 380,
+      height: 640
+    },
+    chatParams: {
+      org: 'your_org_id',
+      t: '2',
+      sid: 'your_sid'
+    }
+  };
 
-            <div class="code-container">
-                <pre class="code-block" id="embed-code"></pre>
-                <button class="copy-button" onclick="copyEmbedCode()">复制代码</button>
-            </div>
-        </div>
-
-        <div class="demo-section">
-            <h2>使用说明</h2>
-            <ol>
-                <li>复制上方的嵌入代码</li>
-                <li>将代码粘贴到您网页的 &lt;body&gt; 标签结束前</li>
-                <li>根据需要修改配置参数</li>
-                <li>完成！现在您的网页已经集成了聊天功能</li>
-            </ol>
+  const bytedesk = new BytedeskWeb(config);
+  bytedesk.init();
+&lt;/script&gt;
+            </code></pre>
         </div>
     </div>
-
-    <!-- 加载 IIFE 版本 -->
-    <script src="/lib/bytedesk-web.js"></script>
-
-    <!-- 使用全局变量的示例 -->
-    <script>
-        // 配置对象
-        const config = {
-            theme: {
-                primaryColor: '#2e88ff',
-                secondaryColor: '#ffffff',
-                textColor: '#333333',
-                backgroundColor: '#ffffff'
-            },
-            window: {
-                title: '在线客服',
-                width: 380,
-                height: 640
-            },
-            chatParams: {
-                org: 'df_org_uid',
-                t: 2,
-                sid: 'df_rt_uid'
-            }
-        };
-
-        // 初始化聊天实例
-        const bytedeskGlobal = new BytedeskWeb(config);
-        bytedeskGlobal.init();
-
-        // 生成嵌入代码
-        function generateEmbedCode() {
-            return `<!-- Bytedesk Chat Widget -->
-<script src="http://localhost:9003/embed/bytedesk-web.js"><\/script>
-<script>
-const bytedesk = new BytedeskWeb(${JSON.stringify(config, null, 2)});
-bytedesk.init();
-<\/script>`;
-        }
-
-        // 页面加载时显示嵌入代码
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('embed-code').textContent = generateEmbedCode();
-        });
-
-        // 添加点击事件
-        document.getElementById('chat-button-global').addEventListener('click', () => {
-            bytedeskGlobal.showChat();
-        });
-
-        // 复制代码功能
-        function copyEmbedCode() {
-            const codeBlock = document.getElementById('embed-code');
-            const range = document.createRange();
-            range.selectNode(codeBlock);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            
-            try {
-                document.execCommand('copy');
-                window.getSelection().removeAllRanges();
-                alert('代码已复制到剪贴板！');
-            } catch (err) {
-                console.error('复制失败:', err);
-                alert('复制失败，请手动复制代码。');
-            }
-        }
-    </script>
 </body>
 
 </html>

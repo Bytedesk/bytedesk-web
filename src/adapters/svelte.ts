@@ -1,24 +1,34 @@
-import { SvelteComponent } from 'svelte';
+import type { BytedeskConfig } from '../types';
 import BytedeskWeb from '../main';
-import type { BytedeskConfig } from '../main';
 
-export class BytedeskSvelte extends SvelteComponent {
-  constructor(options: any) {
-    super(options);
-    const config: BytedeskConfig = {
-      theme: options.props.theme,
-      window: options.props.window,
-      text: options.props.text,
-      tabs: options.props.tabs,
-      showSupport: options.props.showSupport,
-      chatParams: options.props.chatParams
-    };
-    
-    const bytedesk = new BytedeskWeb(config);
-    bytedesk.init();
-    
-    if (options.props.onInit) {
-      options.props.onInit(bytedesk);
-    }
+export const BytedeskSvelte = (options: BytedeskConfig & { onInit?: () => void }) => {
+  let instance: BytedeskWeb | null = null;
+
+  // 初始化
+  instance = new BytedeskWeb(options);
+  instance.init();
+  
+  if (options.onInit) {
+    options.onInit();
   }
-} 
+
+  return {
+    update(newOptions: BytedeskConfig & { onInit?: () => void }) {
+      if (instance) {
+        instance.destroy();
+      }
+      instance = new BytedeskWeb(newOptions);
+      instance.init();
+      
+      if (newOptions.onInit) {
+        newOptions.onInit();
+      }
+    },
+    destroy() {
+      if (instance) {
+        instance.destroy();
+        instance = null;
+      }
+    }
+  };
+}; 

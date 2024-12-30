@@ -1,19 +1,19 @@
 {
   "name": "bytedesk-web",
   "private": false,
-  "version": "1.0.1",
+  "version": "1.0.14",
   "type": "module",
   "authors": [
     "270580156@qq.com"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bytedesk/bytedesk-react.git"
+    "url": "git+https://github.com/bytedesk/bytedesk-web.git"
   },
   "bugs": {
-    "url": "https://github.com/bytedesk/bytedesk-react/issues"
+    "url": "https://github.com/bytedesk/bytedesk-web/issues"
   },
-  "homepage": "https://github.com/bytedesk/bytedesk-react",
+  "homepage": "https://github.com/bytedesk/bytedesk-web",
   "keywords": [
     "ai",
     "chat",
@@ -25,21 +25,37 @@
     "react"
   ],
   "files": [
-    "dist"
+    "dist",
+    "index.d.ts",
+    "README.md"
   ],
-  "main": "./dist/bytedesk-web.umd.js",
-  "module": "./dist/bytedesk-web.es.js",
-  "browser": "./dist/bytedesk-web.js",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/bytedesk-web.es.js",
-      "require": "./dist/bytedesk-web.umd.js",
-      "browser": "./dist/bytedesk-web.js"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index/index.js",
+      "require": "./dist/bytedesk-web.umd.js"
+    },
+    "./react": {
+      "types": "./dist/types/react.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./vue": {
+      "types": "./dist/types/vue.d.ts",
+      "import": "./dist/vue/index.js"
+    },
+    "./svelte": {
+      "types": "./dist/types/svelte.d.ts",
+      "import": "./dist/svelte/index.js"
     }
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc --project tsconfig.json && vite build",
+    "build:esm": "vite build --config vite.config.esm.ts",
+    "build:umd": "vite build --config vite.config.umd.ts",
+    "build": "yarn build:esm && yarn build:umd",
     "preview": "vite preview",
     "demo:react": "cd examples/react-demo && yarn install && yarn dev",
     "demo:vue": "cd examples/vue-demo && yarn install && yarn dev",
@@ -53,14 +69,17 @@
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitejs/plugin-vue": "^4.0.0",
-    "svelte": "^4.0.0",
-    "vue": "^3.0.0",
     "@vue/compiler-sfc": "^3.0.0",
+    "svelte": "^4.0.0",
+    "sync-npm-mirror": "^1.0.0",
     "typescript": "^5.7.2",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^4.4.0",
+    "vue": "^3.0.0"
   },
   "peerDependencies": {
     "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "svelte": "^4.0.0",
     "vue": "^3.0.0"
   },
@@ -69,11 +88,27 @@
     "react": {
       "optional": true
     },
+    "react-dom": {
+      "optional": true
+    },
     "vue": {
       "optional": true
     },
     "svelte": {
       "optional": true
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "react": [
+        "./index.d.ts"
+      ],
+      "vue": [
+        "./index.d.ts"
+      ],
+      "svelte": [
+        "./index.d.ts"
+      ]
     }
   }
 }

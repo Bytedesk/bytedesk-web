@@ -12,83 +12,47 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-import { defineComponent, h, onMounted, onUnmounted, PropType } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import type { BytedeskConfig } from '../types';
 import BytedeskWeb from '../main';
-import { BytedeskConfig } from '../main';
 
 export const BytedeskVue = defineComponent({
   name: 'BytedeskVue',
   props: {
-    theme: {
-      type: Object as PropType<BytedeskConfig['theme']>,
-      default: () => ({
-        primaryColor: '#2e88ff',
-        secondaryColor: '#ffffff',
-        textColor: '#333333',
-        backgroundColor: '#ffffff'
-      })
-    },
-    window: {
-      type: Object as PropType<BytedeskConfig['window']>,
-      default: () => ({})
-    },
-    text: {
-      type: Object,
-      default: () => ({})
-    },
-    tabs: {
-      type: Object as PropType<BytedeskConfig['tabs']>,
-      default: () => ({
-        home: false,
-        messages: true,
-        help: false,
-        news: false
-      })
-    },
-    showSupport: {
-      type: Boolean,
-      default: true
-    },
-    chatParams: {
-      type: Object,
-      default: () => ({})
+    placement: {
+      type: String,
+      required: true,
+      validator: (value: string) => ['bottom-left', 'bottom-right'].includes(value)
     },
     onInit: {
       type: Function,
-      default: () => {}
+      default: null
     }
   },
-
-  setup(props) {
-    let instance: BytedeskWeb | null = null;
+  setup(props, { attrs }) {
+    const bytedeskRef = ref<BytedeskWeb | null>(null);
 
     onMounted(() => {
-      const config: BytedeskConfig = {
-        theme: props.theme,
-        window: props.window,
-        text: props.text,
-        tabs: props.tabs,
-        showSupport: props.showSupport,
-        chatParams: props.chatParams
-      };
+      const config = {
+        ...attrs,
+        placement: props.placement
+      } as BytedeskConfig;
 
-      instance = new BytedeskWeb(config);
-      instance.init();
-
+      bytedeskRef.value = new BytedeskWeb(config);
+      bytedeskRef.value.init();
+      
       if (props.onInit) {
-        props.onInit(instance);
+        props.onInit();
       }
     });
 
     onUnmounted(() => {
-      if (instance) {
-        instance.destroy();
-        instance = null;
+      if (bytedeskRef.value) {
+        bytedeskRef.value.destroy();
+        bytedeskRef.value = null;
       }
     });
 
-    return () => h('div');
+    return () => null;
   }
-});
-
-export type { BytedeskConfig }; 
+}); 

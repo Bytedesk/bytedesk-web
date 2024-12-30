@@ -1,15 +1,67 @@
-<!--
- * @Author: jack ning github@bytedesk.com
- * @Date: 2024-12-28 12:44:05
- * @LastEditors: jack ning github@bytedesk.com
- * @LastEditTime: 2024-12-28 13:07:35
- * @FilePath: /bytedesk_web/examples/react-demo/readme.md
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
--->
-# react-demo
+# React Demo
 
-## 运行
+[中文文档](./README.zh.md)
+
+## Installation
 
 ```bash
-npm run dev
+npm install bytedesk-web
+# or
+yarn add bytedesk-web
+```
+
+## TypeScript Support
+
+Add to your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "bytedesk-web/*": ["./node_modules/bytedesk-web/*"]
+    }
+  }
+}
+```
+
+## Usage Example
+
+```tsx
+import React from 'react';
+import { BytedeskReact } from 'bytedesk-web/react';
+import type { BytedeskConfig } from 'bytedesk-web/react';
+
+const ChatWidget: React.FC = () => {
+  const config: BytedeskConfig = {
+    theme: {
+      primaryColor: '#2e88ff',
+      position: 'right'
+    },
+    window: {
+      title: 'Customer Service',
+      width: 380,
+      height: 640
+    },
+    chatParams: {
+      org: 'your_org_id',
+      t: 2,
+      sid: 'your_sid'
+    }
+  };
+
+  return <BytedeskReact {...config} />;
+};
+
+export default ChatWidget;
+```
+
+## Configuration
+
+[View Full Configuration](../../docs/CONFIG.md)
+
+## Local Development
+
+```bash
+yarn install
+yarn dev
 ```

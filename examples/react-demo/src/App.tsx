@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 12:41:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-28 22:57:16
+ * @LastEditTime: 2024-12-30 14:54:40
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,12 +16,10 @@ import React, { useState } from 'react';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
-import { PresetColor, Position } from '@bytedesk/web/types';
-import { BytedeskConfig, Animation, Margins, Theme } from './types';
+import { PresetColor, Position, BytedeskConfig, Language } from '@bytedesk/web/types';
 import { messages } from './locales';
-import type { Language } from './types';
 
-// 添加导航栏预设颜色选��
+// 添加导航栏预设颜色选
 const NAVBAR_PRESETS = {
   light: {
     backgroundColor: '#ffffff',
@@ -227,29 +225,7 @@ function App() {
       alert('配置无效，请检查输入');
     }
   };
-
-  // 修改导入配置函数
-  const importConfig = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const newConfig = JSON.parse(e.target?.result as string);
-          if (validateConfig(newConfig)) {
-            saveConfig(newConfig);
-          } else {
-            throw new Error('Invalid configuration format');
-          }
-        } catch (error) {
-          console.error('Failed to parse config file:', error);
-          alert('配置文件格式错误或配置无效');
-        }
-      };
-      reader.readAsText(file);
-    }
-  };
-
+  
   // 处理函数
   const handleInit = () => {
     console.log('BytedeskReact component initialized');
@@ -304,59 +280,6 @@ function App() {
       updateConfig(['navbarTextColor'], config.navbarTextColor);
     }
   };
-
-  // 添加导出配置函数
-  const exportConfig = () => {
-    try {
-      // 创建配置文件内容
-      const configToExport = {
-        ...config,
-        exportDate: new Date().toISOString(),
-        version: '1.0.0'
-      };
-
-      // 创建 Blob 对象
-      const blob = new Blob([JSON.stringify(configToExport, null, 2)], {
-        type: 'application/json'
-      });
-
-      // 创建下载链接
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `bytedesk-config-${new Date().toISOString().slice(0, 10)}.json`;
-
-      // 触发下载
-      document.body.appendChild(a);
-      a.click();
-
-      // 清理
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      console.log('Configuration exported successfully');
-    } catch (error) {
-      console.error('Failed to export configuration:', error);
-      alert('导出配置失败，请重试');
-    }
-  };
-
-  // 添加重置配置函数
-  const resetConfig = () => {
-    try {
-      // 获取默认配置
-      const defaultConfig = getDefaultConfig();
-      
-      // 保存默认配置
-      saveConfig(defaultConfig);
-      
-      console.log('Configuration reset to defaults');
-    } catch (error) {
-      console.error('Failed to reset configuration:', error);
-      alert('重置配置失败，请重试');
-    }
-  };
-
   // 添加移动端检测
   const isMobile = window.innerWidth <= 768;
 
@@ -406,30 +329,6 @@ function App() {
 
   const [language, setLanguage] = useState<Language>('zh-CN');
   const t = messages[language];
-
-  // 生成嵌入代码
-  const generateEmbedCode = () => {
-    // 创建简化的配置对象
-    const embedConfig = {
-      theme: config.theme,
-      window: config.window,
-      chatParams: config.chatParams
-    };
-    
-    return `<!-- Bytedesk Chat Widget -->
-<script src="http://localhost:9003/embed/bytedesk-web.js"></script>
-<script>
-const bytedesk = new BytedeskWeb(${JSON.stringify(embedConfig, null, 2)});
-bytedesk.init();
-</script>`;
-  };
-
-  // 复制代码到剪贴板
-  const copyEmbedCode = () => {
-    navigator.clipboard.writeText(generateEmbedCode())
-      .then(() => alert('代码已复制到剪贴板'))
-      .catch(err => console.error('复制失败:', err));
-  };
 
   return (
     <div className="App" style={styles.container}>
@@ -512,28 +411,62 @@ bytedesk.init();
         <div className="config-section" style={styles.section}>
           <h3 style={{ fontSize: isMobile ? '16px' : '18px' }}>{t.settings.bubble}</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <input
                 type="checkbox"
                 checked={config.bubbleConfig.show}
-                onChange={(e) => handleBubbleConfigChange('show', e.target.checked)}
+                onChange={(e) => {
+                  const newConfig = { ...config };
+                  newConfig.bubbleConfig.show = e.target.checked;
+                  saveConfig(newConfig);
+                }}
               />
               显示气泡消息
             </label>
-            <input
-              type="text"
-              value={config.bubbleConfig.title}
-              onChange={(e) => handleBubbleConfigChange('title', e.target.value)}
-              placeholder="气泡标题"
-              style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
-            />
-            <input
-              type="text"
-              value={config.bubbleConfig.subtitle}
-              onChange={(e) => handleBubbleConfigChange('subtitle', e.target.value)}
-              placeholder="气泡副标题"
-              style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
-            />
+            
+            {config.bubbleConfig.show && (
+              <>
+                <div>
+                  <label>图标</label>
+                  <input
+                    type="text"
+                    value={config.bubbleConfig.icon}
+                    onChange={(e) => {
+                      const newConfig = { ...config };
+                      newConfig.bubbleConfig.icon = e.target.value;
+                      saveConfig(newConfig);
+                    }}
+                    style={{ padding: '4px 8px', marginLeft: '10px' }}
+                  />
+                </div>
+                <div>
+                  <label>标题</label>
+                  <input
+                    type="text"
+                    value={config.bubbleConfig.title}
+                    onChange={(e) => {
+                      const newConfig = { ...config };
+                      newConfig.bubbleConfig.title = e.target.value;
+                      saveConfig(newConfig);
+                    }}
+                    style={{ padding: '4px 8px', marginLeft: '10px', width: '200px' }}
+                  />
+                </div>
+                <div>
+                  <label>副标题</label>
+                  <input
+                    type="text"
+                    value={config.bubbleConfig.subtitle}
+                    onChange={(e) => {
+                      const newConfig = { ...config };
+                      newConfig.bubbleConfig.subtitle = e.target.value;
+                      saveConfig(newConfig);
+                    }}
+                    style={{ padding: '4px 8px', marginLeft: '10px', width: '200px' }}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -783,37 +716,90 @@ bytedesk.init();
           </div>
         </div>
 
-        {/* 添加嵌入代码部分 */}
+        {/* 添加使用步骤部分 */}
         <div className="config-section" style={styles.section}>
-          <h3 style={{ fontSize: isMobile ? '16px' : '18px' }}>嵌入代码</h3>
-          <div style={{ position: 'relative' }}>
-            <pre style={{
-              background: '#f5f5f5',
-              padding: '15px',
-              borderRadius: '4px',
-              overflow: 'auto',
-              maxHeight: '300px',
-              fontSize: '14px',
-              lineHeight: '1.5'
-            }}>
-              {generateEmbedCode()}
+          <h3 style={{ fontSize: isMobile ? '16px' : '18px' }}>使用步骤</h3>
+          <div style={{ 
+            padding: '15px',
+            background: '#f5f5f5',
+            borderRadius: '4px',
+            fontSize: '14px',
+            lineHeight: '1.6'
+          }}>
+            <h4>1. 安装依赖</h4>
+            <pre style={{ background: '#e0e0e0', padding: '10px', borderRadius: '4px' }}>
+              npm install bytedesk-web
+              
             </pre>
-            <button
-              onClick={copyEmbedCode}
-              style={{
-                position: 'absolute',
-                top: '10px',
-                right: '10px',
-                padding: '5px 10px',
-                background: config.theme.primaryColor,
-                color: '#fff',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              复制代码
-            </button>
+            <h4>或者</h4>
+            <pre style={{ background: '#e0e0e0', padding: '10px', borderRadius: '4px' }}>
+              yarn add bytedesk-web
+            </pre>
+            <h4>或者</h4>
+            <pre style={{ background: '#e0e0e0', padding: '10px', borderRadius: '4px' }}>
+              pnpm add bytedesk-web
+            </pre>
+          
+            <h4>2. 导入组件</h4>
+            <pre style={{ background: '#e0e0e0', padding: '10px', borderRadius: '4px' }}>
+              import {'{ BytedeskReact }'} from 'bytedesk-web';
+            </pre>
+
+            <h4>3. 配置参数</h4>
+            <pre style={{ background: '#e0e0e0', padding: '10px', borderRadius: '4px' }}>
+{`const config = {
+  theme: {
+    primaryColor: '#2e88ff',
+    secondaryColor: '#ffffff',
+    textColor: '#333333',
+    backgroundColor: '#ffffff'
+  },
+  window: {
+    title: '在线客服',
+    width: 380,
+    height: 640
+  },
+  chatParams: {
+    org: 'your_org_id',
+    t: 2,
+    sid: 'your_sid'
+  }
+};`}
+            </pre>
+
+            <h4>4. 使用组件</h4>
+            <pre style={{ background: '#e0e0e0', padding: '10px', borderRadius: '4px' }}>
+{`function YourComponent() {
+  const handleInit = () => {
+    console.log('BytedeskReact initialized');
+  };
+
+  return (
+    <BytedeskReact 
+      {...config}
+      onInit={handleInit}
+    />
+  );
+}`}
+            </pre>
+
+            <h4>5. 调用方法</h4>
+            <pre style={{ background: '#e0e0e0', padding: '10px', borderRadius: '4px' }}>
+{`// 打开聊天窗口
+window.bytedesk?.showChat();
+
+// 关闭聊天窗口
+window.bytedesk?.hideChat();`}
+            </pre>
+
+            <div style={{ marginTop: '20px', padding: '10px', background: '#fff3cd', borderRadius: '4px' }}>
+              <strong>注意：</strong>
+              <ul style={{ marginTop: '10px', paddingLeft: '20px' }}>
+                <li>确保替换配置中的 org_id 和 sid 为您的实际值</li>
+                <li>组件会自动在全局注册 window.bytedesk 实例</li>
+                <li>可以通过 onInit 回调获取初始化成功的通知</li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -834,7 +820,23 @@ bytedesk.init();
 
       </div>
 
-      <BytedeskReact {...config} onInit={handleInit} />
+      <BytedeskReact 
+        {...config} 
+        onInit={handleInit}
+        text={{
+          bubbleMessage: config.bubbleConfig.show ? {
+            show: true,
+            icon: config.bubbleConfig.icon,
+            title: config.bubbleConfig.title,
+            subtitle: config.bubbleConfig.subtitle
+          } : {
+            show: false,
+            icon: '',
+            title: '',
+            subtitle: ''
+          }
+        }}
+      />
     </div>
   );
 }
