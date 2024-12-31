@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 13:05:55
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-30 13:07:08
+ * @LastEditTime: 2024-12-30 19:07:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,14 +32,33 @@ export default defineConfig({
       formats: ['es']
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'vue', 'svelte'],
+      external: [
+        'react', 
+        'react-dom',
+        'react/jsx-runtime',
+        'vue',
+        'svelte',
+        'react-intl',
+        'vue-i18n',
+        'svelte-i18n'
+      ],
       output: {
         format: 'es',
         dir: 'dist',
         entryFileNames: '[name]/index.js',
         chunkFileNames: '[name]-[hash].js',
         preserveModules: true,
-        preserveModulesRoot: 'src'
+        preserveModulesRoot: 'src',
+        globals: {
+          react: 'React',
+          'react/jsx-runtime': 'jsxRuntime',
+          'react-dom': 'ReactDOM',
+          vue: 'Vue',
+          svelte: 'Svelte',
+          'react-intl': 'ReactIntl',
+          'vue-i18n': 'VueI18n',
+          'svelte-i18n': 'SvelteI18n'
+        }
       }
     }
   },
