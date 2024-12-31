@@ -2,108 +2,11 @@
   <div class="App" :style="styles.container">
     <h1 :style="{ fontSize: isMobile ? '20px' : '24px' }">Bytedesk Vue Demo</h1>
 
+    <InstallGuide />
+
     <div :style="styles.grid">
       <!-- 左侧配置区域 -->
-      <div>
-        <!-- 位置设置 -->
-        <div class="config-section" :style="styles.section">
-          <h3 :style="{ fontSize: isMobile ? '16px' : '18px' }">位置设置</h3>
-          <div :style="{ 
-            display: 'flex',
-            gap: '10px',
-            flexDirection: isMobile ? 'column' : 'row'
-          }">
-            <button
-              @click="handlePlacementChange('bottom-left')"
-              :style="{
-                backgroundColor: config.placement === 'bottom-left' ? config.theme.primaryColor : '#fff',
-                color: config.placement === 'bottom-left' ? '#fff' : '#333',
-                border: '1px solid #ddd',
-                padding: '8px 16px',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }"
-            >
-              左下角
-            </button>
-            <button
-              @click="handlePlacementChange('bottom-right')"
-              :style="{
-                backgroundColor: config.placement === 'bottom-right' ? config.theme.primaryColor : '#fff',
-                color: config.placement === 'bottom-right' ? '#fff' : '#333',
-                border: '1px solid #ddd',
-                padding: '8px 16px',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }"
-            >
-              右下角
-            </button>
-          </div>
-        </div>
-
-        <!-- 标签页设置 -->
-        <div class="config-section" :style="styles.section">
-          <h3 :style="{ fontSize: isMobile ? '16px' : '18px' }">标签页设置</h3>
-          <div style="display: flex; flex-direction: column; gap: 10px">
-            <label v-for="(enabled, tab) in config.tabsConfig" :key="tab" style="display: flex; align-items: center; gap: 8px">
-              <input
-                type="checkbox"
-                :checked="enabled"
-                @change="(e: Event) => handleTabsChange(tab, e)"
-              />
-              {{ tab.charAt(0).toUpperCase() + tab.slice(1) }}
-            </label>
-          </div>
-        </div>
-
-        <!-- 气泡消息设置 -->
-        <div class="config-section" :style="styles.section">
-          <h3 :style="{ fontSize: isMobile ? '16px' : '18px' }">气泡消息���置</h3>
-          <div style="display: flex; flex-direction: column; gap: 10px">
-            <label>
-              <input
-                type="checkbox"
-                v-model="config.bubbleConfig.show"
-                @change="(e) => handleBubbleConfigChange('show', e.target.checked)"
-              />
-              显示气泡消息
-            </label>
-            <input
-              type="text"
-              v-model="config.bubbleConfig.title"
-              @input="(e) => handleBubbleConfigChange('title', e.target.value)"
-              placeholder="气泡标题"
-              style="padding: 8px; border-radius: 4px; border: 1px solid #ddd"
-            />
-            <input
-              type="text"
-              v-model="config.bubbleConfig.subtitle"
-              @input="(e) => handleBubbleConfigChange('subtitle', e.target.value)"
-              placeholder="气泡副标题"
-              style="padding: 8px; border-radius: 4px; border: 1px solid #ddd"
-            />
-          </div>
-        </div>
-
-        <!-- 其他配置区域... -->
-      </div>
-
       <!-- 右侧预览和操作区域 -->
-      <div :style="rightSideStyles">
-        <button 
-          @click="handleShowChat"
-          :style="chatButtonStyles"
-        >
-          打开聊天
-        </button>
-
-        <!-- 当前配置显示 -->
-        <div v-if="!isMobile" :style="{ ...styles.section, marginTop: '20px' }">
-          <h3 :style="{ fontSize: isMobile ? '16px' : '18px' }">当前配置</h3>
-          <pre :style="preStyles">{{ JSON.stringify(config, null, 2) }}</pre>
-        </div>
-      </div>
     </div>
 
     <BytedeskVue v-bind="config" @init="handleInit" />
@@ -112,16 +15,15 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
+// @ts-ignore
 import { BytedeskVue } from '@bytedesk/web/adapters/vue';
-import type { BytedeskConfig } from '@bytedesk/web/adapters/vue';
-import { PRESET_COLORS, Position } from '@bytedesk/web/types';
+// @ts-ignore
+import type { BytedeskConfig, Position } from '@bytedesk/web/types';
+import InstallGuide from './components/InstallGuide.vue';
 
 // 添加导航栏预设颜色选项
 const NAVBAR_PRESETS = {
-  light: {
-    backgroundColor: '#ffffff',
-    textColor: '#333333'
-  },
+
   dark: {
     backgroundColor: '#333333',
     textColor: '#ffffff'
@@ -139,7 +41,8 @@ const NAVBAR_PRESETS = {
 export default defineComponent({
   name: 'App',
   components: {
-    BytedeskVue
+    BytedeskVue,
+    InstallGuide
   },
   setup() {
     // 添加 bytedeskInstance 引用
@@ -176,14 +79,8 @@ export default defineComponent({
       showSupport: true,
       chatParams: getInitialChatParams(),
       theme: {
-        primaryColor: '#2e88ff',
-        secondaryColor: '#ffffff',
-        textColor: '#333333',
-        backgroundColor: '#ffffff',
-        navbar: {
-          backgroundColor: '#ffffff',
-          textColor: '#333333'
-        }
+        textColor: '#ffffff',
+        backgroundColor: '#2e88ff',
       }
     });
 
@@ -193,7 +90,7 @@ export default defineComponent({
     // 计算属性
     const isMobile = computed(() => window.innerWidth <= 768);
 
-    // 样式��算
+    // 样式算
     const styles = computed(() => ({
       container: {
         padding: isMobile.value ? '10px' : '20px',
@@ -210,6 +107,22 @@ export default defineComponent({
         border: '1px solid #ddd',
         borderRadius: '4px'
       }
+    }));
+
+    const rightSideStyles = computed(() => ({
+      display: 'flex',
+      flexDirection: 'column' as const,
+      gap: '20px'
+    }));
+
+    const chatButtonStyles = computed(() => ({
+      backgroundColor: config.value.theme.backgroundColor,
+      color: config.value.theme.textColor,
+      border: 'none',
+      borderRadius: '4px',
+      padding: '10px 20px',
+      cursor: 'pointer',
+      width: '100%'
     }));
 
     // 处理函数
@@ -232,23 +145,20 @@ export default defineComponent({
       config.value.placement = newPlacement;
     };
 
-    const handleTabsChange = (tab: string, e: Event) => {
-      const target = e.target as HTMLInputElement;
-      config.value.tabsConfig[tab] = target.checked;
+    const handleTabsChange = (tab: string, e: { target: HTMLInputElement }) => {
+      config.value.tabsConfig[tab as keyof typeof config.value.tabsConfig] = e.target.checked;
     };
 
-    const handleBubbleConfigChange = (key: string, value: Event) => {
-      if (key === 'show') {
-        config.value.bubbleConfig[key] = (value.target as HTMLInputElement).checked;
-      } else {
-        config.value.bubbleConfig[key] = (value.target as HTMLInputElement).value;
-      }
+    const handleBubbleConfigChange = (key: string, value: any) => {
+      // config.value.bubbleConfig[key as keyof typeof config.value.bubbleConfig] = value;
     };
 
     return {
       config,
       isMobile,
       styles,
+      rightSideStyles,
+      chatButtonStyles,
       bytedeskInstance,
       handleInit,
       handleShowChat,

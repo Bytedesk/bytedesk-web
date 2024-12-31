@@ -31,10 +31,24 @@
 </head>
 <body>
     <h1>Bytedesk JavaScript Demo</h1>
-    
+
+    <!-- 添加安装指南 -->
+    <div id="install-guide"></div>
+
     <div class="nav-links">
         <a href="/global.html">Global Variable Demo</a>
         <a href="/module.html">ES Module Demo</a>
     </div>
+
+    <script>
+        // 加载安装指南
+        fetch('install-guide.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('install-guide').innerHTML = html;
+            });
+
+        // ... 其他脚本代码 ...
+    </script>
 </body>
 </html> 

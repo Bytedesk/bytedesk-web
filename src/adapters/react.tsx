@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 12:37:57
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-31 09:54:29
+ * @LastEditTime: 2024-12-31 10:59:03
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -22,19 +22,19 @@ interface BytedeskReactProps extends BytedeskConfig {
   onInit?: () => void;
 }
 
-export const BytedeskReact: React.FC<BytedeskReactProps> = ({ locale = 'zh-CN', ...props }) => {
+export const BytedeskReact = ({ locale = 'zh-CN', ...props }: BytedeskReactProps) => {
   return (
     <IntlProvider 
       messages={messages[locale as keyof typeof messages] as any} 
       locale={locale}
       defaultLocale="zh-CN"
     >
-      <BytedeskComponent {...props} />
+      <BytedeskComponent {...props} locale={locale} />
     </IntlProvider>
   );
 };
 
-const BytedeskComponent: React.FC<Omit<BytedeskReactProps, 'locale'>> = (props) => {
+const BytedeskComponent = (props: BytedeskReactProps) => {
   const bytedeskRef = useRef<BytedeskWeb | null>(null);
 
   useEffect(() => {

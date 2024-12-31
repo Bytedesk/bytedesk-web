@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 21:09:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-30 15:08:46
+ * @LastEditTime: 2024-12-31 15:24:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,26 +27,13 @@
             // 配置
             const config = {
                 theme: {
-                    primaryColor: '#2e88ff',
-                    secondaryColor: '#ffffff',
-                    textColor: '#333333',
-                    backgroundColor: '#ffffff',
-                    position: 'right',
-                    navbar: {
-                        backgroundColor: '#ffffff',
-                        textColor: '#333333'
-                    }
-                },
-                window: {
-                    title: 'Customer Service',
-                    width: 380,
-                    height: 640,
-                    position: 'right'
+                    textColor: '#ffffff',
+                    backgroundColor: '#2e88ff',
                 },
                 chatParams: {
-                    org: 'your_org_id', // 替换为您的组织ID
+                    org: 'df_org_uid', // 替换为您的组织ID
                     t: '2',
-                    sid: 'your_sid'  // 替换为您的SID
+                    sid: 'df_rt_uid'  // 替换为您的SID
                 },
                 bubbleConfig: {
                     show: true,
@@ -86,19 +73,14 @@
 &lt;script&gt;
   const config = {
     theme: {
-      primaryColor: '#2e88ff',
-      position: 'right'
-    },
-    window: {
-      title: 'Customer Service',
-      width: 380,
-      height: 640
+        textColor: '#ffffff',
+      backgroundColor: '#2e88ff',
     },
     chatParams: {
-      org: 'your_org_id',
-      t: '2',
-      sid: 'your_sid'
-    }
+        org: 'df_org_uid', // 替换为您的组织ID
+        t: '2',
+        sid: 'df_rt_uid'  // 替换为您的SID
+    },
   };
 
   const bytedesk = new BytedeskWeb(config);

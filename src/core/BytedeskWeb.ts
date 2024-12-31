@@ -17,7 +17,7 @@ export default class BytedeskWeb {
 
   private getDefaultConfig(): BytedeskConfig {
     return {
-      baseUrl: 'http://127.0.0.1:9006',
+      baseUrl: 'https://www.weiyuai.cn/chat',
       placement: 'bottom-right',
       marginBottom: 20,
       marginSide: 20,
@@ -39,10 +39,6 @@ export default class BytedeskWeb {
         t: "2",
         sid: 'df_rt_uid'
       },
-      navbarPreset: 'light',
-      customColor: '#000000',
-      navbarColor: '#ffffff',
-      navbarTextColor: '#333333',
       animation: {
         enabled: true,
         duration: 300,
@@ -50,23 +46,15 @@ export default class BytedeskWeb {
       },
       theme: {
         mode: 'system',
-        primaryColor: '#2e88ff',
-        secondaryColor: '#ffffff',
-        textColor: '#333333',
-        backgroundColor: '#ffffff',
-        position: 'right',
-        navbar: {
-          backgroundColor: '#ffffff',
-          textColor: '#333333'
-        }
+        textColor: '#ffffff',
+        backgroundColor: '#0066FF',
       },
       window: {
-        title: '在线客服',
         width: 380,
         height: 640,
-        position: 'right'
       },
-      draggable: false
+      draggable: false,
+      locale: 'zh-CN',
     } as BytedeskConfig;
   }
 
@@ -91,9 +79,10 @@ export default class BytedeskWeb {
     `;
 
     // 创建气泡消息
+    let messageElement: HTMLElement | null = null;
     if (this.config.bubbleConfig?.show) {
-      const message = document.createElement('div');
-      message.style.cssText = `
+      messageElement = document.createElement('div');
+      messageElement.style.cssText = `
         background: white;
         padding: 12px 16px;
         border-radius: 8px;
@@ -133,7 +122,7 @@ export default class BytedeskWeb {
       textDiv.appendChild(subtitle);
 
       messageContent.appendChild(textDiv);
-      message.appendChild(messageContent);
+      messageElement.appendChild(messageContent);
 
       // 添加倒三角
       const triangle = document.createElement('div');
@@ -159,14 +148,16 @@ export default class BytedeskWeb {
         background: white;
       `;
 
-      message.appendChild(triangle);
-      message.appendChild(mask);
-      container.appendChild(message);
+      messageElement.appendChild(triangle);
+      messageElement.appendChild(mask);
+      container.appendChild(messageElement);
 
       // 显示动画
       setTimeout(() => {
-        message.style.opacity = '1';
-        message.style.transform = 'translateY(0)';
+        if (messageElement) {
+          messageElement.style.opacity = '1';
+          messageElement.style.transform = 'translateY(0)';
+        }
       }, 500);
     }
 
@@ -298,6 +289,9 @@ export default class BytedeskWeb {
       }
     });
 
+    // 保存气泡消息引用
+    (this.bubble as any).messageElement = messageElement;
+
     // 最后将容器添加到 body
     document.body.appendChild(container);
   }
@@ -323,7 +317,6 @@ export default class BytedeskWeb {
     const width = Math.min(this.config.window?.width || maxWidth * 0.9, maxWidth * 0.9);
     const height = Math.min(this.config.window?.height || maxHeight * 0.9, maxHeight * 0.9);
     
-    // 移动端样式
     if (isMobile) {
       this.window.style.cssText = `
         position: fixed;
@@ -331,7 +324,6 @@ export default class BytedeskWeb {
         bottom: 0;
         width: 100%;
         height: 90vh;
-        background: ${this.config.theme?.backgroundColor};
         display: none;
         z-index: 10000;
         border-top-left-radius: 12px;
@@ -340,15 +332,13 @@ export default class BytedeskWeb {
         transition: all ${this.config.animation?.duration}ms ${this.config.animation?.type};
       `;
     } else {
-      // 桌面端样式 - 使用与按钮相同的边距
-      const position = this.config.placement || 'bottom-right';
+      // 修复桌面端样式 - 使用正确的位置属性
       this.window.style.cssText = `
         position: fixed;
-        ${position}: ${this.config.marginSide}px;
+        ${this.config.placement === 'bottom-right' ? 'right' : 'left'}: ${this.config.marginSide}px;
         bottom: ${this.config.marginBottom}px;
         width: ${width}px;
         height: ${height}px;
-        background: ${this.config.theme?.backgroundColor};
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
         display: none;
@@ -364,7 +354,6 @@ export default class BytedeskWeb {
       width: 100%;
       height: ${this.config.showSupport ? 'calc(100% - 30px)' : '100%'};
       border: none;
-      background: ${this.config.theme?.backgroundColor};
     `;
     iframe.src = this.generateChatUrl();
     this.window.appendChild(iframe);
@@ -377,7 +366,6 @@ export default class BytedeskWeb {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: ${this.config.theme?.backgroundColor};
         color: #666;
         font-size: 12px;
         line-height: 30px;
@@ -406,6 +394,11 @@ export default class BytedeskWeb {
   private generateChatUrl(tab: string = 'messages'): string {
     console.log('this.config: ', this.config, tab)
     const params = new URLSearchParams();
+
+    // 添加聊天参数
+    Object.entries(this.config.chatParams || {}).forEach(([key, value]) => {
+        params.append(key, String(value));
+    });
     
     // 添加基本参数
     // params.append('tab', tab);
@@ -414,11 +407,6 @@ export default class BytedeskWeb {
 
     // theme添加聊天参数
     Object.entries(this.config.theme || {}).forEach(([key, value]) => {
-      params.append(key, String(value));
-    });
-    
-    // 添加聊天参数
-    Object.entries(this.config.chatParams || {}).forEach(([key, value]) => {
       params.append(key, String(value));
     });
 
@@ -451,10 +439,8 @@ export default class BytedeskWeb {
       const isMobile = window.innerWidth <= 768;
       this.window.style.display = 'block';
       
-      // 确保窗口大小正确
       this.setupResizeListener();
       
-      // 移动端添加动画效果
       if (isMobile) {
         if (this.window) {
           this.window.style.transform = 'translateY(100%)';
@@ -469,6 +455,10 @@ export default class BytedeskWeb {
       this.isVisible = true;
       if (this.bubble) {
         this.bubble.style.display = 'none';
+        const messageElement = (this.bubble as any).messageElement;
+        if (messageElement instanceof HTMLElement) {
+          messageElement.style.display = 'none';
+        }
       }
     }
   }
@@ -478,7 +468,6 @@ export default class BytedeskWeb {
       const isMobile = window.innerWidth <= 768;
       
       if (isMobile) {
-        // 移动端添加关闭动画
         this.window.style.transform = 'translateY(100%)';
         setTimeout(() => {
           if (this.window) {
@@ -492,6 +481,10 @@ export default class BytedeskWeb {
       this.isVisible = false;
       if (this.bubble) {
         this.bubble.style.display = 'inline-flex';
+        const messageElement = (this.bubble as any).messageElement;
+        if (messageElement instanceof HTMLElement) {
+          messageElement.style.display = 'block';
+        }
       }
     }
   }

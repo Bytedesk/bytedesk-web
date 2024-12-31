@@ -1,8 +1,31 @@
-# React Demo
+<!--
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-12-28 12:45:03
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2024-12-31 15:41:12
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+-->
+# bytedesk-web
 
-[中文文档](./README.zh.md)
+Online customer service SDK, supporting multiple frameworks:
 
-## Installation
+- [React Guide](examples/react-demo/readme.md)
+- [Vue Guide](examples/vue-demo/readme.md)
+- [Svelte Guide](examples/svelte-demo/readme.md)
+- [JavaScript Guide](examples/javascript-demo/readme.md)
+
+[中文文档](readme.zh.md)
+
+## Installation Steps
+
+### Install Dependencies
 
 ```bash
 npm install bytedesk-web
@@ -10,58 +33,70 @@ npm install bytedesk-web
 yarn add bytedesk-web
 ```
 
-## TypeScript Support
+### Import Component
 
-Add to your `tsconfig.json`:
-
-```json
-{
-  "compilerOptions": {
-    "paths": {
-      "bytedesk-web/*": ["./node_modules/bytedesk-web/*"]
-    }
-  }
-}
-```
-
-## Usage Example
-
-```tsx
-import React from 'react';
+```bash
 import { BytedeskReact } from 'bytedesk-web/react';
 import type { BytedeskConfig } from 'bytedesk-web/react';
-
-const ChatWidget: React.FC = () => {
-  const config: BytedeskConfig = {
-    theme: {
-      primaryColor: '#2e88ff',
-      position: 'right'
-    },
-    window: {
-      title: 'Customer Service',
-      width: 380,
-      height: 640
-    },
-    chatParams: {
-      org: 'your_org_id',
-      t: 2,
-      sid: 'your_sid'
-    }
-  };
-
-  return <BytedeskReact {...config} />;
-};
-
-export default ChatWidget;
 ```
 
-## Configuration
+### Configure Parameters
 
-[View Full Configuration](../../docs/CONFIG.md)
+```bash
+const config: BytedeskConfig = {
+  placement: 'bottom-right',
+  marginBottom: 20,
+  marginSide: 20,
+  bubbleConfig: {
+    show: true,
+    icon: '👋',
+    title: 'Need help?',
+    subtitle: 'Click to chat'
+  },
+  chatParams: {
+    org: 'df_org_uid',  // Replace with your organization ID
+    t: "2",
+    sid: 'df_rt_uid'      // Replace with your SID
+  }
+};
+```
 
-## Local Development
+### Use Component
+
+```bash
+const App = () => {
+  const handleInit = () => {
+    console.log('BytedeskReact initialized');
+  };
+
+  return (
+    <div>
+      <BytedeskReact {...config} onInit={handleInit} />
+      <button onClick={() => (window as any).bytedesk?.showChat()}>
+        Open Chat
+      </button>
+    </div>
+  );
+};
+```
+
+### Available Methods
+
+```bash
+(window as any).bytedesk?.showChat() - Show chat window
+(window as any).bytedesk?.hideChat() - Hide chat window
+```
+
+## Run Examples
 
 ```bash
 yarn install
-yarn dev
+yarn demo:react    # Run React demo
+yarn demo:vue      # Run Vue demo
+yarn demo:svelte   # Run Svelte demo
+yarn demo:vanilla  # Run Vanilla JS demo
+
+# JavaScript demo requires build first
+yarn build
+yarn demo:javascript
 ```

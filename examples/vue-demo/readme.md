@@ -1,8 +1,8 @@
 <!--
  * @Author: jackning 270580156@qq.com
- * @Date: 2024-12-28 13:08:41
+ * @Date: 2024-12-28 12:45:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-31 15:41:27
+ * @LastEditTime: 2024-12-31 15:42:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -21,7 +21,7 @@ Online customer service SDK, supporting multiple frameworks:
 - [Svelte Guide](examples/svelte-demo/readme.md)
 - [JavaScript Guide](examples/javascript-demo/readme.md)
 
-[English Document](readme.md)
+[中文文档](readme.zh.md)
 
 ## Installation Steps
 
@@ -29,18 +29,18 @@ Online customer service SDK, supporting multiple frameworks:
 
 ```bash
 npm install bytedesk-web
-# 或
+# or
 yarn add bytedesk-web
 ```
 
-### 导入组件
+### Import Component
 
 ```bash
-import { BytedeskReact } from 'bytedesk-web/react';
-import type { BytedeskConfig } from 'bytedesk-web/react';
+import { BytedeskReact } from 'bytedesk-web/vue';
+import type { BytedeskConfig } from 'bytedesk-web/vue';
 ```
 
-### 配置参数
+### Configure Parameters
 
 ```bash
 const config: BytedeskConfig = {
@@ -54,14 +54,14 @@ const config: BytedeskConfig = {
     subtitle: 'Click to chat'
   },
   chatParams: {
-    org: 'df_org_uid',  // 替换为您的组织ID
+    org: 'df_org_uid',  // Replace with your organization ID
     t: "2",
-    sid: 'df_rt_uid'      // 替换为您的SID
+    sid: 'df_rt_uid'      // Replace with your SID
   }
 };
 ```
 
-### 使用组件
+### Use Component
 
 ```bash
 const App = () => {
@@ -73,21 +73,21 @@ const App = () => {
     <div>
       <BytedeskReact {...config} onInit={handleInit} />
       <button onClick={() => (window as any).bytedesk?.showChat()}>
-        打开聊天
+        Open Chat
       </button>
     </div>
   );
 };
 ```
 
-### 可用方法
+### Available Methods
 
 ```bash
-(window as any).bytedesk?.showChat() - 显示聊天窗口
-(window as any).bytedesk?.hideChat() - 隐藏聊天窗口
+(window as any).bytedesk?.showChat() - Show chat window
+(window as any).bytedesk?.hideChat() - Hide chat window
 ```
 
-## 运行示例
+## Run Examples
 
 ```bash
 yarn install

@@ -1,0 +1,70 @@
+<div class="install-guide">
+  <h2>安装步骤</h2>
+  
+  <div class="section">
+    <h3>1. 通过 CDN 引入</h3>
+    <pre><code>&lt;script src="https://unpkg.com/bytedesk-web"&gt;&lt;/script&gt;</code></pre>
+  </div>
+
+  <div class="section">
+    <h3>2. 配置参数</h3>
+    <pre><code>const config = {
+  baseUrl: 'https://ai.bytedesk.com',
+  placement: 'bottom-right',
+  marginBottom: 20,
+  marginSide: 20,
+  chatParams: {
+    org: 'your_org_id',  // 替换为您的组织ID
+    t: "2",
+    sid: 'your_sid'      // 替换为您的SID
+  }
+};</code></pre>
+  </div>
+
+  <div class="section">
+    <h3>3. 初始化</h3>
+    <pre><code>const bytedesk = new BytedeskWeb(config);
+bytedesk.init();</code></pre>
+  </div>
+
+  <div class="section">
+    <h3>4. 使用方法</h3>
+    <pre><code>&lt;button onclick="bytedesk.showChat()"&gt;打开聊天&lt;/button&gt;
+&lt;button onclick="bytedesk.hideChat()"&gt;关闭聊天&lt;/button&gt;</code></pre>
+  </div>
+
+  <div class="section">
+    <h3>5. 可用方法</h3>
+    <ul>
+      <li><code>bytedesk.showChat()</code> - 显示聊天窗口</li>
+      <li><code>bytedesk.hideChat()</code> - 隐藏聊天窗口</li>
+    </ul>
+  </div>
+</div>
+
+<style>
+.install-guide {
+  margin-top: 40px;
+  max-width: 800px;
+  font-family: Arial, sans-serif;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+pre {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+code {
+  font-family: monospace;
+}
+
+ul {
+  line-height: 1.6;
+}
+</style> 

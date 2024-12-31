@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 13:08:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-31 15:41:27
+ * @LastEditTime: 2024-12-31 15:43:07
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -36,8 +36,8 @@ yarn add bytedesk-web
 ### 导入组件
 
 ```bash
-import { BytedeskReact } from 'bytedesk-web/react';
-import type { BytedeskConfig } from 'bytedesk-web/react';
+import { BytedeskSvelte } from 'bytedesk-web/svelte';
+import type { BytedeskConfig } from 'bytedesk-web/svelte';
 ```
 
 ### 配置参数
