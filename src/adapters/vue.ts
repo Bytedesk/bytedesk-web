@@ -12,47 +12,43 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
-import type { BytedeskConfig } from '../types';
+import { defineComponent, onMounted, onUnmounted, h } from 'vue';
+import { createI18n } from 'vue-i18n';
 import BytedeskWeb from '../main';
+import type { BytedeskConfig } from '../types';
+import { messages } from '../locales';
+
+const i18n = createI18n({
+  locale: 'zh-CN',
+  messages
+});
 
 export const BytedeskVue = defineComponent({
   name: 'BytedeskVue',
   props: {
-    placement: {
+    locale: {
       type: String,
-      required: true,
-      validator: (value: string) => ['bottom-left', 'bottom-right'].includes(value)
-    },
-    onInit: {
-      type: Function,
-      default: null
+      default: 'zh-CN'
     }
   },
   setup(props, { attrs }) {
-    const bytedeskRef = ref<BytedeskWeb | null>(null);
+    let instance: BytedeskWeb | null = null;
 
     onMounted(() => {
-      const config = {
-        ...attrs,
-        placement: props.placement
-      } as BytedeskConfig;
-
-      bytedeskRef.value = new BytedeskWeb(config);
-      bytedeskRef.value.init();
-      
-      if (props.onInit) {
-        props.onInit();
-      }
+      i18n.global.locale = props.locale as 'zh-CN' | 'en-US';
+      instance = new BytedeskWeb({
+        ...(attrs as unknown as BytedeskConfig),
+        locale: props.locale
+      });
+      instance.init();
     });
 
     onUnmounted(() => {
-      if (bytedeskRef.value) {
-        bytedeskRef.value.destroy();
-        bytedeskRef.value = null;
-      }
+      instance?.destroy();
     });
 
-    return () => null;
+    return () => h('div', { style: { display: 'none' } });
   }
-}); 
+});
+
+// BytedeskVue.i18n = i18n; 

@@ -17,7 +17,7 @@ export default class BytedeskWeb {
 
   private getDefaultConfig(): BytedeskConfig {
     return {
-      preset: 'default',
+      baseUrl: 'http://127.0.0.1:9006',
       placement: 'bottom-right',
       marginBottom: 20,
       marginSide: 20,
@@ -43,17 +43,13 @@ export default class BytedeskWeb {
       customColor: '#000000',
       navbarColor: '#ffffff',
       navbarTextColor: '#333333',
-      margins: {
-        bottom: 20,
-        right: 20,
-        left: 20
-      },
       animation: {
         enabled: true,
         duration: 300,
         type: 'ease'
       },
       theme: {
+        mode: 'system',
         primaryColor: '#2e88ff',
         secondaryColor: '#ffffff',
         textColor: '#333333',
@@ -69,7 +65,8 @@ export default class BytedeskWeb {
         width: 380,
         height: 640,
         position: 'right'
-      }
+      },
+      draggable: false
     } as BytedeskConfig;
   }
 
@@ -84,17 +81,17 @@ export default class BytedeskWeb {
     const container = document.createElement('div');
     container.style.cssText = `
       position: fixed;
-      ${this.config.theme.position === 'left' ? 'left' : 'right'}: ${this.config.marginSide}px;
+      ${this.config.placement === 'bottom-left' ? 'left' : 'right'}: ${this.config.marginSide}px;
       bottom: ${this.config.marginBottom}px;
       display: flex;
       flex-direction: column;
-      align-items: ${this.config.theme.position === 'left' ? 'flex-start' : 'flex-end'};
+      align-items: ${this.config.placement === 'bottom-left' ? 'flex-start' : 'flex-end'};
       gap: 10px;
       z-index: 9999;
     `;
 
     // 创建气泡消息
-    if (this.config.bubbleConfig.show) {
+    if (this.config.bubbleConfig?.show) {
       const message = document.createElement('div');
       message.style.cssText = `
         background: white;
@@ -106,6 +103,7 @@ export default class BytedeskWeb {
         opacity: 0;
         transform: translateY(10px);
         transition: all 0.3s ease;
+        position: relative;
       `;
 
       // 添加图标和文本
@@ -117,25 +115,52 @@ export default class BytedeskWeb {
       `;
 
       const iconSpan = document.createElement('span');
-      iconSpan.textContent = this.config.bubbleConfig.icon;
+      iconSpan.textContent = this.config.bubbleConfig?.icon || '';
       iconSpan.style.fontSize = '20px';
       messageContent.appendChild(iconSpan);
 
       const textDiv = document.createElement('div');
       const title = document.createElement('div');
-      title.textContent = this.config.bubbleConfig.title;
+      title.textContent = this.config.bubbleConfig?.title || '';
       title.style.fontWeight = 'bold';
       title.style.marginBottom = '4px';
       textDiv.appendChild(title);
 
       const subtitle = document.createElement('div');
-      subtitle.textContent = this.config.bubbleConfig.subtitle;
+      subtitle.textContent = this.config.bubbleConfig?.subtitle || '';
       subtitle.style.fontSize = '0.9em';
       subtitle.style.opacity = '0.8';
       textDiv.appendChild(subtitle);
 
       messageContent.appendChild(textDiv);
       message.appendChild(messageContent);
+
+      // 添加倒三角
+      const triangle = document.createElement('div');
+      triangle.style.cssText = `
+        position: absolute;
+        bottom: -6px;
+        ${this.config.placement === 'bottom-left' ? 'left: 24px' : 'right: 24px'};
+        width: 12px;
+        height: 12px;
+        background: white;
+        transform: rotate(45deg);
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      `;
+
+      // 添加一个白色背景遮罩，遮住三角形上方的阴影
+      const mask = document.createElement('div');
+      mask.style.cssText = `
+        position: absolute;
+        bottom: 0;
+        ${this.config.placement === 'bottom-left' ? 'left: 18px' : 'right: 18px'};
+        width: 24px;
+        height: 12px;
+        background: white;
+      `;
+
+      message.appendChild(triangle);
+      message.appendChild(mask);
       container.appendChild(message);
 
       // 显示动画
@@ -148,12 +173,12 @@ export default class BytedeskWeb {
     // 创建按钮
     this.bubble = document.createElement('button');
     this.bubble.style.cssText = `
-      background-color: ${this.config.theme.primaryColor};
+      background-color: ${this.config.theme?.backgroundColor};
       width: 60px;
       height: 60px;
       border-radius: 30px;
       border: none;
-      cursor: move;
+      cursor: ${this.config.draggable ? 'move' : 'pointer'};
       display: flex;
       align-items: center;
       justify-content: center;
@@ -191,88 +216,101 @@ export default class BytedeskWeb {
     // 先将按钮添加到容器
     container.appendChild(this.bubble);
 
-    // 添加拖动功能
-    let startX = 0;
-    let startY = 0;
-    let initialX = 0;
-    let initialY = 0;
+    // 只有在 draggable 为 true 时才添加拖拽功能
+    if (this.config.draggable) {
+      let startX = 0;
+      let startY = 0;
+      let initialX = 0;
+      let initialY = 0;
 
-    this.bubble.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
-      this.isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      initialX = container.offsetLeft;
-      initialY = container.offsetTop;
+      this.bubble.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        this.isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        initialX = container.offsetLeft;
+        initialY = container.offsetTop;
 
-      container.style.transition = 'none';
-    });
+        container.style.transition = 'none';
+      });
 
-    document.addEventListener('mousemove', (e) => {
-      if (!this.isDragging) return;
+      document.addEventListener('mousemove', (e) => {
+        if (!this.isDragging) return;
 
-      e.preventDefault();
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
+        e.preventDefault();
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
 
-      const newX = initialX + dx;
-      const newY = initialY + dy;
+        const newX = initialX + dx;
+        const newY = initialY + dy;
 
-      // 限制在视窗范围内
-    //   const maxX = window.innerWidth - container.offsetWidth;
-      const maxY = window.innerHeight - container.offsetHeight;
+        // 限制在视窗范围内
+    //       const maxX = window.innerWidth - container.offsetWidth;
+        const maxY = window.innerHeight - container.offsetHeight;
 
-      // 更新水平位置
-      if (newX <= window.innerWidth / 2) {
-        // 靠左
-        container.style.left = `${Math.max(0, newX)}px`;
-        container.style.right = 'auto';
-        this.config.theme.position = 'left';
-      } else {
-        // 靠右
-        container.style.right = `${Math.max(0, window.innerWidth - newX - container.offsetWidth)}px`;
-        container.style.left = 'auto';
-        this.config.theme.position = 'right';
-      }
+        // 更新水平位置
+        if (newX <= window.innerWidth / 2) {
+          // 靠左
+          container.style.left = `${Math.max(0, newX)}px`;
+          container.style.right = 'auto';
+          this.config.placement = 'bottom-left';
+        } else {
+          // 靠右
+          container.style.right = `${Math.max(0, window.innerWidth - newX - container.offsetWidth)}px`;
+          container.style.left = 'auto';
+          this.config.placement = 'bottom-right';
+        }
 
-      // 更新垂直位置
-      container.style.bottom = `${Math.min(Math.max(0, window.innerHeight - newY - container.offsetHeight), maxY)}px`;
-    });
+        // 更新垂直位置
+        container.style.bottom = `${Math.min(Math.max(0, window.innerHeight - newY - container.offsetHeight), maxY)}px`;
+      });
 
-    document.addEventListener('mouseup', () => {
-      if (!this.isDragging) return;
-      this.isDragging = false;
+      document.addEventListener('mouseup', () => {
+        if (!this.isDragging) return;
+        this.isDragging = false;
 
-      // 恢复过渡动画
-      container.style.transition = 'all 0.3s ease';
+        // 恢复过渡动画
+        container.style.transition = 'all 0.3s ease';
 
-      // 保存新位置
-      this.config.marginSide = parseInt(
-        this.config.theme.position === 'left' 
-          ? container.style.left 
-          : container.style.right
-      ) || 20;
-      this.config.marginBottom = parseInt(container.style.bottom || '20');
-    });
+        // 保存新位置
+        this.config.marginSide = parseInt(
+          this.config.placement === 'bottom-left' 
+            ? container.style.left 
+            : container.style.right
+        ) || 20;
+        this.config.marginBottom = parseInt(container.style.bottom || '20');
+      });
+    }
 
     // 修改点击事件，只在非拖动时触发
-    let isClick = true;
+    // let isClick = true;
     this.bubble.addEventListener('mousedown', () => {
-      isClick = true;
+    //   isClick = true;
     });
 
     this.bubble.addEventListener('mousemove', () => {
-      isClick = false;
+    //   isClick = false;
     });
 
     this.bubble.addEventListener('click', () => {
-      if (isClick) {
+      if (!this.isDragging) {
         this.showChat();
       }
     });
 
     // 最后将容器添加到 body
     document.body.appendChild(container);
+  }
+
+  private getSupportText(): string {
+    const locale = this.config.locale || 'zh-CN';
+    const supportTexts = {
+      'zh-CN': '微语技术支持',
+      'en-US': 'Powered by Weiyuai',
+      'ja-JP': 'Weiyuaiによる技術支援',
+      'ko-KR': 'Weiyuai 기술 지원'
+    };
+    return supportTexts[locale as keyof typeof supportTexts] || supportTexts['zh-CN'];
   }
 
   private createChatWindow() {
@@ -282,8 +320,8 @@ export default class BytedeskWeb {
     const maxHeight = window.innerHeight;
     
     // 计算合适的窗口尺寸
-    const width = Math.min(this.config.window.width, maxWidth * 0.9);
-    const height = Math.min(this.config.window.height, maxHeight * 0.9);
+    const width = Math.min(this.config.window?.width || maxWidth * 0.9, maxWidth * 0.9);
+    const height = Math.min(this.config.window?.height || maxHeight * 0.9, maxHeight * 0.9);
     
     // 移动端样式
     if (isMobile) {
@@ -293,30 +331,30 @@ export default class BytedeskWeb {
         bottom: 0;
         width: 100%;
         height: 90vh;
-        background: ${this.config.theme.backgroundColor};
+        background: ${this.config.theme?.backgroundColor};
         display: none;
         z-index: 10000;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
         overflow: hidden;
-        transition: all ${this.config.animation.duration}ms ${this.config.animation.type};
+        transition: all ${this.config.animation?.duration}ms ${this.config.animation?.type};
       `;
     } else {
       // 桌面端样式 - 使用与按钮相同的边距
-      const position = this.config.theme.position || 'right';
+      const position = this.config.placement || 'bottom-right';
       this.window.style.cssText = `
         position: fixed;
         ${position}: ${this.config.marginSide}px;
         bottom: ${this.config.marginBottom}px;
         width: ${width}px;
         height: ${height}px;
-        background: ${this.config.theme.backgroundColor};
+        background: ${this.config.theme?.backgroundColor};
         border-radius: 12px;
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
         display: none;
         overflow: hidden;
         z-index: 10000;
-        transition: all ${this.config.animation.duration}ms ${this.config.animation.type};
+        transition: all ${this.config.animation?.duration}ms ${this.config.animation?.type};
       `;
     }
 
@@ -324,31 +362,69 @@ export default class BytedeskWeb {
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
       width: 100%;
-      height: 100%;
+      height: ${this.config.showSupport ? 'calc(100% - 30px)' : '100%'};
       border: none;
-      background: ${this.config.theme.backgroundColor};
+      background: ${this.config.theme?.backgroundColor};
     `;
     iframe.src = this.generateChatUrl();
     this.window.appendChild(iframe);
+
+    // 添加技术支持信息
+    if (this.config.showSupport) {
+      const supportDiv = document.createElement('div');
+      supportDiv.style.cssText = `
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: ${this.config.theme?.backgroundColor};
+        color: #666;
+        font-size: 12px;
+        line-height: 30px;
+      `;
+      
+      supportDiv.innerHTML = `
+        <a href="https://ai.bytedesk.com" 
+           target="_blank" 
+           style="
+             color: #666;
+             text-decoration: none;
+             display: flex;
+             align-items: center;
+             height: 100%;
+           ">
+          ${this.getSupportText()}
+        </a>
+      `;
+      
+      this.window.appendChild(supportDiv);
+    }
 
     document.body.appendChild(this.window);
   }
 
   private generateChatUrl(tab: string = 'messages'): string {
-    const baseUrl = 'http://127.0.0.1:9006';
+    console.log('this.config: ', this.config, tab)
     const params = new URLSearchParams();
     
     // 添加基本参数
-    params.append('tab', tab);
-    params.append('theme', JSON.stringify(this.config.theme));
-    params.append('window', JSON.stringify(this.config.window));
+    // params.append('tab', tab);
+    // params.append('theme', JSON.stringify(this.config.theme));
+    // params.append('window', JSON.stringify(this.config.window));
+
+    // theme添加聊天参数
+    Object.entries(this.config.theme || {}).forEach(([key, value]) => {
+      params.append(key, String(value));
+    });
     
     // 添加聊天参数
-    Object.entries(this.config.chatParams).forEach(([key, value]) => {
+    Object.entries(this.config.chatParams || {}).forEach(([key, value]) => {
       params.append(key, String(value));
     });
 
-    return `${baseUrl}?${params.toString()}`;
+    let chatUrl = `${this.config.baseUrl}?${params.toString()}`;
+    console.log('chatUrl: ', chatUrl)
+    return chatUrl
   }
 
   private setupMessageListener() {
@@ -408,7 +484,7 @@ export default class BytedeskWeb {
           if (this.window) {
             this.window.style.display = 'none';
           }
-        }, this.config.animation.duration);
+        }, this.config.animation?.duration || 300);
       } else {
         this.window.style.display = 'none';
       }
@@ -457,12 +533,12 @@ export default class BytedeskWeb {
           borderBottomRightRadius: '0'
         });
       } else {
-        let width = this.windowState === 'maximized' ? maxWidth : Math.min(this.config.window.width, maxWidth * 0.9);
-        let height = this.windowState === 'maximized' ? maxHeight : Math.min(this.config.window.height, maxHeight * 0.9);
+        let width = this.windowState === 'maximized' ? maxWidth : Math.min(this.config.window?.width || maxWidth * 0.9, maxWidth * 0.9);
+        let height = this.windowState === 'maximized' ? maxHeight : Math.min(this.config.window?.height || maxHeight * 0.9, maxHeight * 0.9);
 
         // 确保窗口不会超出屏幕
-        const right = this.config.window.position === 'right' ? this.config.marginSide : undefined;
-        const left = this.config.window.position === 'left' ? this.config.marginSide : undefined;
+        const right = this.config.placement === 'bottom-right' ? this.config.marginSide : undefined;
+        const left = this.config.placement === 'bottom-left' ? this.config.marginSide : undefined;
 
         Object.assign(this.window.style, {
           width: `${width}px`,

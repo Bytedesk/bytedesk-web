@@ -1,7 +1,7 @@
 {
   "name": "bytedesk-web",
   "private": false,
-  "version": "1.0.14",
+  "version": "1.0.18",
   "type": "module",
   "authors": [
     "270580156@qq.com"
@@ -110,5 +110,10 @@
         "./index.d.ts"
       ]
     }
+  },
+  "dependencies": {
+    "react-intl": "^7.0.4",
+    "svelte-i18n": "^4.0.1",
+    "vue-i18n": "^11.0.1"
   }
 }

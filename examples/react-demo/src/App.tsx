@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 12:41:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-30 14:54:40
+ * @LastEditTime: 2024-12-30 21:29:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,7 +86,7 @@ function App() {
     const searchParams = new URLSearchParams(window.location.search);
     return {
       org: searchParams.get('org') || 'df_org_uid',
-      t: searchParams.get('t') ? Number(searchParams.get('t')) : 2,
+      t: searchParams.get('t') ? searchParams.get('t') : "2",
       sid: searchParams.get('sid') || 'df_rt_uid'
     };
   };
@@ -225,7 +225,7 @@ function App() {
       alert('配置无效，请检查输入');
     }
   };
-  
+
   // 处理函数
   const handleInit = () => {
     console.log('BytedeskReact component initialized');
@@ -742,7 +742,7 @@ function App() {
           
             <h4>2. 导入组件</h4>
             <pre style={{ background: '#e0e0e0', padding: '10px', borderRadius: '4px' }}>
-              import {'{ BytedeskReact }'} from 'bytedesk-web';
+              import {'{ BytedeskReact }'} from 'bytedesk-web/react';
             </pre>
 
             <h4>3. 配置参数</h4>
