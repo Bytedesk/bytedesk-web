@@ -13,68 +13,50 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 import { defineConfig } from 'vite'
-import { resolve } from 'path'
 import react from '@vitejs/plugin-react'
 import vue from '@vitejs/plugin-vue'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 import dts from 'vite-plugin-dts'
+import { resolve } from 'path'
 
 // 创建两个独立的构建配置
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/main.ts'),
-      name: 'BytedeskWeb',
-      formats: ['umd'],
-      fileName: (format) => `bytedesk-web.${format}.js`
+      entry: {
+        index: resolve(__dirname, 'src/main.ts'),
+        react: resolve(__dirname, 'src/adapters/react.tsx'),
+        vue: resolve(__dirname, 'src/adapters/vue.ts'),
+        svelte: resolve(__dirname, 'src/adapters/svelte.ts'),
+        angular: resolve(__dirname, 'src/adapters/angular.ts')
+      },
+      formats: ['es']
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'vue', 'svelte'],
+      external: ['react', 'react-dom', 'vue', 'svelte', '@angular/core'],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
           vue: 'Vue',
-          svelte: 'Svelte'
-        },
-        inlineDynamicImports: false
+          svelte: 'Svelte',
+          '@angular/core': 'ng'
+        }
       }
     }
   },
   plugins: [
     react(),
     vue(),
-    {
-      ...dts({
-        insertTypesEntry: true,
-        include: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.vue'],
-        outDir: 'dist/types'
-      }),
-      apply: 'build'
-    },
-    {
-      name: 'build-esm',
-      apply: 'build',
-      config(config) {
-        return {
-          build: {
-            lib: {
-              entry: {
-                index: resolve(__dirname, 'src/main.ts'),
-                react: resolve(__dirname, 'src/adapters/react.tsx'),
-                vue: resolve(__dirname, 'src/adapters/vue.ts'),
-                svelte: resolve(__dirname, 'src/adapters/svelte.ts')
-              },
-              formats: ['es'],
-              fileName: (format, entryName) => `${entryName}/index.js`
-            },
-            rollupOptions: {
-              external: ['react', 'react-dom', 'vue', 'svelte'],
-              preserveModules: true,
-              preserveModulesRoot: 'src'
-            }
-          }
-        };
-      }
+    svelte(),
+    dts({
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
+      exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    })
+  ],
+  resolve: {
+    alias: {
+      '@bytedesk/web': resolve(__dirname, 'src')
     }
-  ]
+  }
 }); 

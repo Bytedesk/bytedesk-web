@@ -13,7 +13,7 @@
   "bugs": {
     "url": "https://github.com/bytedesk/bytedesk-web/issues"
   },
-  "homepage": "https://github.com/bytedesk/bytedesk-web",
+  "homepage": "https://ai.bytedesk.com",
   "keywords": [
     "ai",
     "chat",
@@ -49,6 +49,10 @@
     "./svelte": {
       "types": "./dist/types/svelte.d.ts",
       "import": "./dist/svelte/index.js"
+    },
+    "./angular": {
+      "types": "./dist/types/adapters/angular.d.ts",
+      "import": "./dist/adapters/angular.js"
     }
   },
   "scripts": {
@@ -61,12 +65,17 @@
     "demo:vue": "cd examples/vue-demo && yarn install && yarn dev",
     "demo:svelte": "cd examples/svelte-demo && yarn install && yarn dev",
     "demo:vanilla": "cd examples/vanilla-demo && yarn install && yarn dev",
-    "demo:javascript": "cd examples/javascript-demo && yarn install && yarn start"
+    "demo:javascript": "cd examples/javascript-demo && yarn install && yarn start",
+    "demo:angular": "cd examples/angular-demo && yarn install && yarn dev"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "@angular/common": "^16.0.0",
+    "@angular/core": "^16.0.0",
+    "@angular/platform-browser": "^16.0.0",
+    "@angular/platform-browser-dynamic": "^16.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vue/compiler-sfc": "^3.0.0",
@@ -81,7 +90,11 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "svelte": "^4.0.0",
-    "vue": "^3.0.0"
+    "vue": "^3.0.0",
+    "@angular/core": "^16.0.0",
+    "@angular/common": "^16.0.0",
+    "@angular/platform-browser": "^16.0.0",
+    "@angular/platform-browser-dynamic": "^16.0.0"
   },
   "license": "BUSL-1.1",
   "peerDependenciesMeta": {
@@ -95,6 +108,18 @@
       "optional": true
     },
     "svelte": {
+      "optional": true
+    },
+    "@angular/core": {
+      "optional": true
+    },
+    "@angular/common": {
+      "optional": true
+    },
+    "@angular/platform-browser": {
+      "optional": true
+    },
+    "@angular/platform-browser-dynamic": {
       "optional": true
     }
   },
