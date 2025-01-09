@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:22:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 15:57:10
+ * @LastEditTime: 2025-01-01 16:43:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,37 +20,27 @@ import InstallGuide from '../components/InstallGuide';
 
 const OnlineDemo = () => {
   const [config] = useState<BytedeskConfig>({
-    // baseUrl: 'https://ai.bytedesk.com',
-    // placement: 'bottom-right',
-    // marginBottom: 20,
-    // marginSide: 20,
-    // tabsConfig: {
-    //   home: false,
-    //   messages: true,
-    //   help: false,
-    //   news: false
-    // },
-    // bubbleConfig: {
-    //   show: true,
-    //   icon: '👋',
-    //   title: '需要帮助吗？',
-    //   subtitle: '点击开始对话'
-    // },
-    // showSupport: true,
-    // chatParams: {
-    //   org: 'your_org_id',  // 替换为您的组织ID
-    //   t: "2",
-    //   sid: 'your_sid'      // 替换为您的SID
-    // },
-    // theme: {
-    //   mode: 'light',
-    //   backgroundColor: '#ffffff',
-    //   textColor: '#333333'
-    // },
-    // window: {
-    //   width: 380,
-    //   height: 640
-    // }
+    placement: 'bottom-right',
+    marginBottom: 20,
+    marginSide: 20,
+    tabsConfig: {
+      home: false,
+      messages: true,
+      help: false,
+      news: false
+    },
+    bubbleConfig: {
+      show: true,
+      icon: '👋',
+      title: '需要帮助吗？',
+      subtitle: '点击开始对话'
+    },
+    showSupport: true,
+    chatParams: {
+      org: 'df_org_uid',
+      t: "2",
+      sid: 'df_rt_uid'
+    }
   });
 
   const handleInit = () => {

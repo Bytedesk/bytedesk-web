@@ -24,7 +24,7 @@ Object.entries(messages).forEach(([locale, msgs]) => {
 });
 
 init({
-  fallbackLocale: 'en-US',
+  fallbackLocale: 'en',
   initialLocale: getLocaleFromNavigator()
 });
 
@@ -35,7 +35,7 @@ export const BytedeskSvelte = (node: HTMLElement, config: BytedeskConfig & { loc
   onMount(() => {
     instance = new BytedeskWeb({
       ...config,
-      locale: config.locale || getLocaleFromNavigator() || 'zh-CN'
+      locale: config.locale || getLocaleFromNavigator() || 'zh-cn'
     });
     instance.init();
   });

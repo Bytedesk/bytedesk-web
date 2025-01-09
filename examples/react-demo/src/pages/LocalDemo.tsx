@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-31 11:55:00
+ * @LastEditTime: 2025-01-09 22:08:28
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -17,6 +17,26 @@ const LocalDemo = () => {
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,
+    autoPopup: false,
+    inviteParams: {
+      show: true,
+      delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
+      loop: true, // 是否启用循环
+      loopDelay: 10000, // 循环间隔, 单位: 毫秒
+      loopCount: 3, // 循环次数, 设置为0表示无限循环
+      onAccept: () => {
+        console.log('inviteParams onAccept');
+      },
+      onReject: () => {
+        console.log('inviteParams onReject');
+      },
+      onClose: () => {
+        console.log('inviteParams onClose');
+      },
+      onOpen: () => {
+        console.log('inviteParams onOpen');
+      }
+    },
     tabsConfig: {
       home: false,
       messages: true,

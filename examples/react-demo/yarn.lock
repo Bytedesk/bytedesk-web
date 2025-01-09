@@ -755,10 +755,10 @@ browserslist@^4.24.0:
     node-releases "^2.0.19"
     update-browserslist-db "^1.1.1"
 
-bytedesk-web@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.npmmirror.com/bytedesk-web/-/bytedesk-web-1.1.0.tgz#43ae94c35aabb5f7742f401534f6aa7c14b45716"
-  integrity sha512-2GTVkA95WJ4DMBz/CrZbyqSU5L6yXfEy8yiV+K0fwtvHgR5OTkjd2GZYtTAA6TC3vghBDkOF4brJD6SRQJhfug==
+bytedesk-web@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.npmmirror.com/bytedesk-web/-/bytedesk-web-1.1.3.tgz#d142e6fabc29388527b77730464d65231c127410"
+  integrity sha512-am7TFE2jMp8aJIMgbD4KzZaJ9iHhaEVOQom9370tL8ZTeYjt2p5wt3JunAiM5/9LajRuZORfWWuAcvcn6y10ZA==
   dependencies:
     react-intl "^6.6.8"
     svelte-i18n "^4.0.1"

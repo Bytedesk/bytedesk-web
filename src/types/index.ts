@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:07:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-31 08:25:52
+ * @LastEditTime: 2025-01-09 22:06:04
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,62 +13,88 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 export interface Theme {
-  mode?: 'light' | 'dark' | 'system';
-  textColor?: string;
-  backgroundColor?: string;
+  mode?: 'light' | 'dark' | 'system'; // 主题模式
+  textColor?: string; // 导航文本颜色
+  backgroundColor?: string; // 导航背景颜色
 }
 
 export interface BubbleConfig {
-  show?: boolean;
-  icon?: string;
-  title?: string;
-  subtitle?: string;
+  show?: boolean; // 是否显示气泡
+  icon?: string; // 气泡图标
+  title?: string; // 气泡标题
+  subtitle?: string; // 气泡副标题
 }
 
 export interface TabsConfig {
-  home?: boolean;
-  messages?: boolean;
-  help?: boolean;
-  news?: boolean;
+  home?: boolean; // 首页
+  messages?: boolean; // 消息
+  help?: boolean; // 帮助
+  news?: boolean; // 新闻
 }
 
 export interface WindowConfig {
-  width?: number;
-  height?: number;
+  width?: number; // 窗口宽度
+  height?: number; // 窗口高度
 }
 
 export interface Animation {
-  enabled?: boolean;
-  duration?: number;
-  type?: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out';
+  enabled?: boolean; // 是否启用动画
+  duration?: number; // 动画持续时间, 单位: 毫秒
+  type?: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out'; // 动画类型
 }
 
 export interface ChatParams {
-  org: string;
-  t: string
-  sid: string;
-  [key: string]: string | number;
+  org: string; // 组织ID
+  t: string; // 类型
+  sid: string; // 会话ID
+  [key: string]: string | number | undefined;
 } 
 
-export interface BytedeskConfig {
-  isDebug?: boolean;
-  baseUrl?: string;
-  placement?: 'bottom-left' | 'bottom-right';
-  marginBottom?: number;
-  marginSide?: number;
-  tabsConfig?: TabsConfig;
-  bubbleConfig?: BubbleConfig;
-  showSupport?: boolean;
-  chatParams?: ChatParams;
-  animation?: Animation;
-  window?: WindowConfig;
-  theme?: Theme;
-  draggable?: boolean;
-  locale?: string;
-  onInit?: () => void;
+export interface BrowseParams {
+  referrer?: string; // 来源  
+  url?: string; // 页面URL
+  title?: string; // 页面标题
+  [key: string]: string | number | undefined;
 }
 
-export type Language = 'zh-CN' | 'en-US' | 'ja-JP' | 'ko-KR';
+export interface InviteParams {
+  show?: boolean; // 是否显示邀请
+  text?: string; // 邀请文本
+  icon?: string; // 邀请图标
+  delay?: number; // 邀请延迟时间, 单位: 毫秒
+  loop?: boolean; // 是否循环 
+  loopDelay?: number; // 循环延迟时间, 单位: 毫秒
+  loopCount?: number; // 循环次数
+  onAccept?: () => void; // 接受回调
+  onReject?: () => void; // 拒绝回调
+  onClose?: () => void; // 关闭回调
+  onOpen?: () => void; // 打开回调
+}
+
+export interface BytedeskConfig {
+  isDebug?: boolean; // 是否开启调试模式
+  baseUrl?: string; // 基础URL
+  placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
+  marginBottom?: number; // 底部边距
+  marginSide?: number; // 侧边边距
+  autoPopup?: boolean; // 是否自动弹出
+  autoPopupDelay?: number; // 自动弹出延迟时间, 单位: 毫秒
+  inviteParams?: InviteParams; // 邀请参数
+  tabsConfig?: TabsConfig; // 标签配置
+  bubbleConfig?: BubbleConfig; // 气泡配置
+  showSupport?: boolean; // 是否显示支持按钮
+  chatParams?: ChatParams; // 聊天参数
+  browseParams?: BrowseParams; // 浏览参数
+  animation?: Animation; // 动画配置
+  window?: WindowConfig; // 窗口配置
+  theme?: Theme; // 主题配置
+  draggable?: boolean; // 是否可拖动
+  locale?: string; // 语言
+  onInit?: () => void; // 初始化回调
+  onMessage?: (message: string, type: string) => void; // 消息回调
+}
+
+export type Language = 'zh-cn' | 'zh-tw' | 'en' | 'ja' | 'ko';
 
 export interface LocaleMessages {
   [key: string]: {

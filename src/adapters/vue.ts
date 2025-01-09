@@ -19,7 +19,7 @@ import type { BytedeskConfig } from '../types';
 import { messages } from '../locales';
 
 const i18n = createI18n({
-  locale: 'zh-CN',
+  locale: 'zh-cn',
   messages
 });
 
@@ -28,14 +28,14 @@ export const BytedeskVue = defineComponent({
   props: {
     locale: {
       type: String,
-      default: 'zh-CN'
+      default: 'zh-cn'
     }
   },
   setup(props, { attrs }) {
     let instance: BytedeskWeb | null = null;
 
     onMounted(() => {
-      i18n.global.locale = props.locale as 'zh-CN' | 'en-US';
+      i18n.global.locale = props.locale as 'zh-cn' | 'en';
       instance = new BytedeskWeb({
         ...(attrs as unknown as BytedeskConfig),
         locale: props.locale

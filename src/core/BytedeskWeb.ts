@@ -4,9 +4,12 @@ export default class BytedeskWeb {
   private config: BytedeskConfig;
   private bubble: HTMLElement | null = null;
   private window: HTMLElement | null = null;
+  private inviteDialog: HTMLElement | null = null;
   private isVisible: boolean = false;
   private isDragging: boolean = false;
   private windowState: 'minimized' | 'maximized' | 'normal' = 'normal';
+  private loopCount: number = 0;
+  private loopTimer: number | null = null;
 
   constructor(config: BytedeskConfig) {
     this.config = {
@@ -21,6 +24,7 @@ export default class BytedeskWeb {
       placement: 'bottom-right',
       marginBottom: 20,
       marginSide: 20,
+      autoPopup: false,
       tabsConfig: {
         home: false,
         messages: true,
@@ -54,14 +58,29 @@ export default class BytedeskWeb {
         height: 640,
       },
       draggable: false,
-      locale: 'zh-CN',
+      locale: 'zh-cn',
     } as BytedeskConfig;
   }
 
   init() {
     this.createBubble();
+    this.createInviteDialog();
     this.setupMessageListener();
     this.setupResizeListener();
+    // 预加载
+    this.preload();
+    // 自动弹出
+    if (this.config.autoPopup) {
+      setTimeout(() => {
+        this.showChat();
+      }, this.config.autoPopupDelay || 1000);
+    }
+    // 显示邀请框
+    if (this.config.inviteParams?.show) {
+      setTimeout(() => {
+        this.showInviteDialog();
+      }, this.config.inviteParams.delay || 3000);
+    }
   }
 
   private createBubble() {
@@ -274,17 +293,14 @@ export default class BytedeskWeb {
     }
 
     // 修改点击事件，只在非拖动时触发
-    // let isClick = true;
-    this.bubble.addEventListener('mousedown', () => {
-    //   isClick = true;
-    });
-
-    this.bubble.addEventListener('mousemove', () => {
-    //   isClick = false;
-    });
-
     this.bubble.addEventListener('click', () => {
       if (!this.isDragging) {
+        console.log('bubble click')
+        // 隐藏气泡消息
+        const messageElement = (this.bubble as any).messageElement;
+        if (messageElement instanceof HTMLElement) {
+          messageElement.style.display = 'none';
+        }
         this.showChat();
       }
     });
@@ -297,14 +313,14 @@ export default class BytedeskWeb {
   }
 
   private getSupportText(): string {
-    const locale = this.config.locale || 'zh-CN';
+    const locale = this.config.locale || 'zh-cn';
     const supportTexts = {
-      'zh-CN': '微语技术支持',
-      'en-US': 'Powered by Weiyuai',
+      'zh-cn': '微语技术支持',
+      'en': 'Powered by Weiyuai',
       'ja-JP': 'Weiyuaiによる技術支援',
       'ko-KR': 'Weiyuai 기술 지원'
     };
-    return supportTexts[locale as keyof typeof supportTexts] || supportTexts['zh-CN'];
+    return supportTexts[locale as keyof typeof supportTexts] || supportTexts['zh-cn'];
   }
 
   private createChatWindow() {
@@ -356,8 +372,8 @@ export default class BytedeskWeb {
       border: none;
     `;
     iframe.src = this.generateChatUrl();
+    console.log('iframe.src: ', iframe.src)
     this.window.appendChild(iframe);
-
     // 添加技术支持信息
     if (this.config.showSupport) {
       const supportDiv = document.createElement('div');
@@ -387,11 +403,10 @@ export default class BytedeskWeb {
       
       this.window.appendChild(supportDiv);
     }
-
     document.body.appendChild(this.window);
   }
 
-  private generateChatUrl(tab: string = 'messages'): string {
+  private generateChatUrl(preload: boolean = false, tab: string = 'messages'): string {
     console.log('this.config: ', this.config, tab)
     const params = new URLSearchParams();
 
@@ -399,20 +414,27 @@ export default class BytedeskWeb {
     Object.entries(this.config.chatParams || {}).forEach(([key, value]) => {
         params.append(key, String(value));
     });
+
+    // 添加浏览参数
+    Object.entries(this.config.browseParams || {}).forEach(([key, value]) => {
+      params.append(key, String(value));
+    });
     
     // 添加基本参数
     // params.append('tab', tab);
-    // params.append('theme', JSON.stringify(this.config.theme));
-    // params.append('window', JSON.stringify(this.config.window));
 
     // theme添加聊天参数
     Object.entries(this.config.theme || {}).forEach(([key, value]) => {
       params.append(key, String(value));
     });
 
-    let chatUrl = `${this.config.baseUrl}?${params.toString()}`;
-    console.log('chatUrl: ', chatUrl)
-    return chatUrl
+    params.append('lang', this.config.locale || 'zh-cn');
+
+    if (preload) {
+      params.append('preload', '1');
+    }
+
+    return `${this.config.baseUrl}?${params.toString()}`;
   }
 
   private setupMessageListener() {
@@ -427,8 +449,31 @@ export default class BytedeskWeb {
         case 'MINIMIZE_WINDOW':
           this.minimizeWindow();
           break;
+        case 'RECEIVE_MESSAGE':
+          console.log('RECEIVE_MESSAGE')
+          break;
+        case 'INVITE_VISITOR':
+          console.log('INVITE_VISITOR')
+          break;
+        case 'INVITE_VISITOR_ACCEPT':
+          console.log('INVITE_VISITOR_ACCEPT')
+          break;
+        case 'INVITE_VISITOR_REJECT':
+          console.log('INVITE_VISITOR_REJECT')
+          break;
       }
     });
+  }
+
+  preload() {
+    console.log('preload')
+    const preLoadUrl = this.generateChatUrl(true);
+    console.log('preLoadUrl: ', preLoadUrl)
+    // 预加载URL
+    const preLoadIframe = document.createElement('iframe');
+    preLoadIframe.src = preLoadUrl;
+    preLoadIframe.style.display = 'none';
+    document.body.appendChild(preLoadIframe);
   }
 
   showChat() {
@@ -571,5 +616,138 @@ export default class BytedeskWeb {
 
     // 清理事件监听器
     window.removeEventListener('resize', this.setupResizeListener.bind(this));
+
+    // 清理循环定时器
+    if (this.loopTimer) {
+      window.clearTimeout(this.loopTimer);
+      this.loopTimer = null;
+    }
+
+    if (this.inviteDialog && document.body.contains(this.inviteDialog)) {
+      document.body.removeChild(this.inviteDialog);
+      this.inviteDialog = null;
+    }
+  }
+
+  private createInviteDialog() {
+    if (!this.config.inviteParams?.show) return;
+    
+    this.inviteDialog = document.createElement('div');
+    this.inviteDialog.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+      z-index: 10001;
+      display: none;
+      max-width: 300px;
+      text-align: center;
+    `;
+    
+    // 添加图标
+    if (this.config.inviteParams.icon) {
+      const icon = document.createElement('div');
+      icon.style.cssText = `
+        font-size: 32px;
+        margin-bottom: 12px;
+      `;
+      icon.textContent = this.config.inviteParams.icon;
+      this.inviteDialog.appendChild(icon);
+    }
+    
+    // 添加文本
+    const text = document.createElement('div');
+    text.style.cssText = `
+      margin-bottom: 16px;
+      color: #333;
+    `;
+    text.textContent = this.config.inviteParams.text || '需要帮助吗？点击开始对话';
+    this.inviteDialog.appendChild(text);
+    
+    // 添加按钮组
+    const buttons = document.createElement('div');
+    buttons.style.cssText = `
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    `;
+    
+    // 接受按钮
+    const acceptBtn = document.createElement('button');
+    acceptBtn.textContent = '开始对话';
+    acceptBtn.style.cssText = `
+      padding: 8px 16px;
+      background: ${this.config.theme?.backgroundColor || '#0066FF'};
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    `;
+    acceptBtn.onclick = () => {
+      this.hideInviteDialog();
+      this.showChat();
+      this.config.inviteParams?.onAccept?.();
+    };
+    
+    // 拒绝按钮
+    const rejectBtn = document.createElement('button');
+    rejectBtn.textContent = '稍后再说';
+    rejectBtn.style.cssText = `
+      padding: 8px 16px;
+      background: #f5f5f5;
+      color: #666;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    `;
+    rejectBtn.onclick = () => {
+      this.hideInviteDialog();
+      this.config.inviteParams?.onReject?.();
+      this.handleInviteLoop();
+    };
+    
+    buttons.appendChild(acceptBtn);
+    buttons.appendChild(rejectBtn);
+    this.inviteDialog.appendChild(buttons);
+    
+    document.body.appendChild(this.inviteDialog);
+  }
+
+  private handleInviteLoop() {
+    const { loop, loopDelay = 3000, loopCount = Infinity } = this.config.inviteParams || {};
+    
+    // 如果不需要循环或已达到最大循环次数，则不再显示
+    if (!loop || this.loopCount >= loopCount - 1) {
+      return;
+    }
+    
+    // 清除之前的定时器
+    if (this.loopTimer) {
+      window.clearTimeout(this.loopTimer);
+    }
+    
+    // 设置新的定时器
+    this.loopTimer = window.setTimeout(() => {
+      this.loopCount++;
+      this.showInviteDialog();
+    }, loopDelay);
+  }
+
+  private showInviteDialog() {
+    if (this.inviteDialog) {
+      this.inviteDialog.style.display = 'block';
+      this.config.inviteParams?.onOpen?.();
+    }
+  }
+
+  private hideInviteDialog() {
+    if (this.inviteDialog) {
+      this.inviteDialog.style.display = 'none';
+      this.config.inviteParams?.onClose?.();
+    }
   }
 } 

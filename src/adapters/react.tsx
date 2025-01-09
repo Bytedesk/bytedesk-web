@@ -22,12 +22,12 @@ interface BytedeskReactProps extends BytedeskConfig {
   onInit?: () => void;
 }
 
-export const BytedeskReact = ({ locale = 'zh-CN', ...props }: BytedeskReactProps) => {
+export const BytedeskReact = ({ locale = 'zh-cn', ...props }: BytedeskReactProps) => {
   return (
     <IntlProvider 
       messages={messages[locale as keyof typeof messages] as any} 
       locale={locale}
-      defaultLocale="zh-CN"
+      defaultLocale="zh-cn"
     >
       <BytedeskComponent {...props} locale={locale} />
     </IntlProvider>
