@@ -506,6 +506,7 @@ export default class BytedeskWeb {
         }
       }
     }
+    this.hideInviteDialog();
   }
 
   hideChat() {
