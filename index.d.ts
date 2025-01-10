@@ -3,6 +3,7 @@ declare module 'bytedesk-web/react' {
 
   export interface BytedeskConfig {
     isDebug?: boolean;
+    isPreload?: boolean;
     baseUrl?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
@@ -63,6 +64,8 @@ declare module 'bytedesk-web/react' {
       backgroundColor?: string;
     };
     onInit?: () => void;
+    onShowChat?: () => void;
+    onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
   }
 
@@ -74,6 +77,7 @@ declare module 'bytedesk-web/vue' {
 
   export interface BytedeskConfig {
     isDebug?: boolean;
+    isPreload?: boolean;
     baseUrl?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
@@ -134,6 +138,8 @@ declare module 'bytedesk-web/vue' {
       backgroundColor?: string;
     };  
     onInit?: () => void;
+    onShowChat?: () => void;
+    onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
   }
 
@@ -145,6 +151,7 @@ declare module 'bytedesk-web/svelte' {
 
   export interface BytedeskConfig {
     isDebug?: boolean;
+    isPreload?: boolean;
     baseUrl?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
@@ -205,6 +212,8 @@ declare module 'bytedesk-web/svelte' {
       backgroundColor?: string;
     };
     onInit?: () => void;
+    onShowChat?: () => void;
+    onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
   }
 
@@ -216,6 +225,7 @@ declare module 'bytedesk-web/angular' {
 
   export interface BytedeskConfig {
     isDebug?: boolean;
+    isPreload?: boolean;
     baseUrl?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
@@ -276,6 +286,8 @@ declare module 'bytedesk-web/angular' {
       backgroundColor?: string;
     };
     onInit?: () => void;
+    onShowChat?: () => void;
+    onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
   }
 

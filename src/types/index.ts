@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:07:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 22:06:04
+ * @LastEditTime: 2025-01-10 11:48:45
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -73,6 +73,7 @@ export interface InviteParams {
 
 export interface BytedeskConfig {
   isDebug?: boolean; // 是否开启调试模式
+  isPreload?: boolean; // 是否预加载  
   baseUrl?: string; // 基础URL
   placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
   marginBottom?: number; // 底部边距
@@ -91,6 +92,8 @@ export interface BytedeskConfig {
   draggable?: boolean; // 是否可拖动
   locale?: string; // 语言
   onInit?: () => void; // 初始化回调
+  onShowChat?: () => void; // 显示聊天回调
+  onHideChat?: () => void; // 隐藏聊天回调
   onMessage?: (message: string, type: string) => void; // 消息回调
 }
 

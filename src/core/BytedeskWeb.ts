@@ -20,6 +20,8 @@ export default class BytedeskWeb {
 
   private getDefaultConfig(): BytedeskConfig {
     return {
+      isDebug: false,
+      isPreload: false,
       baseUrl: 'https://www.weiyuai.cn/chat',
       placement: 'bottom-right',
       marginBottom: 20,
@@ -466,14 +468,16 @@ export default class BytedeskWeb {
   }
 
   preload() {
-    console.log('preload')
-    const preLoadUrl = this.generateChatUrl(true);
-    console.log('preLoadUrl: ', preLoadUrl)
-    // 预加载URL
-    const preLoadIframe = document.createElement('iframe');
-    preLoadIframe.src = preLoadUrl;
-    preLoadIframe.style.display = 'none';
-    document.body.appendChild(preLoadIframe);
+    console.log('preload');
+    if (this.config.isPreload) {
+      const preLoadUrl = this.generateChatUrl(true);
+      console.log('preLoadUrl: ', preLoadUrl)
+      // 预加载URL
+      const preLoadIframe = document.createElement('iframe');
+      preLoadIframe.src = preLoadUrl;
+      preLoadIframe.style.display = 'none';
+      document.body.appendChild(preLoadIframe);
+    }
   }
 
   showChat() {
@@ -507,6 +511,7 @@ export default class BytedeskWeb {
       }
     }
     this.hideInviteDialog();
+    this.config.onShowChat?.();
   }
 
   hideChat() {
@@ -532,6 +537,7 @@ export default class BytedeskWeb {
           messageElement.style.display = 'block';
         }
       }
+      this.config.onHideChat?.();
     }
   }
 
@@ -539,6 +545,8 @@ export default class BytedeskWeb {
     if (this.window) {
       this.windowState = 'minimized';
       this.window.style.display = 'none';
+      // 显示气泡
+      this.hideChat()
     }
   }
 
