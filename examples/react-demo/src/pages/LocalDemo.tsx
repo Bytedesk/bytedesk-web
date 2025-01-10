@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 22:08:28
+ * @LastEditTime: 2025-01-09 22:27:07
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -24,24 +24,6 @@ const LocalDemo = () => {
       loop: true, // 是否启用循环
       loopDelay: 10000, // 循环间隔, 单位: 毫秒
       loopCount: 3, // 循环次数, 设置为0表示无限循环
-      onAccept: () => {
-        console.log('inviteParams onAccept');
-      },
-      onReject: () => {
-        console.log('inviteParams onReject');
-      },
-      onClose: () => {
-        console.log('inviteParams onClose');
-      },
-      onOpen: () => {
-        console.log('inviteParams onOpen');
-      }
-    },
-    tabsConfig: {
-      home: false,
-      messages: true,
-      help: false,
-      news: false
     },
     bubbleConfig: {
       show: true,
@@ -49,6 +31,10 @@ const LocalDemo = () => {
       title: '需要帮助吗？',
       subtitle: '点击开始对话'
     },
+    // window: {
+    //   width: 800,
+    //   height: 600
+    // },
     showSupport: true,
     chatParams: {
       org: 'df_org_uid',

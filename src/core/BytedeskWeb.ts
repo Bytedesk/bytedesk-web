@@ -545,11 +545,14 @@ export default class BytedeskWeb {
   private toggleMaximize() {
     if (!this.window) return;
 
-    const isMobile = window.innerWidth <= 768;
-    if (isMobile) return;
+    // 直接大小新的网页
+    window.open(this.generateChatUrl(), '_blank');
+    
+    // const isMobile = window.innerWidth <= 768;
+    // if (isMobile) return;
 
-    this.windowState = this.windowState === 'maximized' ? 'normal' : 'maximized';
-    this.setupResizeListener();
+    // this.windowState = this.windowState === 'maximized' ? 'normal' : 'maximized';
+    // this.setupResizeListener();
   }
 
   private setupResizeListener() {

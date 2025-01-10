@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 11:53:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 16:00:51
+ * @LastEditTime: 2025-01-09 22:22:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -41,6 +41,20 @@ import type { BytedeskConfig } from 'bytedesk-web/react';`}
   placement: 'bottom-right',
   marginBottom: 20,
   marginSide: 20,
+  autoPopup: false,
+  inviteParams: {
+    show: false,
+    delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
+    loop: true, // 是否启用循环
+    loopDelay: 10000, // 循环间隔, 单位: 毫秒
+    loopCount: 3, // 循环次数, 设置为0表示无限循环
+  },
+  bubbleConfig: {
+    show: true,
+    icon: '👋',
+    title: '需要帮助吗？',
+    subtitle: '点击开始对话'
+  },
   chatParams: {
     org: 'df_org_uid',  // 替换为您的组织ID
     t: "2",
