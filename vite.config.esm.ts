@@ -80,7 +80,8 @@ export default defineConfig({
       insertTypesEntry: true,
       include: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.vue'],
       outDir: 'dist/types',
-      rollupTypes: true
+      rollupTypes: true,
+      preserveModules: true
     })
   ]
 }); 

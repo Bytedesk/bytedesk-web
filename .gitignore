@@ -67,6 +67,3 @@ examples/**/node_modules/
 # Misc
 .DS_Store
 Thumbs.db
-
-# Demos folder
-demos/
