@@ -81,7 +81,6 @@ export default defineConfig({
       include: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.vue'],
       outDir: 'dist/types',
       rollupTypes: true,
-      preserveModules: true
     })
   ]
 }); 
