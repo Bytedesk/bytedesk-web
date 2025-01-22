@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"../../../src/adapters/nextjs.tsx -> ../main\":{\"id\":\"../../../src/adapters/nextjs.tsx -> ../main\",\"files\":[\"static/chunks/_app-pages-browser_src_main_ts.js\"]}}"

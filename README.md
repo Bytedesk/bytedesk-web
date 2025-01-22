@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 12:45:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 15:56:07
+ * @LastEditTime: 2025-01-22 13:46:21
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,10 +17,14 @@
 Online customer service SDK, supporting multiple frameworks:
 
 - [React Guide](examples/react-demo/readme.md)
+- [Next.js Guide](examples/nextjs-demo/readme.md)
 - [Vue Guide](examples/vue-demo/readme.md)
 - [Svelte Guide](examples/svelte-demo/readme.md)
 - [Angular Guide](examples/angular-demo/readme.md)
 - [JavaScript Guide](examples/javascript-demo/readme.md)
+
+![admin](images/admin/chat.png)
+![chat](images/chat/web_chat.png)
 
 [中文文档](readme.zh.md)
 
@@ -97,6 +101,7 @@ yarn demo:vue      # Run Vue demo
 yarn demo:svelte   # Run Svelte demo
 yarn demo:vanilla  # Run Vanilla JS demo
 yarn demo:angular  # Run Angular demo
+yarn demo:nextjs   # Run Next.js demo
 
 # JavaScript demo requires build first
 yarn build
@@ -112,3 +117,35 @@ yarn demo:javascript
 | [Flutter](https://github.com/bytedesk/bytedesk-flutter) | Flutter | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-flutter)| ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-flutter) |
 | [UniApp](https://github.com/bytedesk/bytedesk-uniapp) | Uniapp | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-uniapp) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-uniapp) |
 | [Web](https://github.com/bytedesk/bytedesk-web) | Web | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-web) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-web) |
+| [Wordpress](https://github.com/bytedesk/bytedesk-wordpress) | Wordpress | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-wordpress) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-wordpress) |
+| [Woocommerce](https://github.com/bytedesk/bytedesk-woocommerce) | woocommerce | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-woocommerce) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-woocommerce) |
+| [Magento](https://github.com/bytedesk/bytedesk-magento) | Magento | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-magento) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-magento) |
+| [Prestashop](https://github.com/bytedesk/bytedesk-prestashop) | Prestashop | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-prestashop) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-prestashop) |
+| [Shopify](https://github.com/bytedesk/bytedesk-shopify) | Shopify | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-shopify) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-shopify) |
+| [Opencart](https://github.com/bytedesk/bytedesk-opencart) | Opencart | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-opencart) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-opencart) |
+| [Laravel](https://github.com/bytedesk/bytedesk-laravel) | Laravel | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-laravel) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-laravel) |
+| [Django](https://github.com/bytedesk/bytedesk-django) | Django | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-django) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-django) |
+
+### Next.js Usage
+
+```typescript
+'use client';
+
+import { BytedeskNextjs } from 'bytedesk-web/nextjs';
+import type { BytedeskConfig } from 'bytedesk-web/nextjs';
+
+export default function Page() {
+  const config = {
+    // ... configuration
+  };
+
+  return (
+    <div>
+      <BytedeskNextjs config={config} />
+      <button onClick={() => (window as any).bytedesk?.showChat()}>
+        Open Chat
+      </button>
+    </div>
+  );
+}
+```

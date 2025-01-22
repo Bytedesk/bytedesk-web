@@ -1,7 +1,7 @@
 {
   "name": "bytedesk-web",
   "private": false,
-  "version": "1.1.10",
+  "version": "1.2.0",
   "type": "module",
   "authors": [
     "270580156@qq.com"
@@ -53,6 +53,10 @@
     "./angular": {
       "types": "./dist/types/adapters/angular.d.ts",
       "import": "./dist/adapters/angular.js"
+    },
+    "./nextjs": {
+      "types": "./dist/types/adapters/nextjs.d.ts",
+      "import": "./dist/adapters/nextjs.js"
     }
   },
   "scripts": {
@@ -66,7 +70,8 @@
     "demo:svelte": "cd examples/svelte-demo && yarn install && yarn dev",
     "demo:vanilla": "cd examples/vanilla-demo && yarn install && yarn dev",
     "demo:javascript": "cd examples/javascript-demo && yarn install && yarn start",
-    "demo:angular": "cd examples/angular-demo && yarn install && yarn dev"
+    "demo:angular": "cd examples/angular-demo && yarn install && yarn dev",
+    "demo:nextjs": "cd examples/nextjs-demo && yarn install && yarn dev"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -79,6 +84,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vue/compiler-sfc": "^3.0.0",
+    "next": "^14.0.0",
     "svelte": "^4.0.0",
     "sync-npm-mirror": "^1.0.0",
     "typescript": "^5.7.2",
@@ -94,7 +100,8 @@
     "@angular/core": "^16.0.0",
     "@angular/common": "^16.0.0",
     "@angular/platform-browser": "^16.0.0",
-    "@angular/platform-browser-dynamic": "^16.0.0"
+    "@angular/platform-browser-dynamic": "^16.0.0",
+    "next": "^14.0.0"
   },
   "license": "BUSL-1.1",
   "peerDependenciesMeta": {
@@ -120,6 +127,9 @@
       "optional": true
     },
     "@angular/platform-browser-dynamic": {
+      "optional": true
+    },
+    "next": {
       "optional": true
     }
   },

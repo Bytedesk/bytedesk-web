@@ -297,3 +297,14 @@ declare module 'bytedesk-web/angular' {
   //   }
   // }
 }
+
+declare module 'bytedesk-web/nextjs' {
+  import { FC } from 'react';
+  import { BytedeskConfig } from 'bytedesk-web/react';
+
+  // 导出 React 版本的配置类型
+  export type { BytedeskConfig };
+
+  // 导出 Next.js 专用组件
+  export const BytedeskNextjs: FC<BytedeskConfig>;
+}
