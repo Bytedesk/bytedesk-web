@@ -300,10 +300,74 @@ declare module 'bytedesk-web/angular' {
 
 declare module 'bytedesk-web/nextjs' {
   import { FC } from 'react';
-  import type { BytedeskConfig as BaseConfig } from 'bytedesk-web/react';
-
-  // 重新导出配置类型
-  export interface BytedeskConfig extends BaseConfig {}
+  
+  export interface BytedeskConfig {
+    isDebug?: boolean;
+    isPreload?: boolean;
+    baseUrl?: string;
+    placement?: 'bottom-left' | 'bottom-right';
+    marginBottom?: number;
+    marginSide?: number;
+    autoPopup?: boolean;
+    autoPopupDelay?: number;
+    inviteParams?: {
+      show?: boolean;
+      text?: string;
+      icon?: string;
+      delay?: number;
+      loop?: boolean;
+      loopDelay?: number;
+      loopCount?: number;
+      onAccept?: () => void;
+      onReject?: () => void;
+      onClose?: () => void;
+      onOpen?: () => void;
+    };
+    tabsConfig?: {
+      home?: boolean;
+      messages?: boolean;
+      help?: boolean;
+      news?: boolean;
+    };
+    bubbleConfig?: {
+      show?: boolean;
+      icon?: string;
+      title?: string;
+      subtitle?: string;
+    };
+    showSupport?: boolean;
+    chatParams?: {
+      org?: string;
+      t?: string
+      sid?: string;
+      [key: string]: any;
+    };
+    browseParams?: {
+      referrer?: string;
+      url?: string;
+      title?: string;
+      [key: string]: any;
+    };
+    draggable?: boolean;
+    animation?: {
+      enabled?: boolean;
+      duration?: number;
+      type?: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out';
+    };
+    window?: {
+      width?: number;
+      height?: number;
+    };
+    theme?: {
+      mode?: 'light' | 'dark' | 'system';
+      textColor?: string;
+      backgroundColor?: string;
+    };
+    onInit?: () => void;
+    onShowChat?: () => void;
+    onHideChat?: () => void;
+    onMessage?: (message: string, type: string) => void;
+  }
 
   // 导出 Next.js 专用组件
   export const BytedeskNextjs: FC<BytedeskConfig>;

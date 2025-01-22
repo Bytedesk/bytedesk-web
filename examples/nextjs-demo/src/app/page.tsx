@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-22 13:19:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-22 14:53:56
+ * @LastEditTime: 2025-01-22 15:11:13
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -42,6 +42,7 @@ export default function Home() {
       subtitle: 'Click to chat'
     },
     theme: {
+      mode: 'system',
       backgroundColor: '#ff4d4f',
       textColor: '#ffffff'
     },
