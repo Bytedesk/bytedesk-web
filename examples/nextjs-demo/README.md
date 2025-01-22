@@ -1,51 +1,104 @@
-# Bytedesk Next.js Demo
+<!--
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-12-28 12:45:03
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-01-22 14:10:28
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+-->
+# bytedesk-web
 
-This is a demo project showing how to integrate Bytedesk chat widget with Next.js.
+Online customer service SDK, supporting multiple frameworks:
 
-## Features
+- [React Guide](examples/react-demo/readme.md)
+- [Vue Guide](examples/vue-demo/readme.md)
+- [Svelte Guide](examples/svelte-demo/readme.md)
+- [JavaScript Guide](examples/javascript-demo/readme.md)
+- [Next.js Guide](examples/nextjs-demo/readme.md)
 
-- Server-side rendering (SSR) support
-- TypeScript support
-- Tailwind CSS for styling
-- Full chat widget functionality
-- Invite dialog with loop feature
-- Responsive design
+[中文文档](readme.zh.md)
 
-## Getting Started
+## Installation Steps
 
-1. Install dependencies:
+### Install Dependencies
+
+```bash
+npm install bytedesk-web
+# or
+yarn add bytedesk-web
+```
+
+### Import Component
+
+```bash
+import { BytedeskNextjs } from 'bytedesk-web/nextjs';
+import type { BytedeskConfig } from 'bytedesk-web/nextjs';
+```
+
+### Configure Parameters
+
+```bash
+const config: BytedeskConfig = {
+  placement: 'bottom-right',
+  marginBottom: 20,
+  marginSide: 20,
+  bubbleConfig: {
+    show: true,
+    icon: '👋',
+    title: 'Need help?',
+    subtitle: 'Click to chat'
+  },
+  chatParams: {
+    org: 'df_org_uid',  // Replace with your organization ID
+    t: "2",
+    sid: 'df_rt_uid'      // Replace with your SID
+  }
+};
+```
+
+### Use Component
+
+```bash
+const App = () => {
+  const handleInit = () => {
+    console.log('BytedeskReact initialized');
+  };
+
+  return (
+    <div>
+      <BytedeskNextjs {...config} onInit={handleInit} />
+      <button onClick={() => (window as any).bytedesk?.showChat()}>
+        Open Chat
+      </button>
+    </div>
+  );
+};
+```
+
+### Available Methods
+
+```bash
+(window as any).bytedesk?.showChat() - Show chat window
+(window as any).bytedesk?.hideChat() - Hide chat window
+```
+
+## Run Examples
+
 ```bash
 yarn install
+yarn demo:react    # Run React demo
+yarn demo:vue      # Run Vue demo
+yarn demo:svelte   # Run Svelte demo
+yarn demo:vanilla  # Run Vanilla JS demo
+yarn demo:nextjs   # Run Next.js demo
+
+# JavaScript demo requires build first
+yarn build
+yarn demo:javascript
 ```
-
-2. Run the development server:
-```bash
-yarn dev
-```
-
-3. Open [http://localhost:9026](http://localhost:9026) in your browser.
-
-## Project Structure
-
-```
-nextjs-demo/
-├── src/
-│   ├── app/
-│   │   ├── page.tsx      # Main demo page
-│   │   ├── layout.tsx    # Root layout
-│   │   └── globals.css   # Global styles
-│   └── components/
-│       └── InstallGuide.tsx  # Installation guide component
-├── public/
-├── package.json
-└── README.md
-```
-
-## Configuration
-
-See the `config` object in `src/app/page.tsx` for available configuration options.
-
-## Learn More
-
-- [Bytedesk Documentation](https://github.com/bytedesk/bytedesk-web)
-- [Next.js Documentation](https://nextjs.org/docs) 

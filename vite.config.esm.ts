@@ -24,10 +24,12 @@ export default defineConfig({
     emptyOutDir: false,
     lib: {
       entry: {
-        index: resolve(__dirname, 'src/main.ts'),
-        react: resolve(__dirname, 'src/adapters/react.tsx'),
-        vue: resolve(__dirname, 'src/adapters/vue.ts'),
-        svelte: resolve(__dirname, 'src/adapters/svelte.ts')
+        'index': resolve(__dirname, 'src/main.ts'),
+        'react': resolve(__dirname, 'src/adapters/react.tsx'),
+        'vue': resolve(__dirname, 'src/adapters/vue.ts'),
+        'svelte': resolve(__dirname, 'src/adapters/svelte.ts'),
+        'angular': resolve(__dirname, 'src/adapters/angular.ts'),
+        'nextjs': resolve(__dirname, 'src/adapters/nextjs.tsx'),
       },
       formats: ['es']
     },
@@ -38,9 +40,14 @@ export default defineConfig({
         'react/jsx-runtime',
         'vue',
         'svelte',
+        '@angular/core',
+        '@angular/common',
+        '@angular/platform-browser',
+        '@angular/platform-browser-dynamic',
         'react-intl',
         'vue-i18n',
-        'svelte-i18n'
+        'svelte-i18n',
+        'next',
       ],
       output: {
         format: 'es',
@@ -50,14 +57,18 @@ export default defineConfig({
         preserveModules: true,
         preserveModulesRoot: 'src',
         globals: {
-          react: 'React',
-          'react/jsx-runtime': 'jsxRuntime',
+          'react': 'React',
           'react-dom': 'ReactDOM',
-          vue: 'Vue',
-          svelte: 'Svelte',
+          'vue': 'Vue',
+          'svelte': 'Svelte',
+          '@angular/core': 'ng.core',
+          '@angular/common': 'ng.common',
+          '@angular/platform-browser': 'ng.platformBrowser',
+          '@angular/platform-browser-dynamic': 'ng.platformBrowserDynamic',
           'react-intl': 'ReactIntl',
           'vue-i18n': 'VueI18n',
-          'svelte-i18n': 'SvelteI18n'
+          'svelte-i18n': 'SvelteI18n',
+          'next': 'Next'
         }
       }
     }

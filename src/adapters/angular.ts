@@ -8,7 +8,7 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import BytedeskWeb from '../main';
 import type { BytedeskConfig } from '../types';
 
-@Component({
+export const BytedeskAngular = Component({
   selector: 'bytedesk-angular',
   template: '',
   styles: [`
@@ -22,8 +22,7 @@ import type { BytedeskConfig } from '../types';
       z-index: 999;
     }
   `]
-})
-export class BytedeskAngular implements OnInit, OnDestroy {
+})(class {
   @Input() config!: BytedeskConfig;
   private instance: BytedeskWeb | null = null;
 
@@ -37,4 +36,4 @@ export class BytedeskAngular implements OnInit, OnDestroy {
     this.instance?.destroy();
     delete (window as any).bytedesk;
   }
-} 
+}); 

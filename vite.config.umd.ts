@@ -14,13 +14,28 @@ export default defineConfig({
       fileName: (format) => format === 'iife' ? 'bytedesk-web.js' : `bytedesk-web.${format}.js`
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'vue', 'svelte'],
+      external: [
+        'react',
+        'react-dom',
+        'vue',
+        'svelte',
+        '@angular/core',
+        '@angular/common',
+        '@angular/platform-browser',
+        '@angular/platform-browser-dynamic',
+        'next'
+      ],
       output: {
         globals: {
-          react: 'React',
+          'react': 'React',
           'react-dom': 'ReactDOM',
-          vue: 'Vue',
-          svelte: 'Svelte'
+          'vue': 'Vue',
+          'svelte': 'Svelte',
+          '@angular/core': 'ng.core',
+          '@angular/common': 'ng.common',
+          '@angular/platform-browser': 'ng.platformBrowser',
+          '@angular/platform-browser-dynamic': 'ng.platformBrowserDynamic',
+          'next': 'Next'
         }
       }
     }
