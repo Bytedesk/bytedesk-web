@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 12:45:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-22 15:25:52
+ * @LastEditTime: 2025-01-22 20:24:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -133,27 +133,3 @@ https://cdn.jsdelivr.net/npm/bytedesk-web@1.2.7/dist/bytedesk-web.umd.js
 | [Opencart](https://github.com/bytedesk/bytedesk-opencart) | Opencart | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-opencart) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-opencart) |
 | [Laravel](https://github.com/bytedesk/bytedesk-laravel) | Laravel | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-laravel) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-laravel) |
 | [Django](https://github.com/bytedesk/bytedesk-django) | Django | ![GitHub forks](https://img.shields.io/github/forks/bytedesk/bytedesk-django) | ![GitHub Repo stars](https://img.shields.io/github/stars/bytedesk/bytedesk-django) |
-
-### Next.js Usage
-
-```typescript
-'use client';
-
-import { BytedeskNextjs } from 'bytedesk-web/nextjs';
-import type { BytedeskConfig } from 'bytedesk-web/nextjs';
-
-export default function Page() {
-  const config = {
-    // ... configuration
-  };
-
-  return (
-    <div>
-      <BytedeskNextjs config={config} />
-      <button onClick={() => (window as any).bytedesk?.showChat()}>
-        Open Chat
-      </button>
-    </div>
-  );
-}
-```

@@ -104,7 +104,8 @@ export default class BytedeskWeb {
     if (this.config.bubbleConfig?.show) {
       messageElement = document.createElement('div');
       messageElement.style.cssText = `
-        background: white;
+        background: ${this.config.theme?.mode === 'dark' ? '#1f2937' : 'white'};
+        color: ${this.config.theme?.mode === 'dark' ? '#e5e7eb' : '#1f2937'};
         padding: 12px 16px;
         border-radius: 8px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
@@ -133,13 +134,14 @@ export default class BytedeskWeb {
       const title = document.createElement('div');
       title.textContent = this.config.bubbleConfig?.title || '';
       title.style.fontWeight = 'bold';
+      title.style.color = this.config.theme?.mode === 'dark' ? '#e5e7eb' : '#1f2937';
       title.style.marginBottom = '4px';
       textDiv.appendChild(title);
 
       const subtitle = document.createElement('div');
       subtitle.textContent = this.config.bubbleConfig?.subtitle || '';
       subtitle.style.fontSize = '0.9em';
-      subtitle.style.opacity = '0.8';
+      subtitle.style.color = this.config.theme?.mode === 'dark' ? '#9ca3af' : '#4b5563';
       textDiv.appendChild(subtitle);
 
       messageContent.appendChild(textDiv);
@@ -153,7 +155,7 @@ export default class BytedeskWeb {
         ${this.config.placement === 'bottom-left' ? 'left: 24px' : 'right: 24px'};
         width: 12px;
         height: 12px;
-        background: white;
+        background: ${this.config.theme?.mode === 'dark' ? '#1f2937' : 'white'};
         transform: rotate(45deg);
         box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
       `;
@@ -166,7 +168,7 @@ export default class BytedeskWeb {
         ${this.config.placement === 'bottom-left' ? 'left: 18px' : 'right: 18px'};
         width: 24px;
         height: 12px;
-        background: white;
+        background: ${this.config.theme?.mode === 'dark' ? '#1f2937' : 'white'};
       `;
 
       messageElement.appendChild(triangle);
