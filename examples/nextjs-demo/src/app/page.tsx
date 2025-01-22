@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-22 13:19:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-22 13:48:33
+ * @LastEditTime: 2025-01-22 14:53:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -19,9 +19,10 @@ import { BytedeskNextjs } from '@bytedesk/web/adapters/nextjs';
 // @ts-ignore
 import type { BytedeskConfig } from '@bytedesk/web/types';
 import InstallGuide from '../components/InstallGuide';
+import { useState } from 'react';
 
 export default function Home() {
-  const config: BytedeskConfig = {
+  const [config] = useState<BytedeskConfig>({
     baseUrl: 'http://127.0.0.1:9006',
     placement: 'bottom-right',
     marginBottom: 20,
@@ -29,10 +30,10 @@ export default function Home() {
     autoPopup: false,
     inviteParams: {
       show: true,
-      delay: 1000,
-      loop: true,
-      loopDelay: 10000,
-      loopCount: 3,
+      delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
+      loop: true, // 是否启用循环
+      loopDelay: 10000, // 循环间隔, 单位: 毫秒
+      loopCount: 3, // 循环次数, 设置为0表示无限循环
     },
     bubbleConfig: {
       show: true,
@@ -44,11 +45,16 @@ export default function Home() {
       backgroundColor: '#ff4d4f',
       textColor: '#ffffff'
     },
+    showSupport: true,
     chatParams: {
       org: 'df_org_uid',
       t: "2",
       sid: 'df_rt_uid'
     }
+  });
+
+  const handleInit = () => {
+    console.log('BytedeskNextjs initialized');
   };
 
   const showChat = () => {
@@ -62,7 +68,7 @@ export default function Home() {
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-4">Bytedesk Next.js Demo</h1>
-      <p className="text-gray-600 mb-6">This demo uses the published npm package</p>
+      <p className="text-gray-600 mb-6">This demo uses local development files</p>
 
       <div className="space-x-4">
         <button 
@@ -80,7 +86,10 @@ export default function Home() {
         </button>
       </div>
 
-      <BytedeskNextjs config={config} />
+      <BytedeskNextjs 
+        {...config}
+        onInit={handleInit}
+      />
       
       <InstallGuide />
     </div>

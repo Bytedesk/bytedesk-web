@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-22 13:19:24
+ * @Date: 2025-01-22 14:22:31
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-22 13:29:14
+ * @LastEditTime: 2025-01-22 14:51:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,34 +14,53 @@
  */
 import { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
+import { IntlProvider } from 'react-intl';
 import type { BytedeskConfig } from '../types';
+import { messages } from '../locales';
 
-// 使用 dynamic import 并禁用 SSR
-const BytedeskNextjs = dynamic(() => Promise.resolve(({ config }: { config: BytedeskConfig }) => {
-  const instanceRef = useRef<any>(null);
+interface BytedeskNextjsProps extends BytedeskConfig {
+  onInit?: () => void;
+}
+
+// 使用动态导入包装组件
+const BytedeskNextjs = dynamic(() => Promise.resolve(({ locale = 'zh-cn', ...props }: BytedeskNextjsProps) => {
+  return (
+    <IntlProvider 
+      messages={messages[locale as keyof typeof messages] as any} 
+      locale={locale}
+      defaultLocale="zh-cn"
+    >
+      <BytedeskComponent {...props} locale={locale} />
+    </IntlProvider>
+  );
+}), {
+  ssr: false // 禁用服务端渲染
+});
+
+const BytedeskComponent = (props: BytedeskNextjsProps) => {
+  const bytedeskRef = useRef<any>(null);
 
   useEffect(() => {
-    // 动态导入 BytedeskWeb，避免服务端渲染时的 window 未定义问题
+    // 动态导入 BytedeskWeb
     import('../main').then(({ default: BytedeskWeb }) => {
-      if (!instanceRef.current) {
-        instanceRef.current = new BytedeskWeb(config);
-        instanceRef.current.init();
-        (window as any).bytedesk = instanceRef.current;
+      if (!bytedeskRef.current) {
+        bytedeskRef.current = new BytedeskWeb(props);
+        bytedeskRef.current.init();
+        props.onInit?.();
+        (window as any).bytedesk = bytedeskRef.current;
       }
     });
 
     return () => {
-      if (instanceRef.current) {
-        instanceRef.current.destroy();
+      if (bytedeskRef.current) {
+        bytedeskRef.current.destroy();
         delete (window as any).bytedesk;
-        instanceRef.current = null;
+        bytedeskRef.current = null;
       }
     };
-  }, [config]);
+  }, [props]);
 
   return null;
-}), {
-  ssr: false // 禁用服务端渲染
-});
+};
 
 export { BytedeskNextjs }; 

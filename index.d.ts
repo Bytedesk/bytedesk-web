@@ -300,10 +300,10 @@ declare module 'bytedesk-web/angular' {
 
 declare module 'bytedesk-web/nextjs' {
   import { FC } from 'react';
-  import { BytedeskConfig } from 'bytedesk-web/react';
+  import type { BytedeskConfig as BaseConfig } from 'bytedesk-web/react';
 
-  // 导出 React 版本的配置类型
-  export type { BytedeskConfig };
+  // 重新导出配置类型
+  export interface BytedeskConfig extends BaseConfig {}
 
   // 导出 Next.js 专用组件
   export const BytedeskNextjs: FC<BytedeskConfig>;

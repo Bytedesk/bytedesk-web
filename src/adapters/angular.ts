@@ -2,38 +2,43 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 16:10:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 16:04:21
+ * @LastEditTime: 2025-01-22 14:55:52
  */
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import BytedeskWeb from '../main';
 import type { BytedeskConfig } from '../types';
 
-export const BytedeskAngular = Component({
+// 定义组件类型
+type BytedeskAngularType = {
+  config: BytedeskConfig;
+  ngOnInit(): void;
+  ngOnDestroy(): void;
+};
+
+// 导出组件
+export const BytedeskAngular: any = Component({
   selector: 'bytedesk-angular',
   template: '',
   styles: [`
     :host {
-      display: block;
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 999;
+      display: none;
     }
   `]
-})(class {
+})(class implements BytedeskAngularType {
   @Input() config!: BytedeskConfig;
-  private instance: BytedeskWeb | null = null;
+  private bytedeskRef: BytedeskWeb | null = null;
 
-  ngOnInit() {
-    this.instance = new BytedeskWeb(this.config);
-    this.instance.init();
-    (window as any).bytedesk = this.instance;
+  ngOnInit(): void {
+    this.bytedeskRef = new BytedeskWeb(this.config);
+    this.bytedeskRef.init();
+    (window as any).bytedesk = this.bytedeskRef;
   }
 
-  ngOnDestroy() {
-    this.instance?.destroy();
-    delete (window as any).bytedesk;
+  ngOnDestroy(): void {
+    if (this.bytedeskRef) {
+      this.bytedeskRef.destroy();
+      delete (window as any).bytedesk;
+      this.bytedeskRef = null;
+    }
   }
 }); 
