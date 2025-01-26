@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 11:53:47
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-09 22:22:23
+ * @LastEditTime: 2025-01-26 14:16:08
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -87,8 +87,14 @@ import type { BytedeskConfig } from 'bytedesk-web/react';`}
       <div>
         <h3>5. 可用方法</h3>
         <ul style={{ lineHeight: '1.6' }}>
+          <li><code>(window as any).bytedesk?.showButton()</code> - 显示按钮</li>
+          <li><code>(window as any).bytedesk?.hideButton()</code> - 隐藏按钮</li>
+          <li><code>(window as any).bytedesk?.showBubble()</code> - 显示气泡消息</li>
+          <li><code>(window as any).bytedesk?.hideBubble()</code> - 隐藏气泡消息</li>
           <li><code>(window as any).bytedesk?.showChat()</code> - 显示聊天窗口</li>
           <li><code>(window as any).bytedesk?.hideChat()</code> - 隐藏聊天窗口</li>
+          <li><code>(window as any).bytedesk?.showInviteDialog()</code> - 显示邀请对话框</li>
+          <li><code>(window as any).bytedesk?.hideInviteDialog()</code> - 隐藏邀请对话框</li>
         </ul>
       </div>
     </div>

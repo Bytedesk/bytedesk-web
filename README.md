@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 12:45:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-22 20:24:25
+ * @LastEditTime: 2025-01-26 14:17:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,6 +43,8 @@ yarn add bytedesk-web
 ```bash
 import { BytedeskReact } from 'bytedesk-web/react';
 import type { BytedeskConfig } from 'bytedesk-web/react';
+# or
+# import type { BytedeskConfig } from 'bytedesk-web';
 ```
 
 ### Configure Parameters
@@ -88,8 +90,21 @@ const App = () => {
 ### Available Methods
 
 ```bash
-(window as any).bytedesk?.showChat() - Show chat window
-(window as any).bytedesk?.hideChat() - Hide chat window
+# show/hide button
+(window as any).bytedesk?.showButton();
+(window as any).bytedesk?.hideButton();
+
+# show/hide bubble
+(window as any).bytedesk?.showBubble();
+(window as any).bytedesk?.hideBubble();
+
+# show/hide chat window
+(window as any).bytedesk?.showChat();
+(window as any).bytedesk?.hideChat();
+
+# show/hide invite dialog
+(window as any).bytedesk?.showInviteDialog();
+(window as any).bytedesk?.hideInviteDialog();
 ```
 
 ## Run Examples

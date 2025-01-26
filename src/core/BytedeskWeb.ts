@@ -731,7 +731,21 @@ export default class BytedeskWeb {
     document.body.appendChild(this.inviteDialog);
   }
 
-  private handleInviteLoop() {
+  showInviteDialog() {
+    if (this.inviteDialog) {
+      this.inviteDialog.style.display = 'block';
+      this.config.inviteParams?.onOpen?.();
+    }
+  }
+
+  hideInviteDialog() {
+    if (this.inviteDialog) {
+      this.inviteDialog.style.display = 'none';
+      this.config.inviteParams?.onClose?.();
+    }
+  }
+
+  handleInviteLoop() {
     const { loop, loopDelay = 3000, loopCount = Infinity } = this.config.inviteParams || {};
     
     // 如果不需要循环或已达到最大循环次数，则不再显示
@@ -751,17 +765,43 @@ export default class BytedeskWeb {
     }, loopDelay);
   }
 
-  private showInviteDialog() {
-    if (this.inviteDialog) {
-      this.inviteDialog.style.display = 'block';
-      this.config.inviteParams?.onOpen?.();
+  showButton() {
+    if (this.bubble) {
+      this.bubble.style.display = 'inline-flex';
     }
   }
 
-  private hideInviteDialog() {
-    if (this.inviteDialog) {
-      this.inviteDialog.style.display = 'none';
-      this.config.inviteParams?.onClose?.();
+  hideButton() {
+    if (this.bubble) {
+      this.bubble.style.display = 'none';
+    }
+  }
+
+  showBubble() {
+    if (this.bubble) {
+      const messageElement = (this.bubble as any).messageElement;
+      if (messageElement instanceof HTMLElement) {
+        messageElement.style.display = 'block';
+        // 显示动画
+        setTimeout(() => {
+          messageElement.style.opacity = '1';
+          messageElement.style.transform = 'translateY(0)';
+        }, 100);
+      }
+    }
+  }
+
+  hideBubble() {
+    if (this.bubble) {
+      const messageElement = (this.bubble as any).messageElement;
+      if (messageElement instanceof HTMLElement) {
+        messageElement.style.opacity = '0';
+        messageElement.style.transform = 'translateY(10px)';
+        // 等待动画完成后隐藏
+        setTimeout(() => {
+          messageElement.style.display = 'none';
+        }, 300);
+      }
     }
   }
 } 

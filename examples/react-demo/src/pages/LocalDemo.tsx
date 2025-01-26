@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-22 13:43:12
+ * @LastEditTime: 2025-01-26 14:13:53
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -52,7 +52,7 @@ const LocalDemo = () => {
       <h1>Bytedesk Local Demo</h1>
       <p>This demo uses local development files</p>
 
-      <div style={{ marginTop: '20px' }}>
+      <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button 
           onClick={() => (window as any).bytedesk?.showChat()}
           style={{
@@ -66,8 +66,6 @@ const LocalDemo = () => {
         >
           Open Chat
         </button>
-      </div>
-      <div style={{ marginTop: '20px' }}>
         <button 
           onClick={() => (window as any).bytedesk?.hideChat()}
           style={{
@@ -81,6 +79,84 @@ const LocalDemo = () => {
         >
           Close Chat
         </button>
+        <button 
+          onClick={() => (window as any).bytedesk?.showButton()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Show Button
+        </button>
+        <button 
+          onClick={() => (window as any).bytedesk?.hideButton()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Hide Button
+        </button>
+        <button 
+          onClick={() => (window as any).bytedesk?.showBubble()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Show Bubble
+        </button>
+        <button 
+          onClick={() => (window as any).bytedesk?.hideBubble()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Hide Bubble
+        </button>
+        <button 
+          onClick={() => (window as any).bytedesk?.showInviteDialog()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Show Invite
+        </button>
+        <button 
+          onClick={() => (window as any).bytedesk?.hideInviteDialog()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Hide Invite
+        </button>
       </div>
       
       <BytedeskReact 
@@ -88,7 +164,7 @@ const LocalDemo = () => {
         onInit={handleInit} 
       />
 
-        <InstallGuide />
+      <InstallGuide />
     </div>
   );
 };
