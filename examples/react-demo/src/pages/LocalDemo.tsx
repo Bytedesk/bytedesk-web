@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-26 14:13:53
+ * @LastEditTime: 2025-01-26 14:33:30
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -18,7 +18,7 @@ const LocalDemo = () => {
     marginBottom: 20,
     marginSide: 20,
     autoPopup: false,
-    inviteParams: {
+    inviteConfig: {
       show: true,
       delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
       loop: true, // 是否启用循环
@@ -31,12 +31,16 @@ const LocalDemo = () => {
       title: '需要帮助吗？',
       subtitle: '点击开始对话'
     },
+    buttonConfig: {
+      show: true,
+      size: 60
+    },
     // window: {
     //   width: 800,
     //   height: 600
     // },
     showSupport: true,
-    chatParams: {
+    chatConfig: {
       org: 'df_org_uid',
       t: "2",
       sid: 'df_rt_uid'

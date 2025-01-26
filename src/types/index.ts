@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:07:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-10 11:48:45
+ * @LastEditTime: 2025-01-26 14:31:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,21 +43,21 @@ export interface Animation {
   type?: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out'; // 动画类型
 }
 
-export interface ChatParams {
+export interface ChatConfig {
   org: string; // 组织ID
   t: string; // 类型
   sid: string; // 会话ID
   [key: string]: string | number | undefined;
 } 
 
-export interface BrowseParams {
+export interface BrowseConfig {
   referrer?: string; // 来源  
   url?: string; // 页面URL
   title?: string; // 页面标题
   [key: string]: string | number | undefined;
 }
 
-export interface InviteParams {
+export interface InviteConfig {
   show?: boolean; // 是否显示邀请
   text?: string; // 邀请文本
   icon?: string; // 邀请图标
@@ -71,6 +71,14 @@ export interface InviteParams {
   onOpen?: () => void; // 打开回调
 }
 
+export interface ButtonConfig {
+  show?: boolean; // 是否显示按钮
+  icon?: string; // 按钮图标
+  text?: string; // 按钮文本
+  size?: number; // 按钮大小
+  onClick?: () => void; // 点击回调
+}
+
 export interface BytedeskConfig {
   isDebug?: boolean; // 是否开启调试模式
   isPreload?: boolean; // 是否预加载  
@@ -80,12 +88,13 @@ export interface BytedeskConfig {
   marginSide?: number; // 侧边边距
   autoPopup?: boolean; // 是否自动弹出
   autoPopupDelay?: number; // 自动弹出延迟时间, 单位: 毫秒
-  inviteParams?: InviteParams; // 邀请参数
+  inviteConfig?: InviteConfig; // 邀请配置
   tabsConfig?: TabsConfig; // 标签配置
   bubbleConfig?: BubbleConfig; // 气泡配置
+  buttonConfig?: ButtonConfig; // 按钮配置
   showSupport?: boolean; // 是否显示支持按钮
-  chatParams?: ChatParams; // 聊天参数
-  browseParams?: BrowseParams; // 浏览参数
+  chatConfig?: ChatConfig; // 聊天配置
+  browseConfig?: BrowseConfig; // 浏览配置
   animation?: Animation; // 动画配置
   window?: WindowConfig; // 窗口配置
   theme?: Theme; // 主题配置

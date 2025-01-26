@@ -39,6 +39,14 @@ export default class BytedeskWeb {
         title: '需要帮助吗？',
         subtitle: '点击开始对话'
       },
+      buttonConfig: {
+        show: true,
+        // icon: '👋',
+        // text: '需要帮助吗？',
+        onClick: () => {
+          this.showChat();
+        }
+      },
       showSupport: true,
       chatParams: {
         org: 'df_org_uid',
@@ -78,10 +86,10 @@ export default class BytedeskWeb {
       }, this.config.autoPopupDelay || 1000);
     }
     // 显示邀请框
-    if (this.config.inviteParams?.show) {
+    if (this.config.inviteConfig?.show) {
       setTimeout(() => {
         this.showInviteDialog();
-      }, this.config.inviteParams.delay || 3000);
+      }, this.config.inviteConfig.delay || 3000);
     }
   }
 
@@ -186,14 +194,16 @@ export default class BytedeskWeb {
 
     // 创建按钮
     this.bubble = document.createElement('button');
+    const buttonConfig = this.config.buttonConfig || {};
+    const buttonSize = buttonConfig.size || 60;
     this.bubble.style.cssText = `
       background-color: ${this.config.theme?.backgroundColor};
-      width: 60px;
-      height: 60px;
-      border-radius: 30px;
+      width: ${buttonSize}px;
+      height: ${buttonSize}px;
+      border-radius: ${buttonSize / 2}px;
       border: none;
       cursor: ${this.config.draggable ? 'move' : 'pointer'};
-      display: flex;
+      display: ${buttonConfig.show === false ? 'none' : 'flex'};
       align-items: center;
       justify-content: center;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
@@ -203,21 +213,46 @@ export default class BytedeskWeb {
       user-select: none;
     `;
 
-    // 添加气泡图标
-    const bubbleIcon = document.createElement('div');
-    bubbleIcon.innerHTML = `
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.663 3.04094 17.0829 4.73812 18.875L2.72681 21.1705C2.44361 21.4937 2.67314 22 3.10288 22H12Z" 
-              fill="white"/>
-      </svg>
-    `;
-    bubbleIcon.style.cssText = `
+    // 添加按钮内容
+    const buttonContent = document.createElement('div');
+    buttonContent.style.cssText = `
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
     `;
 
-    this.bubble.appendChild(bubbleIcon);
+    // 添加图标
+    if (buttonConfig.icon) {
+      const iconElement = document.createElement('span');
+      iconElement.textContent = buttonConfig.icon;
+      iconElement.style.fontSize = `${buttonSize * 0.4}px`;
+      buttonContent.appendChild(iconElement);
+    } else {
+      // 默认图标
+      const bubbleIcon = document.createElement('div');
+      bubbleIcon.innerHTML = `
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.663 3.04094 17.0829 4.73812 18.875L2.72681 21.1705C2.44361 21.4937 2.67314 22 3.10288 22H12Z" 
+                fill="white"/>
+        </svg>
+      `;
+      buttonContent.appendChild(bubbleIcon);
+    }
+
+    // 添加文本
+    if (buttonConfig.text) {
+      const textElement = document.createElement('span');
+      textElement.textContent = buttonConfig.text;
+      textElement.style.cssText = `
+        color: ${this.config.theme?.textColor || '#ffffff'};
+        font-size: ${buttonSize * 0.25}px;
+        white-space: nowrap;
+      `;
+      buttonContent.appendChild(textElement);
+    }
+
+    this.bubble.appendChild(buttonContent);
 
     // 添加悬停效果
     this.bubble!.addEventListener('mouseenter', () => {
@@ -415,12 +450,12 @@ export default class BytedeskWeb {
     const params = new URLSearchParams();
 
     // 添加聊天参数
-    Object.entries(this.config.chatParams || {}).forEach(([key, value]) => {
+    Object.entries(this.config.chatConfig || {}).forEach(([key, value]) => {
         params.append(key, String(value));
     });
 
     // 添加浏览参数
-    Object.entries(this.config.browseParams || {}).forEach(([key, value]) => {
+    Object.entries(this.config.browseConfig || {}).forEach(([key, value]) => {
       params.append(key, String(value));
     });
     
@@ -644,7 +679,7 @@ export default class BytedeskWeb {
   }
 
   private createInviteDialog() {
-    if (!this.config.inviteParams?.show) return;
+    if (!this.config.inviteConfig?.show) return;
     
     this.inviteDialog = document.createElement('div');
     this.inviteDialog.style.cssText = `
@@ -663,13 +698,13 @@ export default class BytedeskWeb {
     `;
     
     // 添加图标
-    if (this.config.inviteParams.icon) {
+    if (this.config.inviteConfig.icon) {
       const icon = document.createElement('div');
       icon.style.cssText = `
         font-size: 32px;
         margin-bottom: 12px;
       `;
-      icon.textContent = this.config.inviteParams.icon;
+      icon.textContent = this.config.inviteConfig.icon;
       this.inviteDialog.appendChild(icon);
     }
     
@@ -679,7 +714,7 @@ export default class BytedeskWeb {
       margin-bottom: 16px;
       color: #333;
     `;
-    text.textContent = this.config.inviteParams.text || '需要帮助吗？点击开始对话';
+    text.textContent = this.config.inviteConfig.text || '需要帮助吗？点击开始对话';
     this.inviteDialog.appendChild(text);
     
     // 添加按钮组
@@ -704,7 +739,7 @@ export default class BytedeskWeb {
     acceptBtn.onclick = () => {
       this.hideInviteDialog();
       this.showChat();
-      this.config.inviteParams?.onAccept?.();
+      this.config.inviteConfig?.onAccept?.();
     };
     
     // 拒绝按钮
@@ -720,7 +755,7 @@ export default class BytedeskWeb {
     `;
     rejectBtn.onclick = () => {
       this.hideInviteDialog();
-      this.config.inviteParams?.onReject?.();
+      this.config.inviteConfig?.onReject?.();
       this.handleInviteLoop();
     };
     
@@ -734,19 +769,19 @@ export default class BytedeskWeb {
   showInviteDialog() {
     if (this.inviteDialog) {
       this.inviteDialog.style.display = 'block';
-      this.config.inviteParams?.onOpen?.();
+      this.config.inviteConfig?.onOpen?.();
     }
   }
 
   hideInviteDialog() {
     if (this.inviteDialog) {
       this.inviteDialog.style.display = 'none';
-      this.config.inviteParams?.onClose?.();
+      this.config.inviteConfig?.onClose?.();
     }
   }
 
   handleInviteLoop() {
-    const { loop, loopDelay = 3000, loopCount = Infinity } = this.config.inviteParams || {};
+    const { loop, loopDelay = 3000, loopCount = Infinity } = this.config.inviteConfig || {};
     
     // 如果不需要循环或已达到最大循环次数，则不再显示
     if (!loop || this.loopCount >= loopCount - 1) {
