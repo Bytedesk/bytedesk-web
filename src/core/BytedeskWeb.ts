@@ -568,10 +568,10 @@ export default class BytedeskWeb {
 
       this.isVisible = false;
       if (this.bubble) {
-        this.bubble.style.display = 'inline-flex';
+        this.bubble.style.display = this.config.buttonConfig?.show === false ? 'none' : 'inline-flex';
         const messageElement = (this.bubble as any).messageElement;
         if (messageElement instanceof HTMLElement) {
-          messageElement.style.display = 'block';
+          messageElement.style.display = this.config.bubbleConfig?.show === false ? 'none' : 'block';
         }
       }
       this.config.onHideChat?.();
