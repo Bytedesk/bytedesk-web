@@ -77,7 +77,7 @@ export default defineComponent({
         subtitle: '点击开始对话'
       },
       showSupport: true,
-      chatParams: getInitialChatParams(),
+      chatConfig: getInitialChatParams(),
       theme: {
         textColor: '#ffffff',
         backgroundColor: '#2e88ff',

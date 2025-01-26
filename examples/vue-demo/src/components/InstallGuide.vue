@@ -36,7 +36,7 @@ import type { BytedeskConfig } from 'bytedesk-web/vue';</code></pre>
   placement: 'bottom-right',
   marginBottom: 20,
   marginSide: 20,
-  chatParams: {
+  chatConfig: {
     org: 'your_org_id',  // 替换为您的组织ID
     t: "2",
     sid: 'your_sid'      // 替换为您的SID

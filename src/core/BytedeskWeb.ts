@@ -48,7 +48,7 @@ export default class BytedeskWeb {
         }
       },
       showSupport: true,
-      chatParams: {
+      chatConfig: {
         org: 'df_org_uid',
         t: "2",
         sid: 'df_rt_uid'

@@ -57,7 +57,7 @@ export class AppComponent {
       title: 'Need help?',
       subtitle: 'Click to chat'
     },
-    chatParams: {
+    chatConfig: {
       org: 'df_org_uid',
       t: "2",
       sid: 'df_rt_uid'

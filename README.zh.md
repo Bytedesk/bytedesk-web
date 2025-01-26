@@ -58,7 +58,7 @@ const config: BytedeskConfig = {
     title: 'Need help?',
     subtitle: 'Click to chat'
   },
-  chatParams: {
+  chatConfig: {
     org: 'df_org_uid',  // 替换为您的组织ID
     t: "2",
     sid: 'df_rt_uid'      // 替换为您的SID

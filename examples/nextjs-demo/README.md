@@ -54,7 +54,7 @@ const config: BytedeskConfig = {
     title: 'Need help?',
     subtitle: 'Click to chat'
   },
-  chatParams: {
+  chatConfig: {
     org: 'df_org_uid',  // Replace with your organization ID
     t: "2",
     sid: 'df_rt_uid'      // Replace with your SID

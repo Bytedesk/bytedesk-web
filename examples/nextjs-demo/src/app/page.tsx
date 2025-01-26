@@ -28,7 +28,7 @@ export default function Home() {
     marginBottom: 20,
     marginSide: 20,
     autoPopup: false,
-    inviteParams: {
+    inviteConfig: {
       show: true,
       delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
       loop: true, // 是否启用循环
@@ -47,7 +47,7 @@ export default function Home() {
       textColor: '#ffffff'
     },
     showSupport: true,
-    chatParams: {
+    chatConfig: {
       org: 'df_org_uid',
       t: "2",
       sid: 'df_rt_uid'

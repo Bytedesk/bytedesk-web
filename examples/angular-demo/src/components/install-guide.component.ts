@@ -29,7 +29,7 @@ const config: BytedeskConfig = &#123;
   placement: 'bottom-right',
   marginBottom: 20,
   marginSide: 20,
-  chatParams: &#123;
+  chatConfig: &#123;
     org: 'your_org_id',  // Replace with your organization ID
     t: "2",
     sid: 'your_sid'      // Replace with your SID

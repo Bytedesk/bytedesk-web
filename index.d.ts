@@ -10,7 +10,7 @@ declare module 'bytedesk-web/react' {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
-    inviteParams?: {
+    inviteConfig?: {
       show?: boolean;
       text?: string;
       icon?: string;
@@ -35,14 +35,20 @@ declare module 'bytedesk-web/react' {
       title?: string;
       subtitle?: string;
     };
+    buttonConfig?: {
+      show?: boolean;
+      icon?: string;
+      title?: string;
+      subtitle?: string;
+    };
     showSupport?: boolean;
-    chatParams?: {
+    chatConfig?: {
       org?: string;
       t?: string
       sid?: string;
       [key: string]: any;
     };
-    browseParams?: {
+    browseConfig?: {
       referrer?: string;
       url?: string;
       title?: string;
@@ -84,7 +90,7 @@ declare module 'bytedesk-web/vue' {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
-    inviteParams?: {
+    inviteConfig?: {
       show?: boolean;
       text?: string;
       icon?: string;
@@ -109,14 +115,20 @@ declare module 'bytedesk-web/vue' {
       title?: string;
       subtitle?: string;
     };
+    buttonConfig?: {
+      show?: boolean;
+      icon?: string;
+      title?: string;
+      subtitle?: string;
+    };
     showSupport?: boolean;
-    chatParams?: {
+    chatConfig?: {
       org?: string;
       t?: string
       sid?: string;
       [key: string]: any;
     };
-    browseParams?: {
+    browseConfig?: {
       referrer?: string;
       url?: string;
       title?: string;
@@ -158,7 +170,7 @@ declare module 'bytedesk-web/svelte' {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
-    inviteParams?: {
+    inviteConfig?: {
       show?: boolean;
       text?: string;
       icon?: string;
@@ -183,14 +195,20 @@ declare module 'bytedesk-web/svelte' {
       title?: string;
       subtitle?: string;
     };
+    buttonConfig?: {
+      show?: boolean;
+      icon?: string;
+      title?: string;
+      subtitle?: string;
+    };
     showSupport?: boolean;
-    chatParams?: {
+    chatConfig?: {
       org?: string;
       t?: string
       sid?: string;
       [key: string]: any;
     };
-    browseParams?: {
+    browseConfig?: {
       referrer?: string;
       url?: string;
       title?: string;
@@ -232,7 +250,7 @@ declare module 'bytedesk-web/angular' {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
-    inviteParams?: {
+    inviteConfig?: {
       show?: boolean;
       text?: string;
       icon?: string;
@@ -257,14 +275,20 @@ declare module 'bytedesk-web/angular' {
       title?: string;
       subtitle?: string;
     };
+    buttonConfig?: {
+      show?: boolean;
+      icon?: string;
+      title?: string;
+      subtitle?: string;
+    };
     showSupport?: boolean;
-    chatParams?: {
+    chatConfig?: {
       org?: string;
       t?: string
       sid?: string;
       [key: string]: any;
     };
-    browseParams?: {
+    browseConfig?: {
       referrer?: string;
       url?: string;
       title?: string;
@@ -310,7 +334,7 @@ declare module 'bytedesk-web/nextjs' {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
-    inviteParams?: {
+    inviteConfig?: {
       show?: boolean;
       text?: string;
       icon?: string;
@@ -335,14 +359,20 @@ declare module 'bytedesk-web/nextjs' {
       title?: string;
       subtitle?: string;
     };
+    buttonConfig?: {
+      show?: boolean;
+      icon?: string;
+      title?: string;
+      subtitle?: string;
+    };
     showSupport?: boolean;
-    chatParams?: {
+    chatConfig?: {
       org?: string;
       t?: string
       sid?: string;
       [key: string]: any;
     };
-    browseParams?: {
+    browseConfig?: {
       referrer?: string;
       url?: string;
       title?: string;

@@ -37,7 +37,7 @@ Online customer service SDK, supporting multiple frameworks:
       backgroundColor: '#0066FF',
       textColor: '#ffffff'
     },
-    chatParams: {
+    chatConfig: {
       org: 'df_org_uid',
       t: '2',
       sid: 'df_rt_uid'
