@@ -774,9 +774,11 @@ export default class BytedeskWeb {
   }
 
   hideInviteDialog() {
+    console.log('hideInviteDialog before');
     if (this.inviteDialog) {
       this.inviteDialog.style.display = 'none';
       this.config.inviteConfig?.onClose?.();
+      console.log('hideInviteDialog after');
     }
   }
 

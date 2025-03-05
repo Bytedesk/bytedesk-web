@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:22:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-01 16:43:05
+ * @LastEditTime: 2025-03-03 13:36:48
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -23,6 +23,13 @@ const OnlineDemo = () => {
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,
+    inviteConfig: {
+      show: true,
+      delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
+      loop: true, // 是否启用循环
+      loopDelay: 10000, // 循环间隔, 单位: 毫秒
+      loopCount: 3, // 循环次数, 设置为0表示无限循环
+    },
     tabsConfig: {
       home: false,
       messages: true,
@@ -51,9 +58,9 @@ const OnlineDemo = () => {
     <div style={{ padding: '20px' }}>
       <h1>Bytedesk Online Demo</h1>
       <p>This demo uses the published npm package</p>
-      
-      <div style={{ marginTop: '20px' }}>
-        <button 
+
+      <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <button
           onClick={() => (window as any).bytedesk?.showChat()}
           style={{
             padding: '10px 20px',
@@ -66,9 +73,7 @@ const OnlineDemo = () => {
         >
           Open Chat
         </button>
-      </div>
-      <div style={{ marginTop: '20px' }}>
-        <button 
+        <button
           onClick={() => (window as any).bytedesk?.hideChat()}
           style={{
             padding: '10px 20px',
@@ -81,13 +86,91 @@ const OnlineDemo = () => {
         >
           Close Chat
         </button>
+        <button
+          onClick={() => (window as any).bytedesk?.showButton()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Show Button
+        </button>
+        <button
+          onClick={() => (window as any).bytedesk?.hideButton()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Hide Button
+        </button>
+        <button
+          onClick={() => (window as any).bytedesk?.showBubble()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Show Bubble
+        </button>
+        <button
+          onClick={() => (window as any).bytedesk?.hideBubble()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Hide Bubble
+        </button>
+        <button
+          onClick={() => (window as any).bytedesk?.showInviteDialog()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Show Invite
+        </button>
+        <button
+          onClick={() => (window as any).bytedesk?.hideInviteDialog()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Hide Invite
+        </button>
       </div>
 
-      <BytedeskReact 
+      <BytedeskReact
         {...config}
         onInit={handleInit}
       />
-      
+
       <InstallGuide />
     </div>
   );

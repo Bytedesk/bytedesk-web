@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 13:08:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-26 15:11:39
+ * @LastEditTime: 2025-03-03 13:20:55
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -27,6 +27,10 @@ Online customer service SDK, supporting multiple frameworks:
 ![chat](images/chat/web_chat.png)
 
 [English Document](readme.md)
+
+- [![npm version](https://badge.fury.io/js/bytedesk-web.svg)](https://badge.fury.io/js/bytedesk-web)
+- [![NPM Downloads](https://img.shields.io/npm/dm/bytedesk-web.svg?style=flat)](https://www.npmjs.com/package/bytedesk-web)
+- [npmjs](https://www.npmjs.com/package/bytedesk-web)
 
 ## Installation Steps
 
