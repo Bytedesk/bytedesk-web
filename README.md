@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 12:45:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-07 07:20:52
+ * @LastEditTime: 2025-03-10 22:48:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -63,6 +63,13 @@ const config: BytedeskConfig = {
     icon: '👋',
     title: 'Need help?',
     subtitle: 'Click to chat'
+  },
+  buttonConfig: {
+    show: true,
+    width: 60,
+    height: 60,
+    // icon: '👋',
+    // text: '需要帮助吗？',
   },
   chatConfig: {
     org: 'df_org_uid',  // Replace with your organization ID

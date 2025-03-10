@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 22:35:39
+ * @LastEditTime: 2025-03-10 22:48:13
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -33,7 +33,6 @@ const LocalDemo = () => {
     },
     buttonConfig: {
       show: true,
-      // size: 60,
       width: 60,
       height: 60,
       // icon: '👋',
