@@ -43,8 +43,8 @@ export default class BytedeskWeb {
       },
       buttonConfig: {
         show: true,
-        // icon: '👋',
-        // text: '需要帮助吗？',
+        width: 60,
+        height: 60,
         onClick: () => {
           this.showChat();
         }
@@ -197,12 +197,16 @@ export default class BytedeskWeb {
     // 创建按钮
     this.bubble = document.createElement('button');
     const buttonConfig = this.config.buttonConfig || {};
-    const buttonSize = buttonConfig.size || 60;
+    const buttonWidth = buttonConfig.width || 60;
+    const buttonHeight = buttonConfig.height || 60;
+    // 使用较小的值来计算圆角，确保在宽高不等时也能保持好看的圆角效果
+    const borderRadius = Math.min(buttonWidth, buttonHeight) / 2;
+
     this.bubble.style.cssText = `
       background-color: ${this.config.theme?.backgroundColor};
-      width: ${buttonSize}px;
-      height: ${buttonSize}px;
-      border-radius: ${buttonSize / 2}px;
+      width: ${buttonWidth}px;
+      height: ${buttonHeight}px;
+      border-radius: ${borderRadius}px;
       border: none;
       cursor: ${this.config.draggable ? 'move' : 'pointer'};
       display: ${buttonConfig.show === false ? 'none' : 'flex'};
@@ -228,7 +232,8 @@ export default class BytedeskWeb {
     if (buttonConfig.icon) {
       const iconElement = document.createElement('span');
       iconElement.textContent = buttonConfig.icon;
-      iconElement.style.fontSize = `${buttonSize * 0.4}px`;
+      // 使用高度作为基准来设置图标大小
+      iconElement.style.fontSize = `${buttonHeight * 0.4}px`;
       buttonContent.appendChild(iconElement);
     } else {
       // 默认图标
@@ -248,7 +253,7 @@ export default class BytedeskWeb {
       textElement.textContent = buttonConfig.text;
       textElement.style.cssText = `
         color: ${this.config.theme?.textColor || '#ffffff'};
-        font-size: ${buttonSize * 0.25}px;
+        font-size: ${buttonHeight * 0.25}px;
         white-space: nowrap;
       `;
       buttonContent.appendChild(textElement);

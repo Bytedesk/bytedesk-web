@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:07:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-26 14:31:14
+ * @LastEditTime: 2025-03-10 22:35:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -75,7 +75,9 @@ export interface ButtonConfig {
   show?: boolean; // 是否显示按钮
   icon?: string; // 按钮图标
   text?: string; // 按钮文本
-  size?: number; // 按钮大小
+  // size?: number; // 按钮大小
+  width?: number; // 按钮宽度
+  height?: number; // 按钮高度
   onClick?: () => void; // 点击回调
 }
 

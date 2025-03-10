@@ -36,10 +36,12 @@ declare module 'bytedesk-web/react' {
       subtitle?: string;
     };
     buttonConfig?: {
-      show?: boolean;
-      icon?: string;
-      title?: string;
-      subtitle?: string;
+      show?: boolean; // 是否显示按钮
+      icon?: string; // 按钮图标
+      text?: string; // 按钮文本
+      width?: number; // 按钮宽度
+      height?: number; // 按钮高度
+      onClick?: () => void; // 点击回调
     };
     showSupport?: boolean;
     chatConfig?: {
@@ -116,10 +118,12 @@ declare module 'bytedesk-web/vue' {
       subtitle?: string;
     };
     buttonConfig?: {
-      show?: boolean;
-      icon?: string;
-      title?: string;
-      subtitle?: string;
+      show?: boolean; // 是否显示按钮
+      icon?: string; // 按钮图标
+      text?: string; // 按钮文本
+      width?: number; // 按钮宽度
+      height?: number; // 按钮高度
+      onClick?: () => void; // 点击回调
     };
     showSupport?: boolean;
     chatConfig?: {
@@ -196,10 +200,12 @@ declare module 'bytedesk-web/svelte' {
       subtitle?: string;
     };
     buttonConfig?: {
-      show?: boolean;
-      icon?: string;
-      title?: string;
-      subtitle?: string;
+      show?: boolean; // 是否显示按钮
+      icon?: string; // 按钮图标
+      text?: string; // 按钮文本
+      width?: number; // 按钮宽度
+      height?: number; // 按钮高度
+      onClick?: () => void; // 点击回调
     };
     showSupport?: boolean;
     chatConfig?: {
@@ -276,10 +282,12 @@ declare module 'bytedesk-web/angular' {
       subtitle?: string;
     };
     buttonConfig?: {
-      show?: boolean;
-      icon?: string;
-      title?: string;
-      subtitle?: string;
+      show?: boolean; // 是否显示按钮
+      icon?: string; // 按钮图标
+      text?: string; // 按钮文本
+      width?: number; // 按钮宽度
+      height?: number; // 按钮高度
+      onClick?: () => void; // 点击回调
     };
     showSupport?: boolean;
     chatConfig?: {
@@ -360,10 +368,12 @@ declare module 'bytedesk-web/nextjs' {
       subtitle?: string;
     };
     buttonConfig?: {
-      show?: boolean;
-      icon?: string;
-      title?: string;
-      subtitle?: string;
+      show?: boolean; // 是否显示按钮
+      icon?: string; // 按钮图标
+      text?: string; // 按钮文本
+      width?: number; // 按钮宽度
+      height?: number; // 按钮高度
+      onClick?: () => void; // 点击回调
     };
     showSupport?: boolean;
     chatConfig?: {
