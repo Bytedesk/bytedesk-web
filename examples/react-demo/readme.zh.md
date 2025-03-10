@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 13:08:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-26 14:15:54
+ * @LastEditTime: 2025-03-10 22:46:18
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -83,6 +83,10 @@ const App = () => {
 ### 可用方法
 
 ```bash
+# 显示/隐藏聊天窗口
+(window as any).bytedesk?.showChat() 
+(window as any).bytedesk?.hideChat()
+
 # 显示/隐藏按钮
 (window as any).bytedesk?.showButton();
 (window as any).bytedesk?.hideButton();
