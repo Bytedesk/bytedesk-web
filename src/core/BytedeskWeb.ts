@@ -895,24 +895,24 @@ export default class BytedeskWeb {
           this.hideBubble();
         }
       },
-      {
-        text: '隐藏按钮和气泡5分钟',
-        onClick: () => {
-          this.hideButton();
-          this.hideBubble();
+      // {
+      //   text: '隐藏按钮和气泡5分钟',
+      //   onClick: () => {
+      //     this.hideButton();
+      //     this.hideBubble();
           
-          // 清除之前的定时器
-          if (this.hideTimeout) {
-            clearTimeout(this.hideTimeout);
-          }
+      //     // 清除之前的定时器
+      //     if (this.hideTimeout) {
+      //       clearTimeout(this.hideTimeout);
+      //     }
           
-          // 5分钟后重新显示
-          this.hideTimeout = setTimeout(() => {
-            this.showButton();
-            this.showBubble();
-          }, 5 * 60 * 1000);
-        }
-      }
+      //     // 5分钟后重新显示
+      //     this.hideTimeout = setTimeout(() => {
+      //       this.showButton();
+      //       this.showBubble();
+      //     }, 5 * 60 * 1000);
+      //   }
+      // }
     ];
 
     menuItems.forEach((item, index) => {
