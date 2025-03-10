@@ -5,6 +5,8 @@ export default class BytedeskWeb {
   private bubble: HTMLElement | null = null;
   private window: HTMLElement | null = null;
   private inviteDialog: HTMLElement | null = null;
+  private contextMenu: HTMLElement | null = null;
+  private hideTimeout: NodeJS.Timeout | null = null;
   private isVisible: boolean = false;
   private isDragging: boolean = false;
   private windowState: 'minimized' | 'maximized' | 'normal' = 'normal';
@@ -22,7 +24,7 @@ export default class BytedeskWeb {
     return {
       isDebug: false,
       isPreload: false,
-      baseUrl: 'https://www.weiyuai.cn/chat',
+      baseUrl: 'https://cdn.weiyuai.cn/chat',
       placement: 'bottom-right',
       marginBottom: 20,
       marginSide: 20,
@@ -51,7 +53,7 @@ export default class BytedeskWeb {
       chatConfig: {
         org: 'df_org_uid',
         t: "2",
-        sid: 'df_rt_uid'
+        sid: 'df_rt_uid',
       },
       animation: {
         enabled: true,
@@ -349,6 +351,16 @@ export default class BytedeskWeb {
 
     // 最后将容器添加到 body
     document.body.appendChild(container);
+
+    // 添加右键菜单事件
+    this.bubble.addEventListener('contextmenu', (e) => {
+      this.showContextMenu(e);
+    });
+
+    // 点击其他地方时隐藏右键菜单
+    document.addEventListener('click', () => {
+      this.hideContextMenu();
+    });
   }
 
   private getSupportText(): string {
@@ -424,6 +436,7 @@ export default class BytedeskWeb {
         color: #666;
         font-size: 12px;
         line-height: 30px;
+        background: #ffffff;
       `;
       
       supportDiv.innerHTML = `
@@ -676,6 +689,18 @@ export default class BytedeskWeb {
       document.body.removeChild(this.inviteDialog);
       this.inviteDialog = null;
     }
+
+    // 清理右键菜单
+    if (this.contextMenu && document.body.contains(this.contextMenu)) {
+      document.body.removeChild(this.contextMenu);
+      this.contextMenu = null;
+    }
+
+    // 清理隐藏定时器
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
+    }
   }
 
   private createInviteDialog() {
@@ -839,6 +864,132 @@ export default class BytedeskWeb {
           messageElement.style.display = 'none';
         }, 300);
       }
+    }
+  }
+
+  private createContextMenu() {
+    // 创建右键菜单
+    this.contextMenu = document.createElement('div');
+    this.contextMenu.style.cssText = `
+      position: fixed;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 4px 0;
+      display: none;
+      z-index: 10000;
+      min-width: 150px;
+    `;
+
+    // 创建菜单项
+    const menuItems = [
+      {
+        text: '隐藏按钮和气泡',
+        onClick: () => {
+          this.hideButton();
+          this.hideBubble();
+        }
+      },
+      {
+        text: '隐藏按钮和气泡5分钟',
+        onClick: () => {
+          this.hideButton();
+          this.hideBubble();
+          
+          // 清除之前的定时器
+          if (this.hideTimeout) {
+            clearTimeout(this.hideTimeout);
+          }
+          
+          // 5分钟后重新显示
+          this.hideTimeout = setTimeout(() => {
+            this.showButton();
+            this.showBubble();
+          }, 5 * 60 * 1000);
+        }
+      }
+    ];
+
+    menuItems.forEach((item, index) => {
+      const menuItem = document.createElement('div');
+      menuItem.style.cssText = `
+        padding: 8px 16px;
+        cursor: pointer;
+        color: #333;
+        font-size: 14px;
+        
+        &:hover {
+          background: #f5f5f5;
+        }
+      `;
+      menuItem.textContent = item.text;
+      menuItem.onclick = () => {
+        item.onClick();
+        this.hideContextMenu();
+      };
+      if (this.contextMenu) {
+        this.contextMenu.appendChild(menuItem);
+      }
+
+      // 添加分隔线（除了最后一项）
+      if (index < menuItems.length - 1) {
+        const divider = document.createElement('div');
+        divider.style.cssText = `
+          height: 1px;
+          background: #eee;
+          margin: 4px 0;
+        `;
+        if (this.contextMenu) {
+          this.contextMenu.appendChild(divider);
+        }
+      }
+    });
+
+    document.body.appendChild(this.contextMenu);
+  }
+
+  private showContextMenu(e: MouseEvent) {
+    e.preventDefault();
+    if (!this.contextMenu) {
+      this.createContextMenu();
+    }
+    
+    if (this.contextMenu) {
+      // 先显示菜单但设为不可见，以获取其尺寸
+      this.contextMenu.style.visibility = 'hidden';
+      this.contextMenu.style.display = 'block';
+      
+      const menuWidth = this.contextMenu.offsetWidth;
+      const menuHeight = this.contextMenu.offsetHeight;
+      
+      // 计算最佳显示位置
+      let x = e.clientX;
+      let y = e.clientY;
+      
+      // 检查右边界
+      if (x + menuWidth > window.innerWidth) {
+        x = x - menuWidth;
+      }
+      
+      // 检查下边界
+      if (y + menuHeight > window.innerHeight) {
+        y = y - menuHeight;
+      }
+      
+      // 确保不会超出左边和上边界
+      x = Math.max(0, x);
+      y = Math.max(0, y);
+      
+      this.contextMenu.style.left = `${x}px`;
+      this.contextMenu.style.top = `${y}px`;
+      // 恢复可见性
+      this.contextMenu.style.visibility = 'visible';
+    }
+  }
+
+  private hideContextMenu() {
+    if (this.contextMenu) {
+      this.contextMenu.style.display = 'none';
     }
   }
 } 

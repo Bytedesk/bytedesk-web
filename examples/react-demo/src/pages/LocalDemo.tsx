@@ -43,7 +43,8 @@ const LocalDemo = () => {
     chatConfig: {
       org: 'df_org_uid',
       t: "2",
-      sid: 'df_rt_uid'
+      sid: 'df_rt_uid',
+      hello: 'hello' // 自定义任意参数
     }
   });
 
