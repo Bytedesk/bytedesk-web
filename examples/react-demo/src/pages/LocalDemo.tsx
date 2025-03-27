@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 22:48:13
+ * @LastEditTime: 2025-03-27 13:48:52
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -73,6 +73,25 @@ const LocalDemo = () => {
           }}
         >
           Open Chat
+        </button>
+        <button 
+          onClick={() => (window as any).bytedesk?.showChat({
+            chatConfig: {
+              org: 'df_org_uid',
+              t: "1",
+              sid: 'df_wg_uid'
+            }
+          })}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#2e88ff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Open Chat With Params
         </button>
         <button 
           onClick={() => (window as any).bytedesk?.hideChat()}

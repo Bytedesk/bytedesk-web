@@ -424,8 +424,10 @@ export default class BytedeskWeb {
     const iframe = document.createElement('iframe');
     iframe.style.cssText = `
       width: 100%;
-      height: ${this.config.showSupport ? 'calc(100% - 30px)' : '100%'};
+      height: ${this.config.showSupport ? 'calc(100% - 24px)' : '100%'};
       border: none;
+      display: block; // 添加这一行
+      vertical-align: bottom; // 添加这一行
     `;
     iframe.src = this.generateChatUrl();
     console.log('iframe.src: ', iframe.src)
@@ -434,18 +436,21 @@ export default class BytedeskWeb {
     if (this.config.showSupport) {
       const supportDiv = document.createElement('div');
       supportDiv.style.cssText = `
-        height: 20px;
+        height: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #666;
         font-size: 12px;
-        line-height: 30px;
+        line-height: 24px;
         background: #ffffff;
+        padding: 0;
+        margin: 0;
+        border-top: none; // 确保没有边框
       `;
       
       supportDiv.innerHTML = `
-        <a href="https://ai.bytedesk.com" 
+        <a href="https://www.bytedesk.com" 
            target="_blank" 
            style="
              color: #666;
@@ -453,6 +458,8 @@ export default class BytedeskWeb {
              display: flex;
              align-items: center;
              height: 100%;
+             width: 100%;
+             justify-content: center;
            ">
           ${this.getSupportText()}
         </a>
@@ -535,7 +542,21 @@ export default class BytedeskWeb {
     }
   }
 
-  showChat() {
+  showChat(config?: Partial<BytedeskConfig>) {
+    // 合并新配置（如果提供了）
+  if (config) {
+    this.config = {
+      ...this.config,
+      ...config
+    };
+    
+    // 如果修改了配置并且窗口已经创建，需要销毁重建
+    if (this.window) {
+      document.body.removeChild(this.window);
+      this.window = null;
+    }
+  }
+  // 
     if (!this.window) {
       this.createChatWindow();
     }
