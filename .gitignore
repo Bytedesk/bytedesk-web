@@ -63,7 +63,7 @@ pnpm-debug.log*
 examples/**/dist/
 examples/**/build/
 examples/**/node_modules/
-demo/
+demos/
 
 # Misc
 .DS_Store
