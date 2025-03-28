@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-27 13:48:52
+ * @LastEditTime: 2025-03-28 21:06:01
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -56,13 +56,14 @@ const LocalDemo = () => {
     //   width: 800,
     //   height: 600
     // },
-    showSupport: true,
     chatConfig: {
       org: 'df_org_uid',
       t: "2",
       sid: 'df_rt_uid',
       hello: 'hello' // 自定义任意参数
-    }
+    },
+    // en || zh-cn || zh-tw || ja || ko
+    locale: 'zh-cn',
   });
 
   const handleInit = () => {

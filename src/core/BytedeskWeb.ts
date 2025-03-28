@@ -375,12 +375,13 @@ export default class BytedeskWeb {
   }
 
   private getSupportText(): string {
-    const locale = this.config.locale || 'zh-cn';
+    const locale = this.config?.locale || 'zh-cn';
     const supportTexts = {
       'zh-cn': '微语技术支持',
-      'en': 'Powered by Weiyuai',
-      'ja-JP': 'Weiyuaiによる技術支援',
-      'ko-KR': 'Weiyuai 기술 지원'
+      'zh-tw': '微語技術支援',
+      'en': 'Powered by Bytedesk',
+      'ja': 'Bytedeskによる技術支援',
+      'ko': 'Bytedesk 기술 지원'
     };
     return supportTexts[locale as keyof typeof supportTexts] || supportTexts['zh-cn'];
   }
