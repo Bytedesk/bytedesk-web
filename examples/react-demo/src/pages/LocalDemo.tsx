@@ -24,6 +24,20 @@ const LocalDemo = () => {
       loop: true, // 是否启用循环
       loopDelay: 10000, // 循环间隔, 单位: 毫秒
       loopCount: 3, // 循环次数, 设置为0表示无限循环
+      // acceptText: '接受',
+      // rejectText: '拒绝',
+      // onAccept: () => {
+      //   console.log('accept');
+      // },
+      // onReject: () => {
+      //   console.log('reject');
+      // },
+      // onClose: () => {
+      //   console.log('close');
+      // },
+      // onOpen: () => {
+      //   console.log('open');
+      // }
     },
     bubbleConfig: {
       show: true,

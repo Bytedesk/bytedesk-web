@@ -65,6 +65,8 @@ export interface InviteConfig {
   loop?: boolean; // 是否循环 
   loopDelay?: number; // 循环延迟时间, 单位: 毫秒
   loopCount?: number; // 循环次数
+  acceptText?: string; // 接受文本
+  rejectText?: string; // 拒绝文本
   onAccept?: () => void; // 接受回调
   onReject?: () => void; // 拒绝回调
   onClose?: () => void; // 关闭回调

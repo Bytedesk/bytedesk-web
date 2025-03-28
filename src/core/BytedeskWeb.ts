@@ -29,6 +29,12 @@ export default class BytedeskWeb {
       marginBottom: 20,
       marginSide: 20,
       autoPopup: false,
+      inviteConfig: {
+        show: false,
+        text: '邀请您加入对话',
+        acceptText: '开始对话',
+        rejectText: '稍后再说',
+      },
       tabsConfig: {
         home: false,
         messages: true,
@@ -778,7 +784,7 @@ export default class BytedeskWeb {
     
     // 接受按钮
     const acceptBtn = document.createElement('button');
-    acceptBtn.textContent = '开始对话';
+    acceptBtn.textContent = this.config?.inviteConfig?.acceptText || '开始对话';
     acceptBtn.style.cssText = `
       padding: 8px 16px;
       background: ${this.config.theme?.backgroundColor || '#0066FF'};
@@ -790,12 +796,12 @@ export default class BytedeskWeb {
     acceptBtn.onclick = () => {
       this.hideInviteDialog();
       this.showChat();
-      this.config.inviteConfig?.onAccept?.();
+      this.config?.inviteConfig?.onAccept?.();
     };
     
     // 拒绝按钮
     const rejectBtn = document.createElement('button');
-    rejectBtn.textContent = '稍后再说';
+    rejectBtn.textContent = this.config?.inviteConfig?.rejectText || '稍后再说';
     rejectBtn.style.cssText = `
       padding: 8px 16px;
       background: #f5f5f5;
@@ -806,7 +812,7 @@ export default class BytedeskWeb {
     `;
     rejectBtn.onclick = () => {
       this.hideInviteDialog();
-      this.config.inviteConfig?.onReject?.();
+      this.config?.inviteConfig?.onReject?.();
       this.handleInviteLoop();
     };
     
