@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-28 21:06:01
+ * @LastEditTime: 2025-03-28 22:55:16
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -61,6 +61,9 @@ const LocalDemo = () => {
       t: "2",
       sid: 'df_rt_uid',
       hello: 'hello' // 自定义任意参数
+    },
+    theme: {
+      mode: 'dark', // dark || light || system
     },
     // en || zh-cn || zh-tw || ja || ko
     locale: 'zh-cn',

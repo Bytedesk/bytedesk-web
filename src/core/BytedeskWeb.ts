@@ -207,9 +207,14 @@ export default class BytedeskWeb {
     const buttonHeight = buttonConfig.height || 60;
     // 使用较小的值来计算圆角，确保在宽高不等时也能保持好看的圆角效果
     const borderRadius = Math.min(buttonWidth, buttonHeight) / 2;
+    
+    // 根据主题模式选择合适的背景色
+    const isDarkMode = this.config.theme?.mode === 'dark';
+    const defaultBackgroundColor = isDarkMode ? '#3B82F6' : '#0066FF';
+    const buttonBackgroundColor = this.config.theme?.backgroundColor || defaultBackgroundColor;
 
     this.bubble.style.cssText = `
-      background-color: ${this.config.theme?.backgroundColor};
+      background-color: ${buttonBackgroundColor};
       width: ${buttonWidth}px;
       height: ${buttonHeight}px;
       border-radius: ${borderRadius}px;
@@ -218,7 +223,7 @@ export default class BytedeskWeb {
       display: ${buttonConfig.show === false ? 'none' : 'flex'};
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, ${isDarkMode ? '0.3' : '0.12'});
       transition: all 0.3s ease;
       outline: none;
       position: relative;
@@ -442,15 +447,16 @@ export default class BytedeskWeb {
     // 添加技术支持信息
     if (this.config.showSupport) {
       const supportDiv = document.createElement('div');
+      const isDarkMode = this.config.theme?.mode === 'dark';
       supportDiv.style.cssText = `
         height: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #666;
+        color: ${isDarkMode ? '#aaa' : '#666'};
         font-size: 12px;
         line-height: 24px;
-        background: #ffffff;
+        background: ${isDarkMode ? '#1f2937' : '#ffffff'};
         padding: 0;
         margin: 0;
         border-top: none; // 确保没有边框
@@ -460,7 +466,7 @@ export default class BytedeskWeb {
         <a href="https://www.bytedesk.com" 
            target="_blank" 
            style="
-             color: #666;
+             color: ${isDarkMode ? '#aaa' : '#666'};
              text-decoration: none;
              display: flex;
              align-items: center;
@@ -471,7 +477,6 @@ export default class BytedeskWeb {
           ${this.getSupportText()}
         </a>
       `;
-      
       this.window.appendChild(supportDiv);
     }
     document.body.appendChild(this.window);
@@ -739,16 +744,17 @@ export default class BytedeskWeb {
   private createInviteDialog() {
     if (!this.config.inviteConfig?.show) return;
     
+    const isDarkMode = this.config.theme?.mode === 'dark';
     this.inviteDialog = document.createElement('div');
     this.inviteDialog.style.cssText = `
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: white;
+      background: ${isDarkMode ? '#1f2937' : 'white'};
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, ${isDarkMode ? '0.3' : '0.15'});
       z-index: 10001;
       display: none;
       max-width: 300px;
@@ -761,6 +767,7 @@ export default class BytedeskWeb {
       icon.style.cssText = `
         font-size: 32px;
         margin-bottom: 12px;
+        color: ${isDarkMode ? '#e5e7eb' : '#333'};
       `;
       icon.textContent = this.config.inviteConfig.icon;
       this.inviteDialog.appendChild(icon);
@@ -770,7 +777,7 @@ export default class BytedeskWeb {
     const text = document.createElement('div');
     text.style.cssText = `
       margin-bottom: 16px;
-      color: #333;
+      color: ${isDarkMode ? '#e5e7eb' : '#333'};
     `;
     text.textContent = this.config.inviteConfig.text || '需要帮助吗？点击开始对话';
     this.inviteDialog.appendChild(text);
@@ -786,9 +793,13 @@ export default class BytedeskWeb {
     // 接受按钮
     const acceptBtn = document.createElement('button');
     acceptBtn.textContent = this.config?.inviteConfig?.acceptText || '开始对话';
+    
+    // 根据主题模式选择合适的背景色
+    const inviteBtnBackgroundColor = this.config.theme?.backgroundColor || (isDarkMode ? '#3B82F6' : '#0066FF');
+    
     acceptBtn.style.cssText = `
       padding: 8px 16px;
-      background: ${this.config.theme?.backgroundColor || '#0066FF'};
+      background: ${inviteBtnBackgroundColor};
       color: white;
       border: none;
       border-radius: 4px;
@@ -805,8 +816,8 @@ export default class BytedeskWeb {
     rejectBtn.textContent = this.config?.inviteConfig?.rejectText || '稍后再说';
     rejectBtn.style.cssText = `
       padding: 8px 16px;
-      background: #f5f5f5;
-      color: #666;
+      background: ${isDarkMode ? '#374151' : '#f5f5f5'};
+      color: ${isDarkMode ? '#d1d5db' : '#666'};
       border: none;
       border-radius: 4px;
       cursor: pointer;
@@ -1025,4 +1036,4 @@ export default class BytedeskWeb {
       this.contextMenu.style.display = 'none';
     }
   }
-} 
+}
