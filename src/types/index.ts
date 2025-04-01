@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:07:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 22:35:25
+ * @LastEditTime: 2025-04-01 11:24:43
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -92,6 +92,8 @@ export interface BytedeskConfig {
   marginSide?: number; // 侧边边距
   autoPopup?: boolean; // 是否自动弹出
   autoPopupDelay?: number; // 自动弹出延迟时间, 单位: 毫秒
+  draggable?: boolean; // 是否可拖动
+  locale?: string; // 语言
   inviteConfig?: InviteConfig; // 邀请配置
   tabsConfig?: TabsConfig; // 标签配置
   bubbleConfig?: BubbleConfig; // 气泡配置
@@ -102,8 +104,6 @@ export interface BytedeskConfig {
   animation?: Animation; // 动画配置
   window?: WindowConfig; // 窗口配置
   theme?: Theme; // 主题配置
-  draggable?: boolean; // 是否可拖动
-  locale?: string; // 语言
   onInit?: () => void; // 初始化回调
   onShowChat?: () => void; // 显示聊天回调
   onHideChat?: () => void; // 隐藏聊天回调

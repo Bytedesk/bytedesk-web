@@ -10,6 +10,8 @@ declare module 'bytedesk-web/react' {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
+    draggable?: boolean;
+    locale?: string;
     inviteConfig?: {
       show?: boolean;
       text?: string;
@@ -56,7 +58,6 @@ declare module 'bytedesk-web/react' {
       title?: string;
       [key: string]: any;
     };
-    draggable?: boolean;
     animation?: {
       enabled?: boolean;
       duration?: number;
@@ -92,6 +93,8 @@ declare module 'bytedesk-web/vue' {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
+    draggable?: boolean;
+    locale?: string;
     inviteConfig?: {
       show?: boolean;
       text?: string;
@@ -138,7 +141,6 @@ declare module 'bytedesk-web/vue' {
       title?: string;
       [key: string]: any;
     };
-    draggable?: boolean;
     animation?: {
       enabled?: boolean;
       duration?: number;
@@ -174,6 +176,8 @@ declare module 'bytedesk-web/svelte' {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
+    draggable?: boolean;
+    locale?: string;
     inviteConfig?: {
       show?: boolean;
       text?: string;
@@ -220,7 +224,6 @@ declare module 'bytedesk-web/svelte' {
       title?: string;
       [key: string]: any;
     };
-    draggable?: boolean;
     animation?: {
       enabled?: boolean;
       duration?: number;
@@ -256,6 +259,8 @@ declare module 'bytedesk-web/angular' {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
+    draggable?: boolean;
+    locale?: string;
     inviteConfig?: {
       show?: boolean;
       text?: string;
@@ -302,7 +307,6 @@ declare module 'bytedesk-web/angular' {
       title?: string;
       [key: string]: any;
     };
-    draggable?: boolean;
     animation?: {
       enabled?: boolean;
       duration?: number;
@@ -342,6 +346,8 @@ declare module 'bytedesk-web/nextjs' {
     marginSide?: number;
     autoPopup?: boolean;
     autoPopupDelay?: number;
+    draggable?: boolean;
+    locale?: string;
     inviteConfig?: {
       show?: boolean;
       text?: string;
@@ -388,7 +394,6 @@ declare module 'bytedesk-web/nextjs' {
       title?: string;
       [key: string]: any;
     };
-    draggable?: boolean;
     animation?: {
       enabled?: boolean;
       duration?: number;
