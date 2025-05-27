@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-28 22:55:16
+ * @LastEditTime: 2025-05-27 18:20:52
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -14,12 +14,14 @@ import InstallGuide from '../components/InstallGuide';
 const LocalDemo = () => {
   const [config] = useState<BytedeskConfig>({
     baseUrl: 'http://127.0.0.1:9006',
-    placement: 'bottom-right',
+    placement: 'bottom-left',
     marginBottom: 20,
     marginSide: 20,
     autoPopup: false,
+    draggable: true, // 是否可拖拽，默认不可拖拽
+    // showSupport: true, // 是否显示微语技术支持，默认显示，付费功能，免费用户请勿使用
     inviteConfig: {
-      show: true,
+      show: false,
       delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
       loop: true, // 是否启用循环
       loopDelay: 10000, // 循环间隔, 单位: 毫秒
@@ -63,7 +65,7 @@ const LocalDemo = () => {
       hello: 'hello' // 自定义任意参数
     },
     theme: {
-      mode: 'dark', // dark || light || system
+      mode: 'light', // dark || light || system
     },
     // en || zh-cn || zh-tw || ja || ko
     locale: 'zh-cn',

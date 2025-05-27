@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 12:45:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 22:48:33
+ * @LastEditTime: 2025-05-28 07:29:05
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -137,9 +137,9 @@ yarn demo:javascript
 ## CDN
 
 ```bash
-# https://cdn.jsdelivr.net/npm/bytedesk-web@1.2.7/dist/
-https://cdn.jsdelivr.net/npm/bytedesk-web@1.2.7/dist/bytedesk-web.js
-https://cdn.jsdelivr.net/npm/bytedesk-web@1.2.7/dist/bytedesk-web.umd.js
+# https://cdn.jsdelivr.net/npm/bytedesk-web@1.4.9/dist/
+https://cdn.jsdelivr.net/npm/bytedesk-web@1.4.9/dist/bytedesk-web.js
+https://cdn.jsdelivr.net/npm/bytedesk-web@1.4.9/dist/bytedesk-web.umd.js
 ```
 
 ## Open Source Demo + SDK

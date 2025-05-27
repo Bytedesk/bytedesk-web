@@ -139,7 +139,9 @@ export default class BytedeskWeb {
         display: flex;
         align-items: center;
         gap: 8px;
+        flex-direction: ${this.config.placement === 'bottom-left' ? 'row' : 'row-reverse'};
       `;
+      messageContent.setAttribute('data-placement', this.config.placement || 'bottom-right'); // 添加属性用于后续识别
 
       const iconSpan = document.createElement('span');
       iconSpan.textContent = this.config.bubbleConfig?.icon || '';
@@ -152,12 +154,14 @@ export default class BytedeskWeb {
       title.style.fontWeight = 'bold';
       title.style.color = this.config.theme?.mode === 'dark' ? '#e5e7eb' : '#1f2937';
       title.style.marginBottom = '4px';
+      title.style.textAlign = this.config.placement === 'bottom-left' ? 'left' : 'right';
       textDiv.appendChild(title);
 
       const subtitle = document.createElement('div');
       subtitle.textContent = this.config.bubbleConfig?.subtitle || '';
       subtitle.style.fontSize = '0.9em';
       subtitle.style.color = this.config.theme?.mode === 'dark' ? '#9ca3af' : '#4b5563';
+      subtitle.style.textAlign = this.config.placement === 'bottom-left' ? 'left' : 'right';
       textDiv.appendChild(subtitle);
 
       messageContent.appendChild(textDiv);
@@ -312,7 +316,6 @@ export default class BytedeskWeb {
         const newY = initialY + dy;
 
         // 限制在视窗范围内
-    //       const maxX = window.innerWidth - container.offsetWidth;
         const maxY = window.innerHeight - container.offsetHeight;
 
         // 更新水平位置
@@ -320,12 +323,20 @@ export default class BytedeskWeb {
           // 靠左
           container.style.left = `${Math.max(0, newX)}px`;
           container.style.right = 'auto';
+          container.style.alignItems = 'flex-start';
           this.config.placement = 'bottom-left';
+          
+          // 实时更新气泡三角形和内容布局
+          // this.updateBubbleLayout('bottom-left');
         } else {
           // 靠右
           container.style.right = `${Math.max(0, window.innerWidth - newX - container.offsetWidth)}px`;
           container.style.left = 'auto';
+          container.style.alignItems = 'flex-end';
           this.config.placement = 'bottom-right';
+          
+          // 实时更新气泡三角形和内容布局
+          // this.updateBubbleLayout('bottom-right');
         }
 
         // 更新垂直位置
@@ -742,8 +753,7 @@ export default class BytedeskWeb {
   }
 
   private createInviteDialog() {
-    if (!this.config.inviteConfig?.show) return;
-    
+    // 移除对 inviteConfig.show 的检查，始终创建邀请框
     const isDarkMode = this.config.theme?.mode === 'dark';
     this.inviteDialog = document.createElement('div');
     this.inviteDialog.style.cssText = `
@@ -762,7 +772,7 @@ export default class BytedeskWeb {
     `;
     
     // 添加图标
-    if (this.config.inviteConfig.icon) {
+    if (this.config.inviteConfig?.icon) {
       const icon = document.createElement('div');
       icon.style.cssText = `
         font-size: 32px;
@@ -779,7 +789,7 @@ export default class BytedeskWeb {
       margin-bottom: 16px;
       color: ${isDarkMode ? '#e5e7eb' : '#333'};
     `;
-    text.textContent = this.config.inviteConfig.text || '需要帮助吗？点击开始对话';
+    text.textContent = this.config.inviteConfig?.text || '需要帮助吗？点击开始对话';
     this.inviteDialog.appendChild(text);
     
     // 添加按钮组
@@ -792,7 +802,7 @@ export default class BytedeskWeb {
     
     // 接受按钮
     const acceptBtn = document.createElement('button');
-    acceptBtn.textContent = this.config?.inviteConfig?.acceptText || '开始对话';
+    acceptBtn.textContent = this.config.inviteConfig?.acceptText || '开始对话';
     
     // 根据主题模式选择合适的背景色
     const inviteBtnBackgroundColor = this.config.theme?.backgroundColor || (isDarkMode ? '#3B82F6' : '#0066FF');
@@ -808,12 +818,12 @@ export default class BytedeskWeb {
     acceptBtn.onclick = () => {
       this.hideInviteDialog();
       this.showChat();
-      this.config?.inviteConfig?.onAccept?.();
+      this.config.inviteConfig?.onAccept?.();
     };
     
     // 拒绝按钮
     const rejectBtn = document.createElement('button');
-    rejectBtn.textContent = this.config?.inviteConfig?.rejectText || '稍后再说';
+    rejectBtn.textContent = this.config.inviteConfig?.rejectText || '稍后再说';
     rejectBtn.style.cssText = `
       padding: 8px 16px;
       background: ${isDarkMode ? '#374151' : '#f5f5f5'};
@@ -824,7 +834,7 @@ export default class BytedeskWeb {
     `;
     rejectBtn.onclick = () => {
       this.hideInviteDialog();
-      this.config?.inviteConfig?.onReject?.();
+      this.config.inviteConfig?.onReject?.();
       this.handleInviteLoop();
     };
     
@@ -836,6 +846,7 @@ export default class BytedeskWeb {
   }
 
   showInviteDialog() {
+    // 移除对 inviteConfig.show 的检查，直接显示邀请框
     if (this.inviteDialog) {
       this.inviteDialog.style.display = 'block';
       this.config.inviteConfig?.onOpen?.();
@@ -934,24 +945,14 @@ export default class BytedeskWeb {
           this.hideBubble();
         }
       },
-      // {
-      //   text: '隐藏按钮和气泡5分钟',
-      //   onClick: () => {
-      //     this.hideButton();
-      //     this.hideBubble();
-          
-      //     // 清除之前的定时器
-      //     if (this.hideTimeout) {
-      //       clearTimeout(this.hideTimeout);
-      //     }
-          
-      //     // 5分钟后重新显示
-      //     this.hideTimeout = setTimeout(() => {
-      //       this.showButton();
-      //       this.showBubble();
-      //     }, 5 * 60 * 1000);
-      //   }
-      // }
+      {
+        text: '切换位置',
+        onClick: () => {
+          // 切换button和bubble的位置
+          this.togglePlacement();
+        }
+      }
+      
     ];
 
     menuItems.forEach((item, index) => {
@@ -1036,4 +1037,85 @@ export default class BytedeskWeb {
       this.contextMenu.style.display = 'none';
     }
   }
+
+  private togglePlacement() {
+    if (!this.bubble) return;
+    
+    // 切换位置参数
+    this.config.placement = this.config.placement === 'bottom-left' ? 'bottom-right' : 'bottom-left';
+    
+    const container = this.bubble.parentElement;
+    if (!container) return;
+    
+    // 更新容器样式以反映新的位置
+    container.style.left = this.config.placement === 'bottom-left' ? `${this.config.marginSide}px` : 'auto';
+    container.style.right = this.config.placement === 'bottom-right' ? `${this.config.marginSide}px` : 'auto';
+    container.style.alignItems = this.config.placement === 'bottom-left' ? 'flex-start' : 'flex-end';
+    
+    // 更新气泡布局
+    // this.updateBubbleLayout(this.config.placement);
+    
+    // 如果聊天窗口可见，也需要更新其位置
+    if (this.window && this.isVisible) {
+      this.window.style.left = this.config.placement === 'bottom-left' ? `${this.config.marginSide}px` : 'auto';
+      this.window.style.right = this.config.placement === 'bottom-right' ? `${this.config.marginSide}px` : 'auto';
+    }
+    
+    // 触发配置变更回调（如果存在）
+    this.config.onConfigChange?.({ placement: this.config.placement });
+  }
+
+  // 添加新方法用于更新气泡布局
+  // private updateBubbleLayout(placement: 'bottom-left' | 'bottom-right') {
+  //   if (!this.bubble) return;
+    
+  //   const messageElement = (this.bubble as any).messageElement;
+  //   if (messageElement instanceof HTMLElement) {
+  //     // 更新消息内容容器的对齐方式
+  //     messageElement.style.textAlign = placement === 'bottom-left' ? 'left' : 'right';
+      
+  //     const triangle = messageElement.querySelector('div:nth-child(2)') as HTMLElement;
+  //     const mask = messageElement.querySelector('div:nth-child(3)') as HTMLElement;
+      
+  //     if (triangle && mask) {
+  //       if (placement === 'bottom-left') {
+  //         // 左下角位置 - 三角形靠左
+  //         triangle.style.left = '24px';
+  //         triangle.style.right = 'unset'; // 使用 unset 清除右侧定位
+          
+  //         mask.style.left = '18px';
+  //         mask.style.right = 'unset';
+  //       } else {
+  //         // 右下角位置 - 三角形靠右
+  //         triangle.style.right = '24px';
+  //         triangle.style.left = 'unset';
+          
+  //         mask.style.right = '18px';
+  //         mask.style.left = 'unset';
+  //       }
+  //     }
+      
+  //     // 更新内容布局
+  //     const messageContent = messageElement.querySelector('div:first-child') as HTMLElement;
+  //     if (messageContent) {
+  //       messageContent.style.flexDirection = placement === 'bottom-left' ? 'row' : 'row-reverse';
+  //       messageContent.setAttribute('data-placement', placement);
+        
+  //       // 更新文本容器内的对齐方式
+  //       const textDiv = messageContent.querySelector('div') as HTMLElement;
+  //       if (textDiv) {
+  //         const title = textDiv.querySelector('div:first-child') as HTMLElement;
+  //         const subtitle = textDiv.querySelector('div:last-child') as HTMLElement;
+          
+  //         if (title) {
+  //           title.style.textAlign = placement === 'bottom-left' ? 'left' : 'right';
+  //         }
+          
+  //         if (subtitle) {
+  //           subtitle.style.textAlign = placement === 'bottom-left' ? 'left' : 'right';
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 }

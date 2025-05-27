@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:07:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-01 11:24:43
+ * @LastEditTime: 2025-04-02 17:02:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -108,6 +108,7 @@ export interface BytedeskConfig {
   onShowChat?: () => void; // 显示聊天回调
   onHideChat?: () => void; // 隐藏聊天回调
   onMessage?: (message: string, type: string) => void; // 消息回调
+  onConfigChange?: (config: BytedeskConfig) => void; // 配置变更回调
 }
 
 export type Language = 'zh-cn' | 'zh-tw' | 'en' | 'ja' | 'ko';
