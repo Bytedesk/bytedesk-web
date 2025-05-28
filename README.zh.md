@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 13:08:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-10 22:48:21
+ * @LastEditTime: 2025-05-28 13:45:09
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -24,7 +24,22 @@ Online customer service SDK, supporting multiple frameworks:
 - [JavaScript Guide](examples/javascript-demo/readme.md)
 
 ![admin](images/admin/chat.png)
-![chat](images/chat/react_demo.png)
+
+## 基本设置
+
+![chat](images/chat/basicsettings.png)
+
+## 用户系统对接
+
+![userinfo](images/chat/userinfo.png)
+
+## 商品信息对接
+
+![goodsinfo](images/chat/goodsinfo.png)
+
+## 订单信息对接
+
+![orderinfo](images/chat/orderinfo.png)
 
 [English Document](readme.md)
 
