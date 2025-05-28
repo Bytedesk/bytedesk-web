@@ -24,6 +24,7 @@ export default class BytedeskWeb {
     return {
       isDebug: false,
       isPreload: false,
+      forceRefresh: false,
       baseUrl: 'https://cdn.weiyuai.cn/chat',
       placement: 'bottom-right',
       marginBottom: 20,
@@ -499,7 +500,40 @@ export default class BytedeskWeb {
 
     // 添加聊天参数
     Object.entries(this.config.chatConfig || {}).forEach(([key, value]) => {
+      // 特殊处理 goodsInfo 和 orderInfo 参数
+      if (key === 'goodsInfo' || key === 'orderInfo') {
+        try {
+          // 如果已经是字符串，直接使用
+          if (typeof value === 'string') {
+            params.append(key, value);
+          } else {
+            // 如果是对象，转换为字符串
+            params.append(key, JSON.stringify(value));
+          }
+        } catch (error) {
+          console.error(`Error processing ${key}:`, error);
+        }
+      } else if (key === 'extra') {
+        try {
+          // 处理 extra 参数，移除 goodsInfo 和 orderInfo
+          let extraData = typeof value === 'string' ? JSON.parse(value) : value;
+          // 如果 extra 中存在 goodsInfo 或 orderInfo，则移除
+          if (extraData.goodsInfo) {
+            delete extraData.goodsInfo;
+          }
+          if (extraData.orderInfo) {
+            delete extraData.orderInfo;
+          }
+          // 只有当 extra 中还有其他数据时才添加
+          if (Object.keys(extraData).length > 0) {
+            params.append(key, JSON.stringify(extraData));
+          }
+        } catch (error) {
+          console.error('Error processing extra parameter:', error);
+        }
+      } else {
         params.append(key, String(value));
+      }
     });
 
     // 添加浏览参数
@@ -567,25 +601,33 @@ export default class BytedeskWeb {
 
   showChat(config?: Partial<BytedeskConfig>) {
     // 合并新配置（如果提供了）
-  if (config) {
-    this.config = {
-      ...this.config,
-      ...config
-    };
-    
-    // 如果修改了配置并且窗口已经创建，需要销毁重建
-    if (this.window) {
-      document.body.removeChild(this.window);
-      this.window = null;
+    if (config) {
+      this.config = {
+        ...this.config,
+        ...config
+      };
+      
+      // 如果修改了配置并且窗口已经创建，需要销毁重建
+      if (this.window) {
+        document.body.removeChild(this.window);
+        this.window = null;
+      }
     }
-  }
-  // 
+    // 
     if (!this.window) {
       this.createChatWindow();
     }
     if (this.window) {
       const isMobile = window.innerWidth <= 768;
       this.window.style.display = 'block';
+      
+      // 如果forceRefresh为true，重新加载iframe
+      if (this.config.forceRefresh) {
+        const iframe = this.window.querySelector('iframe');
+        if (iframe) {
+          iframe.src = this.generateChatUrl();
+        }
+      }
       
       this.setupResizeListener();
       

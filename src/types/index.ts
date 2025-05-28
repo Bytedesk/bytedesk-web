@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:07:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-04-02 17:02:46
+ * @LastEditTime: 2025-05-28 09:42:22
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -86,6 +86,7 @@ export interface ButtonConfig {
 export interface BytedeskConfig {
   isDebug?: boolean; // 是否开启调试模式
   isPreload?: boolean; // 是否预加载  
+  forceRefresh?: boolean; // 是否强制刷新页面
   baseUrl?: string; // 基础URL
   placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
   marginBottom?: number; // 底部边距

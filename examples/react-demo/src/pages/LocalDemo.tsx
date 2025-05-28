@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-27 18:20:52
+ * @LastEditTime: 2025-05-28 13:02:54
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -13,8 +13,8 @@ import InstallGuide from '../components/InstallGuide';
 
 const LocalDemo = () => {
   const [config] = useState<BytedeskConfig>({
-    baseUrl: 'http://127.0.0.1:9006',
-    placement: 'bottom-left',
+    ...(process.env.NODE_ENV === 'development' ? { baseUrl: 'http://127.0.0.1:9006' } : {}),
+    placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,
     autoPopup: false,
@@ -77,8 +77,8 @@ const LocalDemo = () => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>Bytedesk Local Demo</h1>
-      <p>This demo uses local development files</p>
+      <h1>微语基本设置</h1>
+      {/* <p>This demo uses local development files</p> */}
 
       <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button 
@@ -92,7 +92,7 @@ const LocalDemo = () => {
             cursor: 'pointer'
           }}
         >
-          Open Chat
+          打开聊天
         </button>
         <button 
           onClick={() => (window as any).bytedesk?.showChat({
@@ -111,7 +111,7 @@ const LocalDemo = () => {
             cursor: 'pointer'
           }}
         >
-          Open Chat With Params
+          带参数打开聊天
         </button>
         <button 
           onClick={() => (window as any).bytedesk?.hideChat()}
@@ -124,7 +124,7 @@ const LocalDemo = () => {
             cursor: 'pointer'
           }}
         >
-          Close Chat
+          关闭聊天
         </button>
         <button 
           onClick={() => (window as any).bytedesk?.showButton()}
@@ -137,7 +137,7 @@ const LocalDemo = () => {
             cursor: 'pointer'
           }}
         >
-          Show Button
+          显示按钮
         </button>
         <button 
           onClick={() => (window as any).bytedesk?.hideButton()}
@@ -150,7 +150,7 @@ const LocalDemo = () => {
             cursor: 'pointer'
           }}
         >
-          Hide Button
+          隐藏按钮
         </button>
         <button 
           onClick={() => (window as any).bytedesk?.showBubble()}
@@ -163,7 +163,7 @@ const LocalDemo = () => {
             cursor: 'pointer'
           }}
         >
-          Show Bubble
+          显示气泡
         </button>
         <button 
           onClick={() => (window as any).bytedesk?.hideBubble()}
@@ -176,7 +176,7 @@ const LocalDemo = () => {
             cursor: 'pointer'
           }}
         >
-          Hide Bubble
+          隐藏气泡
         </button>
         <button 
           onClick={() => (window as any).bytedesk?.showInviteDialog()}
@@ -189,7 +189,7 @@ const LocalDemo = () => {
             cursor: 'pointer'
           }}
         >
-          Show Invite
+          显示邀请
         </button>
         <button 
           onClick={() => (window as any).bytedesk?.hideInviteDialog()}
@@ -202,7 +202,7 @@ const LocalDemo = () => {
             cursor: 'pointer'
           }}
         >
-          Hide Invite
+          隐藏邀请
         </button>
       </div>
       
