@@ -78,7 +78,14 @@ const LocalDemo = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>微语基本设置</h1>
-      {/* <p>This demo uses local development files</p> */}
+      <p>
+        <a href="https://www.weiyuai.cn/docs/zh-CN/docs/channel/react" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           style={{ color: '#2e88ff', textDecoration: 'none' }}>
+          查看 React 集成文档
+        </a>
+      </p>
 
       <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button 

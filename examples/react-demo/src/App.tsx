@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 12:41:30
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 12:24:24
+ * @LastEditTime: 2025-05-29 13:54:24
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -16,9 +16,10 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import LocalDemo from './pages/LocalDemo';  // 原有的演示页面
 // import OnlineDemo from './pages/OnlineDemo';  // 新的在线演示页面
 import React from 'react';
-import GoodsInfoDemo from './pages/goodsinfo';
-import OrderInfoDemo from './pages/orderinfo';
-import UserInfoDemo from './pages/userinfo';
+import VipLevelDemo from './pages/vipLevelDemo';
+import GoodsInfoDemo from './pages/goodsInfoDemo';
+import OrderInfoDemo from './pages/orderInfoDemo';
+import UserInfoDemo from './pages/userInfoDemo';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <Link to="/userinfo" style={{ marginRight: '20px' }}>用户信息对接</Link>
           <Link to="/goodsinfo" style={{ marginRight: '20px' }}>商品信息对接</Link>
           <Link to="/orderinfo" style={{ marginRight: '20px' }}>订单信息对接</Link>
+          <Link to="/viplevel" style={{ marginRight: '20px' }}>千人千面对接</Link>
           {/* <Link to="/online">Online Demo</Link> */}
         </nav>
 
@@ -40,6 +42,7 @@ function App() {
           <Route path="/userinfo" element={<UserInfoDemo />} />
           <Route path="/orderinfo" element={<OrderInfoDemo />} />
           <Route path="/goodsinfo" element={<GoodsInfoDemo />} />
+          <Route path="/viplevel" element={<VipLevelDemo />} />
           {/* <Route path="/online" element={<OnlineDemo />} /> */}
         </Routes>
       </div>

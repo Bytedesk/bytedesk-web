@@ -162,6 +162,13 @@ const UserInfoDemo = () => {
                 <Paragraph style={{ color: token.colorTextSecondary }}>
                     本示例演示如何通过配置参数传入用户信息（uid、nickname、avatar）到客服组件中。
                     点击下方按钮可以切换不同的用户信息。
+                    <br />
+                    <a href="https://www.weiyuai.cn/docs/zh-CN/docs/development/userinfo" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style={{ color: token.colorPrimary }}>
+                        查看用户信息对接文档
+                    </a>
                 </Paragraph>
 
                 <Card 

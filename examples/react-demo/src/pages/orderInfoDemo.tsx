@@ -214,6 +214,13 @@ const OrderInfoDemo = () => {
                 <Paragraph style={{ color: token.colorTextSecondary }}>
                     本示例演示如何通过配置参数传入订单信息到客服组件中。
                     点击下方按钮可以打开客服窗口，订单信息会自动传递给客服。
+                    <br />
+                    <a href="https://www.weiyuai.cn/docs/zh-CN/docs/development/orderinfo" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style={{ color: token.colorPrimary }}>
+                        查看订单信息对接文档
+                    </a>
                 </Paragraph>
 
                 <Card 
