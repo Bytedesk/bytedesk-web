@@ -31,7 +31,8 @@ export const BytedeskVue = defineComponent({
       default: 'zh-cn'
     }
   },
-  setup(props, { attrs }) {
+  emits: ['init'],
+  setup(props, { attrs, emit }) {
     let instance: BytedeskWeb | null = null;
 
     onMounted(() => {
@@ -41,6 +42,9 @@ export const BytedeskVue = defineComponent({
         locale: props.locale
       });
       instance.init();
+      
+      // 触发init事件并传递实例
+      emit('init', instance);
     });
 
     onUnmounted(() => {
@@ -51,4 +55,4 @@ export const BytedeskVue = defineComponent({
   }
 });
 
-// BytedeskVue.i18n = i18n; 
+// BytedeskVue.i18n = i18n;

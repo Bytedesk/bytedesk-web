@@ -71,14 +71,32 @@ const handleShowChat = () => {
       <ul>
         <li><code>bytedeskInstance.value?.showChat()</code> - 显示聊天窗口</li>
         <li><code>bytedeskInstance.value?.hideChat()</code> - 隐藏聊天窗口</li>
+        <li><code>bytedeskInstance.value?.showButton()</code> - 显示按钮</li>
+        <li><code>bytedeskInstance.value?.hideButton()</code> - 隐藏按钮</li>
+        <li><code>bytedeskInstance.value?.showBubble()</code> - 显示气泡消息</li>
+        <li><code>bytedeskInstance.value?.hideBubble()</code> - 隐藏气泡消息</li>
+        <li><code>bytedeskInstance.value?.showInviteDialog()</code> - 显示邀请对话框</li>
+        <li><code>bytedeskInstance.value?.hideInviteDialog()</code> - 隐藏邀请对话框</li>
       </ul>
     </div>
   </div>
 </template>
 
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'InstallGuide'
+});
+</script>
+
 <style scoped>
 .install-guide {
-  margin-top: 40px;
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: #f9f9f9;
   max-width: 800px;
 }
 

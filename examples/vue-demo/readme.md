@@ -12,32 +12,37 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
 -->
-# bytedesk-web
+# 微语 Vue Demo
 
-Online customer service SDK, supporting multiple frameworks:
-
-- [React Guide](examples/react-demo/readme.md)
-- [Vue Guide](examples/vue-demo/readme.md)
-- [Svelte Guide](examples/svelte-demo/readme.md)
-- [JavaScript Guide](examples/javascript-demo/readme.md)
+在线客服 SDK Vue 集成示例，演示了微语 SDK 在 Vue 项目中的集成使用方法。
 
 [中文文档](readme.zh.md)
 
-## Installation Steps
+## 功能模块
 
-### Install Dependencies
+本 Demo 展示了以下功能：
+
+- 基本配置：演示了微语基本功能和 API 的使用
+- 用户信息对接：演示如何传递用户信息（uid、nickname、avatar）给客服组件
+- 商品信息对接：演示如何传递商品信息给客服组件
+- 订单信息对接：演示如何传递订单信息给客服组件
+- 千人千面对接：演示如何根据 VIP 等级区分用户
+
+## 安装步骤
+
+### 安装依赖
 
 ```bash
-npm install bytedesk-web
+npm install @bytedesk/web
 # or
-yarn add bytedesk-web
+yarn add @bytedesk/web
 ```
 
-### Import Component
+### 导入组件
 
 ```bash
-import { BytedeskReact } from 'bytedesk-web/vue';
-import type { BytedeskConfig } from 'bytedesk-web/vue';
+import { BytedeskVue } from '@bytedesk/web/adapters/vue';
+import type { BytedeskConfig } from '@bytedesk/web/types';
 ```
 
 ### Configure Parameters

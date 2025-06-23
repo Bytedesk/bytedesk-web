@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 12:45:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 13:38:39
+ * @LastEditTime: 2025-06-23 12:36:42
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,6 +13,10 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
 -->
 # bytedesk-web
+
+- [![npm version](https://badge.fury.io/js/bytedesk-web.svg)](https://badge.fury.io/js/bytedesk-web)
+- [![NPM Downloads](https://img.shields.io/npm/dm/bytedesk-web.svg?style=flat)](https://www.npmjs.com/package/bytedesk-web)
+- [npmjs](https://www.npmjs.com/package/bytedesk-web)
 
 Online customer service SDK, supporting multiple frameworks:
 
@@ -36,11 +40,11 @@ Online customer service SDK, supporting multiple frameworks:
 
 ## goods info
 
-![goodsinfo](images/chat/goodsinfo.png)
+![goodsInfo](images/chat/goodsinfo.png)
 
 ## order info
 
-![orderinfo](images/chat/orderinfo.png)
+![orderInfo](images/chat/orderinfo.png)
 
 [中文文档](readme.zh.md)
 
@@ -132,6 +136,11 @@ const App = () => {
 # show/hide invite dialog
 (window as any).bytedesk?.showInviteDialog();
 (window as any).bytedesk?.hideInviteDialog();
+
+# get unread message count
+(window as any).bytedesk?.getUnreadMessageCount()
+# clear unread messages
+(window as any).bytedesk?.clearMessageUnread()
 ```
 
 ## Run Examples

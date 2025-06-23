@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-27 16:45:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 12:12:02
+ * @LastEditTime: 2025-06-21 11:11:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -107,7 +107,12 @@ const OrderInfoDemo = () => {
 
     // 配置客服组件
     const config: BytedeskConfig = {
-        ...(process.env.NODE_ENV === 'development' ? { baseUrl: 'http://127.0.0.1:9006' } : {}),
+        ...(process.env.NODE_ENV === 'development' 
+        ? { 
+            baseUrl: 'http://127.0.0.1:9006', 
+            apiUrl: 'http://127.0.0.1:9003' 
+        } 
+        : {}),
         placement: 'bottom-right',
         autoPopup: false,
         inviteConfig: {

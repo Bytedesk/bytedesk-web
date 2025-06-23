@@ -3,7 +3,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-27 16:46:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 12:39:46
+ * @LastEditTime: 2025-06-21 16:04:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -64,7 +64,12 @@ const UserInfoDemo = () => {
 
     // 配置客服组件
     const config: BytedeskConfig = {
-        ...(process.env.NODE_ENV === 'development' ? { baseUrl: 'http://127.0.0.1:9006' } : {}),
+        ...(process.env.NODE_ENV === 'development' 
+        ? { 
+            baseUrl: 'http://127.0.0.1:9006', 
+            apiUrl: 'http://127.0.0.1:9003' 
+        } 
+        : {}),
         placement: 'bottom-right',
         autoPopup: false,
         forceRefresh: true,
@@ -84,9 +89,9 @@ const UserInfoDemo = () => {
             subtitle: '点击与客服对话'
         },
         chatConfig: {
-            org: 'df_org_uid',
-            t: "1",
-            sid: 'df_wg_uid',
+            org: 'df_org_uid', // 替换为您的组织ID
+            t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
+            sid: 'df_wg_uid', // 替换为您的SID
             // 传入用户信息
             uid: currentUser.uid,
             nickname: currentUser.nickname,
@@ -98,6 +103,10 @@ const UserInfoDemo = () => {
             })
         },
         locale: 'zh-cn',
+        // 添加 onVisitorInfo 回调
+        onVisitorInfo: (uid: string, visitorUid: string) => {
+            console.log('收到访客信息:', { uid, visitorUid });
+        },
     };
 
     // 切换用户信息

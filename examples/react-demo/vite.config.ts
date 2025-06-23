@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 13:13:32
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 12:23:49
+ * @LastEditTime: 2025-06-21 09:57:33
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,7 +17,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 export default defineConfig({
-  base: '/reactdemo/',
+  base: '/reactdemo',
   plugins: [react()],
   server: {
     port: 9020

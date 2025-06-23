@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 13:02:54
+ * @LastEditTime: 2025-06-21 16:05:03
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -13,7 +13,12 @@ import InstallGuide from '../components/InstallGuide';
 
 const LocalDemo = () => {
   const [config] = useState<BytedeskConfig>({
-    ...(process.env.NODE_ENV === 'development' ? { baseUrl: 'http://127.0.0.1:9006' } : {}),
+    ...(process.env.NODE_ENV === 'development' 
+      ? { 
+        baseUrl: 'http://127.0.0.1:9006', 
+        apiUrl: 'http://127.0.0.1:9003' 
+      } 
+      : {}),
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,
@@ -59,9 +64,9 @@ const LocalDemo = () => {
     //   height: 600
     // },
     chatConfig: {
-      org: 'df_org_uid',
-      t: "2",
-      sid: 'df_rt_uid',
+      org: 'df_org_uid', // 替换为您的组织ID
+      t: "2", // 0: 一对一对话；1：工作组对话；2：机器人对话
+      sid: 'df_rt_uid', // 替换为您的SID
       hello: 'hello' // 自定义任意参数
     },
     theme: {
@@ -69,6 +74,10 @@ const LocalDemo = () => {
     },
     // en || zh-cn || zh-tw || ja || ko
     locale: 'zh-cn',
+    // 添加 onVisitorInfo 回调
+    onVisitorInfo: (uid: string, visitorUid: string) => {
+      console.log('收到访客信息:', { uid, visitorUid });
+    },
   });
 
   const handleInit = () => {

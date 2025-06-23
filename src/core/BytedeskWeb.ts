@@ -1,3 +1,11 @@
+import { 
+  BYTEDESK_UID,
+  BYTEDESK_VISITOR_UID,
+  POST_MESSAGE_CLOSE_CHAT_WINDOW, POST_MESSAGE_INVITE_VISITOR, 
+  POST_MESSAGE_INVITE_VISITOR_ACCEPT, POST_MESSAGE_INVITE_VISITOR_REJECT, 
+  POST_MESSAGE_LOCALSTORAGE_RESPONSE, POST_MESSAGE_MAXIMIZE_WINDOW, 
+  POST_MESSAGE_MINIMIZE_WINDOW, POST_MESSAGE_RECEIVE_MESSAGE 
+} from '../utils/constants';
 import type { BytedeskConfig } from '../types';
 
 export default class BytedeskWeb {
@@ -18,6 +26,24 @@ export default class BytedeskWeb {
       ...this.getDefaultConfig(),
       ...config
     };
+    // 直接导入setApiUrl函数
+    this.setupApiUrl();
+  }
+
+  private async setupApiUrl() {
+    try {
+      // 动态导入request模块
+      const { setApiUrl } = await import('../apis/request');
+      // 设置API的baseUrl
+      const apiUrl = this.config.apiUrl || 'https://api.weiyuai.cn';
+      setApiUrl(apiUrl);
+
+      if (this.config.isDebug) {
+        console.log('API URL 已设置为:', apiUrl);
+      }
+    } catch (error) {
+      console.error('设置API URL时出错:', error);
+    }
   }
 
   private getDefaultConfig(): BytedeskConfig {
@@ -26,6 +52,7 @@ export default class BytedeskWeb {
       isPreload: false,
       forceRefresh: false,
       baseUrl: 'https://cdn.weiyuai.cn/chat',
+      apiUrl: 'https://api.weiyuai.cn',
       placement: 'bottom-right',
       marginBottom: 20,
       marginSide: 20,
@@ -82,12 +109,15 @@ export default class BytedeskWeb {
   }
 
   init() {
+    // 
     this.createBubble();
     this.createInviteDialog();
     this.setupMessageListener();
     this.setupResizeListener();
     // 预加载
     this.preload();
+    // 获取未读消息数
+    this._getUnreadMessageCount();
     // 自动弹出
     if (this.config.autoPopup) {
       setTimeout(() => {
@@ -102,7 +132,131 @@ export default class BytedeskWeb {
     }
   }
 
+  async _getUnreadMessageCount() {
+    // 导入依赖
+    return import('../apis/message').then(async ({ getMessageUnreadCount }) => {
+      // 使用chatConfig.uid或其他适当的占位符
+      // 确保uid是string类型
+      const visitorUid = String(this.config.chatConfig?.uid);
+      const localUid = localStorage.getItem(BYTEDESK_UID);
+      const localVisitorUid = localStorage.getItem(BYTEDESK_VISITOR_UID);
+      // 
+      const params: VISITOR.VisitorRequest = {
+        uid: localUid || '',
+        visitorUid: visitorUid || localVisitorUid || '',
+        orgUid: this.config.chatConfig?.org || ''
+      }
+      // 调用API获取未读消息数
+      const response = await getMessageUnreadCount(params);
+      console.log('获取未读消息数:', response.data, params);
+      if (response.data?.code === 200) {
+        if (response?.data?.data && response?.data?.data > 0) {
+          // console.log('未读消息数:', response.data.data);
+          // 在bubble按钮显示未读数目
+          this.showUnreadBadge(response.data.data);
+        } else {
+          // 没有未读消息时，清除数字角标
+          this.clearUnreadBadge();
+        }
+        // 将结果返回
+        return response.data.data || 0;
+      } else {
+        // console.error('获取未读消息数失败:', response.data.message);
+        // 处理错误情况
+        return 0;
+      }
+    });
+  }
+
+  // 新增公共方法，供外部调用获取未读消息数
+  async getUnreadMessageCount() {
+    return this._getUnreadMessageCount();
+  }
+
+  // 显示未读消息数角标
+  private showUnreadBadge(count: number) {
+    if (!this.bubble) return;
+    
+    // 检查是否已经有角标，有则更新，没有则创建
+    let badge = this.bubble.querySelector('.bytedesk-unread-badge') as HTMLElement;
+    
+    if (!badge) {
+      // 创建未读消息角标
+      badge = document.createElement('div');
+      badge.className = 'bytedesk-unread-badge';
+      badge.style.cssText = `
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 4px;
+        background: #ff4d4f;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        border: 2px solid white;
+      `;
+      this.bubble.appendChild(badge);
+    }
+    
+    // 更新数字
+    badge.textContent = count > 99 ? '99+' : count.toString();
+  }
+
+  // 清除未读消息数角标
+  private clearUnreadBadge() {
+    if (!this.bubble) return;
+    
+    const badge = this.bubble.querySelector('.bytedesk-unread-badge');
+    if (badge) {
+      badge.remove();
+    }
+  }
+
+  // 清空未读消息数
+  async clearMessageUnread() {
+    // 导入依赖
+    return import('../apis/message').then(async ({ clearMessageUnread }) => {
+      // const uid = String(this.config.chatConfig?.uid || 'placeholder_uid');
+      // 确保uid是string类型
+      const visitorUid = String(this.config.chatConfig?.uid);
+      const localUid = localStorage.getItem(BYTEDESK_UID);
+      const localVisitorUid = localStorage.getItem(BYTEDESK_VISITOR_UID);
+      // 
+      const params: VISITOR.VisitorRequest = {
+        uid: localUid || '',
+        visitorUid: visitorUid || localVisitorUid || '',
+        orgUid: this.config.chatConfig?.org || ''
+      }
+      const response = await clearMessageUnread(params)
+      console.log('清空未读消息数:', response.data, params);
+      if (response.data.code === 200) {
+        console.log('清空未读消息数成功:', response.data);
+        if (response.data.data === 0) {
+          // 清空未读消息数成功，清除角标
+          this.clearUnreadBadge();
+        }
+        return response.data.data || 0;
+      } else {
+        console.error('清空未读消息数失败:', response.data.message);
+        return 0;
+      }
+    });
+  }
+
   private createBubble() {
+    // 检查气泡是否已存在
+    if (this.bubble && document.body.contains(this.bubble)) {
+      console.log('气泡已存在，不重复创建');
+      return;
+    }
+
     // 创建气泡容器
     const container = document.createElement('div');
     container.style.cssText = `
@@ -561,29 +715,51 @@ export default class BytedeskWeb {
   private setupMessageListener() {
     window.addEventListener('message', (event) => {
       switch (event.data.type) {
-        case 'CLOSE_CHAT_WINDOW':
+        case POST_MESSAGE_CLOSE_CHAT_WINDOW:
           this.hideChat();
           break;
-        case 'MAXIMIZE_WINDOW':
+        case POST_MESSAGE_MAXIMIZE_WINDOW:
           this.toggleMaximize();
           break;
-        case 'MINIMIZE_WINDOW':
+        case POST_MESSAGE_MINIMIZE_WINDOW:
           this.minimizeWindow();
           break;
-        case 'RECEIVE_MESSAGE':
+        case POST_MESSAGE_RECEIVE_MESSAGE:
           console.log('RECEIVE_MESSAGE')
           break;
-        case 'INVITE_VISITOR':
+        case POST_MESSAGE_INVITE_VISITOR:
           console.log('INVITE_VISITOR')
           break;
-        case 'INVITE_VISITOR_ACCEPT':
+        case POST_MESSAGE_INVITE_VISITOR_ACCEPT:
           console.log('INVITE_VISITOR_ACCEPT')
           break;
-        case 'INVITE_VISITOR_REJECT':
+        case POST_MESSAGE_INVITE_VISITOR_REJECT:
           console.log('INVITE_VISITOR_REJECT')
+          break;
+        case POST_MESSAGE_LOCALSTORAGE_RESPONSE:
+          // 处理获取 localStorage 的请求
+          this.handleLocalStorageData(event);
           break;
       }
     });
+  }
+
+  // 处理从 iframe 返回的 localStorage 数据
+  private handleLocalStorageData(event: MessageEvent) {
+    const { uid, visitorUid } = event.data;
+    // console.log("handleLocalStorageData", type, uid, visitorUid, event.data)
+    localStorage.setItem(BYTEDESK_UID, uid);
+    localStorage.setItem(BYTEDESK_VISITOR_UID, visitorUid);
+    // 触发回调或处理数据
+    this.config.onVisitorInfo?.(uid, visitorUid);
+  }
+
+  // 向 iframe 发送消息
+  sendMessageToIframe(message: any) {
+    const iframe = this.window?.querySelector('iframe');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage(message, '*');
+    }
   }
 
   preload() {
@@ -617,6 +793,9 @@ export default class BytedeskWeb {
     if (!this.window) {
       this.createChatWindow();
     }
+    
+    // 打开聊天窗口时清空未读消息计数
+    // this.clearMessageUnread();
     if (this.window) {
       const isMobile = window.innerWidth <= 768;
       this.window.style.display = 'block';
@@ -795,6 +974,12 @@ export default class BytedeskWeb {
   }
 
   private createInviteDialog() {
+    // 检查邀请框是否已存在
+    if (this.inviteDialog && document.body.contains(this.inviteDialog)) {
+      console.log('邀请框已存在，不重复创建');
+      return;
+    }
+
     // 移除对 inviteConfig.show 的检查，始终创建邀请框
     const isDarkMode = this.config.theme?.mode === 'dark';
     this.inviteDialog = document.createElement('div');

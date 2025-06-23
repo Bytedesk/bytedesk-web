@@ -89,10 +89,10 @@ const GoodsInfoDemo = () => {
             subtitle: '点击咨询客服'
         },
         chatConfig: {
-            org: 'df_org_uid',
-            t: "1",
-            sid: 'df_wg_uid',
-            // 传入商品信息
+            org: 'df_org_uid', // 替换为您的组织ID
+            t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
+            sid: 'df_wg_uid', // 替换为您的SID
+            // 自定义用户信息
             uid: 'visitor_001',
             nickname: '访客小明',
             avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',

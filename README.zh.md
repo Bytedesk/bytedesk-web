@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 13:08:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 13:27:25
+ * @LastEditTime: 2025-06-23 12:35:16
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -14,7 +14,11 @@
 -->
 # bytedesk-web
 
-Online customer service SDK, supporting multiple frameworks:
+- [![npm version](https://badge.fury.io/js/bytedesk-web.svg)](https://badge.fury.io/js/bytedesk-web)
+- [![NPM Downloads](https://img.shields.io/npm/dm/bytedesk-web.svg?style=flat)](https://www.npmjs.com/package/bytedesk-web)
+- [npmjs](https://www.npmjs.com/package/bytedesk-web)
+
+在线客服web/js-sdk插件:
 
 - [React Guide](examples/react-demo/readme.md)
 - [Next.js Guide](examples/nextjs-demo/readme.md)
@@ -35,11 +39,11 @@ Online customer service SDK, supporting multiple frameworks:
 
 ## 商品信息对接
 
-![goodsinfo](images/chat/goodsinfo.png)
+![goodsInfo](images/chat/goodsinfo.png)
 
 ## 订单信息对接
 
-![orderinfo](images/chat/orderinfo.png)
+![orderInfo](images/chat/orderinfo.png)
 
 [English Document](readme.md)
 
@@ -129,6 +133,11 @@ const App = () => {
 # 显示/隐藏邀请对话框
 (window as any).bytedesk?.showInviteDialog();
 (window as any).bytedesk?.hideInviteDialog();
+
+# 获取未读消息数
+(window as any).bytedesk?.getUnreadMessageCount()
+# 清空所有未读消息
+(window as any).bytedesk?.clearMessageUnread()
 ```
 
 ## 运行示例
