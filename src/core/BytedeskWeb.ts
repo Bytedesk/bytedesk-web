@@ -134,7 +134,7 @@ export default class BytedeskWeb {
 
   async _getUnreadMessageCount() {
     // 导入依赖
-    return import('../apis/message').then(async ({ getMessageUnreadCount }) => {
+    return import('../apis/message').then(async ({ getUnreadMessageCount }) => {
       // 使用chatConfig.uid或其他适当的占位符
       // 确保uid是string类型
       const visitorUid = String(this.config.chatConfig?.uid);
@@ -147,7 +147,7 @@ export default class BytedeskWeb {
         orgUid: this.config.chatConfig?.org || ''
       }
       // 调用API获取未读消息数
-      const response = await getMessageUnreadCount(params);
+      const response = await getUnreadMessageCount(params);
       console.log('获取未读消息数:', response.data, params);
       if (response.data?.code === 200) {
         if (response?.data?.data && response?.data?.data > 0) {
@@ -220,9 +220,9 @@ export default class BytedeskWeb {
   }
 
   // 清空未读消息数
-  async clearMessageUnread() {
+  async clearUnreadMessages() {
     // 导入依赖
-    return import('../apis/message').then(async ({ clearMessageUnread }) => {
+    return import('../apis/message').then(async ({ clearUnreadMessages }) => {
       // const uid = String(this.config.chatConfig?.uid || 'placeholder_uid');
       // 确保uid是string类型
       const visitorUid = String(this.config.chatConfig?.uid);
@@ -234,7 +234,7 @@ export default class BytedeskWeb {
         visitorUid: visitorUid || localVisitorUid || '',
         orgUid: this.config.chatConfig?.org || ''
       }
-      const response = await clearMessageUnread(params)
+      const response = await clearUnreadMessages(params)
       console.log('清空未读消息数:', response.data, params);
       if (response.data.code === 200) {
         console.log('清空未读消息数成功:', response.data);

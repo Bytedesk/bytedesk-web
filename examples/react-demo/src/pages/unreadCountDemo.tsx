@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-06-21 11:10:07
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 12:35:38
+ * @LastEditTime: 2025-06-24 09:57:52
  */
 import React, { useState, useEffect } from 'react';
 // @ts-ignore
@@ -103,7 +103,7 @@ const UnreadCountDemo = () => {
                 </button>
                 <button 
                     onClick={() => {
-                        (window as any).bytedesk?.clearMessageUnread().then((count: number) => {
+                        (window as any).bytedesk?.clearUnreadMessages().then((count: number) => {
                             console.log('所有消息已标记为已读:', count);
                             setUnreadCount(count); // 重置未读消息数
                         });
@@ -150,7 +150,7 @@ const UnreadCountDemo = () => {
                     {/* <li>未读消息数会自动更新（当收到新消息时）</li> */}
                     {/* <li>当用户阅读消息后，未读消息数会自动减少</li> */}
                     <li>使用 getUnreadMessageCount() 方法可以手动刷新未读消息数</li>
-                    <li>您可以使用 clearUnreadMessageCount() 方法手动重置未读消息数为0</li>
+                    <li>您可以使用 clearUnreadMessages() 方法手动重置未读消息数为0</li>
                 </ul>
             </div>
 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-07-02 16:57:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 16:12:19
+ * @LastEditTime: 2025-06-24 09:56:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -32,8 +32,8 @@ export async function sendPingMessage(uid: string) {
 }
 
 // 拉取未读消息
-export async function getMessageUnread(params: VISITOR.VisitorRequest) {
-  return request<MESSAGE.HttpListResult>("/visitor/api/v1/message/unread", {
+export async function getUnreadMessages(params: VISITOR.VisitorRequest) {
+  return request<MESSAGE.HttpPageResult>("/visitor/api/v1/message/unread", {
     method: "GET",
     params: {
       ...params,
@@ -43,7 +43,7 @@ export async function getMessageUnread(params: VISITOR.VisitorRequest) {
 }
 
 // 获取未读消息数
-export async function getMessageUnreadCount(params: VISITOR.VisitorRequest) {
+export async function getUnreadMessageCount(params: VISITOR.VisitorRequest) {
   return request<MESSAGE.HttpUnreadMessageCountResult>("/visitor/api/v1/message/unread/count", {
     method: "GET",
     params: {
@@ -54,7 +54,7 @@ export async function getMessageUnreadCount(params: VISITOR.VisitorRequest) {
 }
 
 // 标记为已读，清空未读消息数
-export async function clearMessageUnread(params: VISITOR.VisitorRequest) {
+export async function clearUnreadMessages(params: VISITOR.VisitorRequest) {
   return request<MESSAGE.HttpUnreadMessageCountResult>("/visitor/api/v1/message/unread/clear", {
     method: "POST",
     data: {

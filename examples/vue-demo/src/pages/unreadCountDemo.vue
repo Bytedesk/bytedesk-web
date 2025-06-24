@@ -50,7 +50,7 @@
       <h2>使用说明</h2>
       <ul style="line-height: 1.6">
         <li>使用 getUnreadMessageCount() 方法可以手动刷新未读消息数</li>
-        <li>您可以使用 clearUnreadMessageCount() 方法手动重置未读消息数为0</li>
+        <li>您可以使用 clearUnreadMessages() 方法手动重置未读消息数为0</li>
       </ul>
     </div>
   </div>
@@ -115,7 +115,7 @@ export default defineComponent({
     };
 
     const handleClearUnread = () => {
-      bytedeskInstance.value?.clearMessageUnread().then((count: number) => {
+      bytedeskInstance.value?.clearUnreadMessages().then((count: number) => {
         console.log('所有消息已标记为已读:', count);
         unreadCount.value = count; // 重置未读消息数
       });
