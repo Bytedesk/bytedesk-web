@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 13:08:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-23 12:57:21
+ * @LastEditTime: 2025-06-24 10:07:15
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -141,7 +141,7 @@ const App = () => {
 # 获取未读消息数
 (window as any).bytedesk?.getUnreadMessageCount()
 # 清空所有未读消息
-(window as any).bytedesk?.clearMessageUnread()
+(window as any).bytedesk?.clearUnreadMessages()
 ```
 
 ## 运行示例

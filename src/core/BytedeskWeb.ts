@@ -795,7 +795,7 @@ export default class BytedeskWeb {
     }
     
     // 打开聊天窗口时清空未读消息计数
-    // this.clearMessageUnread();
+    // this.clearUnreadMessages();
     if (this.window) {
       const isMobile = window.innerWidth <= 768;
       this.window.style.display = 'block';
