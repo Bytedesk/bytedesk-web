@@ -58,7 +58,7 @@ export default class BytedeskWeb {
   private getDefaultConfig(): BytedeskConfig {
     return {
       isDebug: false,
-      isPreload: false,
+      // isPreload: false,
       forceRefresh: false,
       baseUrl: "https://cdn.weiyuai.cn/chat",
       apiUrl: "https://api.weiyuai.cn",
@@ -120,13 +120,15 @@ export default class BytedeskWeb {
   async init() {
     // 初始化访客信息
     await this._initVisitor();
+    // 发送浏览记录 - 在访客初始化完成后执行
+    await this._browseVisitor();
     //
     this.createBubble();
     this.createInviteDialog();
     this.setupMessageListener();
     this.setupResizeListener();
     // 预加载
-    this.preload();
+    // this.preload();
     // 获取未读消息数 - 在访客初始化完成后执行
     this._getUnreadMessageCount();
     // 自动弹出
@@ -141,7 +143,6 @@ export default class BytedeskWeb {
         this.showInviteDialog();
       }, this.config.inviteConfig.delay || 3000);
     }
-    console.log("BytedeskWeb.init() 执行完成");
   }
 
   async _initVisitor() {
@@ -160,16 +161,22 @@ export default class BytedeskWeb {
     // 首先判断 this.config.chatConfig?.visitorUid 是否为空，如果不为空，跟localVisitorUid对比，
     // 如果相同，则直接返回本地访客信息，不进行API初始化
     // 如果不同，则进行API初始化
+    // 如果 this.config.chatConfig?.visitorUid 为空，则无需对比，直接使用本地信息
+    const shouldCompareVisitorUid = this.config.chatConfig?.visitorUid && localVisitorUid;
+    const visitorUidMatch = shouldCompareVisitorUid 
+      ? this.config.chatConfig?.visitorUid === localVisitorUid 
+      : true;
+    
     if (
       localUid &&
       localVisitorUid &&
-      this.config.chatConfig?.visitorUid &&
-      this.config.chatConfig?.visitorUid === localVisitorUid
+      visitorUidMatch
     ) {
       console.log("访客信息相同，直接返回本地访客信息");
 
       // 触发回调，传递本地存储的访客信息
       this.config.onVisitorInfo?.(localUid || "", localVisitorUid || "");
+      // 直接返回
       return {
         uid: localUid,
         visitorUid: localVisitorUid,
@@ -195,18 +202,11 @@ export default class BytedeskWeb {
                 ? this.config.chatConfig.extra
                 : JSON.stringify(this.config.chatConfig?.extra || {}),
           };
-
-          console.log("this.config.chatConfig: ", this.config.chatConfig);
-          console.log("本地无访客信息，开始API初始化，参数:", params);
-
           // 调用API初始化访客信息
-          console.log("开始调用initVisitor API");
           const response = await initVisitor(params);
-
-          console.log("访客初始化API响应:", response.data);
+          console.log("访客初始化API响应:", response.data, params);
 
           if (response.data?.code === 200) {
-            console.log("访客初始化成功，保存到localStorage");
 
             // 保存访客ID到localStorage
             if (response.data?.data?.uid) {
@@ -252,6 +252,103 @@ export default class BytedeskWeb {
     return this.initVisitorPromise;
   }
 
+  // 获取当前页面浏览信息并发送到服务器
+  private async _browseVisitor() {
+    try {
+      // 获取当前页面信息
+      const currentUrl = window.location.href;
+      const currentTitle = document.title;
+      const referrer = document.referrer;
+
+      // 获取浏览器和设备信息
+      const userAgent = navigator.userAgent;
+      const browser = this.getBrowserInfo(userAgent);
+      const operatingSystem = this.getOSInfo(userAgent);
+      const deviceType = this.getDeviceInfo(userAgent);
+
+      // 获取屏幕分辨率
+      const screenResolution = `${screen.width}x${screen.height}`;
+
+      // 获取UTM参数
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmSource = urlParams.get('utm_source') || undefined;
+      const utmMedium = urlParams.get('utm_medium') || undefined;
+      const utmCampaign = urlParams.get('utm_campaign') || undefined;
+
+      // 首先检查本地 localStorage 是否已有访客信息
+      const localUid = localStorage.getItem(BYTEDESK_UID);
+      // console.log("localUid: ", localUid);
+
+      // 构建浏览参数 - 使用新的BrowseRequest类型
+      const params: BROWSE.BrowseRequest = {
+        url: currentUrl,
+        title: currentTitle,
+        referrer: referrer,
+        userAgent: userAgent,
+        operatingSystem: operatingSystem,
+        browser: browser,
+        deviceType: deviceType,
+        screenResolution: screenResolution,
+        utmSource: utmSource,
+        utmMedium: utmMedium,
+        utmCampaign: utmCampaign,
+        status: "ONLINE",
+        // 注意这里就是uid，不是visitorUid，使用访客系统生成uid
+        visitorUid: String(
+          this.config.chatConfig?.uid || localUid || ""
+        ),
+        orgUid: this.config.chatConfig?.org || "",
+      };
+
+      // 如果visitorUid为空，则不执行browse
+      if (!params.visitorUid) {
+        console.log("访客uid为空，跳过browse操作");
+        return;
+      }
+
+      // 动态导入browse方法
+      const { browse } = await import("../apis/visitor");
+      const response = await browse(params);
+
+      console.log("浏览记录发送结果:", response.data, params);
+
+      if (response.data?.code === 200) {
+        console.log("浏览记录发送成功");
+      } else {
+        console.error("浏览记录发送失败:", response.data?.message);
+      }
+    } catch (error) {
+      console.error("发送浏览记录时出错:", error);
+    }
+  }
+
+  // 获取浏览器信息
+  private getBrowserInfo(userAgent: string): string {
+    if (userAgent.includes("Chrome")) return "Chrome";
+    if (userAgent.includes("Firefox")) return "Firefox";
+    if (userAgent.includes("Safari")) return "Safari";
+    if (userAgent.includes("Edge")) return "Edge";
+    if (userAgent.includes("Opera")) return "Opera";
+    return "Unknown";
+  }
+
+  // 获取操作系统信息
+  private getOSInfo(userAgent: string): string {
+    if (userAgent.includes("Windows")) return "Windows";
+    if (userAgent.includes("Mac")) return "macOS";
+    if (userAgent.includes("Linux")) return "Linux";
+    if (userAgent.includes("Android")) return "Android";
+    if (userAgent.includes("iOS")) return "iOS";
+    return "Unknown";
+  }
+
+  // 获取设备信息
+  private getDeviceInfo(userAgent: string): string {
+    if (userAgent.includes("Mobile")) return "Mobile";
+    if (userAgent.includes("Tablet")) return "Tablet";
+    return "Desktop";
+  }
+
   async _getUnreadMessageCount() {
     // 检查是否已有正在进行的请求
     if (this.getUnreadMessageCountPromise) {
@@ -267,7 +364,7 @@ export default class BytedeskWeb {
         try {
           // 使用chatConfig.uid或其他适当的占位符
           // 确保uid是string类型
-          const visitorUid = String(this.config.chatConfig?.visitorUid);
+          const visitorUid = String(this.config.chatConfig?.visitorUid || "");
           const localUid = localStorage.getItem(BYTEDESK_UID);
           const localVisitorUid = localStorage.getItem(BYTEDESK_VISITOR_UID);
           //
@@ -320,6 +417,11 @@ export default class BytedeskWeb {
   // 新增公共方法，供外部调用初始化访客信息
   async initVisitor() {
     return this._initVisitor();
+  }
+
+  // 新增公共方法，供外部调用发送浏览记录
+  async browseVisitor() {
+    return this._browseVisitor();
   }
 
   // 清除本地访客信息，强制重新初始化
@@ -418,7 +520,7 @@ export default class BytedeskWeb {
     this.clearUnreadMessagesPromise = import("../apis/message").then(
       async ({ clearUnreadMessages }) => {
         try {
-          const visitorUid = String(this.config.chatConfig?.visitorUid);
+          const visitorUid = String(this.config.chatConfig?.visitorUid || "");
           const localUid = localStorage.getItem(BYTEDESK_UID);
           const localVisitorUid = localStorage.getItem(BYTEDESK_VISITOR_UID);
           //
@@ -887,7 +989,7 @@ export default class BytedeskWeb {
   }
 
   private generateChatUrl(
-    preload: boolean = false,
+    // preload: boolean = false,
     tab: string = "messages"
   ): string {
     console.log("this.config: ", this.config, tab);
@@ -958,9 +1060,9 @@ export default class BytedeskWeb {
 
     params.append("lang", this.config.locale || "zh-cn");
 
-    if (preload) {
-      params.append("preload", "1");
-    }
+    // if (preload) {
+    //   params.append("preload", "1");
+    // }
 
     const url = `${this.config.baseUrl}?${params.toString()}`;
     console.log("chat url: ", url);
@@ -1032,18 +1134,18 @@ export default class BytedeskWeb {
     }
   }
 
-  preload() {
-    console.log("preload");
-    if (this.config.isPreload) {
-      const preLoadUrl = this.generateChatUrl(true);
-      console.log("preLoadUrl: ", preLoadUrl);
-      // 预加载URL
-      const preLoadIframe = document.createElement("iframe");
-      preLoadIframe.src = preLoadUrl;
-      preLoadIframe.style.display = "none";
-      document.body.appendChild(preLoadIframe);
-    }
-  }
+  // preload() {
+  //   console.log("preload");
+  //   if (this.config.isPreload) {
+  //     const preLoadUrl = this.generateChatUrl(true);
+  //     console.log("preLoadUrl: ", preLoadUrl);
+  //     // 预加载URL
+  //     const preLoadIframe = document.createElement("iframe");
+  //     preLoadIframe.src = preLoadUrl;
+  //     preLoadIframe.style.display = "none";
+  //     document.body.appendChild(preLoadIframe);
+  //   }
+  // }
 
   showChat(config?: Partial<BytedeskConfig>) {
     // 合并新配置（如果提供了）

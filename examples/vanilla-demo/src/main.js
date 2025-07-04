@@ -51,6 +51,13 @@ bytedesk.init()
 // 清除本地访客信息
 // bytedesk.clearVisitorInfo()
 
+// 手动发送浏览记录
+// bytedesk.browseVisitor().then(() => {
+//   console.log('浏览记录发送成功');
+// }).catch(error => {
+//   console.error('浏览记录发送失败:', error);
+// })
+
 document.querySelector('#chat-button').addEventListener('click', () => {
   bytedesk.showChat()
 })
@@ -69,4 +76,53 @@ document.querySelector('#clear-cache-button').addEventListener('click', () => {
   bytedesk.clearVisitorInfo();
   console.log('本地访客信息已清除');
   alert('本地访客信息已清除！');
-}) 
+})
+
+// 添加手动发送浏览记录的按钮事件
+document.querySelector('#browse-button').addEventListener('click', () => {
+  bytedesk.browseVisitor().then(() => {
+    console.log('浏览记录发送成功');
+    alert('浏览记录发送成功！');
+  }).catch(error => {
+    console.error('浏览记录发送失败:', error);
+    alert('浏览记录发送失败！');
+  });
+})
+
+// 监听页面变化，自动发送浏览记录
+let currentUrl = window.location.href;
+let currentTitle = document.title;
+
+// 监听 URL 变化（适用于 SPA 应用）
+const observer = new MutationObserver(() => {
+  if (window.location.href !== currentUrl || document.title !== currentTitle) {
+    currentUrl = window.location.href;
+    currentTitle = document.title;
+    
+    // 延迟发送，确保页面完全加载
+    setTimeout(() => {
+      bytedesk.browseVisitor().then(() => {
+        console.log('页面变化，浏览记录已发送');
+      }).catch(error => {
+        console.error('页面变化时发送浏览记录失败:', error);
+      });
+    }, 1000);
+  }
+});
+
+// 开始监听 DOM 变化
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+
+// 监听浏览器前进后退
+window.addEventListener('popstate', () => {
+  setTimeout(() => {
+    bytedesk.browseVisitor().then(() => {
+      console.log('浏览器导航，浏览记录已发送');
+    }).catch(error => {
+      console.error('浏览器导航时发送浏览记录失败:', error);
+    });
+  }, 1000);
+}); 

@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-01-06 21:22:08
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 09:10:40
+ * @LastEditTime: 2025-07-04 16:00:06
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -38,8 +38,8 @@ export async function requestThread(params: VISITOR.VisitorRequest) {
   });
 }
 
-export async function browse(params: VISITOR.VisitorRequest) {
-  return request<VISITOR.HttpThreadResult>("/visitor/api/v1/browse", {
+export async function browse(params: BROWSE.BrowseRequest) {
+  return request<BROWSE.HttpResult>("/visitor/api/v1/browse", {
     method: "POST",
     data: {
       ...params,

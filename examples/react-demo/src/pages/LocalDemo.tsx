@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 11:36:38
+ * @LastEditTime: 2025-07-04 16:13:21
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -76,12 +76,12 @@ const LocalDemo = () => {
     locale: 'zh-cn',
     // 添加 onVisitorInfo 回调
     onVisitorInfo: (uid: string, visitorUid: string) => {
-      console.log('收到访客信息:', { uid, visitorUid });
+      console.log('LocalDemo 收到访客信息:', { uid, visitorUid });
     },
   });
 
   const handleInit = () => {
-    console.log('BytedeskReact initialized');
+    console.log('BytedeskReact initialized LocalDemo');
   };
 
   return (
