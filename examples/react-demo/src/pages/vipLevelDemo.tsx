@@ -3,7 +3,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-27 16:46:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 11:11:29
+ * @LastEditTime: 2025-07-04 09:57:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -28,7 +28,7 @@ const { useToken } = theme;
 
 // 定义用户信息接口
 interface UserInfo {
-    uid: string;
+    visitorUid: string;
     nickname: string;
     avatar: string;
     vipLevel: number;
@@ -37,19 +37,19 @@ interface UserInfo {
 // 定义测试用户，包含不同的VIP等级
 const TEST_USERS: UserInfo[] = [
     {
-        uid: 'visitor_001',
+        visitorUid: 'visitor_001',
         nickname: '普通用户',
         avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
         vipLevel: 0
     },
     {
-        uid: 'visitor_002',
+        visitorUid: 'visitor_002',
         nickname: 'VIP1用户',
         avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg',
         vipLevel: 1
     },
     {
-        uid: 'visitor_003',
+        visitorUid: 'visitor_003',
         nickname: 'VIP2用户',
         avatar: 'https://weiyuai.cn/assets/images/avatar/03.jpg',
         vipLevel: 2
@@ -64,6 +64,7 @@ const VipLevelDemo = () => {
 
     // 配置客服组件
     const config: BytedeskConfig = {
+        isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
         ...(process.env.NODE_ENV === 'development' 
         ? { 
             baseUrl: 'http://127.0.0.1:9006', 
@@ -93,7 +94,7 @@ const VipLevelDemo = () => {
             t: "1",
             sid: 'df_wg_uid',
             // 传入用户信息，包含vipLevel
-            uid: currentUser.uid,
+            visitorUid: currentUser.visitorUid,
             nickname: currentUser.nickname,
             avatar: currentUser.avatar,
             vipLevel: currentUser.vipLevel,
@@ -175,7 +176,7 @@ const VipLevelDemo = () => {
                             <Space>
                                 <Avatar src={currentUser.avatar} size={64} />
                                 <div>
-                                    <Paragraph>用户ID: {currentUser.uid}</Paragraph>
+                                    <Paragraph>用户ID: {currentUser.visitorUid}</Paragraph>
                                     <Paragraph>昵称: {currentUser.nickname}</Paragraph>
                                     <Paragraph>
                                         VIP等级: 
@@ -190,10 +191,10 @@ const VipLevelDemo = () => {
                         <Space>
                             {TEST_USERS.map((user) => (
                                 <Button 
-                                    key={user.uid}
+                                    key={user.visitorUid}
                                     type="primary"
                                     onClick={() => handleSwitchUser(user)}
-                                    disabled={currentUser.uid === user.uid}
+                                    disabled={currentUser.visitorUid === user.visitorUid}
                                 >
                                     切换到{user.nickname}
                                 </Button>

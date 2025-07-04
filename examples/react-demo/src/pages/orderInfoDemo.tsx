@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-27 16:45:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 11:11:00
+ * @LastEditTime: 2025-07-04 09:13:57
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -43,19 +43,19 @@ interface GoodsInfo {
 
 // 定义订单信息接口
 interface OrderInfo {
-    uid: string;
-    time: string;
-    status: 'pending' | 'paid' | 'shipped' | 'delivered';
-    statusText: string;
-    goods: GoodsInfo
-    totalAmount: number;
-    shippingAddress: {
-        name: string;
-        phone: string;
-        address: string;
+    uid?: string;
+    time?: string;
+    status?: 'pending' | 'paid' | 'shipped' | 'delivered';
+    statusText?: string;
+    goods?: GoodsInfo
+    totalAmount?: number;
+    shippingAddress?: {
+        name?: string;
+        phone?: string;
+        address?: string;
     };
-    paymentMethod: string;
-    extra: string;
+    paymentMethod?: string;
+    extra?: string;
 }
 
 // 定义测试订单
@@ -107,6 +107,7 @@ const OrderInfoDemo = () => {
 
     // 配置客服组件
     const config: BytedeskConfig = {
+        isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
         ...(process.env.NODE_ENV === 'development' 
         ? { 
             baseUrl: 'http://127.0.0.1:9006', 
@@ -134,20 +135,20 @@ const OrderInfoDemo = () => {
             org: 'df_org_uid',
             t: "1",
             sid: 'df_wg_uid',
-            uid: 'visitor_001',
+            visitorUid: 'visitor_001',
             nickname: '访客小明',
             avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
             // 订单信息通过自定义消息发送
             orderInfo: JSON.stringify({
-                uid: currentOrder.uid,
-                time: currentOrder.time,
-                status: currentOrder.status,
-                statusText: currentOrder.statusText,
-                goods: currentOrder.goods,
-                totalAmount: currentOrder.totalAmount,
-                shippingAddress: currentOrder.shippingAddress,
-                paymentMethod: currentOrder.paymentMethod,
-                extra: currentOrder.extra
+                uid: currentOrder?.uid,
+                time: currentOrder?.time,
+                status: currentOrder?.status,
+                statusText: currentOrder?.statusText,
+                goods: currentOrder?.goods,
+                totalAmount: currentOrder?.totalAmount,
+                shippingAddress: currentOrder?.shippingAddress,
+                paymentMethod: currentOrder?.paymentMethod,
+                extra: currentOrder?.extra
             }),
             // 自定义字段，可以传递任何字段
             extra: JSON.stringify({
@@ -191,7 +192,7 @@ const OrderInfoDemo = () => {
             'delivered': 3
         };
 
-        const currentIndex = statusIndex[currentOrder.status];
+        const currentIndex = statusIndex[currentOrder?.status || ''];
         steps.forEach((step, index) => {
             if (index < currentIndex) {
                 step.status = 'finish';
@@ -245,15 +246,15 @@ const OrderInfoDemo = () => {
                         <div>
                             <Title level={4}>订单信息</Title>
                             <Descriptions bordered>
-                                <Descriptions.Item label="订单编号">{currentOrder.uid}</Descriptions.Item>
-                                <Descriptions.Item label="下单时间">{currentOrder.time}</Descriptions.Item>
+                                <Descriptions.Item label="订单编号">{currentOrder?.uid}</Descriptions.Item>
+                                <Descriptions.Item label="下单时间">{currentOrder?.time}</Descriptions.Item>
                                 <Descriptions.Item label="订单状态">
-                                    <Tag color="blue">{currentOrder.statusText}</Tag>
+                                    <Tag color="blue">{currentOrder?.statusText}</Tag>
                                 </Descriptions.Item>
-                                <Descriptions.Item label="支付方式">{currentOrder.paymentMethod}</Descriptions.Item>
+                                <Descriptions.Item label="支付方式">{currentOrder?.paymentMethod}</Descriptions.Item>
                                 <Descriptions.Item label="订单金额">
                                     <Text strong style={{ color: '#f5222d' }}>
-                                        ¥{currentOrder.totalAmount.toLocaleString()}
+                                        ¥{currentOrder?.totalAmount?.toLocaleString()}
                                     </Text>
                                 </Descriptions.Item>
                             </Descriptions>
@@ -264,16 +265,16 @@ const OrderInfoDemo = () => {
                             <Row gutter={24}>
                                 <Col span={6}>
                                     <Image
-                                        src={currentOrder.goods.image}
-                                        alt={currentOrder.goods.title}
+                                        src={currentOrder?.goods?.image}
+                                        alt={currentOrder?.goods?.title}
                                         style={{ width: '100%', borderRadius: '8px' }}
                                     />
                                 </Col>
                                 <Col span={18}>
                                     <Space direction="vertical" size="small">
-                                        <Title level={5}>{currentOrder.goods.title}</Title>
-                                        <Text>单价：¥{currentOrder.goods.price.toLocaleString()}</Text>
-                                        <Text>数量：{currentOrder.goods.quantity}</Text>
+                                        <Title level={5}>{currentOrder?.goods?.title}</Title>
+                                        <Text>单价：¥{currentOrder?.goods?.price.toLocaleString()}</Text>
+                                        <Text>数量：{currentOrder?.goods?.quantity}</Text>
                                     </Space>
                                 </Col>
                             </Row>
@@ -282,9 +283,9 @@ const OrderInfoDemo = () => {
                         <div>
                             <Title level={4}>收货信息</Title>
                             <Descriptions bordered>
-                                <Descriptions.Item label="收货人">{currentOrder.shippingAddress.name}</Descriptions.Item>
-                                <Descriptions.Item label="联系电话">{currentOrder.shippingAddress.phone}</Descriptions.Item>
-                                <Descriptions.Item label="收货地址">{currentOrder.shippingAddress.address}</Descriptions.Item>
+                                <Descriptions.Item label="收货人">{currentOrder?.shippingAddress?.name}</Descriptions.Item>
+                                <Descriptions.Item label="联系电话">{currentOrder?.shippingAddress?.phone}</Descriptions.Item>
+                                <Descriptions.Item label="收货地址">{currentOrder?.shippingAddress?.address}</Descriptions.Item>
                             </Descriptions>
                         </div>
 

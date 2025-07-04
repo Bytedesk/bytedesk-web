@@ -127,7 +127,7 @@ export default defineComponent({
         t: "1",
         sid: 'df_wg_uid',
         // 传入商品信息
-        uid: 'visitor_001',
+        visitorUid: 'visitor_001',
         nickname: '访客小明',
         avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
         // 商品信息通过自定义消息发送

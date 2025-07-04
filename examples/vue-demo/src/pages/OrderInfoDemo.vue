@@ -227,7 +227,7 @@ export default defineComponent({
         org: 'df_org_uid',
         t: "1",
         sid: 'df_wg_uid',
-        uid: 'visitor_001',
+        visitorUid: 'visitor_001',
         nickname: '访客小明',
         avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
         // 订单信息通过自定义消息发送

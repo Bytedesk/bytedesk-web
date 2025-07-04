@@ -89,7 +89,7 @@ export default defineComponent({
         t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
         sid: 'df_wg_uid',
         // 自定义用户信息
-        uid: 'visitor_001',
+        visitorUid: 'visitor_001',
         nickname: '访客小明',
         avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
       },

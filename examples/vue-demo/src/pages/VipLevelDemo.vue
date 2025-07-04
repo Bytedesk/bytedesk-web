@@ -22,7 +22,7 @@
           <div class="user-info">
             <img :src="currentUser.avatar" alt="用户头像" class="avatar" />
             <div>
-              <p>用户ID: {{ currentUser.uid }}</p>
+              <p>用户ID: {{ currentUser.visitorUid }}</p>
               <p>昵称: {{ currentUser.nickname }}</p>
               <p>
                 VIP等级: 
@@ -37,10 +37,10 @@
         <div class="button-group">
           <button
             v-for="user in testUsers"
-            :key="user.uid"
+            :key="user.visitorUid"
             class="primary-button"
             @click="handleSwitchUser(user)"
-            :disabled="currentUser.uid === user.uid"
+            :disabled="currentUser.visitorUid === user.visitorUid"
           >
             切换到{{ user.nickname }}
           </button>
@@ -85,7 +85,7 @@ import type { BytedeskConfig } from '@bytedesk/web/types';
 
 // 定义用户信息接口
 interface UserInfo {
-  uid: string;
+  visitorUid: string;
   nickname: string;
   avatar: string;
   vipLevel: number;
@@ -100,19 +100,19 @@ export default defineComponent({
     // 定义测试用户，包含不同的VIP等级
     const testUsers = reactive<UserInfo[]>([
       {
-        uid: 'visitor_001',
+        visitorUid: 'visitor_001',
         nickname: '普通用户',
         avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
         vipLevel: 0
       },
       {
-        uid: 'visitor_002',
+        visitorUid: 'visitor_002',
         nickname: 'VIP1用户',
         avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg',
         vipLevel: 1
       },
       {
-        uid: 'visitor_003',
+        visitorUid: 'visitor_003',
         nickname: 'VIP2用户',
         avatar: 'https://weiyuai.cn/assets/images/avatar/03.jpg',
         vipLevel: 2
@@ -149,7 +149,7 @@ export default defineComponent({
         t: "1",
         sid: 'df_wg_uid',
         // 传入用户信息，包含vipLevel
-        uid: currentUser.value.uid,
+        visitorUid: currentUser.value.visitorUid,
         nickname: currentUser.value.nickname,
         avatar: currentUser.value.avatar,
         vipLevel: currentUser.value.vipLevel,
@@ -169,7 +169,7 @@ export default defineComponent({
         forceRefresh: true,
         chatConfig: {
           ...config.value.chatConfig,
-          uid: newUser.uid,
+          visitorUid: newUser.visitorUid,
           nickname: newUser.nickname,
           avatar: newUser.avatar,
           vipLevel: newUser.vipLevel

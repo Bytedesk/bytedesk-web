@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:22:44
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-03-03 13:36:48
+ * @LastEditTime: 2025-07-04 09:13:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -20,6 +20,7 @@ import InstallGuide from '../components/InstallGuide';
 
 const OnlineDemo = () => {
   const [config] = useState<BytedeskConfig>({
+    isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,

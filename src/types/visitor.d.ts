@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-04-05 15:34:40
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 16:11:19
+ * @LastEditTime: 2025-07-04 08:52:25
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
@@ -29,7 +29,11 @@ declare namespace VISITOR {
     browser?: string;
     os?: string;
     device?: string;
+    // 
     referrer?: string;
+    url?: string;
+    title?: string;
+    forceAgent?: boolean;
     // 
     vipLevel?: string;
     goodsInfo?: string;
@@ -37,32 +41,12 @@ declare namespace VISITOR {
     extra?: string;
     // 
     loadHistory?: boolean; // 是否加载历史消息
-    orgUid?: string;
   };
   //
   type HttpInitResult = {
     message?: string;
     code?: number;
     data?: VisitorResponse;
-  };
-
-  type requestParam = {
-    orgUid: string;
-    type: string;
-    sid: string;
-    //
-    uid?: string; // 自动生成访客uID
-    visitorUid?: string; // 自定义访客uID
-    nickname?: string;
-    avatar?: string;
-    //
-    referrer?: string;
-    url?: string;
-    title?: string;
-    forceAgent?: boolean;
-    // 
-    vipLevel?: number;
-    extra?: string;
   };
 
   type HttpThreadResult = {

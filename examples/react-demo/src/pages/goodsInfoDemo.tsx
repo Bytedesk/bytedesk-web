@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-27 16:45:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-05-28 12:36:37
+ * @LastEditTime: 2025-07-04 09:13:49
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -70,6 +70,7 @@ const GoodsInfoDemo = () => {
 
     // 配置客服组件
     const config: BytedeskConfig = {
+        isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
         ...(process.env.NODE_ENV === 'development' ? { baseUrl: 'http://127.0.0.1:9006' } : {}),
         placement: 'bottom-right',
         autoPopup: false,
@@ -93,7 +94,7 @@ const GoodsInfoDemo = () => {
             t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
             sid: 'df_wg_uid', // 替换为您的SID
             // 自定义用户信息
-            uid: 'visitor_001',
+            visitorUid: 'visitor_001',
             nickname: '访客小明',
             avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
             // 商品信息通过自定义消息发送

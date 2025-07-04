@@ -4,10 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bytedesk Vanilla Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .info {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        button {
+            background: #0066FF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0052cc;
+        }
+    </style>
 </head>
 <body>
     <h1>Bytedesk Vanilla Demo</h1>
-    <button id="chat-button">Open Chat</button>
+    
+    <div class="info">
+        <h3>访客初始化功能</h3>
+        <p>此示例展示了如何在 BytedeskWeb 初始化时自动调用访客初始化 API。</p>
+        <ul>
+            <li>页面加载时会优先检查本地缓存，避免重复API调用</li>
+            <li>访客信息会保存到 localStorage</li>
+            <li>可以通过 <code>onVisitorInfo</code> 回调获取访客ID</li>
+            <li>支持强制重新初始化和清除本地缓存</li>
+            <li>开启调试模式可以在控制台查看详细日志</li>
+        </ul>
+    </div>
+    
+    <div style="margin: 20px 0;">
+        <button id="chat-button">Open Chat</button>
+        <button id="force-init-button" style="margin-left: 10px; background: #ff6b6b;">Force Re-init</button>
+        <button id="clear-cache-button" style="margin-left: 10px; background: #6c757d;">Clear Cache</button>
+    </div>
+    
     <script type="module" src="/src/main.js"></script>
 </body>
 </html> 

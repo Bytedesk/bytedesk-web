@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:07:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 15:50:19
+ * @LastEditTime: 2025-07-04 11:41:56
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -47,6 +47,17 @@ export interface ChatConfig {
   org: string; // 组织ID
   t: string; // 类型
   sid: string; // 会话ID
+  // 
+  uid?: string; // 系统自动生成用户ID，不要自定义
+  visitorUid?: string; // 自定义访客Uid，支持自定义
+  nickname?: string; // 自定义昵称，支持自定义
+  avatar?: string; // 自定义头像，支持自定义
+  extra?: string; // 自定义扩展字段，支持自定义
+  // 
+  goodsInfo?: string; // 商品信息
+  orderInfo?: string; // 订单信息
+  vipLevel?: string; // 会员等级
+  // 其他自定义字段
   [key: string]: string | number | undefined;
 } 
 

@@ -3,7 +3,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-27 16:46:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-06-21 16:04:52
+ * @LastEditTime: 2025-07-04 09:14:14
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -31,7 +31,7 @@ const { useToken } = theme;
 
 // 定义用户信息接口
 interface UserInfo {
-    uid: string;
+    visitorUid: string;
     nickname: string;
     avatar: string;
 }
@@ -39,12 +39,12 @@ interface UserInfo {
 // 定义两个测试用户
 const TEST_USERS: UserInfo[] = [
     {
-        uid: 'visitor_001',
+        visitorUid: 'visitor_001',
         nickname: '访客小明',
         avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
     },
     {
-        uid: 'visitor_002',
+        visitorUid: 'visitor_002',
         nickname: '访客小红',
         avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg'
     }
@@ -64,6 +64,7 @@ const UserInfoDemo = () => {
 
     // 配置客服组件
     const config: BytedeskConfig = {
+        isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
         ...(process.env.NODE_ENV === 'development' 
         ? { 
             baseUrl: 'http://127.0.0.1:9006', 
@@ -93,7 +94,7 @@ const UserInfoDemo = () => {
             t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
             sid: 'df_wg_uid', // 替换为您的SID
             // 传入用户信息
-            uid: currentUser.uid,
+            visitorUid: currentUser.visitorUid,
             nickname: currentUser.nickname,
             avatar: currentUser.avatar,
             // 自定义字段，可以传递任何字段
@@ -169,7 +170,7 @@ const UserInfoDemo = () => {
             }}>
                 <Title level={2} style={{ color: token.colorText }}>用户信息对接演示</Title>
                 <Paragraph style={{ color: token.colorTextSecondary }}>
-                    本示例演示如何通过配置参数传入用户信息（uid、nickname、avatar）到客服组件中。
+                    本示例演示如何通过配置参数传入用户信息（visitorUid、nickname、avatar）到客服组件中。
                     点击下方按钮可以切换不同的用户信息。
                     <br />
                     <a href="https://www.weiyuai.cn/docs/zh-CN/docs/development/userinfo" 
@@ -194,7 +195,7 @@ const UserInfoDemo = () => {
                             <Space>
                                 <Avatar src={currentUser.avatar} size={64} />
                                 <div>
-                                    <Paragraph>用户ID: {currentUser.uid}</Paragraph>
+                                    <Paragraph>用户ID: {currentUser.visitorUid}</Paragraph>
                                     <Paragraph>昵称: {currentUser.nickname}</Paragraph>
                                 </div>
                             </Space>
@@ -204,14 +205,14 @@ const UserInfoDemo = () => {
                             <Button 
                                 type="primary"
                                 onClick={() => handleSwitchUser(TEST_USERS[0])}
-                                disabled={currentUser.uid === TEST_USERS[0].uid}
+                                disabled={currentUser.visitorUid === TEST_USERS[0].visitorUid}
                             >
                                 切换到访客小明
                             </Button>
                             <Button 
                                 type="primary"
                                 onClick={() => handleSwitchUser(TEST_USERS[1])}
-                                disabled={currentUser.uid === TEST_USERS[1].uid}
+                                disabled={currentUser.visitorUid === TEST_USERS[1].visitorUid}
                             >
                                 切换到访客小红
                             </Button>

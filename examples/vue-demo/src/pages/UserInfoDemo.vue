@@ -22,7 +22,7 @@
           <div class="user-info">
             <img :src="currentUser.avatar" alt="用户头像" class="avatar" />
             <div>
-              <p>用户ID: {{ currentUser.uid }}</p>
+              <p>用户ID: {{ currentUser.visitorUid }}</p>
               <p>昵称: {{ currentUser.nickname }}</p>
             </div>
           </div>
@@ -32,14 +32,14 @@
           <button
             class="primary-button"
             @click="handleSwitchUser(testUsers[0])"
-            :disabled="currentUser.uid === testUsers[0].uid"
+            :disabled="currentUser.visitorUid === testUsers[0].visitorUid"
           >
             切换到访客小明
           </button>
           <button
             class="primary-button"
             @click="handleSwitchUser(testUsers[1])"
-            :disabled="currentUser.uid === testUsers[1].uid"
+            :disabled="currentUser.visitorUid === testUsers[1].visitorUid"
           >
             切换到访客小红
           </button>
@@ -120,7 +120,7 @@ import type { BytedeskConfig } from '@bytedesk/web/types';
 
 // 定义用户信息接口
 interface UserInfo {
-  uid: string;
+  visitorUid: string;
   nickname: string;
   avatar: string;
 }
@@ -134,12 +134,12 @@ export default defineComponent({
     // 定义测试用户
     const testUsers = reactive<UserInfo[]>([
       {
-        uid: 'visitor_001',
+        visitorUid: 'visitor_001',
         nickname: '访客小明',
         avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
       },
       {
-        uid: 'visitor_002',
+        visitorUid: 'visitor_002',
         nickname: '访客小红',
         avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg'
       }
@@ -175,7 +175,7 @@ export default defineComponent({
         t: "1",
         sid: 'df_wg_uid',
         // 传入用户信息
-        uid: currentUser.value.uid,
+        visitorUid: currentUser.value.visitorUid,
         nickname: currentUser.value.nickname,
         avatar: currentUser.value.avatar,
         // 自定义字段，可以传递任何字段
@@ -194,7 +194,7 @@ export default defineComponent({
         forceRefresh: true,
         chatConfig: {
           ...config.value.chatConfig,
-          uid: newUser.uid,
+          visitorUid: newUser.visitorUid,
           nickname: newUser.nickname,
           avatar: newUser.avatar
         }
