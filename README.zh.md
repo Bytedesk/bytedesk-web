@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 13:08:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 16:50:58
+ * @LastEditTime: 2025-07-12 09:34:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -156,7 +156,7 @@ yarn demo:angular  # Run Angular demo
 yarn demo:nextjs   # Run Next.js demo
 
 # JavaScript demo requires build first
-yarn build 
+yarn build
 yarn demo:javascript
 ```
 

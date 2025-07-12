@@ -197,6 +197,9 @@ export default class BytedeskWeb {
             orgUid: String(this.config.chatConfig?.org || ""),
             nickname: String(this.config.chatConfig?.name || ""),
             avatar: String(this.config.chatConfig?.avatar || ""),
+            mobile: String(this.config.chatConfig?.mobile || ""),
+            email: String(this.config.chatConfig?.email || ""),
+            note: String(this.config.chatConfig?.note || ""),
             extra:
               typeof this.config.chatConfig?.extra === "string"
                 ? this.config.chatConfig.extra
