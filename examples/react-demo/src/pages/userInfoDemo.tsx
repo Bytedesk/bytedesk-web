@@ -3,7 +3,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-27 16:46:34
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 09:14:14
+ * @LastEditTime: 2025-07-12 09:34:52
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -97,6 +97,9 @@ const UserInfoDemo = () => {
             visitorUid: currentUser.visitorUid,
             nickname: currentUser.nickname,
             avatar: currentUser.avatar,
+            mobile: '13800138000',
+            email: 'test@test.com',
+            note: 'test',
             // 自定义字段，可以传递任何字段
             extra: JSON.stringify({
                 type: 'type',

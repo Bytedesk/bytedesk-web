@@ -178,6 +178,9 @@ export default defineComponent({
         visitorUid: currentUser.value.visitorUid,
         nickname: currentUser.value.nickname,
         avatar: currentUser.value.avatar,
+        mobile: '13800138000',
+        email: 'test@test.com',
+        note: 'test',
         // 自定义字段，可以传递任何字段
         extra: JSON.stringify({
           type: 'type',
