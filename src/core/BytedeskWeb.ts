@@ -92,7 +92,6 @@ export default class BytedeskWeb {
           this.showChat();
         },
       },
-      showSupport: true,
       chatConfig: {
         org: "df_org_uid",
         t: "2",
@@ -312,11 +311,9 @@ export default class BytedeskWeb {
       // 动态导入browse方法
       const { browse } = await import("../apis/visitor");
       const response = await browse(params);
-
-      console.log("浏览记录发送结果:", response.data, params);
-
+      // console.log("浏览记录发送结果:", response.data, params);
       if (response.data?.code === 200) {
-        console.log("浏览记录发送成功");
+        // console.log("浏览记录发送成功");
       } else {
         console.error("浏览记录发送失败:", response.data?.message);
       }
@@ -382,7 +379,7 @@ export default class BytedeskWeb {
           }
           // 调用API获取未读消息数
           const response = await getUnreadMessageCount(params);
-          console.log("获取未读消息数:", response.data, params);
+          // console.log("获取未读消息数:", response.data, params);
           if (response.data?.code === 200) {
             if (response?.data?.data && response?.data?.data > 0) {
               // console.log('未读消息数:', response.data.data);
@@ -494,7 +491,7 @@ export default class BytedeskWeb {
 
   // 清除未读消息数角标
   private clearUnreadBadge() {
-    console.log("clearUnreadBadge() 被调用");
+    // console.log("clearUnreadBadge() 被调用");
     if (!this.bubble) {
       console.log("clearUnreadBadge: bubble 不存在");
       return;
@@ -502,7 +499,7 @@ export default class BytedeskWeb {
 
     const badge = this.bubble.querySelector(".bytedesk-unread-badge");
     if (badge) {
-      console.log("clearUnreadBadge: 找到角标，正在移除");
+      // console.log("clearUnreadBadge: 找到角标，正在移除");
       badge.remove();
     } else {
       console.log("clearUnreadBadge: 未找到角标");
@@ -876,19 +873,7 @@ export default class BytedeskWeb {
     });
   }
 
-  private getSupportText(): string {
-    const locale = this.config?.locale || "zh-cn";
-    const supportTexts = {
-      "zh-cn": "微语技术支持",
-      "zh-tw": "微語技術支援",
-      en: "Powered by Bytedesk",
-      ja: "Bytedeskによる技術支援",
-      ko: "Bytedesk 기술 지원",
-    };
-    return (
-      supportTexts[locale as keyof typeof supportTexts] || supportTexts["zh-cn"]
-    );
-  }
+
 
   private createChatWindow() {
     this.window = document.createElement("div");
@@ -945,7 +930,7 @@ export default class BytedeskWeb {
     const iframe = document.createElement("iframe");
     iframe.style.cssText = `
       width: 100%;
-      height: ${this.config.showSupport ? "calc(100% - 24px)" : "100%"};
+      height: 100%;
       border: none;
       display: block; // 添加这一行
       vertical-align: bottom; // 添加这一行
@@ -953,41 +938,6 @@ export default class BytedeskWeb {
     iframe.src = this.generateChatUrl();
     console.log("iframe.src: ", iframe.src);
     this.window.appendChild(iframe);
-    // 添加技术支持信息
-    if (this.config.showSupport) {
-      const supportDiv = document.createElement("div");
-      const isDarkMode = this.config.theme?.mode === "dark";
-      supportDiv.style.cssText = `
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: ${isDarkMode ? "#aaa" : "#666"};
-        font-size: 12px;
-        line-height: 24px;
-        background: ${isDarkMode ? "#1f2937" : "#ffffff"};
-        padding: 0;
-        margin: 0;
-        border-top: none; // 确保没有边框
-      `;
-
-      supportDiv.innerHTML = `
-        <a href="https://www.bytedesk.com" 
-           target="_blank" 
-           style="
-             color: ${isDarkMode ? "#aaa" : "#666"};
-             text-decoration: none;
-             display: flex;
-             align-items: center;
-             height: 100%;
-             width: 100%;
-             justify-content: center;
-           ">
-          ${this.getSupportText()}
-        </a>
-      `;
-      this.window.appendChild(supportDiv);
-    }
     document.body.appendChild(this.window);
   }
 

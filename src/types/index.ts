@@ -114,7 +114,6 @@ export interface BytedeskConfig {
   tabsConfig?: TabsConfig; // 标签配置
   bubbleConfig?: BubbleConfig; // 气泡配置
   buttonConfig?: ButtonConfig; // 按钮配置
-  showSupport?: boolean; // 是否显示支持按钮
   chatConfig?: ChatConfig; // 聊天配置
   browseConfig?: BrowseConfig; // 浏览配置
   animation?: Animation; // 动画配置
