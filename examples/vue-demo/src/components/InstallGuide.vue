@@ -32,7 +32,7 @@ import type { BytedeskConfig } from 'bytedesk-web/vue';</code></pre>
     <div class="section">
       <h3>3. 配置参数</h3>
       <pre><code>const config = ref&lt;BytedeskConfig&gt;({
-  baseUrl: 'https://ai.bytedesk.com',
+  htmlUrl: 'https://ai.bytedesk.com',
   placement: 'bottom-right',
   marginBottom: 20,
   marginSide: 20,

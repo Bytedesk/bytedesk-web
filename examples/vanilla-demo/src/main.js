@@ -17,7 +17,7 @@ import BytedeskWeb from '@bytedesk/web/main'
 const bytedesk = new BytedeskWeb({
   isDebug: true, // 开启调试模式，可以看到访客初始化的日志
   apiUrl: 'https://api.weiyuai.cn',
-  baseUrl: 'https://cdn.weiyuai.cn/chat',
+  htmlUrl: 'https://cdn.weiyuai.cn/chat',
   chatConfig: {
     org: 'your-org-uid', // 替换为你的组织UID
     t: '2',

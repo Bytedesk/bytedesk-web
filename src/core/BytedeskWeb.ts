@@ -1,3 +1,17 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-12-30 11:36:12
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-07-24 07:42:41
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ */
 import {
   BYTEDESK_UID,
   BYTEDESK_VISITOR_UID,
@@ -43,7 +57,7 @@ export default class BytedeskWeb {
     try {
       // 动态导入request模块
       const { setApiUrl } = await import("../apis/request");
-      // 设置API的baseUrl
+      // 设置API url
       const apiUrl = this.config.apiUrl || "https://api.weiyuai.cn";
       setApiUrl(apiUrl);
 
@@ -60,7 +74,7 @@ export default class BytedeskWeb {
       isDebug: false,
       // isPreload: false,
       forceRefresh: false,
-      baseUrl: "https://cdn.weiyuai.cn/chat",
+      htmlUrl: "https://cdn.weiyuai.cn/chat",
       apiUrl: "https://api.weiyuai.cn",
       placement: "bottom-right",
       marginBottom: 20,
@@ -1017,7 +1031,7 @@ export default class BytedeskWeb {
     //   params.append("preload", "1");
     // }
 
-    const url = `${this.config.baseUrl}?${params.toString()}`;
+    const url = `${this.config.htmlUrl}?${params.toString()}`;
     console.log("chat url: ", url);
     return url;
   }

@@ -25,7 +25,7 @@ import type &#123; BytedeskConfig &#125; from 'bytedesk-web/angular';</pre>
         <h3>3. Configure Parameters</h3>
         <pre style="background: #f5f5f5; padding: 15px; border-radius: 4px">
 const config: BytedeskConfig = &#123;
-  baseUrl: 'https://ai.bytedesk.com',
+  htmlUrl: 'https://ai.bytedesk.com',
   placement: 'bottom-right',
   marginBottom: 20,
   marginSide: 20,

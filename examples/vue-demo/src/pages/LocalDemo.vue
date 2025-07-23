@@ -93,7 +93,7 @@ export default defineComponent({
     const bytedeskInstance = ref<any>(null);
 
     const config = ref<BytedeskConfig>({
-      ...(process.env.NODE_ENV === 'development' ? { baseUrl: 'http://127.0.0.1:9006' } : {}),
+      ...(process.env.NODE_ENV === 'development' ? { htmlUrl: 'http://127.0.0.1:9006' } : {}),
       placement: 'bottom-right',
       marginBottom: 20,
       marginSide: 20,

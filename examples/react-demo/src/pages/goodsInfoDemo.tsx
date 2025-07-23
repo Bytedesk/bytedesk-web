@@ -71,7 +71,7 @@ const GoodsInfoDemo = () => {
     // 配置客服组件
     const config: BytedeskConfig = {
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
-        ...(process.env.NODE_ENV === 'development' ? { baseUrl: 'http://127.0.0.1:9006' } : {}),
+        ...(process.env.NODE_ENV === 'development' ? { htmlUrl: 'http://127.0.0.1:9006' } : {}),
         placement: 'bottom-right',
         autoPopup: false,
         inviteConfig: {

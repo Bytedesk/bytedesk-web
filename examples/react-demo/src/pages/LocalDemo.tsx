@@ -16,7 +16,7 @@ const LocalDemo = () => {
     isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
     ...(process.env.NODE_ENV === 'development' 
       ? { 
-        baseUrl: 'http://127.0.0.1:9006', 
+        htmlUrl: 'http://127.0.0.1:9006', 
         apiUrl: 'http://127.0.0.1:9003' 
       } 
       : {}),

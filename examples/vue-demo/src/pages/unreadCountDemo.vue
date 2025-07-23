@@ -75,7 +75,7 @@ export default defineComponent({
     const config = ref<BytedeskConfig>({
       ...(process.env.NODE_ENV === 'development' 
         ? { 
-            baseUrl: 'http://127.0.0.1:9006', 
+            htmlUrl: 'http://127.0.0.1:9006', 
             apiUrl: 'http://127.0.0.1:9003' 
           } 
         : {}),

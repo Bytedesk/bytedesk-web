@@ -23,7 +23,7 @@ import { useState } from 'react';
 
 export default function Home() {
   const [config] = useState<BytedeskConfig>({
-    baseUrl: 'http://127.0.0.1:9006',
+    htmlUrl: 'http://127.0.0.1:9006',
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,
