@@ -144,14 +144,34 @@ const GoodsInfoDemo = () => {
                 <Paragraph style={{ color: token.colorTextSecondary }}>
                     本示例演示如何通过配置参数传入商品信息（uid、title、image、description、price、url）到客服组件中。
                     点击下方按钮可以打开客服窗口，商品信息会自动传递给客服。
-                    <br />
+                </Paragraph>
+                
+                <div style={{ marginBottom: '20px' }}>
+                  <p style={{ marginBottom: '10px' }}>
                     <a href="https://www.weiyuai.cn/docs/zh-CN/docs/development/goodsinfo" 
                        target="_blank" 
                        rel="noopener noreferrer"
                        style={{ color: token.colorPrimary }}>
-                        查看商品信息对接文档
+                      查看商品信息对接文档
                     </a>
-                </Paragraph>
+                  </p>
+                  <p style={{ marginBottom: '10px' }}>
+                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/goodsInfoDemo.tsx" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style={{ color: token.colorPrimary }}>
+                      React 商品信息对接代码示例
+                    </a>
+                  </p>
+                  <p style={{ marginBottom: '10px' }}>
+                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/goodsInfoDemo.vue" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style={{ color: token.colorPrimary }}>
+                      Vue 商品信息对接代码示例
+                    </a>
+                  </p>
+                </div>
 
                 <Card
                     key={themeKey}

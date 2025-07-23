@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 16:13:21
+ * @LastEditTime: 2025-07-24 07:08:29
  */
 import React, { useState } from 'react';
 // @ts-ignore
@@ -87,14 +87,40 @@ const LocalDemo = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>微语基本设置</h1>
-      <p>
-        <a href="https://www.weiyuai.cn/docs/zh-CN/docs/channel/react" 
-           target="_blank" 
-           rel="noopener noreferrer" 
-           style={{ color: '#2e88ff', textDecoration: 'none' }}>
-          查看 React 集成文档
-        </a>
-      </p>
+      <div style={{ marginBottom: '20px' }}>
+        <p style={{ marginBottom: '10px' }}>
+          <a href="https://www.weiyuai.cn/docs/zh-CN/docs/channel/react" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             style={{ color: '#2e88ff', textDecoration: 'none' }}>
+            查看 React 集成文档
+          </a>
+        </p>
+        <p style={{ marginBottom: '10px' }}>
+          <a href="https://www.weiyuai.cn/docs/zh-CN/docs/channel/vue" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             style={{ color: '#2e88ff', textDecoration: 'none' }}>
+            查看 Vue 集成文档
+          </a>
+        </p>
+        <p style={{ marginBottom: '10px' }}>
+          <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/LocalDemo.tsx" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             style={{ color: '#2e88ff', textDecoration: 'none' }}>
+            React 基础集成代码示例
+          </a>
+        </p>
+        <p style={{ marginBottom: '10px' }}>
+          <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/LocalDemo.vue" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             style={{ color: '#2e88ff', textDecoration: 'none' }}>
+            Vue 基础集成代码示例
+          </a>
+        </p>
+      </div>
 
       <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button 

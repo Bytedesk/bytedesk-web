@@ -220,14 +220,34 @@ const OrderInfoDemo = () => {
                 <Paragraph style={{ color: token.colorTextSecondary }}>
                     本示例演示如何通过配置参数传入订单信息到客服组件中。
                     点击下方按钮可以打开客服窗口，订单信息会自动传递给客服。
-                    <br />
+                </Paragraph>
+                
+                <div style={{ marginBottom: '20px' }}>
+                  <p style={{ marginBottom: '10px' }}>
                     <a href="https://www.weiyuai.cn/docs/zh-CN/docs/development/orderinfo" 
                        target="_blank" 
                        rel="noopener noreferrer"
                        style={{ color: token.colorPrimary }}>
-                        查看订单信息对接文档
+                      查看订单信息对接文档
                     </a>
-                </Paragraph>
+                  </p>
+                  <p style={{ marginBottom: '10px' }}>
+                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/orderInfoDemo.tsx" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style={{ color: token.colorPrimary }}>
+                      React 订单信息对接代码示例
+                    </a>
+                  </p>
+                  <p style={{ marginBottom: '10px' }}>
+                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/orderInfoDemo.vue" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style={{ color: token.colorPrimary }}>
+                      Vue 订单信息对接代码示例
+                    </a>
+                  </p>
+                </div>
 
                 <Card 
                     key={themeKey}

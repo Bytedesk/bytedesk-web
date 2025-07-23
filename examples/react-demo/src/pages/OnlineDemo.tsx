@@ -59,6 +59,41 @@ const OnlineDemo = () => {
     <div style={{ padding: '20px' }}>
       <h1>Bytedesk Online Demo</h1>
       <p>This demo uses the published npm package</p>
+      
+      <div style={{ marginBottom: '20px' }}>
+        <p style={{ marginBottom: '10px' }}>
+          <a href="https://www.weiyuai.cn/docs/zh-CN/docs/channel/react" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             style={{ color: '#2e88ff', textDecoration: 'none' }}>
+            查看 React 集成文档
+          </a>
+        </p>
+        <p style={{ marginBottom: '10px' }}>
+          <a href="https://www.weiyuai.cn/docs/zh-CN/docs/channel/vue" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             style={{ color: '#2e88ff', textDecoration: 'none' }}>
+            查看 Vue 集成文档
+          </a>
+        </p>
+        <p style={{ marginBottom: '10px' }}>
+          <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/OnlineDemo.tsx" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             style={{ color: '#2e88ff', textDecoration: 'none' }}>
+            React 在线演示代码示例
+          </a>
+        </p>
+        <p style={{ marginBottom: '10px' }}>
+          <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/OnlineDemo.vue" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             style={{ color: '#2e88ff', textDecoration: 'none' }}>
+            Vue 在线演示代码示例
+          </a>
+        </p>
+      </div>
 
       <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
         <button

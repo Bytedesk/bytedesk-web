@@ -153,14 +153,34 @@ const VipLevelDemo = () => {
                 <Paragraph style={{ color: token.colorTextSecondary }}>
                     本示例演示如何通过配置参数传入用户VIP等级（vipLevel）到客服组件中。
                     点击下方按钮可以切换不同VIP等级的用户信息。
-                    <br />
+                </Paragraph>
+                
+                <div style={{ marginBottom: '20px' }}>
+                  <p style={{ marginBottom: '10px' }}>
                     <a href="https://www.weiyuai.cn/docs/zh-CN/docs/development/viplevel" 
                        target="_blank" 
                        rel="noopener noreferrer"
                        style={{ color: token.colorPrimary }}>
-                        查看VIP等级对接文档
+                      查看VIP等级对接文档
                     </a>
-                </Paragraph>
+                  </p>
+                  <p style={{ marginBottom: '10px' }}>
+                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/vipLevelDemo.tsx" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style={{ color: token.colorPrimary }}>
+                      React VIP等级对接代码示例
+                    </a>
+                  </p>
+                  <p style={{ marginBottom: '10px' }}>
+                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/vipLevelDemo.vue" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       style={{ color: token.colorPrimary }}>
+                      Vue VIP等级对接代码示例
+                    </a>
+                  </p>
+                </div>
 
                 <Card 
                     key={themeKey}
