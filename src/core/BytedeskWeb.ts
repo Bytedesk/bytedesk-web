@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:36:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 07:42:41
+ * @LastEditTime: 2025-07-24 08:52:46
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -15,6 +15,7 @@
 import {
   BYTEDESK_UID,
   BYTEDESK_VISITOR_UID,
+  BYTEDESK_BROWSE_FAILED_TIMESTAMP,
   POST_MESSAGE_CLOSE_CHAT_WINDOW,
   POST_MESSAGE_INVITE_VISITOR,
   POST_MESSAGE_INVITE_VISITOR_ACCEPT,
@@ -271,6 +272,23 @@ export default class BytedeskWeb {
   // 获取当前页面浏览信息并发送到服务器
   private async _browseVisitor() {
     try {
+      // 检查是否在1小时限制期内
+      const failedTimestamp = localStorage.getItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP);
+      if (failedTimestamp) {
+        const failedTime = parseInt(failedTimestamp);
+        const currentTime = Date.now();
+        const oneHour = 60 * 60 * 1000; // 1小时的毫秒数
+        
+        if (currentTime - failedTime < oneHour) {
+          const remainingTime = Math.ceil((oneHour - (currentTime - failedTime)) / 1000 / 60); // 剩余分钟数
+          console.log(`浏览记录发送失败后1小时内禁止发送，还需等待 ${remainingTime} 分钟`);
+          return;
+        } else {
+          // 超过1小时，清除失败记录
+          localStorage.removeItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP);
+        }
+      }
+
       // 获取当前页面信息
       const currentUrl = window.location.href;
       const currentTitle = document.title;
@@ -328,11 +346,19 @@ export default class BytedeskWeb {
       // console.log("浏览记录发送结果:", response.data, params);
       if (response.data?.code === 200) {
         // console.log("浏览记录发送成功");
+        // 发送成功，清除失败记录
+        localStorage.removeItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP);
       } else {
         console.error("浏览记录发送失败:", response.data?.message);
+        // 发送失败，记录失败时间戳
+        localStorage.setItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP, Date.now().toString());
+        console.log("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
       }
     } catch (error) {
       console.error("发送浏览记录时出错:", error);
+      // 发送出错，记录失败时间戳
+      localStorage.setItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP, Date.now().toString());
+      console.log("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
     }
   }
 
@@ -436,6 +462,14 @@ export default class BytedeskWeb {
   // 新增公共方法，供外部调用发送浏览记录
   async browseVisitor() {
     return this._browseVisitor();
+  }
+
+  // 清除浏览记录发送失败的限制
+  clearBrowseFailedLimit() {
+    localStorage.removeItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP);
+    if (this.config.isDebug) {
+      console.log("已清除浏览记录发送失败的限制");
+    }
   }
 
   // 清除本地访客信息，强制重新初始化
@@ -1100,19 +1134,6 @@ export default class BytedeskWeb {
       iframe.contentWindow.postMessage(message, "*");
     }
   }
-
-  // preload() {
-  //   console.log("preload");
-  //   if (this.config.isPreload) {
-  //     const preLoadUrl = this.generateChatUrl(true);
-  //     console.log("preLoadUrl: ", preLoadUrl);
-  //     // 预加载URL
-  //     const preLoadIframe = document.createElement("iframe");
-  //     preLoadIframe.src = preLoadUrl;
-  //     preLoadIframe.style.display = "none";
-  //     document.body.appendChild(preLoadIframe);
-  //   }
-  // }
 
   showChat(config?: Partial<BytedeskConfig>) {
     // 合并新配置（如果提供了）
