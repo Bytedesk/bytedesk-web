@@ -23,6 +23,10 @@ const i18n = createI18n({
   messages
 });
 
+// 全局单例实例
+let globalBytedeskInstance: BytedeskWeb | null = null;
+let activeComponentCount = 0;
+
 export const BytedeskVue = defineComponent({
   name: 'BytedeskVue',
   props: {
@@ -36,19 +40,47 @@ export const BytedeskVue = defineComponent({
     let instance: BytedeskWeb | null = null;
 
     onMounted(() => {
+      activeComponentCount++;
       i18n.global.locale = props.locale as 'zh-cn' | 'en';
-      instance = new BytedeskWeb({
+      
+      const config = {
         ...(attrs as unknown as BytedeskConfig),
         locale: props.locale
-      });
-      instance.init();
+      };
+
+      // 检查是否已经存在全局实例
+      if (globalBytedeskInstance) {
+        console.log('BytedeskVue: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
+        instance = globalBytedeskInstance;
+        emit('init', instance);
+        return;
+      }
+
+      // 创建新的全局实例
+      console.log('BytedeskVue: 创建新的全局实例');
+      globalBytedeskInstance = new BytedeskWeb(config);
+      instance = globalBytedeskInstance;
       
-      // 触发init事件并传递实例
+      globalBytedeskInstance.init();
       emit('init', instance);
     });
 
     onUnmounted(() => {
-      instance?.destroy();
+      activeComponentCount--;
+      console.log('BytedeskVue: 组件卸载，当前活跃组件数:', activeComponentCount);
+      instance = null;
+      
+      // 如果没有活跃组件了，清理全局实例
+      if (activeComponentCount <= 0) {
+        console.log('BytedeskVue: 没有活跃组件，清理全局实例');
+        setTimeout(() => {
+          if (globalBytedeskInstance && activeComponentCount <= 0) {
+            globalBytedeskInstance.destroy();
+            globalBytedeskInstance = null;
+            activeComponentCount = 0;
+          }
+        }, 100);
+      }
     });
 
     return () => h('div', { style: { display: 'none' } });

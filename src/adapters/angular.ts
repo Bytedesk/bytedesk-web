@@ -8,6 +8,10 @@ import { Component, Input } from '@angular/core';
 import BytedeskWeb from '../main';
 import type { BytedeskConfig } from '../types';
 
+// 全局单例实例
+let globalBytedeskInstance: BytedeskWeb | null = null;
+let activeComponentCount = 0;
+
 // 定义组件类型
 type BytedeskAngularType = {
   config: BytedeskConfig;
@@ -26,19 +30,40 @@ export const BytedeskAngular: any = Component({
   `]
 })(class implements BytedeskAngularType {
   @Input() config!: BytedeskConfig;
-  private bytedeskRef: BytedeskWeb | null = null;
 
   ngOnInit(): void {
-    this.bytedeskRef = new BytedeskWeb(this.config);
-    this.bytedeskRef.init();
-    (window as any).bytedesk = this.bytedeskRef;
+    activeComponentCount++;
+    
+    // 检查是否已经存在全局实例
+    if (globalBytedeskInstance) {
+      console.log('BytedeskAngular: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
+      (window as any).bytedesk = globalBytedeskInstance;
+      return;
+    }
+
+    // 创建新的全局实例
+    console.log('BytedeskAngular: 创建新的全局实例');
+    globalBytedeskInstance = new BytedeskWeb(this.config);
+    
+    globalBytedeskInstance.init();
+    (window as any).bytedesk = globalBytedeskInstance;
   }
 
   ngOnDestroy(): void {
-    if (this.bytedeskRef) {
-      this.bytedeskRef.destroy();
-      delete (window as any).bytedesk;
-      this.bytedeskRef = null;
+    activeComponentCount--;
+    console.log('BytedeskAngular: 组件卸载，当前活跃组件数:', activeComponentCount);
+    
+    // 如果没有活跃组件了，清理全局实例
+    if (activeComponentCount <= 0) {
+      console.log('BytedeskAngular: 没有活跃组件，清理全局实例');
+              setTimeout(() => {
+          if (globalBytedeskInstance && activeComponentCount <= 0) {
+            globalBytedeskInstance.destroy();
+            globalBytedeskInstance = null;
+            delete (window as any).bytedesk;
+            activeComponentCount = 0;
+          }
+        }, 100);
     }
   }
 }); 

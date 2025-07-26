@@ -22,6 +22,10 @@ interface BytedeskNextjsProps extends BytedeskConfig {
   onInit?: () => void;
 }
 
+// 全局单例实例
+let globalBytedeskInstance: any = null;
+let activeComponentCount = 0;
+
 // 使用动态导入包装组件
 const BytedeskNextjs = dynamic(() => Promise.resolve(({ locale = 'zh-cn', ...props }: BytedeskNextjsProps) => {
   return (
@@ -41,21 +45,45 @@ const BytedeskComponent = (props: BytedeskNextjsProps) => {
   const bytedeskRef = useRef<any>(null);
 
   useEffect(() => {
+    activeComponentCount++;
+    
     // 动态导入 BytedeskWeb
     import('../main').then(({ default: BytedeskWeb }) => {
-      if (!bytedeskRef.current) {
-        bytedeskRef.current = new BytedeskWeb(props);
-        bytedeskRef.current.init();
+      // 检查是否已经存在全局实例
+      if (globalBytedeskInstance) {
+        console.log('BytedeskNextjs: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
+        bytedeskRef.current = globalBytedeskInstance;
+        (window as any).bytedesk = globalBytedeskInstance;
         props.onInit?.();
-        (window as any).bytedesk = bytedeskRef.current;
+        return;
       }
+
+      // 创建新的全局实例
+      console.log('BytedeskNextjs: 创建新的全局实例');
+      globalBytedeskInstance = new BytedeskWeb(props);
+      bytedeskRef.current = globalBytedeskInstance;
+      
+      globalBytedeskInstance.init();
+      props.onInit?.();
+      (window as any).bytedesk = globalBytedeskInstance;
     });
 
     return () => {
-      if (bytedeskRef.current) {
-        bytedeskRef.current.destroy();
-        delete (window as any).bytedesk;
-        bytedeskRef.current = null;
+      activeComponentCount--;
+      console.log('BytedeskNextjs: 组件卸载，当前活跃组件数:', activeComponentCount);
+      bytedeskRef.current = null;
+      
+      // 如果没有活跃组件了，清理全局实例
+      if (activeComponentCount <= 0) {
+        console.log('BytedeskNextjs: 没有活跃组件，清理全局实例');
+        setTimeout(() => {
+          if (globalBytedeskInstance && activeComponentCount <= 0) {
+            globalBytedeskInstance.destroy();
+            globalBytedeskInstance = null;
+            delete (window as any).bytedesk;
+            activeComponentCount = 0;
+          }
+        }, 100);
       }
     };
   }, [props]);

@@ -494,6 +494,14 @@ export default class BytedeskWeb {
   // 显示未读消息数角标
   private showUnreadBadge(count: number) {
     console.log("showUnreadBadge() 被调用，count:", count);
+    
+    // 检查按钮配置，如果 buttonConfig.show 为 false，则不显示角标
+    const buttonConfig = this.config.buttonConfig || {};
+    if (buttonConfig.show === false) {
+      console.log("showUnreadBadge: buttonConfig.show 为 false，不显示角标");
+      return;
+    }
+    
     if (!this.bubble) {
       console.log("showUnreadBadge: bubble 不存在");
       return;
@@ -604,8 +612,14 @@ export default class BytedeskWeb {
   private createBubble() {
     // 检查气泡是否已存在
     if (this.bubble && document.body.contains(this.bubble)) {
-      console.log("气泡已存在，不重复创建");
+      console.log("createBubble: 气泡已存在，不重复创建");
       return;
+    }
+    
+    // 如果 bubble 存在但不在 DOM 中，先清理
+    if (this.bubble && !document.body.contains(this.bubble)) {
+      console.log("createBubble: 清理已存在的 bubble 引用");
+      this.bubble = null;
     }
 
     // 创建气泡容器
@@ -924,6 +938,18 @@ export default class BytedeskWeb {
 
 
   private createChatWindow() {
+    // 检查聊天窗口是否已存在
+    if (this.window && document.body.contains(this.window)) {
+      console.log("createChatWindow: 聊天窗口已存在，不重复创建");
+      return;
+    }
+    
+    // 如果 window 存在但不在 DOM 中，先清理
+    if (this.window && !document.body.contains(this.window)) {
+      console.log("createChatWindow: 清理已存在的 window 引用");
+      this.window = null;
+    }
+    
     this.window = document.createElement("div");
     const isMobile = window.innerWidth <= 768;
     const maxWidth = window.innerWidth;
@@ -1356,8 +1382,14 @@ export default class BytedeskWeb {
   private createInviteDialog() {
     // 检查邀请框是否已存在
     if (this.inviteDialog && document.body.contains(this.inviteDialog)) {
-      console.log("邀请框已存在，不重复创建");
+      console.log("createInviteDialog: 邀请框已存在，不重复创建");
       return;
+    }
+    
+    // 如果 inviteDialog 存在但不在 DOM 中，先清理
+    if (this.inviteDialog && !document.body.contains(this.inviteDialog)) {
+      console.log("createInviteDialog: 清理已存在的 inviteDialog 引用");
+      this.inviteDialog = null;
     }
 
     // 移除对 inviteConfig.show 的检查，始终创建邀请框
@@ -1497,8 +1529,17 @@ export default class BytedeskWeb {
   }
 
   showButton() {
+    // 检查按钮是否已经显示
+    if (this.bubble && this.bubble.style.display !== "none") {
+      console.log("showButton: 按钮已经显示，无需重复显示");
+      return;
+    }
+    
     if (this.bubble) {
       this.bubble.style.display = "inline-flex";
+      console.log("showButton: 按钮已显示");
+    } else {
+      console.log("showButton: bubble 不存在，需要先创建");
     }
   }
 
@@ -1512,13 +1553,24 @@ export default class BytedeskWeb {
     if (this.bubble) {
       const messageElement = (this.bubble as any).messageElement;
       if (messageElement instanceof HTMLElement) {
+        // 检查气泡是否已经显示
+        if (messageElement.style.display !== "none" && messageElement.style.opacity !== "0") {
+          console.log("showBubble: 气泡已经显示，无需重复显示");
+          return;
+        }
+        
         messageElement.style.display = "block";
         // 显示动画
         setTimeout(() => {
           messageElement.style.opacity = "1";
           messageElement.style.transform = "translateY(0)";
         }, 100);
+        console.log("showBubble: 气泡已显示");
+      } else {
+        console.log("showBubble: messageElement 不存在");
       }
+    } else {
+      console.log("showBubble: bubble 不存在");
     }
   }
 

@@ -28,25 +28,54 @@ init({
   initialLocale: getLocaleFromNavigator()
 });
 
+// 全局单例实例
+let globalBytedeskInstance: BytedeskWeb | null = null;
+let activeComponentCount = 0;
+
 export const BytedeskSvelte = (node: HTMLElement, config: BytedeskConfig & { locale?: string }) => {
-  let instance: BytedeskWeb | null = null;
   console.log('config', config, node);
 
   onMount(() => {
-    instance = new BytedeskWeb({
+    activeComponentCount++;
+    
+    const fullConfig = {
       ...config,
       locale: config.locale || getLocaleFromNavigator() || 'zh-cn'
-    });
-    instance.init();
+    };
+
+    // 检查是否已经存在全局实例
+    if (globalBytedeskInstance) {
+      console.log('BytedeskSvelte: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
+      return;
+    }
+
+    // 创建新的全局实例
+    console.log('BytedeskSvelte: 创建新的全局实例');
+    globalBytedeskInstance = new BytedeskWeb(fullConfig);
+    
+    globalBytedeskInstance.init();
   });
 
   onDestroy(() => {
-    instance?.destroy();
+    activeComponentCount--;
+    console.log('BytedeskSvelte: 组件卸载，当前活跃组件数:', activeComponentCount);
+    
+    // 如果没有活跃组件了，清理全局实例
+    if (activeComponentCount <= 0) {
+      console.log('BytedeskSvelte: 没有活跃组件，清理全局实例');
+              setTimeout(() => {
+          if (globalBytedeskInstance && activeComponentCount <= 0) {
+            globalBytedeskInstance.destroy();
+            globalBytedeskInstance = null;
+            activeComponentCount = 0;
+          }
+        }, 100);
+    }
   });
 
   return {
     destroy() {
-      instance?.destroy();
+      // 这里不需要调用 destroy，因为 onDestroy 已经处理了
     }
   };
 }; 
