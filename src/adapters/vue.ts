@@ -50,14 +50,14 @@ export const BytedeskVue = defineComponent({
 
       // 检查是否已经存在全局实例
       if (globalBytedeskInstance) {
-        console.log('BytedeskVue: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
+        // console.log('BytedeskVue: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
         instance = globalBytedeskInstance;
         emit('init', instance);
         return;
       }
 
       // 创建新的全局实例
-      console.log('BytedeskVue: 创建新的全局实例');
+      // console.log('BytedeskVue: 创建新的全局实例');
       globalBytedeskInstance = new BytedeskWeb(config);
       instance = globalBytedeskInstance;
       
@@ -67,12 +67,12 @@ export const BytedeskVue = defineComponent({
 
     onUnmounted(() => {
       activeComponentCount--;
-      console.log('BytedeskVue: 组件卸载，当前活跃组件数:', activeComponentCount);
+      // console.log('BytedeskVue: 组件卸载，当前活跃组件数:', activeComponentCount);
       instance = null;
       
       // 如果没有活跃组件了，清理全局实例
       if (activeComponentCount <= 0) {
-        console.log('BytedeskVue: 没有活跃组件，清理全局实例');
+        // console.log('BytedeskVue: 没有活跃组件，清理全局实例');
         setTimeout(() => {
           if (globalBytedeskInstance && activeComponentCount <= 0) {
             globalBytedeskInstance.destroy();

@@ -46,7 +46,7 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
     
     // 检查是否已经存在全局实例
     if (globalBytedeskInstance) {
-      console.log('BytedeskReact: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
+      // console.log('BytedeskReact: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
       bytedeskRef.current = globalBytedeskInstance;
       (window as any).bytedesk = globalBytedeskInstance;
       props.onInit?.();
@@ -54,7 +54,7 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
     }
 
     // 创建新的全局实例
-    console.log('BytedeskReact: 创建新的全局实例');
+    // console.log('BytedeskReact: 创建新的全局实例');
     globalBytedeskInstance = new BytedeskWeb(props);
     bytedeskRef.current = globalBytedeskInstance;
     
@@ -64,12 +64,12 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
 
     return () => {
       activeComponentCount--;
-      console.log('BytedeskReact: 组件卸载，当前活跃组件数:', activeComponentCount);
+      // console.log('BytedeskReact: 组件卸载，当前活跃组件数:', activeComponentCount);
       bytedeskRef.current = null;
       
       // 如果没有活跃组件了，清理全局实例
       if (activeComponentCount <= 0) {
-        console.log('BytedeskReact: 没有活跃组件，清理全局实例');
+        // console.log('BytedeskReact: 没有活跃组件，清理全局实例');
         setTimeout(() => {
           if (globalBytedeskInstance && activeComponentCount <= 0) {
             globalBytedeskInstance.destroy();

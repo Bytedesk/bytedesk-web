@@ -51,7 +51,7 @@ const BytedeskComponent = (props: BytedeskNextjsProps) => {
     import('../main').then(({ default: BytedeskWeb }) => {
       // 检查是否已经存在全局实例
       if (globalBytedeskInstance) {
-        console.log('BytedeskNextjs: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
+        // console.log('BytedeskNextjs: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
         bytedeskRef.current = globalBytedeskInstance;
         (window as any).bytedesk = globalBytedeskInstance;
         props.onInit?.();
@@ -59,7 +59,7 @@ const BytedeskComponent = (props: BytedeskNextjsProps) => {
       }
 
       // 创建新的全局实例
-      console.log('BytedeskNextjs: 创建新的全局实例');
+      // console.log('BytedeskNextjs: 创建新的全局实例');
       globalBytedeskInstance = new BytedeskWeb(props);
       bytedeskRef.current = globalBytedeskInstance;
       

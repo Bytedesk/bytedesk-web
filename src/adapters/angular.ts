@@ -36,13 +36,13 @@ export const BytedeskAngular: any = Component({
     
     // 检查是否已经存在全局实例
     if (globalBytedeskInstance) {
-      console.log('BytedeskAngular: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
+      // console.log('BytedeskAngular: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
       (window as any).bytedesk = globalBytedeskInstance;
       return;
     }
 
     // 创建新的全局实例
-    console.log('BytedeskAngular: 创建新的全局实例');
+    // console.log('BytedeskAngular: 创建新的全局实例');
     globalBytedeskInstance = new BytedeskWeb(this.config);
     
     globalBytedeskInstance.init();
