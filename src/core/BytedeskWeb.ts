@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:36:12
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 08:52:46
+ * @LastEditTime: 2025-09-15 16:56:35
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -44,6 +44,17 @@ export default class BytedeskWeb {
   private initVisitorPromise: Promise<any> | null = null;
   private getUnreadMessageCountPromise: Promise<any> | null = null;
   private clearUnreadMessagesPromise: Promise<any> | null = null;
+
+  // 文档反馈功能相关属性
+  private feedbackTooltip: HTMLElement | null = null;
+  private feedbackDialog: HTMLElement | null = null;
+  private selectedText: string = "";
+  // 添加防抖和状态管理
+  private selectionDebounceTimer: NodeJS.Timeout | null = null;
+  private isTooltipVisible: boolean = false;
+  private lastSelectionText: string = "";
+  private lastMouseEvent: MouseEvent | null = null;
+  private lastSelectionRect: DOMRect | null = null;
 
   constructor(config: BytedeskConfig) {
     this.config = {
@@ -107,6 +118,29 @@ export default class BytedeskWeb {
           this.showChat();
         },
       },
+      feedbackConfig: {
+        enabled: false,
+        trigger: "selection",
+        showOnSelection: true,
+        selectionText: "文档反馈",
+        buttonText: "文档反馈",
+        dialogTitle: "提交意见反馈",
+        placeholder: "请描述您的问题或优化建议",
+        submitText: "提交反馈",
+        cancelText: "取消",
+        successMessage: "反馈已提交，感谢您的意见！",
+        categoryNames: [
+          '错别字、拼写错误',
+          '链接跳转有问题',
+          '文档和实操过程不一致',
+          '文档难以理解',
+          '建议或其他'
+        ],
+        requiredTypes: false,
+        typesSectionTitle: '问题类型',
+        typesDescription: '（多选）',
+        submitScreenshot: true,
+      },
       chatConfig: {
         org: "df_org_uid",
         t: "2",
@@ -141,6 +175,45 @@ export default class BytedeskWeb {
     this.createInviteDialog();
     this.setupMessageListener();
     this.setupResizeListener();
+    // 初始化文档反馈功能 - 立即初始化并设置备用触发
+    if (this.config.feedbackConfig?.enabled) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 开始初始化文档反馈功能，document.readyState:', document.readyState);
+      }
+      
+      // 立即尝试初始化
+      this.initFeedbackFeature();
+      
+      // 如果DOM还没完全加载，设置备用初始化
+      if (document.readyState !== 'complete') {
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: DOM未完全加载，设置备用初始化');
+        }
+        
+        const loadHandler = () => {
+          if (this.config.isDebug) {
+            console.log('BytedeskWeb: window load事件触发，重新初始化反馈功能');
+          }
+          this.initFeedbackFeature();
+          window.removeEventListener('load', loadHandler);
+        };
+        
+        window.addEventListener('load', loadHandler);
+        
+        // 额外的DOMContentLoaded监听作为备用
+        const domHandler = () => {
+          if (this.config.isDebug) {
+            console.log('BytedeskWeb: DOMContentLoaded事件触发，重新初始化反馈功能');
+          }
+          setTimeout(() => this.initFeedbackFeature(), 100);
+          document.removeEventListener('DOMContentLoaded', domHandler);
+        };
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', domHandler);
+        }
+      }
+    }
     // 预加载
     // this.preload();
     // 获取未读消息数 - 在访客初始化完成后执行
@@ -1377,6 +1450,15 @@ export default class BytedeskWeb {
       clearTimeout(this.hideTimeout);
       this.hideTimeout = null;
     }
+
+    // 清理防抖定时器
+    if (this.selectionDebounceTimer) {
+      clearTimeout(this.selectionDebounceTimer);
+      this.selectionDebounceTimer = null;
+    }
+
+    // 清理反馈功能
+    this.destroyFeedbackFeature();
   }
 
   private createInviteDialog() {
@@ -1797,4 +1879,1604 @@ export default class BytedeskWeb {
   //     }
   //   }
   // }
+
+  // ======================== 文档反馈功能 ========================
+
+  /**
+   * 初始化文档反馈功能
+   */
+  private initFeedbackFeature() {
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 初始化文档反馈功能开始');
+      console.log('BytedeskWeb: feedbackConfig:', this.config.feedbackConfig);
+      console.log('BytedeskWeb: feedbackConfig.enabled:', this.config.feedbackConfig?.enabled);
+    }
+
+    if (!this.config.feedbackConfig?.enabled) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 文档反馈功能未启用，退出初始化');
+      }
+      return;
+    }
+
+    // 防止重复初始化
+    if (this.feedbackTooltip || this.feedbackDialog) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 反馈功能已存在，先销毁再重新创建');
+      }
+      this.destroyFeedbackFeature();
+    }
+
+    // 监听文本选择事件
+    if (this.config.feedbackConfig.trigger === 'selection' || this.config.feedbackConfig.trigger === 'both') {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 触发器匹配，设置文本选择监听器');
+        console.log('BytedeskWeb: 触发器类型:', this.config.feedbackConfig.trigger);
+      }
+      this.setupTextSelectionListener();
+    } else {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 触发器不匹配，跳过文本选择监听器');
+        console.log('BytedeskWeb: 触发器类型:', this.config.feedbackConfig.trigger);
+      }
+    }
+
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 开始创建反馈提示框');
+    }
+    this.createFeedbackTooltip();
+    
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 开始创建反馈对话框');
+    }
+    this.createFeedbackDialog();
+    
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 文档反馈功能初始化完成');
+      console.log('BytedeskWeb: 反馈提示框存在:', !!this.feedbackTooltip);
+      console.log('BytedeskWeb: 反馈对话框存在:', !!this.feedbackDialog);
+    }
+  }
+
+  /**
+   * 设置文本选择监听器
+   */
+  private setupTextSelectionListener() {
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 设置文本选择监听器');
+    }
+
+    // 监听鼠标抬起事件，检测文本选择（主要处理方式）
+    document.addEventListener('mouseup', (event) => {
+      this.lastMouseEvent = event as MouseEvent;
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: mouseup事件触发', event);
+      }
+      this.handleTextSelectionWithDebounce(event);
+    }, { capture: true, passive: true });
+
+    // 监听选择变化事件（备用方案，但需要防抖）
+    document.addEventListener('selectionchange', () => {
+      // 避免频繁触发，只在没有最近鼠标事件时使用
+      if (!this.lastMouseEvent) {
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: selectionchange事件触发（无鼠标事件）');
+        }
+        const mockEvent = new MouseEvent('mouseup', {
+          clientX: window.innerWidth / 2,
+          clientY: window.innerHeight / 2
+        });
+        this.handleTextSelectionWithDebounce(mockEvent);
+      }
+    });
+
+    // 监听键盘事件，处理键盘选择
+    document.addEventListener('keyup', (event) => {
+      if (event.shiftKey || event.ctrlKey || event.metaKey) {
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: keyup事件触发（带修饰键）', event);
+        }
+        this.handleTextSelectionWithDebounce(event);
+      }
+    }, { capture: true, passive: true });
+
+    // 监听点击事件，隐藏提示
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      // 如果点击的不是反馈相关元素，隐藏提示
+      if (!target?.closest('[data-bytedesk-feedback]')) {
+        this.hideFeedbackTooltip();
+      }
+    });
+
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 文本选择监听器设置完成');
+    }
+  }
+
+  /**
+   * 带防抖的文本选择处理
+   */
+  private handleTextSelectionWithDebounce(event: Event) {
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: handleTextSelectionWithDebounce被调用 - 防抖机制生效');
+    }
+    
+    // 清除之前的防抖定时器
+    if (this.selectionDebounceTimer) {
+      clearTimeout(this.selectionDebounceTimer);
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 清除之前的防抖定时器');
+      }
+    }
+
+    // 设置防抖延迟（200ms）
+    this.selectionDebounceTimer = setTimeout(() => {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 防抖延迟结束，开始处理文本选择');
+      }
+      this.handleTextSelection(event);
+    }, 200);
+  }
+
+  /**
+   * 处理文本选择
+   */
+  private handleTextSelection(_event: Event) {
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: handleTextSelection被调用');
+    }
+
+    const selection = window.getSelection();
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: window.getSelection()结果:', selection);
+      console.log('BytedeskWeb: selection.rangeCount:', selection?.rangeCount);
+    }
+
+    if (!selection || selection.rangeCount === 0) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 没有选择或范围为0，隐藏提示');
+      }
+      this.hideFeedbackTooltip();
+      return;
+    }
+
+    const selectedText = selection.toString().trim();
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 检测到文本选择:', `"${selectedText}"`);
+      console.log('BytedeskWeb: 选中文本长度:', selectedText.length);
+    }
+
+    // 检查是否与上次选择的文本相同
+    if (selectedText === this.lastSelectionText && this.isTooltipVisible) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 文本选择未变化且提示框已显示，跳过处理');
+      }
+      return;
+    }
+
+    if (selectedText.length === 0) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 选中文本为空，隐藏提示');
+      }
+      this.hideFeedbackTooltip();
+      return;
+    }
+
+    // 检查选中文本长度，避免显示过短的选择
+    if (selectedText.length < 3) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 选中文本太短，忽略:', `"${selectedText}"`);
+      }
+      this.hideFeedbackTooltip();
+      return;
+    }
+
+    // 更新状态
+    this.selectedText = selectedText;
+    this.lastSelectionText = selectedText;
+    
+    // 存储选中文本的位置信息
+    try {
+      const range = selection.getRangeAt(0);
+      this.lastSelectionRect = range.getBoundingClientRect();
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 存储选中文本位置:', this.lastSelectionRect);
+      }
+    } catch (error) {
+      if (this.config.isDebug) {
+        console.warn('BytedeskWeb: 获取选中文本位置失败:', error);
+      }
+      this.lastSelectionRect = null;
+    }
+    
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 设置selectedText为:', `"${selectedText}"`);
+    }
+
+    // 显示反馈提示
+    if (this.config.feedbackConfig?.showOnSelection) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 配置允许显示选择提示，调用showFeedbackTooltip');
+      }
+      this.showFeedbackTooltip(this.lastMouseEvent || undefined);
+    } else {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 配置不允许显示选择提示');
+        console.log('BytedeskWeb: feedbackConfig.showOnSelection:', this.config.feedbackConfig?.showOnSelection);
+      }
+    }
+  }
+
+  /**
+   * 创建反馈提示框
+   */
+  private createFeedbackTooltip() {
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: createFeedbackTooltip被调用');
+    }
+
+    // 检查提示框是否存在且在DOM中
+    if (this.feedbackTooltip && document.body.contains(this.feedbackTooltip)) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 反馈提示框已存在且在DOM中，跳过创建');
+      }
+      return;
+    }
+
+    // 如果变量存在但不在DOM中，重置变量
+    if (this.feedbackTooltip && !document.body.contains(this.feedbackTooltip)) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 提示框变量存在但不在DOM中，重置变量');
+      }
+      this.feedbackTooltip = null;
+    }
+
+    this.feedbackTooltip = document.createElement('div');
+    this.feedbackTooltip.setAttribute('data-bytedesk-feedback', 'tooltip');
+    this.feedbackTooltip.style.cssText = `
+      position: fixed;
+      background: #2e88ff;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      cursor: pointer;
+      z-index: 999999;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-100%);
+      margin-top: -8px;
+      user-select: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      display: none;
+    `;
+
+    const selectionText = this.config.feedbackConfig?.selectionText || '文档反馈';
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 提示框文本:', selectionText);
+    }
+
+    // 添加图标和文本
+    this.feedbackTooltip.innerHTML = `
+      <span style="margin-right: 4px;">📝</span>
+      ${selectionText}
+    `;
+
+    // 点击事件
+    this.feedbackTooltip.addEventListener('click', async (e) => {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 反馈提示框被点击');
+        console.log('BytedeskWeb: 点击时选中文字:', this.selectedText);
+      }
+      e.stopPropagation();
+      e.preventDefault();
+      
+      // 先显示对话框，再隐藏提示框
+      try {
+        await this.showFeedbackDialog();
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: 对话框显示完成，现在隐藏提示框');
+        }
+        this.hideFeedbackTooltip();
+      } catch (error) {
+        if (this.config.isDebug) {
+          console.error('BytedeskWeb: 显示对话框时出错:', error);
+        }
+      }
+    });
+
+    // 添加到页面
+    document.body.appendChild(this.feedbackTooltip);
+    
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 反馈提示框已创建并添加到页面');
+      console.log('BytedeskWeb: 提示框元素:', this.feedbackTooltip);
+    }
+  }
+
+  /**
+   * 显示反馈提示框
+   */
+  private showFeedbackTooltip(_event?: MouseEvent) {
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: showFeedbackTooltip被调用');
+      console.log('BytedeskWeb: feedbackTooltip存在:', !!this.feedbackTooltip);
+      console.log('BytedeskWeb: selectedText存在:', !!this.selectedText);
+    }
+
+    // 检查提示框是否真的存在于DOM中
+    const tooltipInDOM = this.feedbackTooltip && document.body.contains(this.feedbackTooltip);
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: feedbackTooltip在DOM中:', tooltipInDOM);
+    }
+
+    // 如果提示框不存在或不在DOM中，重新创建
+    if (!this.feedbackTooltip || !tooltipInDOM) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 提示框不存在或已从DOM中移除，重新创建');
+      }
+      this.createFeedbackTooltip();
+    }
+
+    if (!this.feedbackTooltip || !this.selectedText) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 提示框或选中文本不存在，退出显示');
+      }
+      return;
+    }
+
+    // 获取选中文本的位置信息
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 无有效选择，无法计算位置');
+      }
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    
+    // 获取选中文字的第一行位置，而不是整个选中区域
+    let firstLineRect: DOMRect;
+    
+    try {
+      // 创建一个新的范围来获取第一个字符的位置
+      const startRange = document.createRange();
+      startRange.setStart(range.startContainer, range.startOffset);
+      
+      // 尝试找到第一行的结束位置
+      let endOffset = range.startOffset;
+      const textContent = range.startContainer.textContent || '';
+      
+      // 如果开始容器是文本节点，尝试找到第一行的结束
+      if (range.startContainer.nodeType === Node.TEXT_NODE) {
+        // 逐个字符检查，找到第一个换行或者到选择结束
+        while (endOffset < Math.min(textContent.length, range.endOffset)) {
+          const testRange = document.createRange();
+          testRange.setStart(range.startContainer, range.startOffset);
+          testRange.setEnd(range.startContainer, endOffset + 1);
+          
+          const testRect = testRange.getBoundingClientRect();
+          const startRect = startRange.getBoundingClientRect();
+          
+          // 如果垂直位置发生变化，说明换行了
+          if (Math.abs(testRect.top - startRect.top) > 5) {
+            break;
+          }
+          
+          endOffset++;
+        }
+        
+        startRange.setEnd(range.startContainer, Math.max(endOffset, range.startOffset + 1));
+        firstLineRect = startRange.getBoundingClientRect();
+      } else {
+        // 如果不是文本节点，使用整个范围
+        firstLineRect = range.getBoundingClientRect();
+      }
+    } catch (error) {
+      // 如果出错，回退到使用整个选择区域
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 获取第一行位置失败，使用整个选择区域:', error);
+      }
+      firstLineRect = range.getBoundingClientRect();
+    }
+    
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 选中文本第一行位置信息:', {
+        left: firstLineRect.left,
+        top: firstLineRect.top,
+        right: firstLineRect.right,
+        bottom: firstLineRect.bottom,
+        width: firstLineRect.width,
+        height: firstLineRect.height
+      });
+    }
+
+    // 计算提示框位置 - 显示在选中文字第一行左上角上方
+    const tooltipWidth = 120; // 预估提示框宽度
+    const tooltipHeight = 40; // 预估提示框高度
+    const verticalOffset = 15; // 与选中文字的垂直间距，增加间距避免遮挡
+    const horizontalOffset = 5; // 水平微调，避免完全贴边
+
+    // 水平位置：选中文字第一行的左上角，稍微右移一点
+    let x = firstLineRect.left + horizontalOffset;
+    // 显示在选中文字第一行上方，增加垂直间距
+    let y = firstLineRect.top - tooltipHeight - verticalOffset;
+
+    // 边界检查和调整
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+
+    // 左边界检查
+    if (x < 10) {
+      x = 10;
+    }
+    // 右边界检查
+    if (x + tooltipWidth > viewportWidth - 10) {
+      x = viewportWidth - tooltipWidth - 10;
+    }
+
+    // 上边界检查 - 如果上方空间不够，显示在第一行下方
+    if (y < scrollY + 10) {
+      y = firstLineRect.bottom + verticalOffset;
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 上方空间不足，调整为显示在选中文字第一行下方');
+      }
+    }
+
+    // 加上滚动偏移
+    x += scrollX;
+    y += scrollY;
+
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 最终提示框位置:', { 
+        x: x, 
+        y: y, 
+        说明: '显示在选中文字第一行左上角上方，增加间距避免遮挡',
+        verticalOffset: verticalOffset,
+        horizontalOffset: horizontalOffset,
+        选中区域: firstLineRect,
+        视口信息: { viewportWidth, viewportHeight, scrollX, scrollY }
+      });
+    }
+
+    // 确保提示框完全重置到可见状态
+    this.feedbackTooltip.style.position = 'absolute';
+    this.feedbackTooltip.style.left = x + 'px';
+    this.feedbackTooltip.style.top = y + 'px';
+    this.feedbackTooltip.style.display = 'block';
+    this.feedbackTooltip.style.visibility = 'visible';
+    this.feedbackTooltip.style.opacity = '0'; // 先设为0，然后动画到1
+    this.feedbackTooltip.style.zIndex = '999999';
+    
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 提示框位置已设置，样式:', {
+        position: this.feedbackTooltip.style.position,
+        left: this.feedbackTooltip.style.left,
+        top: this.feedbackTooltip.style.top,
+        display: this.feedbackTooltip.style.display,
+        visibility: this.feedbackTooltip.style.visibility,
+        opacity: this.feedbackTooltip.style.opacity,
+        zIndex: this.feedbackTooltip.style.zIndex
+      });
+    }
+    
+    // 立即更新状态
+    this.isTooltipVisible = true;
+    
+    // 延迟显示动画
+    setTimeout(() => {
+      if (this.feedbackTooltip && this.isTooltipVisible) {
+        this.feedbackTooltip.style.opacity = '1';
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: 提示框透明度设置为1，应该可见了');
+        }
+      }
+    }, 10);
+  }
+
+  /**
+   * 隐藏反馈提示框
+   */
+  private hideFeedbackTooltip() {
+    // 检查提示框是否真的存在于DOM中
+    const tooltipInDOM = this.feedbackTooltip && document.body.contains(this.feedbackTooltip);
+    
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: hideFeedbackTooltip被调用');
+      console.log('BytedeskWeb: feedbackTooltip存在:', !!this.feedbackTooltip);
+      console.log('BytedeskWeb: feedbackTooltip在DOM中:', tooltipInDOM);
+    }
+
+    if (!this.feedbackTooltip || !tooltipInDOM) {
+      this.isTooltipVisible = false;
+      this.lastSelectionText = '';
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 提示框不存在或不在DOM中，仅重置状态');
+      }
+      return;
+    }
+
+    this.isTooltipVisible = false;
+    this.lastSelectionText = '';
+    this.feedbackTooltip.style.opacity = '0';
+    
+    // 使用更短的延迟并检查状态
+    setTimeout(() => {
+      // 只有在状态仍然是不可见时才真正隐藏
+      if (this.feedbackTooltip && document.body.contains(this.feedbackTooltip) && !this.isTooltipVisible) {
+        this.feedbackTooltip.style.display = 'none';
+        this.feedbackTooltip.style.visibility = 'hidden';
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: 提示框已隐藏');
+        }
+      } else if (this.config.isDebug && this.isTooltipVisible) {
+        console.log('BytedeskWeb: 跳过隐藏操作，提示框状态已改变为可见');
+      }
+    }, 100); // 减少延迟时间
+  }
+
+  /**
+   * 创建反馈对话框
+   */
+  private createFeedbackDialog() {
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: createFeedbackDialog被调用');
+    }
+
+    // 检查对话框是否存在且在DOM中
+    if (this.feedbackDialog && document.body.contains(this.feedbackDialog)) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 反馈对话框已存在且在DOM中，跳过创建');
+      }
+      return;
+    }
+
+    // 如果变量存在但不在DOM中，重置变量
+    if (this.feedbackDialog && !document.body.contains(this.feedbackDialog)) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 对话框变量存在但不在DOM中，重置变量');
+      }
+      this.feedbackDialog = null;
+    }
+
+    this.feedbackDialog = document.createElement('div');
+    this.feedbackDialog.setAttribute('data-bytedesk-feedback', 'dialog');
+    this.feedbackDialog.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    `;
+
+    const dialogContent = document.createElement('div');
+    dialogContent.style.cssText = `
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      position: relative;
+    `;
+
+    dialogContent.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #333;">
+          ${this.config.feedbackConfig?.dialogTitle || '提交意见反馈'}
+        </h3>
+        <button type="button" data-action="close" style="
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: #999;
+          line-height: 1;
+          padding: 0;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">×</button>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #555;">选中的文字：</label>
+        <div id="bytedesk-selected-text" style="
+          background: #f5f5f5;
+          padding: 12px;
+          border-radius: 6px;
+          border-left: 4px solid #2e88ff;
+          font-size: 14px;
+          line-height: 1.5;
+          color: #333;
+          max-height: 100px;
+          overflow-y: auto;
+        "></div>
+      </div>
+
+      ${this.config.feedbackConfig?.categoryNames && this.config.feedbackConfig.categoryNames.length > 0 ? `
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
+          <span style="color: #ff4d4f;">*</span> ${this.config.feedbackConfig?.typesSectionTitle || '问题类型'} ${this.config.feedbackConfig?.typesDescription || '（多选）'}
+        </label>
+        <div id="bytedesk-feedback-types" style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 12px;
+          margin-bottom: 8px;
+        ">
+          ${this.config.feedbackConfig.categoryNames.map((categoryName) => `
+            <label style="
+              display: flex;
+              align-items: flex-start;
+              gap: 8px;
+              cursor: pointer;
+              padding: 8px;
+              border-radius: 4px;
+              transition: background-color 0.2s;
+            " onmouseover="this.style.backgroundColor='#f5f5f5'" onmouseout="this.style.backgroundColor='transparent'">
+              <input type="checkbox" name="feedback-type" value="${categoryName}" style="
+                margin: 2px 0 0 0;
+                cursor: pointer;
+              ">
+              <span style="
+                font-size: 14px;
+                line-height: 1.4;
+                color: #333;
+                flex: 1;
+              ">${categoryName}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+      ` : ''}
+
+      ${this.config.feedbackConfig?.submitScreenshot !== false ? `
+      <div style="margin-bottom: 16px;">
+        <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: 500; color: #555;">
+          <input type="checkbox" id="bytedesk-submit-screenshot" checked style="cursor: pointer;">
+          提交截图内容
+        </label>
+        <div id="bytedesk-screenshot-container" style="
+          border: 2px dashed #ddd;
+          border-radius: 6px;
+          padding: 20px;
+          text-align: center;
+          color: #999;
+          min-height: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: 8px;
+        ">
+          <div style="font-size: 24px;">📷</div>
+          <div>正在生成截图预览...</div>
+          <div style="font-size: 12px; color: #666;">截图将在提交时上传到服务器</div>
+        </div>
+      </div>
+      ` : ''}
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
+          <span style="color: #ff4d4f;">*</span> 问题描述
+        </label>
+        <textarea id="bytedesk-feedback-text" placeholder="${this.config.feedbackConfig?.placeholder || '请详细描述您的问题或优化建议'}" style="
+          width: 100%;
+          min-height: 120px;
+          padding: 12px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 14px;
+          font-family: inherit;
+          resize: vertical;
+          box-sizing: border-box;
+        "></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button type="button" data-action="cancel" style="
+          background: #f5f5f5;
+          color: #666;
+          border: 1px solid #ddd;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-family: inherit;
+        ">${this.config.feedbackConfig?.cancelText || '取消'}</button>
+        <button type="button" data-action="submit" style="
+          background: #2e88ff;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-family: inherit;
+        ">${this.config.feedbackConfig?.submitText || '提交反馈'}</button>
+      </div>
+    `;
+
+    // 添加事件监听
+    dialogContent.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const action = target.getAttribute('data-action');
+      
+      switch (action) {
+        case 'close':
+        case 'cancel':
+          this.hideFeedbackDialog();
+          this.config.feedbackConfig?.onCancel?.();
+          break;
+        case 'submit':
+          this.submitFeedback();
+          break;
+      }
+    });
+
+    this.feedbackDialog.appendChild(dialogContent);
+
+    // 点击遮罩关闭
+    this.feedbackDialog.addEventListener('click', (e) => {
+      if (e.target === this.feedbackDialog) {
+        this.hideFeedbackDialog();
+        this.config.feedbackConfig?.onCancel?.();
+      }
+    });
+
+    // ESC键关闭
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.feedbackDialog?.style.display === 'flex') {
+        this.hideFeedbackDialog();
+        this.config.feedbackConfig?.onCancel?.();
+      }
+    });
+
+    document.body.appendChild(this.feedbackDialog);
+  }
+
+  /**
+   * 显示反馈对话框
+   */
+  private async showFeedbackDialog() {
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: showFeedbackDialog被调用');
+      console.log('BytedeskWeb: feedbackDialog存在:', !!this.feedbackDialog);
+    }
+
+    // 检查对话框是否真的存在于DOM中
+    const dialogInDOM = this.feedbackDialog && document.body.contains(this.feedbackDialog);
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: feedbackDialog在DOM中:', dialogInDOM);
+    }
+
+    // 如果对话框不存在或不在DOM中，重新创建
+    if (!this.feedbackDialog || !dialogInDOM) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 对话框不存在或已从DOM中移除，重新创建');
+      }
+      this.createFeedbackDialog();
+    }
+
+    if (!this.feedbackDialog) {
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 对话框创建失败，退出显示');
+      }
+      return;
+    }
+
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 开始填充对话框内容');
+    }
+
+    // 填充选中的文字
+    const selectedTextElement = this.feedbackDialog.querySelector('#bytedesk-selected-text');
+    if (selectedTextElement) {
+      selectedTextElement.textContent = this.selectedText || '';
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 已填充选中文字:', this.selectedText);
+      }
+    }
+
+    // 清空之前的反馈内容
+    const feedbackTextarea = this.feedbackDialog.querySelector('#bytedesk-feedback-text') as HTMLTextAreaElement;
+    if (feedbackTextarea) {
+      feedbackTextarea.value = '';
+    }
+
+    // 显示对话框
+    this.feedbackDialog.style.display = 'flex';
+    
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 对话框已设置为显示状态');
+      console.log('BytedeskWeb: 对话框样式:', {
+        display: this.feedbackDialog.style.display,
+        visibility: this.feedbackDialog.style.visibility,
+        zIndex: this.feedbackDialog.style.zIndex
+      });
+    }
+
+    // 生成截图预览（但不上传）
+    try {
+      await this.generateScreenshotPreview();
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 截图预览生成完成');
+      }
+    } catch (error) {
+      if (this.config.isDebug) {
+        console.error('BytedeskWeb: 截图预览生成失败:', error);
+      }
+    }
+  }
+
+  /**
+   * 隐藏反馈对话框
+   */
+  private hideFeedbackDialog() {
+    if (!this.feedbackDialog) return;
+    this.feedbackDialog.style.display = 'none';
+  }
+
+  /**
+   * 生成页面截图并上传到服务器
+   * @returns 返回上传后的截图URL，如果失败则返回null
+   */
+  private async generateAndUploadScreenshot(): Promise<string | null> {
+    try {
+      let canvas: HTMLCanvasElement;
+
+      // 检查是否已有预生成的截图canvas
+      const existingCanvas = (this.feedbackDialog as any)?.screenshotCanvas;
+      if (existingCanvas) {
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: 使用已生成的截图canvas');
+        }
+        canvas = existingCanvas;
+      } else {
+        // 如果没有预生成的截图，重新生成
+        const html2canvas = await this.loadHtml2Canvas();
+        if (!html2canvas) {
+          if (this.config.isDebug) {
+            console.log('BytedeskWeb: html2canvas加载失败，跳过截图');
+          }
+          return null;
+        }
+
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: 重新生成截图');
+        }
+
+        // 计算选中文本附近的截图区域
+        const screenshotOptions = this.calculateScreenshotArea();
+        
+        // 生成截图
+        canvas = await html2canvas(document.body, {
+          height: screenshotOptions.height,
+          width: screenshotOptions.width,
+          x: screenshotOptions.x,
+          y: screenshotOptions.y,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          scale: 1,
+          ignoreElements: (element: HTMLElement) => {
+            // 忽略反馈相关的元素
+            return element.hasAttribute('data-bytedesk-feedback') || 
+                   element.closest('[data-bytedesk-feedback]') !== null;
+          }
+        });
+      }
+
+      // 将Canvas转换为Blob
+      return new Promise<string | null>((resolve) => {
+        canvas.toBlob(async (blob: Blob | null) => {
+          if (!blob) {
+            console.error('无法生成截图blob');
+            resolve(null);
+            return;
+          }
+
+          try {
+            // 创建文件对象
+            const fileName = `screenshot_${Date.now()}.jpg`;
+            const file = new File([blob], fileName, { type: 'image/jpeg' });
+            
+            if (this.config.isDebug) {
+              console.log('BytedeskWeb: 截图生成成功，文件大小:', Math.round(blob.size / 1024), 'KB');
+            }
+            
+            // 动态导入上传API并上传截图到服务器
+            const { uploadScreenshot } = await import('../apis/upload');
+            const screenshotUrl = await uploadScreenshot(file, {
+              orgUid: this.config.chatConfig?.org || '',
+              isDebug: this.config.isDebug
+            });
+            
+            if (this.config.isDebug) {
+              console.log('BytedeskWeb: 截图上传成功，URL:', screenshotUrl);
+            }
+            
+            resolve(screenshotUrl);
+          } catch (error) {
+            console.error('截图上传失败:', error);
+            resolve(null);
+          }
+        }, 'image/jpeg', 0.8);
+      });
+
+    } catch (error) {
+      console.error('生成截图失败:', error);
+      return null;
+    }
+  }
+
+  /**
+   * 生成截图预览（不上传到服务器）
+   */
+  private async generateScreenshotPreview() {
+    const screenshotContainer = this.feedbackDialog?.querySelector('#bytedesk-screenshot-container');
+    if (!screenshotContainer) return;
+
+    try {
+      // 动态导入 html2canvas
+      const html2canvas = await this.loadHtml2Canvas();
+      if (!html2canvas) {
+        screenshotContainer.innerHTML = `
+          <div style="color: #999; text-align: center; padding: 20px; flex-direction: column; gap: 8px; display: flex; align-items: center;">
+            <div style="font-size: 24px;">📷</div>
+            <div>截图功能暂时不可用</div>
+            <div style="font-size: 12px; color: #666;">网络连接问题或资源加载失败</div>
+          </div>
+        `;
+        return;
+      }
+
+      screenshotContainer.innerHTML = '正在生成截图预览...';
+
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 开始生成截图预览');
+      }
+
+      // 计算选中文本附近的截图区域
+      const screenshotOptions = this.calculateScreenshotArea();
+      
+      // 生成截图
+      const canvas = await html2canvas(document.body, {
+        height: screenshotOptions.height,
+        width: screenshotOptions.width,
+        x: screenshotOptions.x,
+        y: screenshotOptions.y,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        scale: 1,
+        ignoreElements: (element: HTMLElement) => {
+          // 忽略反馈相关的元素
+          return element.hasAttribute('data-bytedesk-feedback') || 
+                 element.closest('[data-bytedesk-feedback]') !== null;
+        }
+      });
+
+      // 创建预览图片
+      const img = document.createElement('img');
+      img.src = canvas.toDataURL('image/jpeg', 0.8);
+      img.style.cssText = `
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        cursor: pointer;
+      `;
+
+      // 添加点击放大功能
+      img.onclick = () => {
+        const fullImg = document.createElement('img');
+        fullImg.src = img.src;
+        fullImg.style.cssText = `
+          max-width: 90vw;
+          max-height: 90vh;
+          border-radius: 8px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        `;
+        
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0,0,0,0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000001;
+          cursor: pointer;
+        `;
+        
+        // 添加关闭提示
+        const closeHint = document.createElement('div');
+        closeHint.style.cssText = `
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          color: white;
+          font-size: 14px;
+          background: rgba(0,0,0,0.6);
+          padding: 8px 12px;
+          border-radius: 4px;
+          user-select: none;
+        `;
+        closeHint.textContent = '点击任意位置关闭';
+        overlay.appendChild(closeHint);
+        
+        overlay.appendChild(fullImg);
+        overlay.onclick = () => document.body.removeChild(overlay);
+        document.body.appendChild(overlay);
+      };
+
+      // 创建容器包含图片和提示文字
+      const previewContainer = document.createElement('div');
+      previewContainer.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      `;
+      
+      previewContainer.appendChild(img);
+      
+      const tipText = document.createElement('div');
+      tipText.style.cssText = `
+        font-size: 12px;
+        color: #666;
+        text-align: center;
+      `;
+      tipText.innerHTML = '点击图片可放大查看<br/>提交时将自动上传此截图';
+      previewContainer.appendChild(tipText);
+
+      screenshotContainer.innerHTML = '';
+      screenshotContainer.appendChild(previewContainer);
+
+      // 在对话框对象上存储canvas，以便提交时使用
+      (this.feedbackDialog as any).screenshotCanvas = canvas;
+
+      if (this.config.isDebug) {
+        console.log('BytedeskWeb: 截图预览生成成功');
+      }
+
+    } catch (error) {
+      console.error('生成截图预览失败:', error);
+      screenshotContainer.innerHTML = `
+        <div style="color: #ff6b6b; text-align: center; flex-direction: column; gap: 8px; display: flex; align-items: center;">
+          <div style="font-size: 24px;">⚠️</div>
+          <div>截图预览生成失败</div>
+          <div style="font-size: 12px; margin-top: 4px; color: #999;">请检查页面权限或网络连接</div>
+        </div>
+      `;
+    }
+  }
+
+  /**
+   * 计算选中文本附近的截图区域
+   */
+  private calculateScreenshotArea() {
+    // 默认截图整个视窗
+    let screenshotOptions = {
+      height: window.innerHeight,
+      width: window.innerWidth,
+      x: 0,
+      y: 0,
+      scrollX: 0,
+      scrollY: 0
+    };
+
+    try {
+      // 优先使用存储的选中文本位置
+      let rect = this.lastSelectionRect;
+      
+      // 如果没有存储的位置，尝试获取当前选中的文本位置
+      if (!rect) {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0);
+          rect = range.getBoundingClientRect();
+        }
+      }
+      
+      if (rect && rect.width > 0 && rect.height > 0) {
+        // 获取当前页面的滚动位置
+        const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // 计算选中文本在页面中的绝对位置
+        const absoluteLeft = rect.left + scrollX;
+        const absoluteTop = rect.top + scrollY;
+        
+        // 设置截图区域的大小（围绕选中文本）
+        const captureWidth = Math.min(800, window.innerWidth);  // 最大800px宽
+        const captureHeight = Math.min(600, window.innerHeight); // 最大600px高
+        
+        // 计算截图区域的左上角位置（以选中文本为中心）
+        let captureX = absoluteLeft - captureWidth / 2;
+        let captureY = absoluteTop - captureHeight / 2;
+        
+        // 确保截图区域不超出页面边界
+        const pageWidth = document.documentElement.scrollWidth;
+        const pageHeight = document.documentElement.scrollHeight;
+        
+        captureX = Math.max(0, Math.min(captureX, pageWidth - captureWidth));
+        captureY = Math.max(0, Math.min(captureY, pageHeight - captureHeight));
+        
+        screenshotOptions = {
+          height: captureHeight,
+          width: captureWidth,
+          x: captureX,
+          y: captureY,
+          scrollX: 0,
+          scrollY: 0
+        };
+        
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: 选中文本截图区域:', {
+            selectedRect: rect,
+            absolutePosition: { left: absoluteLeft, top: absoluteTop },
+            captureArea: { x: captureX, y: captureY, width: captureWidth, height: captureHeight },
+            pageSize: { width: pageWidth, height: pageHeight }
+          });
+        }
+      } else {
+        // 如果没有选中文本，尝试使用存储的最后一次鼠标事件位置
+        if (this.lastMouseEvent) {
+          const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+          const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+          
+          const absoluteX = this.lastMouseEvent.clientX + scrollX;
+          const absoluteY = this.lastMouseEvent.clientY + scrollY;
+          
+          const captureWidth = Math.min(800, window.innerWidth);
+          const captureHeight = Math.min(600, window.innerHeight);
+          
+          let captureX = absoluteX - captureWidth / 2;
+          let captureY = absoluteY - captureHeight / 2;
+          
+          const pageWidth = document.documentElement.scrollWidth;
+          const pageHeight = document.documentElement.scrollHeight;
+          
+          captureX = Math.max(0, Math.min(captureX, pageWidth - captureWidth));
+          captureY = Math.max(0, Math.min(captureY, pageHeight - captureHeight));
+          
+          screenshotOptions = {
+            height: captureHeight,
+            width: captureWidth,
+            x: captureX,
+            y: captureY,
+            scrollX: 0,
+            scrollY: 0
+          };
+          
+          if (this.config.isDebug) {
+            console.log('BytedeskWeb: 鼠标位置截图区域:', {
+              mousePosition: { x: this.lastMouseEvent.clientX, y: this.lastMouseEvent.clientY },
+              absolutePosition: { x: absoluteX, y: absoluteY },
+              captureArea: { x: captureX, y: captureY, width: captureWidth, height: captureHeight }
+            });
+          }
+        }
+      }
+    } catch (error) {
+      if (this.config.isDebug) {
+        console.warn('BytedeskWeb: 计算截图区域失败，使用默认区域:', error);
+      }
+    }
+    
+    return screenshotOptions;
+  }
+
+  /**
+   * 动态加载 html2canvas
+   */
+  private async loadHtml2Canvas() {
+    try {
+      // 尝试从全局变量获取
+      if ((window as any).html2canvas) {
+        return (window as any).html2canvas;
+      }
+
+      // 尝试通过 CDN 加载
+      return await this.loadHtml2CanvasFromCDN();
+    } catch (error) {
+      if (this.config.isDebug) {
+        console.warn('html2canvas 加载失败:', error);
+      }
+      return null;
+    }
+  }
+
+  /**
+   * 从CDN加载html2canvas
+   */
+  private async loadHtml2CanvasFromCDN(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      // 检查是否已经加载
+      if ((window as any).html2canvas) {
+        resolve((window as any).html2canvas);
+        return;
+      }
+
+      // 创建script标签加载资源
+      const script = document.createElement('script');
+      script.src = this.config.apiUrl + '/assets/js/html2canvas.min.js';
+      script.onload = () => {
+        if ((window as any).html2canvas) {
+          resolve((window as any).html2canvas);
+        } else {
+          reject(new Error('html2canvas 加载失败'));
+        }
+      };
+      script.onerror = () => {
+        reject(new Error('无法从CDN加载html2canvas'));
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+
+
+  /**
+   * 提交反馈
+   */
+  private async submitFeedback() {
+    const feedbackTextarea = this.feedbackDialog?.querySelector('#bytedesk-feedback-text') as HTMLTextAreaElement;
+    const feedbackText = feedbackTextarea?.value.trim() || '';
+
+    if (!feedbackText) {
+      alert('请填写反馈内容');
+      feedbackTextarea?.focus();
+      return;
+    }
+
+    // 收集选中的反馈类型
+    const selectedTypes: string[] = [];
+    const typeCheckboxes = this.feedbackDialog?.querySelectorAll('input[name="feedback-type"]:checked') as NodeListOf<HTMLInputElement>;
+    if (typeCheckboxes) {
+      typeCheckboxes.forEach((checkbox) => {
+        selectedTypes.push(checkbox.value);
+      });
+    }
+
+    // 检查是否必须选择反馈类型
+    if (this.config.feedbackConfig?.requiredTypes && selectedTypes.length === 0) {
+      alert('请至少选择一个问题类型');
+      return;
+    }
+
+    // 获取提交按钮并设置加载状态
+    const submitButton = this.feedbackDialog?.querySelector('.bytedesk-feedback-submit') as HTMLButtonElement;
+    const originalSubmitText = submitButton?.textContent || '提交反馈';
+    
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = '提交中...';
+      submitButton.style.opacity = '0.6';
+    }
+
+    try {
+      // 检查是否需要提交截图
+      const submitScreenshotCheckbox = this.feedbackDialog?.querySelector('#bytedesk-submit-screenshot') as HTMLInputElement;
+      const shouldSubmitScreenshot = submitScreenshotCheckbox?.checked !== false;
+      
+      let screenshotUrls: string[] = [];
+      
+      // 如果需要提交截图，先生成和上传截图
+      if (shouldSubmitScreenshot) {
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: 开始生成和上传截图');
+        }
+        
+        if (submitButton) {
+          submitButton.textContent = '正在生成截图...';
+        }
+        
+        // 生成截图
+        const screenshotUrl = await this.generateAndUploadScreenshot();
+        if (screenshotUrl) {
+          screenshotUrls.push(screenshotUrl);
+          if (this.config.isDebug) {
+            console.log('BytedeskWeb: 截图上传成功:', screenshotUrl);
+          }
+        }
+        
+        if (submitButton) {
+          submitButton.textContent = '正在提交反馈...';
+        }
+      }
+      
+      // 构建反馈数据（统一数据结构）
+      const feedbackData: FEEDBACK.FeedbackRequest = {
+        selectedText: this.selectedText,
+        ...(screenshotUrls.length > 0 && { images: screenshotUrls }), // 将截图URL放入images数组
+        content: feedbackText,
+        url: window.location.href,
+        title: document.title,
+        userAgent: navigator.userAgent,
+        visitorUid: localStorage.getItem('bytedesk_uid') || '',
+        orgUid: this.config.chatConfig?.org || '',
+        ...(selectedTypes.length > 0 && { categoryNames: selectedTypes.join(',') }),
+      };
+
+      // 调用提交回调或提交到服务器
+      if (this.config.feedbackConfig?.onSubmit) {
+        // 如果有自定义回调，调用回调函数（现在类型完全匹配）
+        this.config.feedbackConfig.onSubmit(feedbackData);
+      } else {
+        // 默认提交到服务器
+        await this.submitFeedbackToServer(feedbackData);
+      }
+
+      // 显示成功消息
+      this.showFeedbackSuccess();
+      
+      // 关闭对话框
+      setTimeout(() => {
+        this.hideFeedbackDialog();
+      }, 2000);
+
+    } catch (error) {
+      console.error('提交反馈失败:', error);
+      alert('提交失败，请稍后重试');
+    } finally {
+      // 恢复提交按钮状态
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = originalSubmitText;
+        submitButton.style.opacity = '1';
+      }
+    }
+  }
+
+  /**
+   * 提交反馈到服务器
+   */
+  private async submitFeedbackToServer(feedbackData: FEEDBACK.FeedbackRequest) {
+    try {
+      const { submitFeedback } = await import('../apis/feedback');
+      const response = await submitFeedback(feedbackData);
+      
+      if (this.config.isDebug) {
+        console.log('反馈提交响应:', response);
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('提交反馈到服务器失败:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 显示反馈成功消息
+   */
+  private showFeedbackSuccess() {
+    if (!this.feedbackDialog) return;
+
+    const dialogContent = this.feedbackDialog.querySelector('div > div');
+    if (!dialogContent) return;
+
+    dialogContent.innerHTML = `
+      <div style="text-align: center; padding: 40px 20px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+        <h3 style="margin: 0 0 12px 0; color: #28a745;">
+          ${this.config.feedbackConfig?.successMessage || '反馈已提交，感谢您的意见！'}
+        </h3>
+        <div style="color: #666; font-size: 14px;">
+          我们会认真处理您的反馈，不断改进产品体验
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * 公共方法：显示反馈对话框
+   */
+  public showDocumentFeedback(selectedText?: string) {
+    if (!this.config.feedbackConfig?.enabled) {
+      console.warn('文档反馈功能未启用');
+      return;
+    }
+
+    if (selectedText) {
+      this.selectedText = selectedText;
+    }
+
+    this.showFeedbackDialog();
+  }
+
+  /**
+   * 公共方法：重新初始化反馈功能
+   */
+  public reinitFeedbackFeature() {
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 重新初始化反馈功能');
+    }
+    // 先销毁现有的反馈功能
+    this.destroyFeedbackFeature();
+    // 重新初始化
+    this.initFeedbackFeature();
+  }
+
+  /**
+   * 公共方法：强制初始化反馈功能（用于调试）
+   */
+  public forceInitFeedbackFeature() {
+    console.log('BytedeskWeb: 强制初始化反馈功能被调用');
+    console.log('BytedeskWeb: 当前配置:', this.config.feedbackConfig);
+    console.log('BytedeskWeb: isDebug:', this.config.isDebug);
+    
+    // 确保配置是启用的
+    if (!this.config.feedbackConfig) {
+      console.log('BytedeskWeb: 创建默认反馈配置');
+      this.config.feedbackConfig = {
+        enabled: true,
+        trigger: 'selection',
+        showOnSelection: true,
+        selectionText: '📝 文档反馈',
+        dialogTitle: '提交意见反馈',
+        placeholder: '请详细描述您发现的问题、改进建议或其他意见...',
+        submitText: '提交反馈',
+        cancelText: '取消',
+        successMessage: '感谢您的反馈！我们会认真处理您的意见。',
+      };
+    }
+    
+    if (!this.config.feedbackConfig.enabled) {
+      console.log('BytedeskWeb: 启用反馈配置');
+      this.config.feedbackConfig.enabled = true;
+    }
+    
+    console.log('BytedeskWeb: 销毁现有反馈功能');
+    this.destroyFeedbackFeature();
+    
+    console.log('BytedeskWeb: 重新初始化反馈功能');
+    this.initFeedbackFeature();
+    
+    console.log('BytedeskWeb: 强制初始化完成，检查结果:');
+    console.log('- showDocumentFeedback方法存在:', typeof this.showDocumentFeedback === 'function');
+    console.log('- testTextSelection方法存在:', typeof this.testTextSelection === 'function');
+    console.log('- 反馈提示框存在:', !!this.feedbackTooltip);
+    console.log('- 反馈对话框存在:', !!this.feedbackDialog);
+    console.log('- 反馈提示框DOM存在:', !!document.querySelector('[data-bytedesk-feedback="tooltip"]'));
+    console.log('- 反馈对话框DOM存在:', !!document.querySelector('[data-bytedesk-feedback="dialog"]'));
+    
+    // 返回初始化状态
+    return {
+      success: !!(this.feedbackTooltip && this.feedbackDialog),
+      methods: {
+        showDocumentFeedback: typeof this.showDocumentFeedback === 'function',
+        testTextSelection: typeof this.testTextSelection === 'function'
+      },
+      elements: {
+        tooltip: !!this.feedbackTooltip,
+        dialog: !!this.feedbackDialog,
+        tooltipDOM: !!document.querySelector('[data-bytedesk-feedback="tooltip"]'),
+        dialogDOM: !!document.querySelector('[data-bytedesk-feedback="dialog"]')
+      }
+    };
+  }
+
+  /**
+   * 公共方法：测试文本选择功能
+   */
+  public testTextSelection(text: string = '测试选中文字') {
+    if (this.config.isDebug) {
+      console.log('BytedeskWeb: 测试文本选择功能，模拟选中文字:', `"${text}"`);
+    }
+    
+    this.selectedText = text;
+    
+    // 创建一个模拟的文本选择
+    try {
+      const testElement = document.createElement('div');
+      testElement.textContent = text;
+      testElement.style.cssText = `
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px;
+        background: #f0f0f0;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        z-index: 1000;
+        pointer-events: none;
+      `;
+      document.body.appendChild(testElement);
+      
+      // 创建选择范围
+      const range = document.createRange();
+      range.selectNodeContents(testElement);
+      
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        if (this.config.isDebug) {
+          console.log('BytedeskWeb: 已创建模拟文本选择');
+        }
+        
+        // 显示提示框
+        if (this.feedbackTooltip) {
+          this.showFeedbackTooltip();
+        } else {
+          console.error('BytedeskWeb: 反馈提示框不存在，无法测试');
+        }
+        
+        // 5秒后清理
+        setTimeout(() => {
+          if (selection) {
+            selection.removeAllRanges();
+          }
+          if (document.body.contains(testElement)) {
+            document.body.removeChild(testElement);
+          }
+          this.hideFeedbackTooltip();
+        }, 5000);
+      }
+    } catch (error) {
+      console.error('BytedeskWeb: 创建测试选择失败:', error);
+    }
+  }
+
+  /**
+   * 公共方法：获取调试信息
+   */
+  public getDebugInfo() {
+    return {
+      config: this.config,
+      feedbackConfig: this.config.feedbackConfig,
+      feedbackTooltip: !!this.feedbackTooltip,
+      feedbackDialog: !!this.feedbackDialog,
+      selectedText: this.selectedText,
+      methods: {
+        showDocumentFeedback: typeof this.showDocumentFeedback,
+        testTextSelection: typeof this.testTextSelection,
+        forceInitFeedbackFeature: typeof this.forceInitFeedbackFeature
+      }
+    };
+  }
+
+  /**
+   * 公共方法：销毁反馈功能
+   */
+  private destroyFeedbackFeature() {
+    if (this.feedbackTooltip) {
+      this.feedbackTooltip.remove();
+      this.feedbackTooltip = null;
+    }
+
+    if (this.feedbackDialog) {
+      this.feedbackDialog.remove();
+      this.feedbackDialog = null;
+    }
+
+    this.selectedText = '';
+  }
 }

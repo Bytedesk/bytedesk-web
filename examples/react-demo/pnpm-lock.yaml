@@ -12,8 +12,8 @@ importers:
         specifier: ^5.25.3
         version: 5.25.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       bytedesk-web:
-        specifier: ^1.5.7
-        version: 1.5.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(svelte@4.2.20)(typescript@5.8.3)(vue@3.5.15(typescript@5.8.3))
+        specifier: ^1.6.4
+        version: 1.6.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(svelte@4.2.20)(typescript@5.8.3)(vue@3.5.15(typescript@5.8.3))
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -789,8 +789,8 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
-  bytedesk-web@1.5.7:
-    resolution: {integrity: sha512-vYfiGQVZtK5DbJPUohXspP82tIl9bWB9JChVSP9OF8K66+IhE+R4QWtEpfUjokpQ6CeHtKfzWMomL30fKRlYaw==}
+  bytedesk-web@1.6.4:
+    resolution: {integrity: sha512-XIr8vmwp1oSTv5P7Z3ZCCtjHel7yWeH+hzTZmbD+1+j2Z1MMNlhRZ54mqjoEKOLSBc8HogrOrU1pdgePIpiyig==}
     peerDependencies:
       '@angular/common': ^16.0.0
       '@angular/core': ^16.0.0
@@ -2241,7 +2241,7 @@ snapshots:
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.24.5)
 
-  bytedesk-web@1.5.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(svelte@4.2.20)(typescript@5.8.3)(vue@3.5.15(typescript@5.8.3)):
+  bytedesk-web@1.6.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(svelte@4.2.20)(typescript@5.8.3)(vue@3.5.15(typescript@5.8.3)):
     dependencies:
       axios: 1.10.0
       mitt: 3.0.1

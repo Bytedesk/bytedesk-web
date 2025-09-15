@@ -21,6 +21,7 @@ import GoodsInfoDemo from './pages/goodsInfoDemo';
 import OrderInfoDemo from './pages/orderInfoDemo';
 import UserInfoDemo from './pages/userInfoDemo';
 import UnreadCountDemo from './pages/unreadCountDemo';
+import DocumentFeedbackDemo from './pages/DocumentFeedbackDemo';
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function AppContent() {
         <Link to="/orderInfo" style={getLinkStyle('/orderInfo')}>订单信息对接</Link>
         <Link to="/vipLevel" style={getLinkStyle('/vipLevel')}>千人千面对接</Link>
         <Link to="/unreadCount" style={getLinkStyle('/unreadCount')}>未读消息数对接</Link>
+        <Link to="/documentFeedback" style={getLinkStyle('/documentFeedback')}>📝 文档反馈演示</Link>
           {/* <Link to="/online">Online Demo</Link> */}
         </nav>
 
@@ -66,6 +68,7 @@ function AppContent() {
           <Route path="/goodsInfo" element={<GoodsInfoDemo />} />
           <Route path="/vipLevel" element={<VipLevelDemo />} />
           <Route path="/unreadCount" element={<UnreadCountDemo />} />
+          <Route path="/documentFeedback" element={<DocumentFeedbackDemo />} />
           {/* <Route path="/online" element={<OnlineDemo />} /> */}
         </Routes>
       </div>

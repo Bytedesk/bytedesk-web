@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-30 11:07:38
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 07:38:05
+ * @LastEditTime: 2025-09-15 16:53:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -97,6 +97,38 @@ export interface ButtonConfig {
   onClick?: () => void; // 点击回调
 }
 
+export interface FeedbackConfig {
+  enabled?: boolean; // 是否启用文档反馈功能
+  trigger?: 'selection' | 'button' | 'both'; // 触发方式：选中文本、按钮、或两者
+  showOnSelection?: boolean; // 是否在选中文本时显示提示
+  selectionText?: string; // 选中文本时显示的提示文字
+  buttonText?: string; // 按钮文字
+  dialogTitle?: string; // 反馈对话框标题
+  placeholder?: string; // 反馈内容输入框占位符
+  submitText?: string; // 提交按钮文字
+  cancelText?: string; // 取消按钮文字
+  successMessage?: string; // 提交成功提示
+  categoryNames?: string[]; // 反馈类型选项（字符串数组）
+  requiredTypes?: boolean; // 是否必须选择至少一个类型
+  typesSectionTitle?: string; // 反馈类型区域标题
+  typesDescription?: string; // 反馈类型描述
+  submitScreenshot?: boolean; // 是否提交截图
+  onSubmit?: (feedback: FeedbackData) => void; // 提交回调
+  onCancel?: () => void; // 取消回调
+}
+
+export interface FeedbackData {
+  selectedText: string; // 选中的文本
+  images?: string[]; // 上传图片URL列表（可选）
+  content: string; // 用户反馈内容
+  categoryNames?: string; // 反馈类型，多个类型用逗号分隔（可选）
+  url: string; // 当前页面URL
+  title: string; // 当前页面标题
+  userAgent: string; // 用户代理信息
+  visitorUid?: string; // 访客ID（可选）
+  orgUid?: string; // 组织ID（可选）
+}
+
 export interface BytedeskConfig {
   isDebug?: boolean; // 是否开启调试模式
   forceRefresh?: boolean; // 是否强制刷新页面
@@ -113,6 +145,7 @@ export interface BytedeskConfig {
   tabsConfig?: TabsConfig; // 标签配置
   bubbleConfig?: BubbleConfig; // 气泡配置
   buttonConfig?: ButtonConfig; // 按钮配置
+  feedbackConfig?: FeedbackConfig; // 文档反馈配置
   chatConfig?: ChatConfig; // 聊天配置
   browseConfig?: BrowseConfig; // 浏览配置
   animation?: Animation; // 动画配置

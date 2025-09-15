@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 13:08:41
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-08-08 19:54:49
+ * @LastEditTime: 2025-09-15 17:46:31
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -48,6 +48,53 @@
 ## 未读消息数
 
 ![unread](images/chat/unread_count.png)
+
+## 文档反馈功能 ✨ 新功能
+
+文档反馈功能是一个创新性功能，允许用户直接针对页面内容提交精准的反馈意见。
+
+### 功能特点
+
+- **智能文本检测**：自动监听页面文本选择事件
+- **实时截图生成**：基于 html2canvas 技术自动截取页面状态
+- **精准定位**：记录用户选中的具体文字内容
+- **友好界面**：简洁美观的反馈对话框
+- **灵活配置**：支持多种触发方式和自定义样式
+
+### 使用方法
+
+1. 用鼠标选中页面中的任意文字
+2. 自动弹出"文档反馈"提示按钮
+3. 点击按钮打开反馈对话框
+4. 查看选中文字和页面截图
+5. 输入反馈内容并提交
+
+### 配置示例
+
+```javascript
+const config = {
+  feedbackConfig: {
+    enabled: true, // 启用文档反馈功能
+    trigger: 'selection', // 触发方式
+    showOnSelection: true, // 选中文本时显示提示
+    selectionText: '文档反馈',
+    dialogTitle: '提交意见反馈',
+    placeholder: '请描述您的问题或优化建议',
+    onSubmit: (feedbackData) => {
+      console.log('收到反馈数据:', feedbackData);
+      // 自定义提交逻辑
+    }
+  }
+};
+```
+
+### 依赖安装
+
+文档反馈功能需要 html2canvas 库支持截图功能：
+
+```bash
+npm install html2canvas
+```
 
 [English Document](./readme.md)
 
@@ -137,7 +184,7 @@ const App = () => {
 # 显示/隐藏邀请对话框
 (window as any).bytedesk?.showInviteDialog();
 (window as any).bytedesk?.hideInviteDialog();
-
+ 
 # 获取未读消息数
 (window as any).bytedesk?.getUnreadMessageCount()
 # 清空所有未读消息

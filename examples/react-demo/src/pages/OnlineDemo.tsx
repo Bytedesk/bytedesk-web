@@ -15,7 +15,7 @@
 import React, { useState } from 'react';
 import { BytedeskReact } from 'bytedesk-web/react';
 // @ts-ignore
-import type { BytedeskConfig } from 'bytedesk-web/react';
+import type { BytedeskConfig, FeedbackData } from 'bytedesk-web/react';
 import InstallGuide from '../components/InstallGuide';
 
 const OnlineDemo = () => {
@@ -42,6 +42,25 @@ const OnlineDemo = () => {
       icon: '👋',
       title: '需要帮助吗？',
       subtitle: '点击开始对话'
+    },
+    // 文档反馈功能配置
+    feedbackConfig: {
+      enabled: true, // 启用文档反馈功能
+      trigger: 'selection', // 选中文本时触发
+      showOnSelection: true, // 选中文本时显示提示
+      selectionText: '文档反馈',
+      dialogTitle: '提交意见反馈',
+      placeholder: '请描述您的问题或优化建议',
+      submitText: '提交反馈',
+      cancelText: '取消',
+      successMessage: '反馈已提交，感谢您的意见！',
+      onSubmit: (feedbackData: FeedbackData) => {
+        console.log('收到反馈数据:', feedbackData);
+        // 这里可以自定义提交逻辑，比如发送到自己的服务器
+      },
+      onCancel: () => {
+        console.log('用户取消了反馈');
+      }
     },
     chatConfig: {
       org: 'df_org_uid',
@@ -92,6 +111,40 @@ const OnlineDemo = () => {
             Vue 在线演示代码示例
           </a>
         </p>
+      </div>
+
+      {/* 文档反馈功能演示内容 */}
+      <div style={{ marginTop: '30px', padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+        <h3 style={{ color: '#333', marginBottom: '16px' }}>📝 文档反馈功能演示</h3>
+        <p style={{ lineHeight: '1.6', color: '#666', marginBottom: '12px' }}>
+          <strong>如何使用文档反馈功能：</strong>
+        </p>
+        <ol style={{ lineHeight: '1.6', color: '#666', paddingLeft: '20px' }}>
+          <li>用鼠标选中下面的任意文字</li>
+          <li>会自动弹出"文档反馈"提示按钮</li>
+          <li>点击按钮即可提交反馈，系统会自动截图并记录选中的文字</li>
+        </ol>
+        
+        <div style={{ 
+          marginTop: '20px', 
+          padding: '16px', 
+          backgroundColor: 'white', 
+          borderRadius: '6px', 
+          border: '1px solid #e9ecef' 
+        }}>
+          <p style={{ lineHeight: '1.8', color: '#333', marginBottom: '12px' }}>
+            这是一段示例文档内容。BytedeskWeb 是一个强大的客服插件，支持实时聊天、智能机器人、文档反馈等多种功能。
+            您可以选中这段文字来体验文档反馈功能的便利性。
+          </p>
+          <p style={{ lineHeight: '1.8', color: '#333', marginBottom: '12px' }}>
+            当您选中文字时，系统会自动检测到文本选择，并在鼠标附近显示一个蓝色的"文档反馈"按钮。
+            点击按钮后，会打开反馈对话框，显示您选中的文字内容和当前页面的截图。
+          </p>
+          <p style={{ lineHeight: '1.8', color: '#333' }}>
+            这个功能特别适用于文档网站、帮助中心、产品介绍页面等需要收集用户反馈的场景。
+            用户可以直接针对特定内容提出问题或建议，极大提升了反馈的精准度和开发者的响应效率。
+          </p>
+        </div>
       </div>
 
       <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -198,6 +251,19 @@ const OnlineDemo = () => {
           }}
         >
           Hide Invite
+        </button>
+        <button
+          onClick={() => (window as any).bytedesk?.showDocumentFeedback('这是手动触发的反馈功能演示')}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#28a745',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          📝 手动触发文档反馈
         </button>
       </div>
 

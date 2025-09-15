@@ -44,23 +44,27 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
   useEffect(() => {
     activeComponentCount++;
     
-    // 检查是否已经存在全局实例
+    // 为了确保配置正确应用，我们总是销毁现有实例并重新创建
     if (globalBytedeskInstance) {
-      // console.log('BytedeskReact: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
-      bytedeskRef.current = globalBytedeskInstance;
-      (window as any).bytedesk = globalBytedeskInstance;
-      props.onInit?.();
-      return;
+      // console.log('BytedeskReact: 销毁现有实例以应用新配置');
+      globalBytedeskInstance.destroy();
+      globalBytedeskInstance = null;
+      delete (window as any).bytedesk;
     }
 
     // 创建新的全局实例
     // console.log('BytedeskReact: 创建新的全局实例');
     globalBytedeskInstance = new BytedeskWeb(props);
     bytedeskRef.current = globalBytedeskInstance;
-    
-    globalBytedeskInstance.init();
-    props.onInit?.();
     (window as any).bytedesk = globalBytedeskInstance;
+    
+    // 异步初始化，确保 window.bytedesk 在 onInit 调用前已设置
+    globalBytedeskInstance.init().then(() => {
+      props.onInit?.();
+    }).catch((error) => {
+      console.error('BytedeskWeb 初始化失败:', error);
+      props.onInit?.(); // 即使失败也调用 onInit，让组件知道初始化尝试已完成
+    });
 
     return () => {
       activeComponentCount--;

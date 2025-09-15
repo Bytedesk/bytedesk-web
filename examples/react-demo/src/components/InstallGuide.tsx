@@ -4,7 +4,41 @@
  * @LastEditors: jackning 270580156@qq.com
  * @LastEditTime: 2025-07-24 14:49:20
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+        <div>
+        <h3>5. 可用方法</h3>
+        <ul style={{ lineHeight: '1.6' }}>
+          <li><code>(window as any).bytedesk?.showButton()</code> - 显示按钮</li>
+          <li><code>(window as any).bytedesk?.hideButton()</code> - 隐藏按钮</li>
+          <li><code>(window as any).bytedesk?.showBubble()</code> - 显示气泡消息</li>
+          <li><code>(window as any).bytedesk?.hideBubble()</code> - 隐藏气泡消息</li>
+          <li><code>(window as any).bytedesk?.showChat()</code> - 显示聊天窗口</li>
+          <li><code>(window as any).bytedesk?.hideChat()</code> - 隐藏聊天窗口</li>
+          <li><code>(window as any).bytedesk?.showInviteDialog()</code> - 显示邀请对话框</li>
+          <li><code>(window as any).bytedesk?.hideInviteDialog()</code> - 隐藏邀请对话框</li>
+          <li><code>(window as any).bytedesk?.showDocumentFeedback(selectedText?)</code> - 显示文档反馈对话框 (新功能)</li>
+        </ul>
+      </div>
+
+      <div style={{ marginTop: '20px' }}>
+        <h3>6. 文档反馈功能说明</h3>
+        <p style={{ marginBottom: '12px' }}>文档反馈功能是一个全新的特色功能，可以让用户针对页面内容提交精准的反馈意见：</p>
+        <ul style={{ lineHeight: '1.6', marginBottom: '16px' }}>
+          <li><strong>自动检测文本选择：</strong>当用户选中页面中的文字时，自动显示"文档反馈"提示</li>
+          <li><strong>智能截图：</strong>自动截取当前页面状态，为反馈提供视觉上下文</li>
+          <li><strong>精准定位：</strong>记录用户选中的具体文字内容，方便开发者快速定位问题</li>
+          <li><strong>多种触发方式：</strong>支持文本选择触发、按钮触发或两者结合</li>
+          <li><strong>自定义处理：</strong>支持自定义提交逻辑，可以发送到自己的服务器</li>
+        </ul>
+        
+        <div style={{ backgroundColor: '#e7f3ff', padding: '12px', borderRadius: '6px', border: '1px solid #b3d8ff' }}>
+          <p style={{ margin: '0', fontSize: '14px', color: '#0066cc' }}>
+            <strong>💡 提示：</strong>文档反馈功能需要安装 <code>html2canvas</code> 库来支持截图功能：
+          </p>
+          <pre style={{ background: '#f8f9fa', padding: '8px', borderRadius: '4px', marginTop: '8px', fontSize: '12px' }}>
+            {`npm install html2canvas`}
+          </pre>
+        </div>
+      </div>e aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
  *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
  *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
@@ -118,6 +152,25 @@ import type { BytedeskConfig } from 'bytedesk-web/react';`}
     onReject: () => console.log('用户拒绝邀请'),
     onClose: () => console.log('邀请对话框关闭'),
     onOpen: () => console.log('邀请对话框打开'),
+  },
+  
+  // 文档反馈配置 (新功能)
+  feedbackConfig: {
+    enabled: true, // 是否启用文档反馈功能
+    trigger: 'selection', // 触发方式: 'selection' | 'button' | 'both'
+    showOnSelection: true, // 是否在选中文本时显示提示
+    selectionText: '文档反馈', // 选中文本时显示的提示文字
+    buttonText: '文档反馈', // 按钮文字
+    dialogTitle: '提交意见反馈', // 反馈对话框标题
+    placeholder: '请描述您的问题或优化建议', // 反馈内容输入框占位符
+    submitText: '提交反馈', // 提交按钮文字
+    cancelText: '取消', // 取消按钮文字
+    successMessage: '反馈已提交，感谢您的意见！', // 提交成功提示
+    onSubmit: (feedbackData) => {
+      console.log('收到反馈数据:', feedbackData);
+      // 自定义提交逻辑，可以发送到自己的服务器
+    },
+    onCancel: () => console.log('用户取消了反馈'),
   },
   
   // 气泡配置
