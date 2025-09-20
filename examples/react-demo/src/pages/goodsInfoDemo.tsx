@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-27 16:45:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 09:13:49
+ * @LastEditTime: 2025-09-20 09:22:29
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -12,8 +12,7 @@
  *  技术/商务联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button, Card, Typography, Space, Image, Divider, Row, Col, Tag } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
@@ -22,8 +21,6 @@ import type { BytedeskConfig } from '@bytedesk/web/types';
 // import { BytedeskReact } from 'bytedesk-web/react';
 // import { BytedeskConfig } from 'bytedesk-web';
 import { theme } from 'antd';
-import { useContext } from 'react';
-import React from 'react';
 
 const { Title, Paragraph, Text } = Typography;
 const { useToken } = theme;
@@ -92,7 +89,7 @@ const GoodsInfoDemo = () => {
         chatConfig: {
             org: 'df_org_uid', // 替换为您的组织ID
             t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
-            sid: 'df_wg_uid', // 替换为您的SID
+            sid: 'df_wg_aftersales', // 替换为您的SID
             // 自定义用户信息
             visitorUid: 'visitor_001',
             nickname: '访客小明',

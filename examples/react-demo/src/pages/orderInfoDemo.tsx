@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-27 16:45:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-04 09:13:57
+ * @LastEditTime: 2025-09-20 09:22:23
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -13,32 +13,26 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 
-import { useState, useEffect } from 'react';
-import { Button, Card, Typography, Space, Image, Divider, Row, Col, Tag, Steps, Descriptions } from 'antd';
+import { useState } from 'react';
+import { Button, Card, Typography, Space, Image, Divider, Row, Col, Tag, Steps, Descriptions, theme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig } from '@bytedesk/web/types';
-// import { BytedeskReact } from 'bytedesk-web/react';
-// import { BytedeskConfig } from 'bytedesk-web';
-import { theme } from 'antd';
-import { useContext } from 'react';
-import React from 'react';
 
 const { Title, Paragraph, Text } = Typography;
-const { useToken } = theme;
 
 // 定义商品信息接口
 interface GoodsInfo {
-    uid: string;
-    title: string;
-    image: string;
-    description: string;
+    uid?: string;
+    title?: string;
+    image?: string;
+    description?: string;
     price: number;
-    url: string;
-    tagList: string[];
-    extra: string;
-    quantity: number
+    url?: string;
+    tagList?: string[];
+    extra?: string;
+    quantity?: number;
 }
 
 // 定义订单信息接口
@@ -96,7 +90,7 @@ const TEST_ORDER: OrderInfo = {
 const OrderInfoDemo = () => {
     // 当前订单信息
     const [currentOrder, setCurrentOrder] = useState<OrderInfo>(TEST_ORDER);
-    const { token } = useToken();
+    const { token } = theme.useToken();
     // const { isDarkMode } = useContext(AppContext);
     const [themeKey, setThemeKey] = useState(0); // 添加主题key用于强制重新渲染
 
@@ -134,7 +128,7 @@ const OrderInfoDemo = () => {
         chatConfig: {
             org: 'df_org_uid',
             t: "1",
-            sid: 'df_wg_uid',
+            sid: 'df_wg_aftersales',
             visitorUid: 'visitor_001',
             nickname: '访客小明',
             avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
@@ -185,14 +179,16 @@ const OrderInfoDemo = () => {
             { title: '已完成', status: 'wait' }
         ];
 
-        const statusIndex = {
-            'pending': 0,
-            'paid': 1,
-            'shipped': 2,
-            'delivered': 3
+        type OrderStatus = NonNullable<OrderInfo['status']>;
+        const statusIndex: Record<OrderStatus, number> = {
+            pending: 0,
+            paid: 1,
+            shipped: 2,
+            delivered: 3,
         };
 
-        const currentIndex = statusIndex[currentOrder?.status || ''];
+        const safeStatus: OrderStatus = currentOrder?.status ?? 'pending';
+        const currentIndex = statusIndex[safeStatus];
         steps.forEach((step, index) => {
             if (index < currentIndex) {
                 step.status = 'finish';
@@ -293,7 +289,7 @@ const OrderInfoDemo = () => {
                                 <Col span={18}>
                                     <Space direction="vertical" size="small">
                                         <Title level={5}>{currentOrder?.goods?.title}</Title>
-                                        <Text>单价：¥{currentOrder?.goods?.price.toLocaleString()}</Text>
+                                        <Text>单价：¥{currentOrder?.goods?.price?.toLocaleString?.()}</Text>
                                         <Text>数量：{currentOrder?.goods?.quantity}</Text>
                                     </Space>
                                 </Col>
