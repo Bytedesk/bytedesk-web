@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, FeedbackData } from '@bytedesk/web/types';
+import InstallGuide from '../components/InstallGuide';
 
 const DocumentFeedbackDemo = () => {
   const [feedbackLogs, setFeedbackLogs] = useState<FeedbackData[]>([]);
@@ -339,6 +340,46 @@ ${!status.tooltipElement ? '\n⚠️ 反馈提示框元素未创建' : ''}
         <p style={{ fontSize: '16px', color: '#666', marginTop: '15px' }}>
           体验创新的文档反馈功能，让用户能够精准地针对页面内容提供反馈意见
         </p>
+      </div>
+
+      {/* 代码演示使用步骤 & 文档链接（参考 LocalDemo） */}
+      <div style={{ 
+        backgroundColor: '#ffffff',
+        padding: '20px',
+        borderRadius: '12px',
+        marginBottom: '20px',
+        border: '1px solid #e9ecef',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.04)'
+      }}>
+        <h3 style={{ color: '#333', marginBottom: '12px' }}>📚 代码演示使用步骤：DocumentFeedbackDemo</h3>
+        <ol style={{ margin: 0, paddingLeft: '20px', lineHeight: 1.8, color: '#333' }}>
+          <li>
+            安装 SDK 并引入组件：在页面中引入 <code>BytedeskReact</code>，并准备 <code>BytedeskConfig</code> 配置。
+          </li>
+          <li>
+            启用文档反馈：在 <code>feedbackConfig</code> 中设置 <code>enabled: true</code>、<code>trigger: 'selection'</code>、<code>showOnSelection: true</code>。
+          </li>
+          <li>
+            渲染组件：将 <code>{'<BytedeskReact {...config} />'}</code> 放在页面中。
+          </li>
+          <li>
+            体验功能：用鼠标选中下方任意文本，页面会在光标附近显示“📝 文档反馈”提示按钮，点击后填写并提交。
+          </li>
+          <li>
+            工具按钮：可使用上方“强制初始化/手动触发/测试文本选择/检查功能状态”按钮来辅助验证与调试。
+          </li>
+        </ol>
+        <div style={{ marginTop: '12px' }}>
+          <a href="https://www.weiyuai.cn/docs/zh-CN/docs/channel/react" target="_blank" rel="noopener noreferrer" style={{ color: '#2e88ff', textDecoration: 'none', marginRight: 16 }}>
+            查看 React 集成文档
+          </a>
+          <a href="https://www.weiyuai.cn/docs/zh-CN/docs/channel/vue" target="_blank" rel="noopener noreferrer" style={{ color: '#2e88ff', textDecoration: 'none', marginRight: 16 }}>
+            查看 Vue 集成文档
+          </a>
+          <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/DocumentFeedbackDemo.tsx" target="_blank" rel="noopener noreferrer" style={{ color: '#2e88ff', textDecoration: 'none' }}>
+            本示例源码（DocumentFeedbackDemo.tsx）
+          </a>
+        </div>
       </div>
 
       {/* 功能介绍 */}
@@ -711,6 +752,11 @@ feedbackTooltip在DOM中: ${bytedesk.feedbackTooltip && document.body.contains(b
         {...config}
         onInit={handleInit}
       />
+
+      {/* 安装指引（与 LocalDemo 一致） */}
+      <div style={{ marginTop: '20px' }}>
+        <InstallGuide />
+      </div>
     </div>
   );
 };

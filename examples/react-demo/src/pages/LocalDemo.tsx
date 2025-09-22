@@ -2,9 +2,9 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-31 10:20:19
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-07-24 07:08:29
+ * @LastEditTime: 2025-09-22 10:31:18
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
