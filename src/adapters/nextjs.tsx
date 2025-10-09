@@ -17,6 +17,7 @@ import dynamic from 'next/dynamic';
 import { IntlProvider } from 'react-intl';
 import type { BytedeskConfig } from '../types';
 import { messages } from '../locales';
+import logger from '../utils/logger';
 
 interface BytedeskNextjsProps extends BytedeskConfig {
   onInit?: () => void;
@@ -70,12 +71,12 @@ const BytedeskComponent = (props: BytedeskNextjsProps) => {
 
     return () => {
       activeComponentCount--;
-      console.log('BytedeskNextjs: 组件卸载，当前活跃组件数:', activeComponentCount);
+      logger.debug('BytedeskNextjs: 组件卸载，当前活跃组件数:', activeComponentCount);
       bytedeskRef.current = null;
       
       // 如果没有活跃组件了，清理全局实例
       if (activeComponentCount <= 0) {
-        console.log('BytedeskNextjs: 没有活跃组件，清理全局实例');
+        logger.debug('BytedeskNextjs: 没有活跃组件，清理全局实例');
         setTimeout(() => {
           if (globalBytedeskInstance && activeComponentCount <= 0) {
             globalBytedeskInstance.destroy();

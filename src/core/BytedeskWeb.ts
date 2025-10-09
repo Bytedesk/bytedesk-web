@@ -26,6 +26,7 @@ import {
   POST_MESSAGE_RECEIVE_MESSAGE,
 } from "../utils/constants";
 import type { BytedeskConfig } from "../types";
+import logger, { setGlobalConfig } from "../utils/logger";
 
 export default class BytedeskWeb {
   private config: BytedeskConfig;
@@ -61,6 +62,8 @@ export default class BytedeskWeb {
       ...this.getDefaultConfig(),
       ...config,
     };
+    // 设置全局日志配置
+    setGlobalConfig(this.config);
     // 直接导入setApiUrl函数
     this.setupApiUrl();
   }
@@ -73,11 +76,9 @@ export default class BytedeskWeb {
       const apiUrl = this.config.apiUrl || "https://api.weiyuai.cn";
       setApiUrl(apiUrl);
 
-      if (this.config.isDebug) {
-        console.log("API URL 已设置为:", apiUrl);
-      }
+      logger.info("API URL 已设置为:", apiUrl);
     } catch (error) {
-      console.error("设置API URL时出错:", error);
+      logger.error("设置API URL时出错:", error);
     }
   }
 
@@ -178,7 +179,7 @@ export default class BytedeskWeb {
     // 初始化文档反馈功能 - 立即初始化并设置备用触发
     if (this.config.feedbackConfig?.enabled) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 开始初始化文档反馈功能，document.readyState:', document.readyState);
+        logger.debug('BytedeskWeb: 开始初始化文档反馈功能，document.readyState:', document.readyState);
       }
       
       // 立即尝试初始化
@@ -187,12 +188,12 @@ export default class BytedeskWeb {
       // 如果DOM还没完全加载，设置备用初始化
       if (document.readyState !== 'complete') {
         if (this.config.isDebug) {
-          console.log('BytedeskWeb: DOM未完全加载，设置备用初始化');
+          logger.debug('BytedeskWeb: DOM未完全加载，设置备用初始化');
         }
         
         const loadHandler = () => {
           if (this.config.isDebug) {
-            console.log('BytedeskWeb: window load事件触发，重新初始化反馈功能');
+            logger.debug('BytedeskWeb: window load事件触发，重新初始化反馈功能');
           }
           this.initFeedbackFeature();
           window.removeEventListener('load', loadHandler);
@@ -203,7 +204,7 @@ export default class BytedeskWeb {
         // 额外的DOMContentLoaded监听作为备用
         const domHandler = () => {
           if (this.config.isDebug) {
-            console.log('BytedeskWeb: DOMContentLoaded事件触发，重新初始化反馈功能');
+            logger.debug('BytedeskWeb: DOMContentLoaded事件触发，重新初始化反馈功能');
           }
           setTimeout(() => this.initFeedbackFeature(), 100);
           document.removeEventListener('DOMContentLoaded', domHandler);
@@ -235,15 +236,15 @@ export default class BytedeskWeb {
   async _initVisitor() {
     // 检查是否已有正在进行的请求
     if (this.initVisitorPromise) {
-      console.log("访客初始化请求正在进行中，返回现有Promise");
+      logger.debug("访客初始化请求正在进行中，返回现有Promise");
       return this.initVisitorPromise;
     }
 
     // 首先检查本地 localStorage 是否已有访客信息
     const localUid = localStorage.getItem(BYTEDESK_UID);
     const localVisitorUid = localStorage.getItem(BYTEDESK_VISITOR_UID);
-    console.log("localUid: ", localUid);
-    console.log("localVisitorUid: ", localVisitorUid);
+    logger.debug("localUid: ", localUid);
+    logger.debug("localVisitorUid: ", localVisitorUid);
 
     // 首先判断 this.config.chatConfig?.visitorUid 是否为空，如果不为空，跟localVisitorUid对比，
     // 如果相同，则直接返回本地访客信息，不进行API初始化
@@ -259,7 +260,7 @@ export default class BytedeskWeb {
       localVisitorUid &&
       visitorUidMatch
     ) {
-      console.log("访客信息相同，直接返回本地访客信息");
+      logger.debug("访客信息相同，直接返回本地访客信息");
 
       // 触发回调，传递本地存储的访客信息
       this.config.onVisitorInfo?.(localUid || "", localVisitorUid || "");
@@ -271,7 +272,7 @@ export default class BytedeskWeb {
     }
 
     // 创建新的请求Promise
-    console.log("开始创建访客初始化Promise");
+    logger.debug("开始创建访客初始化Promise");
     this.initVisitorPromise = import("../apis/visitor").then(
       async ({ initVisitor }) => {
         try {
@@ -294,21 +295,21 @@ export default class BytedeskWeb {
           };
           // 调用API初始化访客信息
           const response = await initVisitor(params);
-          console.log("访客初始化API响应:", response.data, params);
+          logger.debug("访客初始化API响应:", response.data, params);
 
           if (response.data?.code === 200) {
 
             // 保存访客ID到localStorage
             if (response.data?.data?.uid) {
               localStorage.setItem(BYTEDESK_UID, response.data.data.uid);
-              console.log("已保存uid到localStorage:", response.data.data.uid);
+              logger.debug("已保存uid到localStorage:", response.data.data.uid);
             }
             if (response.data?.data?.visitorUid) {
               localStorage.setItem(
                 BYTEDESK_VISITOR_UID,
                 response.data.data.visitorUid
               );
-              console.log(
+              logger.debug(
                 "已保存visitorUid到localStorage:",
                 response.data.data.visitorUid
               );
@@ -316,7 +317,7 @@ export default class BytedeskWeb {
 
             // 触发回调
             if (response.data?.data) {
-              console.log("触发onVisitorInfo回调");
+              logger.debug("触发onVisitorInfo回调");
               this.config.onVisitorInfo?.(
                 response.data.data.uid || "",
                 response.data.data.visitorUid || ""
@@ -325,15 +326,15 @@ export default class BytedeskWeb {
 
             return response.data.data;
           } else {
-            console.error("访客初始化失败:", response.data?.message);
+            logger.error("访客初始化失败:", response.data?.message);
             return null;
           }
         } catch (error) {
-          console.error("访客初始化出错:", error);
+          logger.error("访客初始化出错:", error);
           return null;
         } finally {
           // 请求完成后清除Promise引用
-          console.log("访客初始化Promise完成，清除引用");
+          logger.debug("访客初始化Promise完成，清除引用");
           this.initVisitorPromise = null;
         }
       }
@@ -354,7 +355,7 @@ export default class BytedeskWeb {
         
         if (currentTime - failedTime < oneHour) {
           const remainingTime = Math.ceil((oneHour - (currentTime - failedTime)) / 1000 / 60); // 剩余分钟数
-          console.log(`浏览记录发送失败后1小时内禁止发送，还需等待 ${remainingTime} 分钟`);
+          logger.warn(`浏览记录发送失败后1小时内禁止发送，还需等待 ${remainingTime} 分钟`);
           return;
         } else {
           // 超过1小时，清除失败记录
@@ -384,7 +385,7 @@ export default class BytedeskWeb {
 
       // 首先检查本地 localStorage 是否已有访客信息
       const localUid = localStorage.getItem(BYTEDESK_UID);
-      // console.log("localUid: ", localUid);
+      // logger.debug("localUid: ", localUid);
 
       // 构建浏览参数 - 使用新的BrowseRequest类型
       const params: BROWSE.BrowseRequest = {
@@ -409,29 +410,29 @@ export default class BytedeskWeb {
 
       // 如果visitorUid为空，则不执行browse
       if (!params.visitorUid) {
-        console.log("访客uid为空，跳过browse操作");
+        logger.warn("访客uid为空，跳过browse操作");
         return;
       }
 
       // 动态导入browse方法
       const { browse } = await import("../apis/visitor");
       const response = await browse(params);
-      // console.log("浏览记录发送结果:", response.data, params);
+      // logger.debug("浏览记录发送结果:", response.data, params);
       if (response.data?.code === 200) {
-        // console.log("浏览记录发送成功");
+        // logger.debug("浏览记录发送成功");
         // 发送成功，清除失败记录
         localStorage.removeItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP);
       } else {
-        console.error("浏览记录发送失败:", response.data?.message);
+        logger.error("浏览记录发送失败:", response.data?.message);
         // 发送失败，记录失败时间戳
         localStorage.setItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP, Date.now().toString());
-        console.log("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
+        logger.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
       }
     } catch (error) {
-      console.error("发送浏览记录时出错:", error);
+      logger.error("发送浏览记录时出错:", error);
       // 发送出错，记录失败时间戳
       localStorage.setItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP, Date.now().toString());
-      console.log("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
+      logger.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
     }
   }
 
@@ -465,9 +466,7 @@ export default class BytedeskWeb {
   async _getUnreadMessageCount() {
     // 检查是否已有正在进行的请求
     if (this.getUnreadMessageCountPromise) {
-      if (this.config.isDebug) {
-        console.log("获取未读消息数请求正在进行中，返回现有Promise");
-      }
+      logger.debug("获取未读消息数请求正在进行中，返回现有Promise");
       return this.getUnreadMessageCountPromise;
     }
 
@@ -492,10 +491,10 @@ export default class BytedeskWeb {
           }
           // 调用API获取未读消息数
           const response = await getUnreadMessageCount(params);
-          // console.log("获取未读消息数:", response.data, params);
+          // logger.debug("获取未读消息数:", response.data, params);
           if (response.data?.code === 200) {
             if (response?.data?.data && response?.data?.data > 0) {
-              // console.log('未读消息数:', response.data.data);
+              // logger.debug('未读消息数:', response.data.data);
               // 在bubble按钮显示未读数目
               this.showUnreadBadge(response.data.data);
             } else {
@@ -505,12 +504,12 @@ export default class BytedeskWeb {
             // 将结果返回
             return response.data.data || 0;
           } else {
-            // console.error('获取未读消息数失败:', response.data.message);
+            // logger.error('获取未读消息数失败:', response.data.message);
             // 处理错误情况
             return 0;
           }
         } catch (error) {
-          console.error("获取未读消息数出错:", error);
+          logger.error("获取未读消息数出错:", error);
           return 0;
         } finally {
           // 请求完成后清除Promise引用
@@ -540,18 +539,14 @@ export default class BytedeskWeb {
   // 清除浏览记录发送失败的限制
   clearBrowseFailedLimit() {
     localStorage.removeItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP);
-    if (this.config.isDebug) {
-      console.log("已清除浏览记录发送失败的限制");
-    }
+    logger.info("已清除浏览记录发送失败的限制");
   }
 
   // 清除本地访客信息，强制重新初始化
   clearVisitorInfo() {
     localStorage.removeItem(BYTEDESK_UID);
     localStorage.removeItem(BYTEDESK_VISITOR_UID);
-    if (this.config.isDebug) {
-      console.log("已清除本地访客信息");
-    }
+    logger.info("已清除本地访客信息");
   }
 
   // 强制重新初始化访客信息（忽略本地缓存）
@@ -566,17 +561,17 @@ export default class BytedeskWeb {
 
   // 显示未读消息数角标
   private showUnreadBadge(count: number) {
-    console.log("showUnreadBadge() 被调用，count:", count);
+    logger.debug("showUnreadBadge() 被调用，count:", count);
     
     // 检查按钮配置，如果 buttonConfig.show 为 false，则不显示角标
     const buttonConfig = this.config.buttonConfig || {};
     if (buttonConfig.show === false) {
-      console.log("showUnreadBadge: buttonConfig.show 为 false，不显示角标");
+      logger.debug("showUnreadBadge: buttonConfig.show 为 false，不显示角标");
       return;
     }
     
     if (!this.bubble) {
-      console.log("showUnreadBadge: bubble 不存在");
+      logger.debug("showUnreadBadge: bubble 不存在");
       return;
     }
 
@@ -586,7 +581,7 @@ export default class BytedeskWeb {
     ) as HTMLElement;
 
     if (!badge) {
-      console.log("showUnreadBadge: 创建新的角标");
+      logger.debug("showUnreadBadge: 创建新的角标");
       // 创建未读消息角标
       badge = document.createElement("div");
       badge.className = "bytedesk-unread-badge";
@@ -610,28 +605,28 @@ export default class BytedeskWeb {
       `;
       this.bubble.appendChild(badge);
     } else {
-      console.log("showUnreadBadge: 更新现有角标");
+      logger.debug("showUnreadBadge: 更新现有角标");
     }
 
     // 更新数字
     badge.textContent = count > 99 ? "99+" : count.toString();
-    console.log("showUnreadBadge: 角标数字已更新为", badge.textContent);
+    logger.debug("showUnreadBadge: 角标数字已更新为", badge.textContent);
   }
 
   // 清除未读消息数角标
   private clearUnreadBadge() {
-    // console.log("clearUnreadBadge() 被调用");
+    // logger.debug("clearUnreadBadge() 被调用");
     if (!this.bubble) {
-      console.log("clearUnreadBadge: bubble 不存在");
+      logger.debug("clearUnreadBadge: bubble 不存在");
       return;
     }
 
     const badge = this.bubble.querySelector(".bytedesk-unread-badge");
     if (badge) {
-      // console.log("clearUnreadBadge: 找到角标，正在移除");
+      // logger.debug("clearUnreadBadge: 找到角标，正在移除");
       badge.remove();
     } else {
-      console.log("clearUnreadBadge: 未找到角标");
+      logger.debug("clearUnreadBadge: 未找到角标");
     }
   }
 
@@ -639,9 +634,7 @@ export default class BytedeskWeb {
   async clearUnreadMessages() {
     // 检查是否已有正在进行的请求
     if (this.clearUnreadMessagesPromise) {
-      if (this.config.isDebug) {
-        console.log("清空未读消息请求正在进行中，返回现有Promise");
-      }
+      logger.debug("清空未读消息请求正在进行中，返回现有Promise");
       return this.clearUnreadMessagesPromise;
     }
 
@@ -659,18 +652,18 @@ export default class BytedeskWeb {
             orgUid: this.config.chatConfig?.org || "",
           };
           const response = await clearUnreadMessages(params);
-          console.log("清空未读消息数:", response.data, params);
+          logger.debug("清空未读消息数:", response.data, params);
           if (response.data.code === 200) {
-            console.log("清空未读消息数成功:", response.data);
+            logger.info("清空未读消息数成功:", response.data);
             // 清空未读消息数成功，无论返回什么值都清除角标
             this.clearUnreadBadge();
             return response.data.data || 0;
           } else {
-            console.error("清空未读消息数失败:", response.data.message);
+            logger.error("清空未读消息数失败:", response.data.message);
             return 0;
           }
         } catch (error) {
-          console.error("清空未读消息数出错:", error);
+          logger.error("清空未读消息数出错:", error);
           return 0;
         } finally {
           // 请求完成后清除Promise引用
@@ -685,13 +678,13 @@ export default class BytedeskWeb {
   private createBubble() {
     // 检查气泡是否已存在
     if (this.bubble && document.body.contains(this.bubble)) {
-      console.log("createBubble: 气泡已存在，不重复创建");
+      logger.debug("createBubble: 气泡已存在，不重复创建");
       return;
     }
     
     // 如果 bubble 存在但不在 DOM 中，先清理
     if (this.bubble && !document.body.contains(this.bubble)) {
-      console.log("createBubble: 清理已存在的 bubble 引用");
+      logger.debug("createBubble: 清理已存在的 bubble 引用");
       this.bubble = null;
     }
 
@@ -981,7 +974,7 @@ export default class BytedeskWeb {
     // 修改点击事件，只在非拖动时触发
     this.bubble.addEventListener("click", () => {
       if (!this.isDragging) {
-        console.log("bubble click");
+        logger.debug("bubble click");
         // 隐藏气泡消息
         const messageElement = (this.bubble as any).messageElement;
         if (messageElement instanceof HTMLElement) {
@@ -1013,13 +1006,13 @@ export default class BytedeskWeb {
   private createChatWindow() {
     // 检查聊天窗口是否已存在
     if (this.window && document.body.contains(this.window)) {
-      console.log("createChatWindow: 聊天窗口已存在，不重复创建");
+      logger.debug("createChatWindow: 聊天窗口已存在，不重复创建");
       return;
     }
     
     // 如果 window 存在但不在 DOM 中，先清理
     if (this.window && !document.body.contains(this.window)) {
-      console.log("createChatWindow: 清理已存在的 window 引用");
+      logger.debug("createChatWindow: 清理已存在的 window 引用");
       this.window = null;
     }
     
@@ -1083,7 +1076,7 @@ export default class BytedeskWeb {
       vertical-align: bottom; // 添加这一行
     `;
     iframe.src = this.generateChatUrl();
-    console.log("iframe.src: ", iframe.src);
+    logger.debug("iframe.src: ", iframe.src);
     this.window.appendChild(iframe);
     document.body.appendChild(this.window);
   }
@@ -1092,7 +1085,7 @@ export default class BytedeskWeb {
     // preload: boolean = false,
     tab: string = "messages"
   ): string {
-    console.log("this.config: ", this.config, tab);
+    logger.debug("this.config: ", this.config, tab);
     const params = new URLSearchParams();
 
     // 检查 localStorage 中的 uid 和 visitorUid，如果不为空则添加到URL参数中
@@ -1120,7 +1113,7 @@ export default class BytedeskWeb {
             params.append(key, JSON.stringify(value));
           }
         } catch (error) {
-          console.error(`Error processing ${key}:`, error);
+          logger.error(`Error processing ${key}:`, error);
         }
       } else if (key === "extra") {
         try {
@@ -1138,7 +1131,7 @@ export default class BytedeskWeb {
             params.append(key, JSON.stringify(extraData));
           }
         } catch (error) {
-          console.error("Error processing extra parameter:", error);
+          logger.error("Error processing extra parameter:", error);
         }
       } else {
         params.append(key, String(value));
@@ -1165,7 +1158,7 @@ export default class BytedeskWeb {
     // }
 
     const url = `${this.config.htmlUrl}?${params.toString()}`;
-    console.log("chat url: ", url);
+    logger.debug("chat url: ", url);
     return url;
   }
 
@@ -1182,16 +1175,16 @@ export default class BytedeskWeb {
           this.minimizeWindow();
           break;
         case POST_MESSAGE_RECEIVE_MESSAGE:
-          console.log("RECEIVE_MESSAGE");
+          logger.debug("RECEIVE_MESSAGE");
           break;
         case POST_MESSAGE_INVITE_VISITOR:
-          console.log("INVITE_VISITOR");
+          logger.debug("INVITE_VISITOR");
           break;
         case POST_MESSAGE_INVITE_VISITOR_ACCEPT:
-          console.log("INVITE_VISITOR_ACCEPT");
+          logger.debug("INVITE_VISITOR_ACCEPT");
           break;
         case POST_MESSAGE_INVITE_VISITOR_REJECT:
-          console.log("INVITE_VISITOR_REJECT");
+          logger.debug("INVITE_VISITOR_REJECT");
           break;
         case POST_MESSAGE_LOCALSTORAGE_RESPONSE:
           // 处理获取 localStorage 的请求
@@ -1204,20 +1197,20 @@ export default class BytedeskWeb {
   // 处理从 iframe 返回的 localStorage 数据
   private handleLocalStorageData(event: MessageEvent) {
     const { uid, visitorUid } = event.data;
-    console.log("handleLocalStorageData 被调用", uid, visitorUid, event.data);
+    logger.debug("handleLocalStorageData 被调用", uid, visitorUid, event.data);
 
     // 检查是否与当前存储的值相同，避免重复设置
     const currentUid = localStorage.getItem(BYTEDESK_UID);
     const currentVisitorUid = localStorage.getItem(BYTEDESK_VISITOR_UID);
 
     if (currentUid === uid && currentVisitorUid === visitorUid) {
-      console.log("handleLocalStorageData: 值相同，跳过设置");
+      logger.debug("handleLocalStorageData: 值相同，跳过设置");
       return;
     }
 
     localStorage.setItem(BYTEDESK_UID, uid);
     localStorage.setItem(BYTEDESK_VISITOR_UID, visitorUid);
-    console.log("handleLocalStorageData: 已更新localStorage", {
+    logger.debug("handleLocalStorageData: 已更新localStorage", {
       uid,
       visitorUid,
     });
@@ -1464,13 +1457,13 @@ export default class BytedeskWeb {
   private createInviteDialog() {
     // 检查邀请框是否已存在
     if (this.inviteDialog && document.body.contains(this.inviteDialog)) {
-      console.log("createInviteDialog: 邀请框已存在，不重复创建");
+      logger.debug("createInviteDialog: 邀请框已存在，不重复创建");
       return;
     }
     
     // 如果 inviteDialog 存在但不在 DOM 中，先清理
     if (this.inviteDialog && !document.body.contains(this.inviteDialog)) {
-      console.log("createInviteDialog: 清理已存在的 inviteDialog 引用");
+      logger.debug("createInviteDialog: 清理已存在的 inviteDialog 引用");
       this.inviteDialog = null;
     }
 
@@ -1578,11 +1571,11 @@ export default class BytedeskWeb {
   }
 
   hideInviteDialog() {
-    console.log("hideInviteDialog before");
+    logger.debug("hideInviteDialog before");
     if (this.inviteDialog) {
       this.inviteDialog.style.display = "none";
       this.config.inviteConfig?.onClose?.();
-      console.log("hideInviteDialog after");
+      logger.debug("hideInviteDialog after");
     }
   }
 
@@ -1613,15 +1606,15 @@ export default class BytedeskWeb {
   showButton() {
     // 检查按钮是否已经显示
     if (this.bubble && this.bubble.style.display !== "none") {
-      console.log("showButton: 按钮已经显示，无需重复显示");
+      logger.debug("showButton: 按钮已经显示，无需重复显示");
       return;
     }
     
     if (this.bubble) {
       this.bubble.style.display = "inline-flex";
-      console.log("showButton: 按钮已显示");
+      logger.debug("showButton: 按钮已显示");
     } else {
-      console.log("showButton: bubble 不存在，需要先创建");
+      logger.debug("showButton: bubble 不存在，需要先创建");
     }
   }
 
@@ -1637,7 +1630,7 @@ export default class BytedeskWeb {
       if (messageElement instanceof HTMLElement) {
         // 检查气泡是否已经显示
         if (messageElement.style.display !== "none" && messageElement.style.opacity !== "0") {
-          console.log("showBubble: 气泡已经显示，无需重复显示");
+          logger.debug("showBubble: 气泡已经显示，无需重复显示");
           return;
         }
         
@@ -1647,12 +1640,12 @@ export default class BytedeskWeb {
           messageElement.style.opacity = "1";
           messageElement.style.transform = "translateY(0)";
         }, 100);
-        console.log("showBubble: 气泡已显示");
+        logger.debug("showBubble: 气泡已显示");
       } else {
-        console.log("showBubble: messageElement 不存在");
+        logger.debug("showBubble: messageElement 不存在");
       }
     } else {
-      console.log("showBubble: bubble 不存在");
+      logger.debug("showBubble: bubble 不存在");
     }
   }
 
@@ -1886,72 +1879,52 @@ export default class BytedeskWeb {
    * 初始化文档反馈功能
    */
   private initFeedbackFeature() {
-    if (this.config.isDebug) {
-      console.log('BytedeskWeb: 初始化文档反馈功能开始');
-      console.log('BytedeskWeb: feedbackConfig:', this.config.feedbackConfig);
-      console.log('BytedeskWeb: feedbackConfig.enabled:', this.config.feedbackConfig?.enabled);
-    }
+    logger.debug('BytedeskWeb: 初始化文档反馈功能开始');
+    logger.debug('BytedeskWeb: feedbackConfig:', this.config.feedbackConfig);
+    logger.debug('BytedeskWeb: feedbackConfig.enabled:', this.config.feedbackConfig?.enabled);
 
     if (!this.config.feedbackConfig?.enabled) {
-      if (this.config.isDebug) {
-        console.log('BytedeskWeb: 文档反馈功能未启用，退出初始化');
-      }
+      logger.debug('BytedeskWeb: 文档反馈功能未启用，退出初始化');
       return;
     }
 
     // 防止重复初始化
     if (this.feedbackTooltip || this.feedbackDialog) {
-      if (this.config.isDebug) {
-        console.log('BytedeskWeb: 反馈功能已存在，先销毁再重新创建');
-      }
+      logger.debug('BytedeskWeb: 反馈功能已存在，先销毁再重新创建');
       this.destroyFeedbackFeature();
     }
 
     // 监听文本选择事件
     if (this.config.feedbackConfig.trigger === 'selection' || this.config.feedbackConfig.trigger === 'both') {
-      if (this.config.isDebug) {
-        console.log('BytedeskWeb: 触发器匹配，设置文本选择监听器');
-        console.log('BytedeskWeb: 触发器类型:', this.config.feedbackConfig.trigger);
-      }
+      logger.debug('BytedeskWeb: 触发器匹配，设置文本选择监听器');
+      logger.debug('BytedeskWeb: 触发器类型:', this.config.feedbackConfig.trigger);
       this.setupTextSelectionListener();
     } else {
-      if (this.config.isDebug) {
-        console.log('BytedeskWeb: 触发器不匹配，跳过文本选择监听器');
-        console.log('BytedeskWeb: 触发器类型:', this.config.feedbackConfig.trigger);
-      }
+      logger.debug('BytedeskWeb: 触发器不匹配，跳过文本选择监听器');
+      logger.debug('BytedeskWeb: 触发器类型:', this.config.feedbackConfig.trigger);
     }
 
-    if (this.config.isDebug) {
-      console.log('BytedeskWeb: 开始创建反馈提示框');
-    }
+    logger.debug('BytedeskWeb: 开始创建反馈提示框');
     this.createFeedbackTooltip();
     
-    if (this.config.isDebug) {
-      console.log('BytedeskWeb: 开始创建反馈对话框');
-    }
+    logger.debug('BytedeskWeb: 开始创建反馈对话框');
     this.createFeedbackDialog();
     
-    if (this.config.isDebug) {
-      console.log('BytedeskWeb: 文档反馈功能初始化完成');
-      console.log('BytedeskWeb: 反馈提示框存在:', !!this.feedbackTooltip);
-      console.log('BytedeskWeb: 反馈对话框存在:', !!this.feedbackDialog);
-    }
+    logger.debug('BytedeskWeb: 文档反馈功能初始化完成');
+    logger.debug('BytedeskWeb: 反馈提示框存在:', !!this.feedbackTooltip);
+    logger.debug('BytedeskWeb: 反馈对话框存在:', !!this.feedbackDialog);
   }
 
   /**
    * 设置文本选择监听器
    */
   private setupTextSelectionListener() {
-    if (this.config.isDebug) {
-      console.log('BytedeskWeb: 设置文本选择监听器');
-    }
+    logger.debug('BytedeskWeb: 设置文本选择监听器');
 
     // 监听鼠标抬起事件，检测文本选择（主要处理方式）
     document.addEventListener('mouseup', (event) => {
       this.lastMouseEvent = event as MouseEvent;
-      if (this.config.isDebug) {
-        console.log('BytedeskWeb: mouseup事件触发', event);
-      }
+      logger.debug('BytedeskWeb: mouseup事件触发', event);
       this.handleTextSelectionWithDebounce(event);
     }, { capture: true, passive: true });
 
@@ -1959,9 +1932,7 @@ export default class BytedeskWeb {
     document.addEventListener('selectionchange', () => {
       // 避免频繁触发，只在没有最近鼠标事件时使用
       if (!this.lastMouseEvent) {
-        if (this.config.isDebug) {
-          console.log('BytedeskWeb: selectionchange事件触发（无鼠标事件）');
-        }
+        logger.debug('BytedeskWeb: selectionchange事件触发（无鼠标事件）');
         const mockEvent = new MouseEvent('mouseup', {
           clientX: window.innerWidth / 2,
           clientY: window.innerHeight / 2
@@ -1973,9 +1944,7 @@ export default class BytedeskWeb {
     // 监听键盘事件，处理键盘选择
     document.addEventListener('keyup', (event) => {
       if (event.shiftKey || event.ctrlKey || event.metaKey) {
-        if (this.config.isDebug) {
-          console.log('BytedeskWeb: keyup事件触发（带修饰键）', event);
-        }
+        logger.debug('BytedeskWeb: keyup事件触发（带修饰键）', event);
         this.handleTextSelectionWithDebounce(event);
       }
     }, { capture: true, passive: true });
@@ -1989,9 +1958,7 @@ export default class BytedeskWeb {
       }
     });
 
-    if (this.config.isDebug) {
-      console.log('BytedeskWeb: 文本选择监听器设置完成');
-    }
+    logger.debug('BytedeskWeb: 文本选择监听器设置完成');
   }
 
   /**
@@ -1999,21 +1966,21 @@ export default class BytedeskWeb {
    */
   private handleTextSelectionWithDebounce(event: Event) {
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: handleTextSelectionWithDebounce被调用 - 防抖机制生效');
+      logger.debug('BytedeskWeb: handleTextSelectionWithDebounce被调用 - 防抖机制生效');
     }
     
     // 清除之前的防抖定时器
     if (this.selectionDebounceTimer) {
       clearTimeout(this.selectionDebounceTimer);
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 清除之前的防抖定时器');
+        logger.debug('BytedeskWeb: 清除之前的防抖定时器');
       }
     }
 
     // 设置防抖延迟（200ms）
     this.selectionDebounceTimer = setTimeout(() => {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 防抖延迟结束，开始处理文本选择');
+        logger.debug('BytedeskWeb: 防抖延迟结束，开始处理文本选择');
       }
       this.handleTextSelection(event);
     }, 200);
@@ -2024,18 +1991,18 @@ export default class BytedeskWeb {
    */
   private handleTextSelection(_event: Event) {
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: handleTextSelection被调用');
+      logger.debug('BytedeskWeb: handleTextSelection被调用');
     }
 
     const selection = window.getSelection();
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: window.getSelection()结果:', selection);
-      console.log('BytedeskWeb: selection.rangeCount:', selection?.rangeCount);
+      logger.debug('BytedeskWeb: window.getSelection()结果:', selection);
+      logger.debug('BytedeskWeb: selection.rangeCount:', selection?.rangeCount);
     }
 
     if (!selection || selection.rangeCount === 0) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 没有选择或范围为0，隐藏提示');
+        logger.debug('BytedeskWeb: 没有选择或范围为0，隐藏提示');
       }
       this.hideFeedbackTooltip();
       return;
@@ -2043,21 +2010,21 @@ export default class BytedeskWeb {
 
     const selectedText = selection.toString().trim();
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 检测到文本选择:', `"${selectedText}"`);
-      console.log('BytedeskWeb: 选中文本长度:', selectedText.length);
+      logger.debug('BytedeskWeb: 检测到文本选择:', `"${selectedText}"`);
+      logger.debug('BytedeskWeb: 选中文本长度:', selectedText.length);
     }
 
     // 检查是否与上次选择的文本相同
     if (selectedText === this.lastSelectionText && this.isTooltipVisible) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 文本选择未变化且提示框已显示，跳过处理');
+        logger.debug('BytedeskWeb: 文本选择未变化且提示框已显示，跳过处理');
       }
       return;
     }
 
     if (selectedText.length === 0) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 选中文本为空，隐藏提示');
+        logger.debug('BytedeskWeb: 选中文本为空，隐藏提示');
       }
       this.hideFeedbackTooltip();
       return;
@@ -2066,7 +2033,7 @@ export default class BytedeskWeb {
     // 检查选中文本长度，避免显示过短的选择
     if (selectedText.length < 3) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 选中文本太短，忽略:', `"${selectedText}"`);
+        logger.debug('BytedeskWeb: 选中文本太短，忽略:', `"${selectedText}"`);
       }
       this.hideFeedbackTooltip();
       return;
@@ -2081,29 +2048,29 @@ export default class BytedeskWeb {
       const range = selection.getRangeAt(0);
       this.lastSelectionRect = range.getBoundingClientRect();
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 存储选中文本位置:', this.lastSelectionRect);
+        logger.debug('BytedeskWeb: 存储选中文本位置:', this.lastSelectionRect);
       }
     } catch (error) {
       if (this.config.isDebug) {
-        console.warn('BytedeskWeb: 获取选中文本位置失败:', error);
+        logger.warn('BytedeskWeb: 获取选中文本位置失败:', error);
       }
       this.lastSelectionRect = null;
     }
     
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 设置selectedText为:', `"${selectedText}"`);
+      logger.debug('BytedeskWeb: 设置selectedText为:', `"${selectedText}"`);
     }
 
     // 显示反馈提示
     if (this.config.feedbackConfig?.showOnSelection) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 配置允许显示选择提示，调用showFeedbackTooltip');
+        logger.debug('BytedeskWeb: 配置允许显示选择提示，调用showFeedbackTooltip');
       }
       this.showFeedbackTooltip(this.lastMouseEvent || undefined);
     } else {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 配置不允许显示选择提示');
-        console.log('BytedeskWeb: feedbackConfig.showOnSelection:', this.config.feedbackConfig?.showOnSelection);
+        logger.debug('BytedeskWeb: 配置不允许显示选择提示');
+        logger.debug('BytedeskWeb: feedbackConfig.showOnSelection:', this.config.feedbackConfig?.showOnSelection);
       }
     }
   }
@@ -2113,13 +2080,13 @@ export default class BytedeskWeb {
    */
   private createFeedbackTooltip() {
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: createFeedbackTooltip被调用');
+      logger.debug('BytedeskWeb: createFeedbackTooltip被调用');
     }
 
     // 检查提示框是否存在且在DOM中
     if (this.feedbackTooltip && document.body.contains(this.feedbackTooltip)) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 反馈提示框已存在且在DOM中，跳过创建');
+        logger.debug('BytedeskWeb: 反馈提示框已存在且在DOM中，跳过创建');
       }
       return;
     }
@@ -2127,7 +2094,7 @@ export default class BytedeskWeb {
     // 如果变量存在但不在DOM中，重置变量
     if (this.feedbackTooltip && !document.body.contains(this.feedbackTooltip)) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 提示框变量存在但不在DOM中，重置变量');
+        logger.debug('BytedeskWeb: 提示框变量存在但不在DOM中，重置变量');
       }
       this.feedbackTooltip = null;
     }
@@ -2155,7 +2122,7 @@ export default class BytedeskWeb {
 
     const selectionText = this.config.feedbackConfig?.selectionText || '文档反馈';
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 提示框文本:', selectionText);
+      logger.debug('BytedeskWeb: 提示框文本:', selectionText);
     }
 
     // 添加图标和文本
@@ -2167,8 +2134,8 @@ export default class BytedeskWeb {
     // 点击事件
     this.feedbackTooltip.addEventListener('click', async (e) => {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 反馈提示框被点击');
-        console.log('BytedeskWeb: 点击时选中文字:', this.selectedText);
+        logger.debug('BytedeskWeb: 反馈提示框被点击');
+        logger.debug('BytedeskWeb: 点击时选中文字:', this.selectedText);
       }
       e.stopPropagation();
       e.preventDefault();
@@ -2177,12 +2144,12 @@ export default class BytedeskWeb {
       try {
         await this.showFeedbackDialog();
         if (this.config.isDebug) {
-          console.log('BytedeskWeb: 对话框显示完成，现在隐藏提示框');
+          logger.debug('BytedeskWeb: 对话框显示完成，现在隐藏提示框');
         }
         this.hideFeedbackTooltip();
       } catch (error) {
         if (this.config.isDebug) {
-          console.error('BytedeskWeb: 显示对话框时出错:', error);
+          logger.error('BytedeskWeb: 显示对话框时出错:', error);
         }
       }
     });
@@ -2191,8 +2158,8 @@ export default class BytedeskWeb {
     document.body.appendChild(this.feedbackTooltip);
     
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 反馈提示框已创建并添加到页面');
-      console.log('BytedeskWeb: 提示框元素:', this.feedbackTooltip);
+      logger.debug('BytedeskWeb: 反馈提示框已创建并添加到页面');
+      logger.debug('BytedeskWeb: 提示框元素:', this.feedbackTooltip);
     }
   }
 
@@ -2201,28 +2168,28 @@ export default class BytedeskWeb {
    */
   private showFeedbackTooltip(_event?: MouseEvent) {
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: showFeedbackTooltip被调用');
-      console.log('BytedeskWeb: feedbackTooltip存在:', !!this.feedbackTooltip);
-      console.log('BytedeskWeb: selectedText存在:', !!this.selectedText);
+      logger.debug('BytedeskWeb: showFeedbackTooltip被调用');
+      logger.debug('BytedeskWeb: feedbackTooltip存在:', !!this.feedbackTooltip);
+      logger.debug('BytedeskWeb: selectedText存在:', !!this.selectedText);
     }
 
     // 检查提示框是否真的存在于DOM中
     const tooltipInDOM = this.feedbackTooltip && document.body.contains(this.feedbackTooltip);
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: feedbackTooltip在DOM中:', tooltipInDOM);
+      logger.debug('BytedeskWeb: feedbackTooltip在DOM中:', tooltipInDOM);
     }
 
     // 如果提示框不存在或不在DOM中，重新创建
     if (!this.feedbackTooltip || !tooltipInDOM) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 提示框不存在或已从DOM中移除，重新创建');
+        logger.debug('BytedeskWeb: 提示框不存在或已从DOM中移除，重新创建');
       }
       this.createFeedbackTooltip();
     }
 
     if (!this.feedbackTooltip || !this.selectedText) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 提示框或选中文本不存在，退出显示');
+        logger.debug('BytedeskWeb: 提示框或选中文本不存在，退出显示');
       }
       return;
     }
@@ -2231,7 +2198,7 @@ export default class BytedeskWeb {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 无有效选择，无法计算位置');
+        logger.debug('BytedeskWeb: 无有效选择，无法计算位置');
       }
       return;
     }
@@ -2278,13 +2245,13 @@ export default class BytedeskWeb {
     } catch (error) {
       // 如果出错，回退到使用整个选择区域
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 获取第一行位置失败，使用整个选择区域:', error);
+        logger.debug('BytedeskWeb: 获取第一行位置失败，使用整个选择区域:', error);
       }
       firstLineRect = range.getBoundingClientRect();
     }
     
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 选中文本第一行位置信息:', {
+      logger.debug('BytedeskWeb: 选中文本第一行位置信息:', {
         left: firstLineRect.left,
         top: firstLineRect.top,
         right: firstLineRect.right,
@@ -2324,7 +2291,7 @@ export default class BytedeskWeb {
     if (y < scrollY + 10) {
       y = firstLineRect.bottom + verticalOffset;
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 上方空间不足，调整为显示在选中文字第一行下方');
+        logger.debug('BytedeskWeb: 上方空间不足，调整为显示在选中文字第一行下方');
       }
     }
 
@@ -2333,7 +2300,7 @@ export default class BytedeskWeb {
     y += scrollY;
 
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 最终提示框位置:', { 
+      logger.debug('BytedeskWeb: 最终提示框位置:', { 
         x: x, 
         y: y, 
         说明: '显示在选中文字第一行左上角上方，增加间距避免遮挡',
@@ -2354,7 +2321,7 @@ export default class BytedeskWeb {
     this.feedbackTooltip.style.zIndex = '999999';
     
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 提示框位置已设置，样式:', {
+      logger.debug('BytedeskWeb: 提示框位置已设置，样式:', {
         position: this.feedbackTooltip.style.position,
         left: this.feedbackTooltip.style.left,
         top: this.feedbackTooltip.style.top,
@@ -2373,7 +2340,7 @@ export default class BytedeskWeb {
       if (this.feedbackTooltip && this.isTooltipVisible) {
         this.feedbackTooltip.style.opacity = '1';
         if (this.config.isDebug) {
-          console.log('BytedeskWeb: 提示框透明度设置为1，应该可见了');
+          logger.debug('BytedeskWeb: 提示框透明度设置为1，应该可见了');
         }
       }
     }, 10);
@@ -2387,16 +2354,16 @@ export default class BytedeskWeb {
     const tooltipInDOM = this.feedbackTooltip && document.body.contains(this.feedbackTooltip);
     
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: hideFeedbackTooltip被调用');
-      console.log('BytedeskWeb: feedbackTooltip存在:', !!this.feedbackTooltip);
-      console.log('BytedeskWeb: feedbackTooltip在DOM中:', tooltipInDOM);
+      logger.debug('BytedeskWeb: hideFeedbackTooltip被调用');
+      logger.debug('BytedeskWeb: feedbackTooltip存在:', !!this.feedbackTooltip);
+      logger.debug('BytedeskWeb: feedbackTooltip在DOM中:', tooltipInDOM);
     }
 
     if (!this.feedbackTooltip || !tooltipInDOM) {
       this.isTooltipVisible = false;
       this.lastSelectionText = '';
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 提示框不存在或不在DOM中，仅重置状态');
+        logger.debug('BytedeskWeb: 提示框不存在或不在DOM中，仅重置状态');
       }
       return;
     }
@@ -2412,10 +2379,10 @@ export default class BytedeskWeb {
         this.feedbackTooltip.style.display = 'none';
         this.feedbackTooltip.style.visibility = 'hidden';
         if (this.config.isDebug) {
-          console.log('BytedeskWeb: 提示框已隐藏');
+          logger.debug('BytedeskWeb: 提示框已隐藏');
         }
       } else if (this.config.isDebug && this.isTooltipVisible) {
-        console.log('BytedeskWeb: 跳过隐藏操作，提示框状态已改变为可见');
+        logger.debug('BytedeskWeb: 跳过隐藏操作，提示框状态已改变为可见');
       }
     }, 100); // 减少延迟时间
   }
@@ -2425,13 +2392,13 @@ export default class BytedeskWeb {
    */
   private createFeedbackDialog() {
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: createFeedbackDialog被调用');
+      logger.debug('BytedeskWeb: createFeedbackDialog被调用');
     }
 
     // 检查对话框是否存在且在DOM中
     if (this.feedbackDialog && document.body.contains(this.feedbackDialog)) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 反馈对话框已存在且在DOM中，跳过创建');
+        logger.debug('BytedeskWeb: 反馈对话框已存在且在DOM中，跳过创建');
       }
       return;
     }
@@ -2439,7 +2406,7 @@ export default class BytedeskWeb {
     // 如果变量存在但不在DOM中，重置变量
     if (this.feedbackDialog && !document.body.contains(this.feedbackDialog)) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 对话框变量存在但不在DOM中，重置变量');
+        logger.debug('BytedeskWeb: 对话框变量存在但不在DOM中，重置变量');
       }
       this.feedbackDialog = null;
     }
@@ -2662,33 +2629,33 @@ export default class BytedeskWeb {
    */
   private async showFeedbackDialog() {
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: showFeedbackDialog被调用');
-      console.log('BytedeskWeb: feedbackDialog存在:', !!this.feedbackDialog);
+      logger.debug('BytedeskWeb: showFeedbackDialog被调用');
+      logger.debug('BytedeskWeb: feedbackDialog存在:', !!this.feedbackDialog);
     }
 
     // 检查对话框是否真的存在于DOM中
     const dialogInDOM = this.feedbackDialog && document.body.contains(this.feedbackDialog);
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: feedbackDialog在DOM中:', dialogInDOM);
+      logger.debug('BytedeskWeb: feedbackDialog在DOM中:', dialogInDOM);
     }
 
     // 如果对话框不存在或不在DOM中，重新创建
     if (!this.feedbackDialog || !dialogInDOM) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 对话框不存在或已从DOM中移除，重新创建');
+        logger.debug('BytedeskWeb: 对话框不存在或已从DOM中移除，重新创建');
       }
       this.createFeedbackDialog();
     }
 
     if (!this.feedbackDialog) {
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 对话框创建失败，退出显示');
+        logger.debug('BytedeskWeb: 对话框创建失败，退出显示');
       }
       return;
     }
 
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 开始填充对话框内容');
+      logger.debug('BytedeskWeb: 开始填充对话框内容');
     }
 
     // 填充选中的文字
@@ -2696,7 +2663,7 @@ export default class BytedeskWeb {
     if (selectedTextElement) {
       selectedTextElement.textContent = this.selectedText || '';
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 已填充选中文字:', this.selectedText);
+        logger.debug('BytedeskWeb: 已填充选中文字:', this.selectedText);
       }
     }
 
@@ -2710,8 +2677,8 @@ export default class BytedeskWeb {
     this.feedbackDialog.style.display = 'flex';
     
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 对话框已设置为显示状态');
-      console.log('BytedeskWeb: 对话框样式:', {
+      logger.debug('BytedeskWeb: 对话框已设置为显示状态');
+      logger.debug('BytedeskWeb: 对话框样式:', {
         display: this.feedbackDialog.style.display,
         visibility: this.feedbackDialog.style.visibility,
         zIndex: this.feedbackDialog.style.zIndex
@@ -2722,11 +2689,11 @@ export default class BytedeskWeb {
     try {
       await this.generateScreenshotPreview();
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 截图预览生成完成');
+        logger.debug('BytedeskWeb: 截图预览生成完成');
       }
     } catch (error) {
       if (this.config.isDebug) {
-        console.error('BytedeskWeb: 截图预览生成失败:', error);
+        logger.error('BytedeskWeb: 截图预览生成失败:', error);
       }
     }
   }
@@ -2751,7 +2718,7 @@ export default class BytedeskWeb {
       const existingCanvas = (this.feedbackDialog as any)?.screenshotCanvas;
       if (existingCanvas) {
         if (this.config.isDebug) {
-          console.log('BytedeskWeb: 使用已生成的截图canvas');
+          logger.debug('BytedeskWeb: 使用已生成的截图canvas');
         }
         canvas = existingCanvas;
       } else {
@@ -2759,13 +2726,13 @@ export default class BytedeskWeb {
         const html2canvas = await this.loadHtml2Canvas();
         if (!html2canvas) {
           if (this.config.isDebug) {
-            console.log('BytedeskWeb: html2canvas加载失败，跳过截图');
+            logger.debug('BytedeskWeb: html2canvas加载失败，跳过截图');
           }
           return null;
         }
 
         if (this.config.isDebug) {
-          console.log('BytedeskWeb: 重新生成截图');
+          logger.debug('BytedeskWeb: 重新生成截图');
         }
 
         // 计算选中文本附近的截图区域
@@ -2793,7 +2760,7 @@ export default class BytedeskWeb {
       return new Promise<string | null>((resolve) => {
         canvas.toBlob(async (blob: Blob | null) => {
           if (!blob) {
-            console.error('无法生成截图blob');
+            logger.error('无法生成截图blob');
             resolve(null);
             return;
           }
@@ -2804,7 +2771,7 @@ export default class BytedeskWeb {
             const file = new File([blob], fileName, { type: 'image/jpeg' });
             
             if (this.config.isDebug) {
-              console.log('BytedeskWeb: 截图生成成功，文件大小:', Math.round(blob.size / 1024), 'KB');
+              logger.debug('BytedeskWeb: 截图生成成功，文件大小:', Math.round(blob.size / 1024), 'KB');
             }
             
             // 动态导入上传API并上传截图到服务器
@@ -2815,19 +2782,19 @@ export default class BytedeskWeb {
             });
             
             if (this.config.isDebug) {
-              console.log('BytedeskWeb: 截图上传成功，URL:', screenshotUrl);
+              logger.debug('BytedeskWeb: 截图上传成功，URL:', screenshotUrl);
             }
             
             resolve(screenshotUrl);
           } catch (error) {
-            console.error('截图上传失败:', error);
+            logger.error('截图上传失败:', error);
             resolve(null);
           }
         }, 'image/jpeg', 0.8);
       });
 
     } catch (error) {
-      console.error('生成截图失败:', error);
+      logger.error('生成截图失败:', error);
       return null;
     }
   }
@@ -2856,7 +2823,7 @@ export default class BytedeskWeb {
       screenshotContainer.innerHTML = '正在生成截图预览...';
 
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 开始生成截图预览');
+        logger.debug('BytedeskWeb: 开始生成截图预览');
       }
 
       // 计算选中文本附近的截图区域
@@ -2964,11 +2931,11 @@ export default class BytedeskWeb {
       (this.feedbackDialog as any).screenshotCanvas = canvas;
 
       if (this.config.isDebug) {
-        console.log('BytedeskWeb: 截图预览生成成功');
+        logger.debug('BytedeskWeb: 截图预览生成成功');
       }
 
     } catch (error) {
-      console.error('生成截图预览失败:', error);
+      logger.error('生成截图预览失败:', error);
       screenshotContainer.innerHTML = `
         <div style="color: #ff6b6b; text-align: center; flex-direction: column; gap: 8px; display: flex; align-items: center;">
           <div style="font-size: 24px;">⚠️</div>
@@ -3040,7 +3007,7 @@ export default class BytedeskWeb {
         };
         
         if (this.config.isDebug) {
-          console.log('BytedeskWeb: 选中文本截图区域:', {
+          logger.debug('BytedeskWeb: 选中文本截图区域:', {
             selectedRect: rect,
             absolutePosition: { left: absoluteLeft, top: absoluteTop },
             captureArea: { x: captureX, y: captureY, width: captureWidth, height: captureHeight },
@@ -3078,7 +3045,7 @@ export default class BytedeskWeb {
           };
           
           if (this.config.isDebug) {
-            console.log('BytedeskWeb: 鼠标位置截图区域:', {
+            logger.debug('BytedeskWeb: 鼠标位置截图区域:', {
               mousePosition: { x: this.lastMouseEvent.clientX, y: this.lastMouseEvent.clientY },
               absolutePosition: { x: absoluteX, y: absoluteY },
               captureArea: { x: captureX, y: captureY, width: captureWidth, height: captureHeight }
@@ -3088,7 +3055,7 @@ export default class BytedeskWeb {
       }
     } catch (error) {
       if (this.config.isDebug) {
-        console.warn('BytedeskWeb: 计算截图区域失败，使用默认区域:', error);
+        logger.warn('BytedeskWeb: 计算截图区域失败，使用默认区域:', error);
       }
     }
     
@@ -3109,7 +3076,7 @@ export default class BytedeskWeb {
       return await this.loadHtml2CanvasFromCDN();
     } catch (error) {
       if (this.config.isDebug) {
-        console.warn('html2canvas 加载失败:', error);
+        logger.warn('html2canvas 加载失败:', error);
       }
       return null;
     }
@@ -3193,7 +3160,7 @@ export default class BytedeskWeb {
       // 如果需要提交截图，先生成和上传截图
       if (shouldSubmitScreenshot) {
         if (this.config.isDebug) {
-          console.log('BytedeskWeb: 开始生成和上传截图');
+          logger.debug('BytedeskWeb: 开始生成和上传截图');
         }
         
         if (submitButton) {
@@ -3205,7 +3172,7 @@ export default class BytedeskWeb {
         if (screenshotUrl) {
           screenshotUrls.push(screenshotUrl);
           if (this.config.isDebug) {
-            console.log('BytedeskWeb: 截图上传成功:', screenshotUrl);
+            logger.debug('BytedeskWeb: 截图上传成功:', screenshotUrl);
           }
         }
         
@@ -3245,7 +3212,7 @@ export default class BytedeskWeb {
       }, 2000);
 
     } catch (error) {
-      console.error('提交反馈失败:', error);
+      logger.error('提交反馈失败:', error);
       alert('提交失败，请稍后重试');
     } finally {
       // 恢复提交按钮状态
@@ -3266,12 +3233,12 @@ export default class BytedeskWeb {
       const response = await submitFeedback(feedbackData);
       
       if (this.config.isDebug) {
-        console.log('反馈提交响应:', response);
+        logger.debug('反馈提交响应:', response);
       }
       
       return response;
     } catch (error) {
-      console.error('提交反馈到服务器失败:', error);
+      logger.error('提交反馈到服务器失败:', error);
       throw error;
     }
   }
@@ -3303,7 +3270,7 @@ export default class BytedeskWeb {
    */
   public showDocumentFeedback(selectedText?: string) {
     if (!this.config.feedbackConfig?.enabled) {
-      console.warn('文档反馈功能未启用');
+      logger.warn('文档反馈功能未启用');
       return;
     }
 
@@ -3319,7 +3286,7 @@ export default class BytedeskWeb {
    */
   public reinitFeedbackFeature() {
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 重新初始化反馈功能');
+      logger.debug('BytedeskWeb: 重新初始化反馈功能');
     }
     // 先销毁现有的反馈功能
     this.destroyFeedbackFeature();
@@ -3331,13 +3298,13 @@ export default class BytedeskWeb {
    * 公共方法：强制初始化反馈功能（用于调试）
    */
   public forceInitFeedbackFeature() {
-    console.log('BytedeskWeb: 强制初始化反馈功能被调用');
-    console.log('BytedeskWeb: 当前配置:', this.config.feedbackConfig);
-    console.log('BytedeskWeb: isDebug:', this.config.isDebug);
+    logger.debug('BytedeskWeb: 强制初始化反馈功能被调用');
+    logger.debug('BytedeskWeb: 当前配置:', this.config.feedbackConfig);
+    logger.debug('BytedeskWeb: isDebug:', this.config.isDebug);
     
     // 确保配置是启用的
     if (!this.config.feedbackConfig) {
-      console.log('BytedeskWeb: 创建默认反馈配置');
+      logger.debug('BytedeskWeb: 创建默认反馈配置');
       this.config.feedbackConfig = {
         enabled: true,
         trigger: 'selection',
@@ -3352,23 +3319,23 @@ export default class BytedeskWeb {
     }
     
     if (!this.config.feedbackConfig.enabled) {
-      console.log('BytedeskWeb: 启用反馈配置');
+      logger.debug('BytedeskWeb: 启用反馈配置');
       this.config.feedbackConfig.enabled = true;
     }
     
-    console.log('BytedeskWeb: 销毁现有反馈功能');
+    logger.debug('BytedeskWeb: 销毁现有反馈功能');
     this.destroyFeedbackFeature();
     
-    console.log('BytedeskWeb: 重新初始化反馈功能');
+    logger.debug('BytedeskWeb: 重新初始化反馈功能');
     this.initFeedbackFeature();
     
-    console.log('BytedeskWeb: 强制初始化完成，检查结果:');
-    console.log('- showDocumentFeedback方法存在:', typeof this.showDocumentFeedback === 'function');
-    console.log('- testTextSelection方法存在:', typeof this.testTextSelection === 'function');
-    console.log('- 反馈提示框存在:', !!this.feedbackTooltip);
-    console.log('- 反馈对话框存在:', !!this.feedbackDialog);
-    console.log('- 反馈提示框DOM存在:', !!document.querySelector('[data-bytedesk-feedback="tooltip"]'));
-    console.log('- 反馈对话框DOM存在:', !!document.querySelector('[data-bytedesk-feedback="dialog"]'));
+    logger.debug('BytedeskWeb: 强制初始化完成，检查结果:');
+    logger.debug('- showDocumentFeedback方法存在:', typeof this.showDocumentFeedback === 'function');
+    logger.debug('- testTextSelection方法存在:', typeof this.testTextSelection === 'function');
+    logger.debug('- 反馈提示框存在:', !!this.feedbackTooltip);
+    logger.debug('- 反馈对话框存在:', !!this.feedbackDialog);
+    logger.debug('- 反馈提示框DOM存在:', !!document.querySelector('[data-bytedesk-feedback="tooltip"]'));
+    logger.debug('- 反馈对话框DOM存在:', !!document.querySelector('[data-bytedesk-feedback="dialog"]'));
     
     // 返回初始化状态
     return {
@@ -3391,7 +3358,7 @@ export default class BytedeskWeb {
    */
   public testTextSelection(text: string = '测试选中文字') {
     if (this.config.isDebug) {
-      console.log('BytedeskWeb: 测试文本选择功能，模拟选中文字:', `"${text}"`);
+      logger.debug('BytedeskWeb: 测试文本选择功能，模拟选中文字:', `"${text}"`);
     }
     
     this.selectedText = text;
@@ -3425,14 +3392,14 @@ export default class BytedeskWeb {
         selection.addRange(range);
         
         if (this.config.isDebug) {
-          console.log('BytedeskWeb: 已创建模拟文本选择');
+          logger.debug('BytedeskWeb: 已创建模拟文本选择');
         }
         
         // 显示提示框
         if (this.feedbackTooltip) {
           this.showFeedbackTooltip();
         } else {
-          console.error('BytedeskWeb: 反馈提示框不存在，无法测试');
+          logger.error('BytedeskWeb: 反馈提示框不存在，无法测试');
         }
         
         // 5秒后清理
@@ -3447,7 +3414,7 @@ export default class BytedeskWeb {
         }, 5000);
       }
     } catch (error) {
-      console.error('BytedeskWeb: 创建测试选择失败:', error);
+      logger.error('BytedeskWeb: 创建测试选择失败:', error);
     }
   }
 

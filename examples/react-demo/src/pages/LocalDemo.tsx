@@ -13,7 +13,7 @@ import InstallGuide from '../components/InstallGuide';
 
 const LocalDemo = () => {
   const [config] = useState<BytedeskConfig>({
-    isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
+    isDebug: false, // 是否开启调试模式, 默认: false, 生产环境请设置为false
     ...(process.env.NODE_ENV === 'development' 
       ? { 
         htmlUrl: 'http://127.0.0.1:9006', 

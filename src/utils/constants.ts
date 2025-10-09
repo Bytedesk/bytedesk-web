@@ -40,3 +40,5 @@ export const BYTEDESK_UID = "BYTEDESK_UID";
 export const BYTEDESK_VISITOR_UID = "BYTEDESK_VISITOR_UID";
 // 浏览记录发送失败的时间戳，用于限制1小时内不再发送
 export const BYTEDESK_BROWSE_FAILED_TIMESTAMP = "BYTEDESK_BROWSE_FAILED_TIMESTAMP";
+// 日志相关常量
+export const LOG_ENABLE = "BYTEDESK_LOG_ENABLE";

@@ -20,6 +20,7 @@ import {
   ANONYMOUS,
 } from "../utils/constants";
 import emitter from "../utils/eventsEmitter";
+import logger from "../utils/logger";
 
 // API URL配置，默认从BytedeskWeb中获取
 // 初始为默认值，可以通过setApiUrl动态更新
@@ -33,9 +34,9 @@ export function getApiUrl() {
 export function setApiUrl(url: string) {
   if (url && url.trim() !== '') {
     apiUrl = url;
-    console.log('API URL已设置为:', apiUrl);
+    logger.info('API URL已设置为:', apiUrl);
   } else {
-    console.warn('尝试设置无效的API URL');
+    logger.warn('尝试设置无效的API URL');
   }
   return apiUrl;
 }
@@ -77,7 +78,7 @@ request.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.log("request error", error);
+    logger.error("request error", error);
     if (error.response.status === 403) {
       emitter.emit(EVENT_BUS_HTTP_ERROR, "403");
     }
@@ -96,28 +97,28 @@ request.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.log("response error", error);
+    logger.error("response error", error);
     if (error.response) {
       switch (error.response.status) {
         case 400:
           // TODO: 修改登录错误提示为：密码错误
-          console.log("axios interception error 400");
+          logger.error("axios interception error 400");
           emitter.emit(EVENT_BUS_HTTP_ERROR, "400");
           break;
         case 401:
           // FIXME: 401报错自动清理本地存储access_token, 然后重新获取access_token
-          console.log("axios interception error 401");
+          logger.error("axios interception error 401");
           emitter.emit(EVENT_BUS_HTTP_ERROR, "401");
           break;
         case 403:
           // TODO: 通过refresh_token获取最新access_token?
           // 403 无权限，跳转到首页
-          console.log("axios interception error 403");
+          logger.error("axios interception error 403");
           emitter.emit(EVENT_BUS_HTTP_ERROR, "403");
           break;
         case 500:
           // TODO: 服务器错误
-          console.log("axios interception error 500");
+          logger.error("axios interception error 500");
           emitter.emit(EVENT_BUS_SERVER_ERROR_500, "500");
           break;
       }

@@ -13,6 +13,7 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 import { getApiUrl } from './request';
+import logger from '../utils/logger';
 
 // 上传相关类型定义
 export interface UploadResponse {
@@ -92,7 +93,7 @@ export async function handleUpload(
     formData.append('client', config?.client || 'web');
 
     if (config?.isDebug) {
-      console.log('handleUpload formData', formData);
+      logger.debug('handleUpload formData', formData);
     }
 
     // 获取上传URL - 使用 getApiUrl
@@ -115,12 +116,12 @@ export async function handleUpload(
     const result: HttpUploadResult = await response.json();
     
     if (config?.isDebug) {
-      console.log('upload data:', result);
+      logger.debug('upload data:', result);
     }
 
     return result;
   } catch (error) {
-    console.error('文件上传失败:', error);
+    logger.error('文件上传失败:', error);
     throw error;
   }
 }
@@ -154,7 +155,7 @@ export async function uploadMultipleFiles(files: File[], config?: UploadConfig):
     handleUpload(file, undefined, undefined, config)
       .then(result => result.data?.fileUrl || '')
       .catch(error => {
-        console.error(`文件 ${file.name} 上传失败:`, error);
+        logger.error(`文件 ${file.name} 上传失败:`, error);
         return ''; // 失败时返回空字符串
       })
   );

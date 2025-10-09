@@ -17,6 +17,7 @@ import { init, addMessages, getLocaleFromNavigator } from 'svelte-i18n';
 import BytedeskWeb from '../main';
 import type { BytedeskConfig } from '../types';
 import { messages } from '../locales';
+import logger from '../utils/logger';
 
 // 初始化 i18n
 Object.entries(messages).forEach(([locale, msgs]) => {
@@ -33,7 +34,7 @@ let globalBytedeskInstance: BytedeskWeb | null = null;
 let activeComponentCount = 0;
 
 export const BytedeskSvelte = (node: HTMLElement, config: BytedeskConfig & { locale?: string }) => {
-  console.log('config', config, node);
+  logger.debug('config', config, node);
 
   onMount(() => {
     activeComponentCount++;

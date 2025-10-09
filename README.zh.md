@@ -194,7 +194,7 @@ const App = () => {
 ## 运行示例
 
 ```bash
-yarn install
+yarn install 
 yarn demo:react    # Run React demo
 yarn demo:vue      # Run Vue demo
 yarn demo:svelte   # Run Svelte demo

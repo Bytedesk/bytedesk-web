@@ -7,6 +7,7 @@
 import { Component, Input } from '@angular/core';
 import BytedeskWeb from '../main';
 import type { BytedeskConfig } from '../types';
+import logger from '../utils/logger';
 
 // 全局单例实例
 let globalBytedeskInstance: BytedeskWeb | null = null;
@@ -51,11 +52,11 @@ export const BytedeskAngular: any = Component({
 
   ngOnDestroy(): void {
     activeComponentCount--;
-    console.log('BytedeskAngular: 组件卸载，当前活跃组件数:', activeComponentCount);
+    logger.debug('BytedeskAngular: 组件卸载，当前活跃组件数:', activeComponentCount);
     
     // 如果没有活跃组件了，清理全局实例
     if (activeComponentCount <= 0) {
-      console.log('BytedeskAngular: 没有活跃组件，清理全局实例');
+      logger.debug('BytedeskAngular: 没有活跃组件，清理全局实例');
               setTimeout(() => {
           if (globalBytedeskInstance && activeComponentCount <= 0) {
             globalBytedeskInstance.destroy();
