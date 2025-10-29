@@ -55,13 +55,16 @@ export interface ChatConfig {
   mobile?: string; // 自定义手机号，支持自定义
   email?: string; // 自定义邮箱，支持自定义
   note?: string; // 自定义备注，支持自定义
-  extra?: string; // 自定义扩展字段，支持自定义
   // 
   goodsInfo?: string; // 商品信息
   orderInfo?: string; // 订单信息
+  extra?: string; // 自定义扩展字段，支持自定义
+  // 
   vipLevel?: string; // 会员等级
+  debug?: boolean; // 用于区分本地测试还是线上环境
+  loadHistory?: boolean; // 是否加载历史消息
   // 其他自定义字段
-  [key: string]: string | number | undefined;
+  [key: string]: string | number | boolean | undefined;
 } 
 
 export interface BrowseConfig {

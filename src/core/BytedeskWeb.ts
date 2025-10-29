@@ -292,13 +292,15 @@ export default class BytedeskWeb {
               typeof this.config.chatConfig?.extra === "string"
                 ? this.config.chatConfig.extra
                 : JSON.stringify(this.config.chatConfig?.extra || {}),
+            vipLevel: String(this.config.chatConfig?.vipLevel || ""),
+            debug: this.config.chatConfig?.debug || false,
+            loadHistory: this.config.chatConfig?.loadHistory || false,
           };
           // 调用API初始化访客信息
           const response = await initVisitor(params);
           logger.debug("访客初始化API响应:", response.data, params);
 
           if (response.data?.code === 200) {
-
             // 保存访客ID到localStorage
             if (response.data?.data?.uid) {
               localStorage.setItem(BYTEDESK_UID, response.data.data.uid);

@@ -38,11 +38,12 @@ declare namespace VISITOR {
     title?: string;
     forceAgent?: boolean;
     // 
-    vipLevel?: string;
     goodsInfo?: string;
     orderInfo?: string;
     extra?: string;
     // 
+    vipLevel?: string;
+    debug?: boolean; // 用于区分本地测试还是线上环境
     loadHistory?: boolean; // 是否加载历史消息
   };
   //
