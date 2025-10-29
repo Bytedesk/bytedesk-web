@@ -62,6 +62,7 @@ export interface ChatConfig {
   // 
   vipLevel?: string; // 会员等级
   debug?: boolean; // 用于区分本地测试还是线上环境
+  settingsUid?: string; // 设置唯一ID, 主要用于调试模式
   loadHistory?: boolean; // 是否加载历史消息
   // 其他自定义字段
   [key: string]: string | number | boolean | undefined;

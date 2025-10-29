@@ -294,6 +294,7 @@ export default class BytedeskWeb {
                 : JSON.stringify(this.config.chatConfig?.extra || {}),
             vipLevel: String(this.config.chatConfig?.vipLevel || ""),
             debug: this.config.chatConfig?.debug || false,
+            settingsUid: this.config.chatConfig?.settingsUid || "",
             loadHistory: this.config.chatConfig?.loadHistory || false,
           };
           // 调用API初始化访客信息

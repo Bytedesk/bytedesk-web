@@ -44,6 +44,7 @@ declare namespace VISITOR {
     // 
     vipLevel?: string;
     debug?: boolean; // 用于区分本地测试还是线上环境
+    settingsUid?: string; // 设置唯一ID, 主要用于调试模式
     loadHistory?: boolean; // 是否加载历史消息
   };
   //
