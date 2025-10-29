@@ -204,7 +204,7 @@ yarn demo:nextjs   # Run Next.js demo
 
 # JavaScript demo requires build first
 yarn build
-yarn demo:javascript
+yarn demo:javascript 
 ```
 
 ## 开源Demo + SDK

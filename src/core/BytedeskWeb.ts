@@ -1104,8 +1104,16 @@ export default class BytedeskWeb {
 
     // 添加聊天参数
     Object.entries(this.config.chatConfig || {}).forEach(([key, value]) => {
+      // 特殊处理 debug 参数
+      if (key === "debug" && value === true) {
+        params.append("debug", "1");
+      }
+      // 特殊处理 loadHistory 参数
+      else if (key === "loadHistory" && value === true) {
+        params.append("loadHistory", "1");
+      }
       // 特殊处理 goodsInfo 和 orderInfo 参数
-      if (key === "goodsInfo" || key === "orderInfo") {
+      else if (key === "goodsInfo" || key === "orderInfo") {
         try {
           // 如果已经是字符串，直接使用
           if (typeof value === "string") {
@@ -1135,7 +1143,8 @@ export default class BytedeskWeb {
         } catch (error) {
           logger.error("Error processing extra parameter:", error);
         }
-      } else {
+      } else if (key !== "debug" && key !== "loadHistory") {
+        // 排除 debug 和 loadHistory，避免重复处理
         params.append(key, String(value));
       }
     });
