@@ -46,226 +46,96 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-import React from 'react';
+import { useMemo } from 'react';
+import { Alert, Card, List, Space, Typography, theme } from 'antd';
+// @ts-ignore
+import type { Language } from '@bytedesk/web/types';
+import { getLocaleMessages } from '../locales';
 
-const InstallGuide = () => {
-  return (
-    <div style={{ marginTop: '40px', maxWidth: '800px' }}>
-      <h2>安装步骤</h2>
-      
-      <div style={{ marginBottom: '20px' }}>
-        <h3>1. 安装依赖</h3>
-        <pre style={{ background: '#f5f5f5', padding: '15px', borderRadius: '4px' }}>
-          {`npm install bytedesk-web\n# 或\nyarn add bytedesk-web`}
-        </pre>
-      </div>
+interface InstallGuideProps {
+  locale: Language;
+}
 
-      <div style={{ marginBottom: '20px' }}>
-        <h3>2. 导入组件</h3>
-        <pre style={{ background: '#f5f5f5', padding: '15px', borderRadius: '4px' }}>
-          {`import { BytedeskReact } from 'bytedesk-web/react';
-import type { BytedeskConfig } from 'bytedesk-web/react';`}
-        </pre>
-      </div>
+const codeStyle = (background: string, borderColor: string) => ({
+  background,
+  border: `1px solid ${borderColor}`,
+  borderRadius: 6,
+  padding: 12,
+  fontSize: 13,
+  lineHeight: 1.6,
+  whiteSpace: 'pre-wrap'
+}) as const;
 
-      <div style={{ marginBottom: '20px' }}>
-        <h3>3. 配置参数</h3>
-        
-        <div style={{ marginBottom: '15px' }}>
-          <h4>最小参数配置 (必需)</h4>
-          <pre style={{ background: '#f0f8ff', padding: '15px', borderRadius: '4px', border: '1px solid #b0d4f1' }}>
-            {`const config: BytedeskConfig = {
-  // 聊天配置 (必需)
-  chatConfig: {
-    org: 'df_org_uid',  // 组织ID (必需，请替换为您的组织ID)
-    t: "2",             // 类型 (必需，0：一对一，1：工作组，2：机器人)
-    sid: 'df_rt_uid',   // 会话ID (必需，请替换为您的会话ID)
-  },
-};`}
-          </pre>
-          <p style={{ fontSize: '14px', color: '#666', marginTop: '8px' }}>
-            <strong>注意：</strong>以上三个参数是启动聊天功能的最小配置，请务必替换为您自己的实际参数值。
-          </p>
-        </div>
+const InstallGuide = ({ locale }: InstallGuideProps) => {
+  const messages = useMemo(() => getLocaleMessages(locale), [locale]);
+  const { token } = theme.useToken();
+  const guide = messages.components.installGuide;
 
-        <div style={{ marginBottom: '15px' }}>
-          <h4>完整配置参数 (可选)</h4>
-          <pre style={{ background: '#f5f5f5', padding: '15px', borderRadius: '4px' }}>
-            {`const config: BytedeskConfig = {
-  // 基础配置
-  isDebug: false, // 是否开启调试模式
-  forceRefresh: false, // 是否强制刷新页面
-  apiUrl: 'https://api.weiyuai.cn', // API基础URL
-  htmlUrl: 'https://www.weiyuai.cn/chat', // 对话页面Html基础URL
-  locale: 'zh-cn', // 语言: 'zh-cn' | 'zh-tw' | 'en' | 'ja' | 'ko'
-  
-  // 位置和布局配置
-  placement: 'bottom-right', // 弹出位置: 'bottom-left' | 'bottom-right'
-  marginBottom: 20, // 底部边距
-  marginSide: 20, // 侧边边距
-  draggable: true, // 是否可拖动
-  
-  // 自动弹出配置
-  autoPopup: false, // 是否自动弹出
-  autoPopupDelay: 3000, // 自动弹出延迟时间, 单位: 毫秒
-  
-  // 聊天配置 (必需)
-  chatConfig: {
-    org: 'df_org_uid',  // 组织ID (必需，请替换为您的组织ID)
-    t: "2",             // 类型 (必需，0：一对一，1：工作组，2：机器人)
-    sid: 'df_rt_uid',   // 会话ID (必需，请替换为您的会话ID)
-    
-    // 可选用户信息
-    visitorUid: '', // 自定义访客Uid，支持自定义
-    nickname: '', // 自定义昵称，支持自定义
-    avatar: '', // 自定义头像，支持自定义
-    mobile: '', // 自定义手机号，支持自定义
-    email: '', // 自定义邮箱，支持自定义
-    note: '', // 自定义备注，支持自定义
-    extra: '', // 自定义扩展字段，支持自定义
-    
-    // 业务信息
-    goodsInfo: '', // 商品信息
-    orderInfo: '', // 订单信息
-    vipLevel: '', // 会员等级
-  },
-  
-  // 浏览配置
-  browseConfig: {
-    referrer: '', // 来源
-    url: window.location.href, // 页面URL
-    title: document.title, // 页面标题
-  },
-  
-  // 邀请配置
-  inviteConfig: {
-    show: false, // 是否显示邀请
-    text: '需要帮助吗？', // 邀请文本
-    icon: '👋', // 邀请图标
-    delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
-    loop: true, // 是否启用循环
-    loopDelay: 10000, // 循环间隔, 单位: 毫秒
-    loopCount: 3, // 循环次数, 设置为0表示无限循环
-    acceptText: '开始对话', // 接受文本
-    rejectText: '稍后再说', // 拒绝文本
-    onAccept: () => console.log('用户接受邀请'),
-    onReject: () => console.log('用户拒绝邀请'),
-    onClose: () => console.log('邀请对话框关闭'),
-    onOpen: () => console.log('邀请对话框打开'),
-  },
-  
-  // 文档反馈配置 (新功能)
-  feedbackConfig: {
-    enabled: true, // 是否启用文档反馈功能
-    trigger: 'selection', // 触发方式: 'selection' | 'button' | 'both'
-    showOnSelection: true, // 是否在选中文本时显示提示
-    selectionText: '文档反馈', // 选中文本时显示的提示文字
-    buttonText: '文档反馈', // 按钮文字
-    dialogTitle: '提交意见反馈', // 反馈对话框标题
-    placeholder: '请描述您的问题或优化建议', // 反馈内容输入框占位符
-    submitText: '提交反馈', // 提交按钮文字
-    cancelText: '取消', // 取消按钮文字
-    successMessage: '反馈已提交，感谢您的意见！', // 提交成功提示
-    onSubmit: (feedbackData) => {
-      console.log('收到反馈数据:', feedbackData);
-      // 自定义提交逻辑，可以发送到自己的服务器
-    },
-    onCancel: () => console.log('用户取消了反馈'),
-  },
-  
-  // 气泡配置
-  bubbleConfig: {
-    show: true, // 是否显示气泡
-    icon: '💬', // 气泡图标
-    title: '需要帮助吗？', // 气泡标题
-    subtitle: '点击开始对话', // 气泡副标题
-  },
-  
-  // 按钮配置
-  buttonConfig: {
-    show: true, // 是否显示按钮
-    icon: '💬', // 按钮图标
-    text: '在线客服', // 按钮文本
-    width: 60, // 按钮宽度
-    height: 60, // 按钮高度
-    onClick: () => console.log('按钮被点击'),
-  },
-  
-  // 标签配置
-  tabsConfig: {
-    home: true, // 首页
-    messages: true, // 消息
-    help: true, // 帮助
-    news: false, // 新闻
-  },
-  
-  // 主题配置
-  theme: {
-    mode: 'light', // 主题模式: 'light' | 'dark' | 'system'
-    textColor: '#333333', // 导航文本颜色
-    backgroundColor: '#ffffff', // 导航背景颜色
-  },
-  
-  // 窗口配置
-  window: {
-    width: 400, // 窗口宽度
-    height: 600, // 窗口高度
-  },
-  
-  // 动画配置
-  animation: {
-    enabled: true, // 是否启用动画
-    duration: 300, // 动画持续时间, 单位: 毫秒
-    type: 'ease-in-out', // 动画类型: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out'
-  },
-  
-  // 事件回调
-  onInit: () => console.log('BytedeskReact initialized'),
-  onShowChat: () => console.log('聊天窗口显示'),
-  onHideChat: () => console.log('聊天窗口隐藏'),
-  onMessage: (message: string, type: string) => console.log('收到消息:', message, type),
-  onConfigChange: (config: BytedeskConfig) => console.log('配置变更:', config),
-  onVisitorInfo: (uid: string, visitorUid: string) => console.log('访客信息:', uid, visitorUid),
-};`}
-          </pre>
-        </div>
-      </div>
-
-      <div style={{ marginBottom: '20px' }}>
-        <h3>4. 使用组件</h3>
-        <pre style={{ background: '#f5f5f5', padding: '15px', borderRadius: '4px' }}>
-          {`const App = () => {
-  const handleInit = () => {
-    console.log('BytedeskReact initialized');
-  };
-
-  return (
-    <div>
-      <BytedeskReact {...config} onInit={handleInit} />
-      <button onClick={() => (window as any).bytedesk?.showChat()}>
-        打开聊天
-      </button>
-    </div>
+  const renderCode = (code: string, emphasis = false) => (
+    <pre style={codeStyle(emphasis ? token.colorInfoBg : token.colorFillQuaternary, token.colorBorder)}>
+      {code}
+    </pre>
   );
-};`}
-        </pre>
-      </div>
 
-      <div>
-        <h3>5. 可用方法</h3>
-        <ul style={{ lineHeight: '1.6' }}>
-          <li><code>(window as any).bytedesk?.showButton()</code> - 显示按钮</li>
-          <li><code>(window as any).bytedesk?.hideButton()</code> - 隐藏按钮</li>
-          <li><code>(window as any).bytedesk?.showBubble()</code> - 显示气泡消息</li>
-          <li><code>(window as any).bytedesk?.hideBubble()</code> - 隐藏气泡消息</li>
-          <li><code>(window as any).bytedesk?.showChat()</code> - 显示聊天窗口</li>
-          <li><code>(window as any).bytedesk?.hideChat()</code> - 隐藏聊天窗口</li>
-          <li><code>(window as any).bytedesk?.showInviteDialog()</code> - 显示邀请对话框</li>
-          <li><code>(window as any).bytedesk?.hideInviteDialog()</code> - 隐藏邀请对话框</li>
-        </ul>
-      </div>
-    </div>
+  return (
+    <Card style={{ marginTop: 40 }}>
+      <Typography.Title level={3}>{guide.title}</Typography.Title>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Card type="inner" title={guide.sections.installDeps.title} bordered>
+          {renderCode(guide.sections.installDeps.code)}
+        </Card>
+
+        <Card type="inner" title={guide.sections.importComponent.title} bordered>
+          {renderCode(guide.sections.importComponent.code)}
+        </Card>
+
+        <Card type="inner" title={guide.sections.config.title} bordered>
+          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            <Typography.Text strong>{guide.sections.config.minimalTitle}</Typography.Text>
+            {renderCode(guide.sections.config.minimalCode, true)}
+            <Typography.Paragraph type="secondary">{guide.sections.config.minimalNote}</Typography.Paragraph>
+            <Typography.Text strong>{guide.sections.config.fullTitle}</Typography.Text>
+            {renderCode(guide.sections.config.fullCode)}
+          </Space>
+        </Card>
+
+        <Card type="inner" title={guide.sections.usage.title} bordered>
+          {renderCode(guide.sections.usage.code)}
+        </Card>
+
+        <Card type="inner" title={guide.sections.methods.title} bordered>
+          <List
+            dataSource={[...guide.sections.methods.list]}
+            renderItem={(item: (typeof guide.sections.methods.list)[number]) => (
+              <List.Item style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <Typography.Text code>{item.code}</Typography.Text>
+                <Typography.Text type="secondary">{item.description}</Typography.Text>
+              </List.Item>
+            )}
+          />
+        </Card>
+
+        <Card type="inner" title={guide.sections.feedback.title} bordered>
+          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            <Typography.Paragraph>{guide.sections.feedback.intro}</Typography.Paragraph>
+            <List
+              size="small"
+              dataSource={[...guide.sections.feedback.bullets]}
+              renderItem={(text: (typeof guide.sections.feedback.bullets)[number]) => (
+                <List.Item style={{ paddingInline: 0 }}>{text}</List.Item>
+              )}
+            />
+            <Alert
+              type="info"
+              showIcon
+              message={guide.sections.feedback.tip}
+              description={renderCode(guide.sections.feedback.tipCommand, true)}
+            />
+          </Space>
+        </Card>
+      </Space>
+    </Card>
   );
 };
 
-export default InstallGuide; 
+export default InstallGuide;

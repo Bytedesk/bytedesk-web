@@ -14,20 +14,19 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Button, Card, Typography, Space, Avatar, Divider, Row, Col } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
-import type { BytedeskConfig } from '@bytedesk/web/types';
+import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
 // import { BytedeskReact } from 'bytedesk-web/react';
 // import { BytedeskConfig } from 'bytedesk-web';
-import { theme } from 'antd';
 // import { useContext } from 'react';
-import React from 'react';
+import { getLocaleMessages, type LocaleMessages } from '../locales';
+import PageContainer from '../components/PageContainer';
 
 const { Title, Paragraph } = Typography;
-const { useToken } = theme;
 
 // 定义用户信息接口
 interface UserInfo {
@@ -36,34 +35,42 @@ interface UserInfo {
     avatar: string;
 }
 
-// 定义两个测试用户
-const TEST_USERS: UserInfo[] = [
+type UserPreset = {
+    visitorUid: string;
+    avatar: string;
+    nicknameKey: keyof LocaleMessages['pages']['userInfoDemo']['users'];
+};
+
+const USER_PRESETS: UserPreset[] = [
     {
         visitorUid: 'visitor_001',
-        nickname: '访客小明',
-        avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
+        avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
+        nicknameKey: 'user1'
     },
     {
         visitorUid: 'visitor_002',
-        nickname: '访客小红',
-        avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg'
+        avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg',
+        nicknameKey: 'user2'
     }
 ];
 
-const UserInfoDemo = () => {
-    // 当前选中的用户信息
-    const [currentUser, setCurrentUser] = useState<UserInfo>(TEST_USERS[0]);
-    const { token } = useToken();
-    // const { isDarkMode } = useContext(AppContext);
-    const [themeKey, setThemeKey] = useState(0); // 添加主题key用于强制重新渲染
+interface DemoPageProps {
+    locale: Language;
+    themeMode: BytedeskTheme['mode'];
+}
 
-    // 监听主题变化
-    // useEffect(() => {
-    //     setThemeKey(prev => prev + 1);
-    // }, [isDarkMode]);
+const UserInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
+    const messages = useMemo(() => getLocaleMessages(locale), [locale]);
+    const users = useMemo<UserInfo[]>(() => USER_PRESETS.map((preset) => ({
+        visitorUid: preset.visitorUid,
+        avatar: preset.avatar,
+        nickname: messages.pages.userInfoDemo.users[preset.nicknameKey]
+    })), [messages]);
+    const [currentUserIndex, setCurrentUserIndex] = useState(0);
+    const currentUser = users[currentUserIndex] || users[0];
 
     // 配置客服组件
-    const config: BytedeskConfig = {
+    const config = useMemo<BytedeskConfig>(() => ({
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
         ...(process.env.NODE_ENV === 'development' 
         ? { 
@@ -76,7 +83,7 @@ const UserInfoDemo = () => {
         forceRefresh: true,
         inviteConfig: {
             show: false,
-            text: '您好，请问有什么可以帮您？',
+            text: messages.pages.userInfoDemo.inviteText,
         },
         marginBottom: 20,
         marginSide: 20,
@@ -86,8 +93,8 @@ const UserInfoDemo = () => {
         bubbleConfig: {
             show: false,
             icon: '👋',
-            title: '需要帮助吗？',
-            subtitle: '点击与客服对话'
+            title: messages.pages.localDemo.bubbleTitle,
+            subtitle: messages.pages.localDemo.bubbleSubtitle
         },
         chatConfig: {
             org: 'df_org_uid', // 替换为您的组织ID
@@ -106,16 +113,19 @@ const UserInfoDemo = () => {
                 test: 'test'
             })
         },
-        locale: 'zh-cn',
+        locale,
+        theme: {
+            mode: themeMode
+        },
         // 添加 onVisitorInfo 回调
         onVisitorInfo: (uid: string, visitorUid: string) => {
             console.log('收到访客信息:', { uid, visitorUid });
         },
-    };
+    }), [locale, messages, currentUser, themeMode]);
 
     // 切换用户信息
-    const handleSwitchUser = (user: UserInfo) => {
-        setCurrentUser(user);
+    const handleSwitchUser = (index: number) => {
+        setCurrentUserIndex(index);
     };
 
     // Bytedesk 接口控制函数
@@ -159,147 +169,131 @@ const UserInfoDemo = () => {
         (window as any).bytedesk?.hideInviteDialog();
     };
 
-    return (
-        <div style={{ 
-            height: '100%',
-            overflowY: 'auto',
-            boxSizing: 'border-box',
-            background: 'transparent'
-        }}>
-            <div style={{ 
-                padding: '24px',
-                background: 'transparent',
-                borderRadius: '8px'
-            }}>
-                <Title level={2} style={{ color: token.colorText }}>用户信息对接演示</Title>
-                <Paragraph style={{ color: token.colorTextSecondary }}>
-                    本示例演示如何通过配置参数传入用户信息（visitorUid、nickname、avatar）到客服组件中。
-                    点击下方按钮可以切换不同的用户信息。
-                </Paragraph>
-                
-                <div style={{ marginBottom: '20px' }}>
-                  <p style={{ marginBottom: '10px' }}>
-                    <a href="https://www.weiyuai.cn/docs/zh-CN/docs/development/userinfo" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       style={{ color: token.colorPrimary }}>
-                      查看用户信息对接文档
-                    </a>
-                  </p>
-                  <p style={{ marginBottom: '10px' }}>
-                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/userInfoDemo.tsx" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       style={{ color: token.colorPrimary }}>
-                      React 用户信息对接代码示例
-                    </a>
-                  </p>
-                  <p style={{ marginBottom: '10px' }}>
-                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/userInfoDemo.vue" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       style={{ color: token.colorPrimary }}>
-                      Vue 用户信息对接代码示例
-                    </a>
-                  </p>
-                </div>
+    const docLinks = [
+        { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/userinfo', label: messages.pages.userInfoDemo.docLinks.userInfoDoc },
+        { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/userInfoDemo.tsx', label: messages.pages.userInfoDemo.docLinks.reactExample },
+        { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/userInfoDemo.vue', label: messages.pages.userInfoDemo.docLinks.vueExample }
+    ];
 
-                <Card 
-                    key={themeKey}
-                    style={{ 
-                        marginTop: '20px',
-                        background: token.colorBgContainer,
-                        borderColor: token.colorBorder
-                    }}
-                >
+    const formatSwitchUserLabel = (name: string) =>
+        messages.pages.userInfoDemo.switchToUserLabel.replace('{{name}}', name);
+
+    const formatApiHint = (code: string) => `${messages.pages.userInfoDemo.apiHintPrefix} ${code}`;
+
+        return (
+        <PageContainer>
+            <Card>
+                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <div>
+                    <Title level={2} style={{ marginBottom: 0 }}>{messages.pages.userInfoDemo.title}</Title>
+                    <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                        {messages.pages.userInfoDemo.description}
+                    </Paragraph>
+                </div>
+                <Space direction="vertical" size={4}>
+                    {docLinks.map((link) => (
+                        <Typography.Link
+                            key={link.href}
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {link.label}
+                        </Typography.Link>
+                    ))}
+                </Space>
+                </Space>
+            </Card>
+
+            <Card>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
                         <div>
-                            <Title level={4}>当前用户信息：</Title>
+                            <Title level={4}>{messages.pages.userInfoDemo.currentUserTitle}</Title>
                             <Space>
                                 <Avatar src={currentUser.avatar} size={64} />
                                 <div>
-                                    <Paragraph>用户ID: {currentUser.visitorUid}</Paragraph>
-                                    <Paragraph>昵称: {currentUser.nickname}</Paragraph>
+                                    <Paragraph>
+                                        {messages.pages.userInfoDemo.currentUserIdLabel}: {currentUser.visitorUid}
+                                    </Paragraph>
+                                    <Paragraph>
+                                        {messages.pages.userInfoDemo.currentUserNicknameLabel}: {currentUser.nickname}
+                                    </Paragraph>
                                 </div>
                             </Space>
                         </div>
 
-                        <Space>
-                            <Button 
-                                type="primary"
-                                onClick={() => handleSwitchUser(TEST_USERS[0])}
-                                disabled={currentUser.visitorUid === TEST_USERS[0].visitorUid}
-                            >
-                                切换到访客小明
-                            </Button>
-                            <Button 
-                                type="primary"
-                                onClick={() => handleSwitchUser(TEST_USERS[1])}
-                                disabled={currentUser.visitorUid === TEST_USERS[1].visitorUid}
-                            >
-                                切换到访客小红
-                            </Button>
+                        <Space wrap>
+                            {users.map((user, index) => (
+                                <Button
+                                    key={user.visitorUid}
+                                    type="primary"
+                                    onClick={() => handleSwitchUser(index)}
+                                    disabled={currentUser.visitorUid === user.visitorUid}
+                                >
+                                    {formatSwitchUserLabel(user.nickname)}
+                                </Button>
+                            ))}
                         </Space>
                         <div style={{ textAlign: 'center', marginTop: '16px' }}>
                             <Button type="primary" size="large" onClick={handleShowChat}>
-                                咨询客服
+                                {messages.pages.userInfoDemo.contactSupport}
                             </Button>
                         </div>
                     </Space>
                 </Card>
 
-                <Card style={{ marginTop: '20px' }}>
-                    <Title level={4}>微语 接口控制面板</Title>
+                <Card>
+                    <Title level={4}>{messages.pages.userInfoDemo.controlPanel.title}</Title>
                     <Divider />
                     <Row gutter={[16, 16]}>
                         <Col span={12}>
-                            <Card size="small" title="聊天窗口控制">
+                            <Card size="small" title={messages.pages.userInfoDemo.controlPanel.chatWindow}>
                                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                                     <Space>
-                                        <Button onClick={handleShowChat}>显示聊天窗口</Button>
-                                        <Button onClick={handleHideChat}>隐藏聊天窗口</Button>
+                                        <Button onClick={handleShowChat}>{messages.common.buttons.openChat}</Button>
+                                        <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
                                     </Space>
                                     <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        调用代码：bytedesk.showChat() / bytedesk.hideChat()
+                                        {formatApiHint('bytedesk.showChat() / bytedesk.hideChat()')}
                                     </Typography.Text>
                                 </Space>
                             </Card>
                         </Col>
                         <Col span={12}>
-                            <Card size="small" title="按钮控制">
+                            <Card size="small" title={messages.pages.userInfoDemo.controlPanel.button}>
                                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                                     <Space>
-                                        <Button onClick={handleShowButton}>显示按钮</Button>
-                                        <Button onClick={handleHideButton}>隐藏按钮</Button>
+                                        <Button onClick={handleShowButton}>{messages.common.buttons.showButton}</Button>
+                                        <Button onClick={handleHideButton}>{messages.common.buttons.hideButton}</Button>
                                     </Space>
                                     <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        调用代码：bytedesk.showButton() / bytedesk.hideButton()
+                                        {formatApiHint('bytedesk.showButton() / bytedesk.hideButton()')}
                                     </Typography.Text>
                                 </Space>
                             </Card>
                         </Col>
                         <Col span={12}>
-                            <Card size="small" title="气泡消息控制">
+                            <Card size="small" title={messages.pages.userInfoDemo.controlPanel.bubble}>
                                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                                     <Space>
-                                        <Button onClick={handleShowBubble}>显示气泡</Button>
-                                        <Button onClick={handleHideBubble}>隐藏气泡</Button>
+                                        <Button onClick={handleShowBubble}>{messages.common.buttons.showBubble}</Button>
+                                        <Button onClick={handleHideBubble}>{messages.common.buttons.hideBubble}</Button>
                                     </Space>
                                     <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        调用代码：bytedesk.showBubble() / bytedesk.hideBubble()
+                                        {formatApiHint('bytedesk.showBubble() / bytedesk.hideBubble()')}
                                     </Typography.Text>
                                 </Space>
                             </Card>
                         </Col>
                         <Col span={12}>
-                            <Card size="small" title="邀请对话框控制">
+                            <Card size="small" title={messages.pages.userInfoDemo.controlPanel.invite}>
                                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                                     <Space>
-                                        <Button onClick={handleShowInviteDialog}>显示邀请对话框</Button>
-                                        <Button onClick={handleHideInviteDialog}>隐藏邀请对话框</Button>
+                                        <Button onClick={handleShowInviteDialog}>{messages.common.buttons.showInvite}</Button>
+                                        <Button onClick={handleHideInviteDialog}>{messages.common.buttons.hideInvite}</Button>
                                     </Space>
                                     <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        调用代码：bytedesk.showInviteDialog() / bytedesk.hideInviteDialog()
+                                        {formatApiHint('bytedesk.showInviteDialog() / bytedesk.hideInviteDialog()')}
                                     </Typography.Text>
                                 </Space>
                             </Card>
@@ -308,8 +302,7 @@ const UserInfoDemo = () => {
                 </Card>
 
                 <BytedeskReact {...config} />
-            </div>
-        </div>
+        </PageContainer>
     );
 };
 

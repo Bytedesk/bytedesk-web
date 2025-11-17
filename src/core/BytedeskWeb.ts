@@ -40,6 +40,7 @@ export default class BytedeskWeb {
   private windowState: "minimized" | "maximized" | "normal" = "normal";
   private loopCount: number = 0;
   private loopTimer: number | null = null;
+  private isDestroyed: boolean = false;
 
   // 添加请求状态管理
   private initVisitorPromise: Promise<any> | null = null;
@@ -167,15 +168,29 @@ export default class BytedeskWeb {
   }
 
   async init() {
+    if (this.isDestroyed) {
+      logger.warn("BytedeskWeb 已销毁，跳过初始化");
+      return;
+    }
+
     // 初始化访客信息
     await this._initVisitor();
+    if (this.isDestroyed) return;
+
     // 发送浏览记录 - 在访客初始化完成后执行
     await this._browseVisitor();
+    if (this.isDestroyed) return;
+
     //
     this.createBubble();
+    if (this.isDestroyed) return;
+
     this.createInviteDialog();
+    if (this.isDestroyed) return;
+
     this.setupMessageListener();
     this.setupResizeListener();
+    if (this.isDestroyed) return;
     // 初始化文档反馈功能 - 立即初始化并设置备用触发
     if (this.config.feedbackConfig?.enabled) {
       if (this.config.isDebug) {
@@ -219,14 +234,20 @@ export default class BytedeskWeb {
     // this.preload();
     // 获取未读消息数 - 在访客初始化完成后执行
     this._getUnreadMessageCount();
+    if (this.isDestroyed) return;
+
     // 自动弹出
     if (this.config.autoPopup) {
+      if (this.isDestroyed) return;
       setTimeout(() => {
         this.showChat();
       }, this.config.autoPopupDelay || 1000);
     }
+    if (this.isDestroyed) return;
+
     // 显示邀请框
     if (this.config.inviteConfig?.show) {
+      if (this.isDestroyed) return;
       setTimeout(() => {
         this.showInviteDialog();
       }, this.config.inviteConfig.delay || 3000);
@@ -1417,6 +1438,7 @@ export default class BytedeskWeb {
   }
 
   destroy() {
+    this.isDestroyed = true;
     // 找到气泡容器的父元素
     const bubbleContainer = this.bubble?.parentElement;
     if (bubbleContainer && document.body.contains(bubbleContainer)) {

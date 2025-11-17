@@ -12,18 +12,18 @@
  *  技术/商务联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { Button, Card, Typography, Space, Image, Divider, Row, Col, Tag } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
-import type { BytedeskConfig } from '@bytedesk/web/types';
+import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
 // import { BytedeskReact } from 'bytedesk-web/react';
 // import { BytedeskConfig } from 'bytedesk-web';
-import { theme } from 'antd';
+import { getLocaleMessages } from '../locales';
+import PageContainer from '../components/PageContainer';
 
 const { Title, Paragraph, Text } = Typography;
-const { useToken } = theme;
 
 // 定义商品信息接口
 interface GoodsInfo {
@@ -37,43 +37,41 @@ interface GoodsInfo {
     extra: string;
 }
 
-// 定义测试商品
-const TEST_GOODS: GoodsInfo = {
+const GOODS_BASE: Pick<GoodsInfo, 'uid' | 'image' | 'price' | 'url' | 'extra'> = {
     uid: 'goods_001',
-    title: '比亚迪 仰望U7 豪华纯电动轿车',
     image: 'https://www.weiyuai.cn/assets/images/car/yu7.jpg',
-    description: '比亚迪仰望U7是一款豪华纯电动轿车，采用最新一代刀片电池技术，续航里程可达1000公里。配备智能驾驶辅助系统，支持L3级别自动驾驶。内饰采用高级真皮材质，配备全景天窗、智能座舱等豪华配置。',
     price: 299900,
     url: 'https://www.weiyuai.cn/assets/images/car/yu7.jpg',
-    tagList: ['新能源', '豪华轿车', '智能驾驶', '长续航'],
-    // 额外信息，自定义
     extra: JSON.stringify({
         extraText: 'goodsExtraText',
         extraName: 'goodsExtraName'
     })
 };
 
-const GoodsInfoDemo = () => {
-    // 当前商品信息
-    const [currentGoods, setCurrentGoods] = useState<GoodsInfo>(TEST_GOODS);
-    const { token } = useToken();
-    // const { isDarkMode } = useContext(AppContext);
-    const [themeKey, setThemeKey] = useState(0); // 添加主题key用于强制重新渲染
+interface DemoPageProps {
+    locale: Language;
+    themeMode: BytedeskTheme['mode'];
+}
 
-    // 监听主题变化
-    // useEffect(() => {
-    //     setThemeKey(prev => prev + 1);
-    // }, [isDarkMode]);
+const GoodsInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
+    const messages = useMemo(() => getLocaleMessages(locale), [locale]);
+    const currentGoods = useMemo<GoodsInfo>(() => ({
+        ...GOODS_BASE,
+        title: messages.pages.goodsInfoDemo.product.title,
+        description: messages.pages.goodsInfoDemo.product.description,
+        tagList: [...messages.pages.goodsInfoDemo.product.tags],
+        extra: GOODS_BASE.extra
+    }), [messages]);
 
     // 配置客服组件
-    const config: BytedeskConfig = {
+    const config = useMemo<BytedeskConfig>(() => ({
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
         ...(process.env.NODE_ENV === 'development' ? { htmlUrl: 'http://127.0.0.1:9006' } : {}),
         placement: 'bottom-right',
         autoPopup: false,
         inviteConfig: {
             show: false,
-            text: '您好，请问有什么可以帮您？',
+            text: messages.pages.userInfoDemo.inviteText,
         },
         marginBottom: 20,
         marginSide: 20,
@@ -83,8 +81,8 @@ const GoodsInfoDemo = () => {
         bubbleConfig: {
             show: false,
             icon: '🚗',
-            title: '想了解更多？',
-            subtitle: '点击咨询客服'
+            title: messages.pages.localDemo.bubbleTitle,
+            subtitle: messages.pages.localDemo.bubbleSubtitle
         },
         chatConfig: {
             org: 'df_org_uid', // 替换为您的组织ID
@@ -111,8 +109,11 @@ const GoodsInfoDemo = () => {
                 test: 'test'
             })
         },
-        locale: 'zh-cn',
-    };
+        locale,
+        theme: {
+            mode: themeMode
+        },
+    }), [currentGoods, locale, messages, themeMode]);
 
     // Bytedesk 接口控制函数
     const handleShowChat = () => {
@@ -125,62 +126,43 @@ const GoodsInfoDemo = () => {
         (window as any).bytedesk?.hideChat();
     };
 
-    return (
-        <div style={{
-            height: '100%',
-            overflowY: 'auto',
-            boxSizing: 'border-box',
-            background: 'transparent'
-        }}>
-            <div style={{
-                padding: '24px',
-                background: 'transparent',
-                borderRadius: '8px'
-            }}>
-                <Title level={2} style={{ color: token.colorText }}>商品信息对接演示</Title>
-                <Paragraph style={{ color: token.colorTextSecondary }}>
-                    本示例演示如何通过配置参数传入商品信息（uid、title、image、description、price、url）到客服组件中。
-                    点击下方按钮可以打开客服窗口，商品信息会自动传递给客服。
-                </Paragraph>
-                
-                <div style={{ marginBottom: '20px' }}>
-                  <p style={{ marginBottom: '10px' }}>
-                    <a href="https://www.weiyuai.cn/docs/zh-CN/docs/development/goodsinfo" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       style={{ color: token.colorPrimary }}>
-                      查看商品信息对接文档
-                    </a>
-                  </p>
-                  <p style={{ marginBottom: '10px' }}>
-                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/goodsInfoDemo.tsx" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       style={{ color: token.colorPrimary }}>
-                      React 商品信息对接代码示例
-                    </a>
-                  </p>
-                  <p style={{ marginBottom: '10px' }}>
-                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/goodsInfoDemo.vue" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       style={{ color: token.colorPrimary }}>
-                      Vue 商品信息对接代码示例
-                    </a>
-                  </p>
-                </div>
+    const docLinks = [
+        { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/goodsinfo', label: messages.pages.goodsInfoDemo.docLinks.goodsDoc },
+        { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/goodsInfoDemo.tsx', label: messages.pages.goodsInfoDemo.docLinks.reactExample },
+        { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/goodsInfoDemo.vue', label: messages.pages.goodsInfoDemo.docLinks.vueExample }
+    ];
 
-                <Card
-                    key={themeKey}
-                    style={{
-                        marginTop: '20px',
-                        background: token.colorBgContainer,
-                        borderColor: token.colorBorder
-                    }}
-                >
+    const formatApiHint = (code: string) => `${messages.common.apiHintPrefix} ${code}`;
+
+    return (
+        <PageContainer>
+                <Card>
+                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                        <div>
+                                <Title level={2} style={{ marginBottom: 0 }}>{messages.pages.goodsInfoDemo.title}</Title>
+                                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                                        {messages.pages.goodsInfoDemo.description}
+                                </Paragraph>
+                        </div>
+                        <Space direction="vertical" size={4}>
+                                {docLinks.map((link) => (
+                                        <Typography.Link
+                                            key={link.href}
+                                            href={link.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {link.label}
+                                        </Typography.Link>
+                                ))}
+                        </Space>
+                    </Space>
+                </Card>
+
+                <Card>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
                         <div>
-                            <Title level={4}>商品信息：</Title>
+                            <Title level={4}>{messages.pages.goodsInfoDemo.infoCardTitle}</Title>
                             <Row gutter={24}>
                                 <Col span={12}>
                                     <Image
@@ -197,12 +179,14 @@ const GoodsInfoDemo = () => {
                                                 <Tag key={index} color="blue">{tag}</Tag>
                                             ))}
                                         </Space>
-                                        <Paragraph>{currentGoods.description}</Paragraph>
+                                        <Paragraph>
+                                            <Text strong>{messages.pages.goodsInfoDemo.descriptionLabel}：</Text> {currentGoods.description}
+                                        </Paragraph>
                                         <Text strong style={{ fontSize: '24px', color: '#f5222d' }}>
-                                            ¥{currentGoods.price.toLocaleString()}
+                                            {messages.pages.goodsInfoDemo.priceLabel}: ¥{currentGoods.price.toLocaleString()}
                                         </Text>
                                         <Button type="primary" size="large" onClick={handleShowChat}>
-                                            咨询客服
+                                            {messages.pages.goodsInfoDemo.contactSupport}
                                         </Button>
                                     </Space>
                                 </Col>
@@ -211,19 +195,19 @@ const GoodsInfoDemo = () => {
                     </Space>
                 </Card>
 
-                <Card style={{ marginTop: '20px' }}>
-                    <Title level={4}>微语 接口控制面板</Title>
+                <Card>
+                    <Title level={4}>{messages.pages.goodsInfoDemo.controlPanel.title}</Title>
                     <Divider />
                     <Row gutter={[16, 16]}>
                         <Col span={12}>
-                            <Card size="small" title="聊天窗口控制">
+                            <Card size="small" title={messages.pages.goodsInfoDemo.controlPanel.chatWindow}>
                                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                                     <Space>
-                                        <Button onClick={handleShowChat}>显示聊天窗口</Button>
-                                        <Button onClick={handleHideChat}>隐藏聊天窗口</Button>
+                                        <Button onClick={handleShowChat}>{messages.common.buttons.openChat}</Button>
+                                        <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
                                     </Space>
                                     <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        调用代码：bytedesk.showChat() / bytedesk.hideChat()
+                                        {formatApiHint('bytedesk.showChat() / bytedesk.hideChat()')}
                                     </Typography.Text>
                                 </Space>
                             </Card>
@@ -232,8 +216,7 @@ const GoodsInfoDemo = () => {
                 </Card>
 
                 <BytedeskReact {...config} />
-            </div>
-        </div>
+        </PageContainer>
     );
 };
 

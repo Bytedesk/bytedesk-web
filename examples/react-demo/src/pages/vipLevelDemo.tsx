@@ -14,17 +14,16 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button, Card, Typography, Space, Avatar, Divider, Row, Col, Tag } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
-import type { BytedeskConfig } from '@bytedesk/web/types';
-import { theme } from 'antd';
-import React from 'react';
+import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
+import { getLocaleMessages, type LocaleMessages } from '../locales';
+import PageContainer from '../components/PageContainer';
 
 const { Title, Paragraph } = Typography;
-const { useToken } = theme;
 
 // 定义用户信息接口
 interface UserInfo {
@@ -34,36 +33,60 @@ interface UserInfo {
     vipLevel: number;
 }
 
-// 定义测试用户，包含不同的VIP等级
-const TEST_USERS: UserInfo[] = [
+type VipUserPreset = {
+    visitorUid: string;
+    avatar: string;
+    vipLevel: number;
+    nicknameKey: keyof LocaleMessages['pages']['vipLevelDemo']['users'];
+};
+
+const USER_PRESETS: VipUserPreset[] = [
     {
         visitorUid: 'visitor_001',
-        nickname: '普通用户',
         avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
-        vipLevel: 0
+        vipLevel: 0,
+        nicknameKey: 'user1'
     },
     {
         visitorUid: 'visitor_002',
-        nickname: 'VIP1用户',
         avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg',
-        vipLevel: 1
+        vipLevel: 1,
+        nicknameKey: 'user2'
     },
     {
         visitorUid: 'visitor_003',
-        nickname: 'VIP2用户',
         avatar: 'https://weiyuai.cn/assets/images/avatar/03.jpg',
-        vipLevel: 2
+        vipLevel: 2,
+        nicknameKey: 'user3'
     }
 ];
 
-const VipLevelDemo = () => {
-    // 当前选中的用户信息
-    const [currentUser, setCurrentUser] = useState<UserInfo>(TEST_USERS[0]);
-    const { token } = useToken();
-    const [themeKey, setThemeKey] = useState(0);
+interface DemoPageProps {
+    locale: Language;
+    themeMode: BytedeskTheme['mode'];
+}
+
+const VipLevelDemo = ({ locale, themeMode }: DemoPageProps) => {
+    const messages = useMemo(() => getLocaleMessages(locale), [locale]);
+    const users = useMemo<UserInfo[]>(() => USER_PRESETS.map((preset) => ({
+        visitorUid: preset.visitorUid,
+        avatar: preset.avatar,
+        vipLevel: preset.vipLevel,
+        nickname: messages.pages.vipLevelDemo.users[preset.nicknameKey]
+    })), [messages]);
+    const [currentUserIndex, setCurrentUserIndex] = useState(0);
+    const currentUser = users[currentUserIndex] || users[0];
+    const docLinks = useMemo(
+        () => [
+            { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/viplevel', label: messages.pages.vipLevelDemo.docLinks.vipDoc },
+            { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/vipLevelDemo.tsx', label: messages.pages.vipLevelDemo.docLinks.reactExample },
+            { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/vipLevelDemo.vue', label: messages.pages.vipLevelDemo.docLinks.vueExample }
+        ],
+        [messages]
+    );
 
     // 配置客服组件
-    const config: BytedeskConfig = {
+    const config = useMemo<BytedeskConfig>(() => ({
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
         ...(process.env.NODE_ENV === 'development' 
         ? { 
@@ -76,7 +99,7 @@ const VipLevelDemo = () => {
         forceRefresh: true,
         inviteConfig: {
             show: false,
-            text: '您好，请问有什么可以帮您？',
+            text: messages.pages.userInfoDemo.inviteText,
         },
         marginBottom: 20,
         marginSide: 20,
@@ -86,8 +109,8 @@ const VipLevelDemo = () => {
         bubbleConfig: {
             show: false,
             icon: '👋',
-            title: '需要帮助吗？',
-            subtitle: '点击与客服对话'
+            title: messages.pages.localDemo.bubbleTitle,
+            subtitle: messages.pages.localDemo.bubbleSubtitle
         },
         chatConfig: {
             org: 'df_org_uid',
@@ -97,19 +120,22 @@ const VipLevelDemo = () => {
             visitorUid: currentUser.visitorUid,
             nickname: currentUser.nickname,
             avatar: currentUser.avatar,
-            vipLevel: currentUser.vipLevel,
+            vipLevel: String(currentUser.vipLevel),
             // 自定义字段
             extra: JSON.stringify({
                 type: 'type',
                 test: 'test'
             })
         },
-        locale: 'zh-cn',
-    };
+        locale,
+        theme: {
+            mode: themeMode
+        },
+    }), [currentUser, locale, messages, themeMode]);
 
     // 切换用户信息
-    const handleSwitchUser = (user: UserInfo) => {
-        setCurrentUser(user);
+    const handleSwitchUser = (index: number) => {
+        setCurrentUserIndex(index);
     };
 
     // Bytedesk 接口控制函数
@@ -137,120 +163,104 @@ const VipLevelDemo = () => {
         }
     };
 
+    const formatVipTag = (level: number) =>
+        level === 0 ? messages.pages.vipLevelDemo.normalLabel : `${messages.pages.vipLevelDemo.vipPrefix}${level}`;
+
+    const formatSwitchLabel = (name: string) =>
+        messages.pages.vipLevelDemo.switchButtonLabel.replace('{{name}}', name);
+
+    const formatApiHint = (code: string) => `${messages.common.apiHintPrefix} ${code}`;
+
     return (
-        <div style={{ 
-            height: '100%',
-            overflowY: 'auto',
-            boxSizing: 'border-box',
-            background: 'transparent'
-        }}>
-            <div style={{ 
-                padding: '24px',
-                background: 'transparent',
-                borderRadius: '8px'
-            }}>
-                <Title level={2} style={{ color: token.colorText }}>VIP等级对接演示</Title>
-                <Paragraph style={{ color: token.colorTextSecondary }}>
-                    本示例演示如何通过配置参数传入用户VIP等级（vipLevel）到客服组件中。
-                    点击下方按钮可以切换不同VIP等级的用户信息。
-                </Paragraph>
-                
-                <div style={{ marginBottom: '20px' }}>
-                  <p style={{ marginBottom: '10px' }}>
-                    <a href="https://www.weiyuai.cn/docs/zh-CN/docs/development/viplevel" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       style={{ color: token.colorPrimary }}>
-                      查看VIP等级对接文档
-                    </a>
-                  </p>
-                  <p style={{ marginBottom: '10px' }}>
-                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/vipLevelDemo.tsx" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       style={{ color: token.colorPrimary }}>
-                      React VIP等级对接代码示例
-                    </a>
-                  </p>
-                  <p style={{ marginBottom: '10px' }}>
-                    <a href="https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/vipLevelDemo.vue" 
-                       target="_blank" 
-                       rel="noopener noreferrer"
-                       style={{ color: token.colorPrimary }}>
-                      Vue VIP等级对接代码示例
-                    </a>
-                  </p>
-                </div>
-
-                <Card 
-                    key={themeKey}
-                    style={{ 
-                        marginTop: '20px',
-                        background: token.colorBgContainer,
-                        borderColor: token.colorBorder
-                    }}
-                >
-                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                        <div>
-                            <Title level={4}>当前用户信息：</Title>
-                            <Space>
-                                <Avatar src={currentUser.avatar} size={64} />
-                                <div>
-                                    <Paragraph>用户ID: {currentUser.visitorUid}</Paragraph>
-                                    <Paragraph>昵称: {currentUser.nickname}</Paragraph>
-                                    <Paragraph>
-                                        VIP等级: 
-                                        <Tag color={getVipLevelColor(currentUser.vipLevel)} style={{ marginLeft: 8 }}>
-                                            {currentUser.vipLevel === 0 ? '普通用户' : `VIP${currentUser.vipLevel}`}
-                                        </Tag>
-                                    </Paragraph>
-                                </div>
-                            </Space>
-                        </div>
-
-                        <Space>
-                            {TEST_USERS.map((user) => (
-                                <Button 
-                                    key={user.visitorUid}
-                                    type="primary"
-                                    onClick={() => handleSwitchUser(user)}
-                                    disabled={currentUser.visitorUid === user.visitorUid}
-                                >
-                                    切换到{user.nickname}
-                                </Button>
-                            ))}
-                        </Space>
-                        <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                            <Button type="primary" size="large" onClick={handleShowChat}>
-                                咨询客服
-                            </Button>
-                        </div>
+        <PageContainer>
+            <Card>
+                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                    <div>
+                        <Title level={2} style={{ marginBottom: 0 }}>{messages.pages.vipLevelDemo.title}</Title>
+                        <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                            {messages.pages.vipLevelDemo.description}
+                        </Paragraph>
+                    </div>
+                    <Space direction="vertical" size={4}>
+                        {docLinks.map((link) => (
+                            <Typography.Link
+                                key={link.href}
+                                href={link.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {link.label}
+                            </Typography.Link>
+                        ))}
                     </Space>
-                </Card>
+                </Space>
+            </Card>
 
-                <Card style={{ marginTop: '20px' }}>
-                    <Title level={4}>微语 接口控制面板</Title>
-                    <Divider />
-                    <Row gutter={[16, 16]}>
-                        <Col span={12}>
-                            <Card size="small" title="聊天窗口控制">
-                                <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                                    <Space>
-                                        <Button onClick={handleShowChat}>显示聊天窗口</Button>
-                                        <Button onClick={handleHideChat}>隐藏聊天窗口</Button>
-                                    </Space>
-                                    <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        调用代码：bytedesk.showChat() / bytedesk.hideChat()
-                                    </Typography.Text>
+            <Card>
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    <div>
+                        <Title level={4}>{messages.pages.userInfoDemo.currentUserTitle}</Title>
+                        <Space>
+                            <Avatar src={currentUser.avatar} size={64} />
+                            <div>
+                                <Paragraph style={{ marginBottom: 4 }}>
+                                    {messages.pages.userInfoDemo.currentUserIdLabel}: {currentUser.visitorUid}
+                                </Paragraph>
+                                <Paragraph style={{ marginBottom: 4 }}>
+                                    {messages.pages.userInfoDemo.currentUserNicknameLabel}: {currentUser.nickname}
+                                </Paragraph>
+                                <Paragraph style={{ marginBottom: 0 }}>
+                                    {messages.pages.vipLevelDemo.vipLabel}:
+                                    <Tag color={getVipLevelColor(currentUser.vipLevel)} style={{ marginLeft: 8 }}>
+                                        {formatVipTag(currentUser.vipLevel)}
+                                    </Tag>
+                                </Paragraph>
+                            </div>
+                        </Space>
+                    </div>
+
+                    <Space wrap>
+                        {users.map((user, index) => (
+                            <Button
+                                key={user.visitorUid}
+                                type="primary"
+                                onClick={() => handleSwitchUser(index)}
+                                disabled={currentUser.visitorUid === user.visitorUid}
+                            >
+                                {formatSwitchLabel(user.nickname)}
+                            </Button>
+                        ))}
+                    </Space>
+                    <div style={{ textAlign: 'center' }}>
+                        <Button type="primary" size="large" onClick={handleShowChat}>
+                            {messages.pages.userInfoDemo.contactSupport}
+                        </Button>
+                    </div>
+                </Space>
+            </Card>
+
+            <Card>
+                <Title level={4}>{messages.pages.goodsInfoDemo.controlPanel.title}</Title>
+                <Divider />
+                <Row gutter={[16, 16]}>
+                    <Col span={12}>
+                        <Card size="small" title={messages.pages.goodsInfoDemo.controlPanel.chatWindow}>
+                            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                                <Space>
+                                    <Button onClick={handleShowChat}>{messages.common.buttons.openChat}</Button>
+                                    <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
                                 </Space>
-                            </Card>
-                        </Col>
-                    </Row>
-                </Card>
+                                <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
+                                    {formatApiHint('bytedesk.showChat() / bytedesk.hideChat()')}
+                                </Typography.Text>
+                            </Space>
+                        </Card>
+                    </Col>
+                </Row>
+            </Card>
 
-                <BytedeskReact {...config} />
-            </div>
-        </div>
+            <BytedeskReact {...config} />
+        </PageContainer>
     );
 };
 
