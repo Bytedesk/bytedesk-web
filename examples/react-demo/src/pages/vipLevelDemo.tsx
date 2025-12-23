@@ -129,7 +129,7 @@ const VipLevelDemo = ({ locale, themeMode }: DemoPageProps) => {
         },
         locale,
         theme: {
-            mode: themeMode
+            mode: themeMode,
         },
     }), [currentUser, locale, messages, themeMode]);
 

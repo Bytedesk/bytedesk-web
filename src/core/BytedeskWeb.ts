@@ -16,6 +16,7 @@ import {
   BYTEDESK_UID,
   BYTEDESK_VISITOR_UID,
   BYTEDESK_BROWSE_FAILED_TIMESTAMP,
+  BYTEDESK_BROWSE_LAST_TIMESTAMP,
   POST_MESSAGE_CLOSE_CHAT_WINDOW,
   POST_MESSAGE_INVITE_VISITOR,
   POST_MESSAGE_INVITE_VISITOR_ACCEPT,
@@ -173,13 +174,20 @@ export default class BytedeskWeb {
       return;
     }
 
+    // 只有在按钮显示时才自动请求 browse / 未读数等接口
+    const shouldAutoRequest = this.config.buttonConfig?.show !== false;
+
     // 初始化访客信息
     await this._initVisitor();
     if (this.isDestroyed) return;
 
-    // 发送浏览记录 - 在访客初始化完成后执行
-    await this._browseVisitor();
-    if (this.isDestroyed) return;
+    // 发送浏览记录 - 在访客初始化完成后执行（仅按钮显示时自动发送）
+    if (shouldAutoRequest) {
+      await this._browseVisitor();
+      if (this.isDestroyed) return;
+    } else {
+      logger.debug("buttonConfig.show=false，跳过自动发送浏览记录");
+    }
 
     //
     this.createBubble();
@@ -232,9 +240,13 @@ export default class BytedeskWeb {
     }
     // 预加载
     // this.preload();
-    // 获取未读消息数 - 在访客初始化完成后执行
-    this._getUnreadMessageCount();
-    if (this.isDestroyed) return;
+    // 获取未读消息数 - 在访客初始化完成后执行（仅按钮显示时自动请求）
+    if (shouldAutoRequest) {
+      this._getUnreadMessageCount();
+      if (this.isDestroyed) return;
+    } else {
+      logger.debug("buttonConfig.show=false，跳过自动获取未读消息数");
+    }
 
     // 自动弹出
     if (this.config.autoPopup) {
@@ -370,6 +382,27 @@ export default class BytedeskWeb {
   // 获取当前页面浏览信息并发送到服务器
   private async _browseVisitor() {
     try {
+      // 严格控制调用频率：1小时最多调用一次（不区分成功/失败，按“发起调用”计）
+      const lastBrowseTimestamp = localStorage.getItem(
+        BYTEDESK_BROWSE_LAST_TIMESTAMP
+      );
+      if (lastBrowseTimestamp) {
+        const lastBrowseTime = parseInt(lastBrowseTimestamp);
+        const currentTime = Date.now();
+        const oneHour = 60 * 60 * 1000; // 1小时的毫秒数
+
+        if (
+          !Number.isNaN(lastBrowseTime) &&
+          currentTime - lastBrowseTime < oneHour
+        ) {
+          const remainingTime = Math.ceil(
+            (oneHour - (currentTime - lastBrowseTime)) / 1000 / 60
+          ); // 剩余分钟数
+          logger.warn(`浏览记录1小时内最多发送一次，还需等待 ${remainingTime} 分钟`);
+          return;
+        }
+      }
+
       // 检查是否在1小时限制期内
       const failedTimestamp = localStorage.getItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP);
       if (failedTimestamp) {
@@ -437,6 +470,9 @@ export default class BytedeskWeb {
         logger.warn("访客uid为空，跳过browse操作");
         return;
       }
+
+      // 记录本次 browse 触发时间（用于频控）
+      localStorage.setItem(BYTEDESK_BROWSE_LAST_TIMESTAMP, Date.now().toString());
 
       // 动态导入browse方法
       const { browse } = await import("../apis/visitor");
@@ -563,6 +599,7 @@ export default class BytedeskWeb {
   // 清除浏览记录发送失败的限制
   clearBrowseFailedLimit() {
     localStorage.removeItem(BYTEDESK_BROWSE_FAILED_TIMESTAMP);
+    localStorage.removeItem(BYTEDESK_BROWSE_LAST_TIMESTAMP);
     logger.info("已清除浏览记录发送失败的限制");
   }
 
@@ -1130,6 +1167,10 @@ export default class BytedeskWeb {
       if (key === "debug" && value === true) {
         params.append("debug", "1");
       }
+      // 特殊处理 draft 参数（灰度测试标识）
+      else if (key === "draft" && value === true) {
+        params.append("draft", "1");
+      }
       // 特殊处理 loadHistory 参数
       else if (key === "loadHistory" && value === true) {
         params.append("loadHistory", "1");
@@ -1165,8 +1206,8 @@ export default class BytedeskWeb {
         } catch (error) {
           logger.error("Error processing extra parameter:", error);
         }
-      } else if (key !== "debug" && key !== "loadHistory") {
-        // 排除 debug 和 loadHistory，避免重复处理
+      } else if (key !== "debug" && key !== "draft" && key !== "loadHistory") {
+        // 排除 debug / draft / loadHistory，避免重复处理
         params.append(key, String(value));
       }
     });

@@ -12,6 +12,7 @@ export const en = {
       dark: 'Dark',
       system: 'System'
     },
+    officialSiteLabel: 'Official site',
     docLinks: {
       react: 'View React integration docs',
       vue: 'View Vue integration docs',
@@ -44,13 +45,14 @@ export const en = {
     apiHintPrefix: 'API calls:'
   },
   nav: {
-    localDemo: 'Basic Setup',
-    userInfoDemo: 'User Info Integration',
-    goodsInfoDemo: 'Goods Info Integration',
-    orderInfoDemo: 'Order Info Integration',
-    vipLevelDemo: 'Personalization',
-    unreadCountDemo: 'Unread Counter',
-    documentFeedbackDemo: '📝 Document Feedback'
+    localDemo: '⚙️ Basic Setup',
+    userInfoDemo: '👤 User Info',
+    goodsInfoDemo: '🛒 Goods Info',
+    orderInfoDemo: '📦 Order Info',
+    vipLevelDemo: '👑 Personalization',
+    unreadCountDemo: '🔔 Unread Counter',
+    documentFeedbackDemo: '📝 Doc Feedback',
+    flightBookingDemo: '✈️ Flight Booking'
   },
   pages: {
     localDemo: {
@@ -285,6 +287,97 @@ export const en = {
           lastSelection: 'lastSelectionText',
           tooltipVisible: 'Tooltip visibility',
           currentSelection: 'Current selection'
+        }
+      }
+    },
+    flightBookingDemo: {
+      title: 'Flight Booking Demo',
+      description: 'Complete flight booking, cancellation, and rebooking through AI-powered conversations. Users can interact with the AI assistant to search flights, select seats, modify orders, and more - no tedious forms required.',
+      bubbleTitle: 'Need help?',
+      bubbleSubtitle: 'Book/Cancel/Change flights',
+      sections: {
+        flightStatus: 'Flight Status',
+        flightInfo: 'Flight Information',
+        bookingInfo: 'Booking Details',
+        passengerInfo: 'Passenger Information'
+      },
+      labels: {
+        departure: 'Departure',
+        arrival: 'Arrival',
+        flightDate: 'Flight Date',
+        cabinClass: 'Cabin Class',
+        flightStatus: 'Flight Status',
+        ticketPrice: 'Ticket Price',
+        perPerson: 'person',
+        bookingNo: 'Booking No.',
+        bookingTime: 'Booking Time',
+        paymentStatus: 'Payment Status',
+        paymentMethod: 'Payment Method',
+        passengerCount: 'Passengers',
+        totalAmount: 'Total Amount',
+        person: 'person(s)',
+        passenger: 'Passenger',
+        passengerName: 'Name',
+        idType: 'ID Type',
+        idNumber: 'ID Number',
+        phone: 'Phone'
+      },
+      statusText: {
+        scheduled: 'Scheduled',
+        boarding: 'Boarding',
+        departed: 'Departed',
+        arrived: 'Arrived',
+        cancelled: 'Cancelled'
+      },
+      paymentStatusText: {
+        pending: 'Pending',
+        paid: 'Paid',
+        refunded: 'Refunded'
+      },
+      buttons: {
+        contactSupport: 'Contact Support',
+        viewItinerary: 'View Itinerary',
+        changeBooking: 'Change Flight',
+        cancelBooking: 'Cancel Booking'
+      },
+      flight: {
+        airlines: {
+          airChina: 'Air China',
+          chinaEastern: 'China Eastern',
+          chinaSouthern: 'China Southern'
+        },
+        cities: {
+          beijing: 'Beijing',
+          shanghai: 'Shanghai',
+          guangzhou: 'Guangzhou',
+          shenzhen: 'Shenzhen'
+        },
+        airports: {
+          pek: 'Capital Intl Airport T3',
+          pvg: 'Pudong Intl Airport T2',
+          can: 'Baiyun Intl Airport T2',
+          szx: 'Bao\'an Intl Airport T3'
+        },
+        cabinClasses: {
+          economy: 'Economy',
+          business: 'Business',
+          first: 'First Class'
+        }
+      },
+      passenger: {
+        samplePassenger1: 'John Smith',
+        samplePassenger2: 'Jane Doe',
+        idTypes: {
+          idCard: 'ID Card',
+          passport: 'Passport',
+          other: 'Other'
+        }
+      },
+      booking: {
+        paymentMethods: {
+          alipay: 'Alipay',
+          wechat: 'WeChat Pay',
+          card: 'Credit Card'
         }
       }
     },

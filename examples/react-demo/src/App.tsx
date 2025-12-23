@@ -22,6 +22,7 @@ import OrderInfoDemo from './pages/orderInfoDemo';
 import UserInfoDemo from './pages/userInfoDemo';
 import UnreadCountDemo from './pages/unreadCountDemo';
 import DocumentFeedbackDemo from './pages/DocumentFeedbackDemo';
+// import FlightBookingDemo from './pages/FlightBookingDemo';
 // @ts-ignore
 import type { Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
 import { getLocaleMessages, type LocaleMessages } from './locales';
@@ -175,7 +176,8 @@ function AppLayout({
     { path: '/orderInfo', label: messages.nav.orderInfoDemo },
     { path: '/vipLevel', label: messages.nav.vipLevelDemo },
     { path: '/unreadCount', label: messages.nav.unreadCountDemo },
-    { path: '/documentFeedback', label: messages.nav.documentFeedbackDemo }
+    { path: '/documentFeedback', label: messages.nav.documentFeedbackDemo },
+    // { path: '/flightBooking', label: messages.nav.flightBookingDemo }
   ];
 
   const getLinkStyle = (path: string) => {
@@ -190,6 +192,14 @@ function AppLayout({
       transition: 'all 0.2s ease'
     };
   };
+
+  const githubUrl = 'https://github.com/Bytedesk/bytedesk-web';
+  const siteUrlMap: Record<DemoLocale, string> = {
+    en: 'https://www.weiyuai.cn/en/',
+    'zh-cn': 'https://www.weiyuai.cn/',
+    'zh-tw': 'https://www.weiyuai.cn/zh-TW/'
+  };
+  const currentSiteUrl = siteUrlMap[locale] || siteUrlMap['zh-cn'];
 
   return (
     <Layout style={{ minHeight: '100vh', background: token.colorBgLayout }}>
@@ -265,6 +275,29 @@ function AppLayout({
               style={{ width: '100%' }}
             />
           </div>
+          <a
+            href={githubUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Bytedesk GitHub"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '6px 12px',
+              borderRadius: 6,
+              textDecoration: 'none',
+              fontWeight: 600,
+              color: token.colorPrimary,
+              backgroundColor: 'transparent',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+              <path d="M12 .297C5.373.297 0 5.67 0 12.297c0 5.292 3.438 9.776 8.205 11.366.6.111.82-.261.82-.58 0-.287-.011-1.046-.017-2.053-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.73.083-.73 1.205.085 1.84 1.238 1.84 1.238 1.07 1.835 2.807 1.305 3.492.998.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.931 0-1.31.469-2.381 1.235-3.221-.124-.303-.535-1.525.117-3.176 0 0 1.008-.323 3.301 1.23a11.52 11.52 0 013.003-.404c1.02.005 2.045.138 3.003.404 2.291-1.553 3.297-1.23 3.297-1.23.653 1.651.242 2.873.118 3.176.77.84 1.233 1.911 1.233 3.221 0 4.609-2.807 5.625-5.48 5.921.43.373.814 1.103.814 2.222 0 1.606-.015 2.903-.015 3.296 0 .322.216.697.825.579C20.565 22.07 24 17.587 24 12.297 24 5.67 18.627.297 12 .297z" />
+            </svg>
+            <span style={{ fontSize: 13 }}>GitHub</span>
+          </a>
         </div>
       </Layout.Header>
       <Layout.Content style={{ padding: 0, background: token.colorBgLayout }}>
@@ -294,8 +327,32 @@ function AppLayout({
             path="/documentFeedback"
             element={<DocumentFeedbackDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />}
           />
+          {/* <Route
+            path="/flightBooking"
+            element={<FlightBookingDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />}
+          /> */}
         </Routes>
       </Layout.Content>
+      <Layout.Footer
+        style={{
+          background: token.colorBgContainer,
+          borderTop: `1px solid ${token.colorSplit}`,
+          padding: '10px 24px',
+          textAlign: 'center'
+        }}
+      >
+        <div style={{ fontSize: 12, color: token.colorTextSecondary || token.colorText }}>
+          <a
+            href={currentSiteUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${messages.common.officialSiteLabel} ${messages.common.languageOptions[locale]}`}
+            style={{ color: token.colorText }}
+          >
+            {messages.common.officialSiteLabel}
+          </a>
+        </div>
+      </Layout.Footer>
     </Layout>
   );
 }

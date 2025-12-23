@@ -111,7 +111,7 @@ const GoodsInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
         },
         locale,
         theme: {
-            mode: themeMode
+            mode: themeMode,
         },
     }), [currentGoods, locale, messages, themeMode]);
 

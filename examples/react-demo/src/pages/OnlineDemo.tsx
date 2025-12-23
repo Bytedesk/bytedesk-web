@@ -245,7 +245,7 @@ const OnlineDemo = ({ locale }: DemoPageProps) => {
         </Col>
       </Row>
 
-      <Card bordered>
+      <Card>
         <Typography.Title level={4} style={{ marginBottom: 16 }}>BytedeskReact</Typography.Title>
         <BytedeskReact
           {...config}

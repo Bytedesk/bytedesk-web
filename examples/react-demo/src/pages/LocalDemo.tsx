@@ -62,6 +62,7 @@ const LocalDemo = ({ locale, themeMode }: LocalDemoProps) => {
     },
     theme: {
       mode: themeMode || 'light',
+      textColor: '#ffffff',
       backgroundColor: THEME_COLORS[0]
     },
     locale,

@@ -151,7 +151,7 @@ const OrderInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
     },
     locale,
     theme: {
-      mode: themeMode
+      mode: themeMode,
     }
   }), [currentOrder, locale, messages, themeMode]);
 

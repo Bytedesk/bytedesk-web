@@ -171,6 +171,10 @@ https://cdn.jsdelivr.net/npm/bytedesk-web@1.4.9/dist/bytedesk-web.js
 https://cdn.jsdelivr.net/npm/bytedesk-web@1.4.9/dist/bytedesk-web.umd.js
 ```
 
+## Server
+
+- [Bytedesk](https://github.com/Bytedesk/bytedesk)
+
 ## Open Source Demo + SDK
 
 | Project     | Description           | Forks          | Stars             |

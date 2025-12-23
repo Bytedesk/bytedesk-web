@@ -12,6 +12,7 @@ export const zhTw = {
       dark: '深色',
       system: '跟隨系統'
     },
+    officialSiteLabel: '官方網站',
     docLinks: {
       react: '查看 React 集成文件',
       vue: '查看 Vue 集成文件',
@@ -44,13 +45,14 @@ export const zhTw = {
     apiHintPrefix: '呼叫程式：'
   },
   nav: {
-    localDemo: '基本設定',
-    userInfoDemo: '使用者資訊對接',
-    goodsInfoDemo: '商品資訊對接',
-    orderInfoDemo: '訂單資訊對接',
-    vipLevelDemo: '千人千面',
-    unreadCountDemo: '未讀訊息對接',
-    documentFeedbackDemo: '📝 文件回饋示範'
+    localDemo: '⚙️ 基本設定',
+    userInfoDemo: '👤 使用者資訊對接',
+    goodsInfoDemo: '🛒 商品資訊對接',
+    orderInfoDemo: '📦 訂單資訊對接',
+    vipLevelDemo: '👑 千人千面',
+    unreadCountDemo: '🔔 未讀訊息對接',
+    documentFeedbackDemo: '📝 文件回饋示範',
+    flightBookingDemo: '✈️ 機票預訂示範'
   },
   pages: {
     localDemo: {
@@ -285,6 +287,97 @@ export const zhTw = {
           lastSelection: 'lastSelectionText',
           tooltipVisible: '提示框顯示狀態',
           currentSelection: '目前選中文字'
+        }
+      }
+    },
+    flightBookingDemo: {
+      title: '機票預訂示範',
+      description: '透過 AI 智慧對話實現機票預訂、退票、改簽等全流程服務。使用者可直接與 AI 客服對話完成航班查詢、座位選擇、訂單修改等操作，無需繁瑣的表單填寫。',
+      bubbleTitle: '需要協助嗎？',
+      bubbleSubtitle: '機票預訂/退票/改簽',
+      sections: {
+        flightStatus: '航班狀態',
+        flightInfo: '航班資訊',
+        bookingInfo: '訂單資訊',
+        passengerInfo: '乘客資訊'
+      },
+      labels: {
+        departure: '出發',
+        arrival: '抵達',
+        flightDate: '出發日期',
+        cabinClass: '艙等',
+        flightStatus: '航班狀態',
+        ticketPrice: '票價',
+        perPerson: '人',
+        bookingNo: '訂單編號',
+        bookingTime: '下單時間',
+        paymentStatus: '付款狀態',
+        paymentMethod: '付款方式',
+        passengerCount: '乘客人數',
+        totalAmount: '訂單總額',
+        person: '人',
+        passenger: '乘客',
+        passengerName: '姓名',
+        idType: '證件類型',
+        idNumber: '證件號碼',
+        phone: '聯絡電話'
+      },
+      statusText: {
+        scheduled: '待起飛',
+        boarding: '登機中',
+        departed: '已起飛',
+        arrived: '已抵達',
+        cancelled: '已取消'
+      },
+      paymentStatusText: {
+        pending: '待付款',
+        paid: '已付款',
+        refunded: '已退款'
+      },
+      buttons: {
+        contactSupport: '諮詢客服',
+        viewItinerary: '查看行程單',
+        changeBooking: '改簽機票',
+        cancelBooking: '取消訂單'
+      },
+      flight: {
+        airlines: {
+          airChina: '中國國際航空',
+          chinaEastern: '中國東方航空',
+          chinaSouthern: '中國南方航空'
+        },
+        cities: {
+          beijing: '北京',
+          shanghai: '上海',
+          guangzhou: '廣州',
+          shenzhen: '深圳'
+        },
+        airports: {
+          pek: '首都國際機場 T3',
+          pvg: '浦東國際機場 T2',
+          can: '白雲國際機場 T2',
+          szx: '寶安國際機場 T3'
+        },
+        cabinClasses: {
+          economy: '經濟艙',
+          business: '商務艙',
+          first: '頭等艙'
+        }
+      },
+      passenger: {
+        samplePassenger1: '張三',
+        samplePassenger2: '李四',
+        idTypes: {
+          idCard: '身分證',
+          passport: '護照',
+          other: '其他'
+        }
+      },
+      booking: {
+        paymentMethods: {
+          alipay: '支付寶',
+          wechat: '微信支付',
+          card: '銀行卡'
         }
       }
     },

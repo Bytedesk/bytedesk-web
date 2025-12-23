@@ -34,7 +34,7 @@ export function getApiUrl() {
 export function setApiUrl(url: string) {
   if (url && url.trim() !== '') {
     apiUrl = url;
-    logger.info('API URL已设置为:', apiUrl);
+    logger.debug('API URL已设置为:', apiUrl);
   } else {
     logger.warn('尝试设置无效的API URL');
   }

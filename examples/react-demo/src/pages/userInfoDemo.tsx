@@ -115,7 +115,7 @@ const UserInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
         },
         locale,
         theme: {
-            mode: themeMode
+            mode: themeMode,
         },
         // 添加 onVisitorInfo 回调
         onVisitorInfo: (uid: string, visitorUid: string) => {
