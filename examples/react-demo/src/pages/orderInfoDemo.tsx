@@ -137,13 +137,16 @@ const OrderInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
       subtitle: messages.pages.localDemo.bubbleSubtitle
     },
     chatConfig: {
-      org: 'df_org_uid',
-      t: '1',
-      sid: 'df_wg_aftersales',
+      org: 'df_org_uid', // 替换为您的组织ID
+      t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
+      sid: 'df_wg_aftersales', // 替换为您的SID
+      // 自定义用户信息
       visitorUid: 'visitor_001',
       nickname: '访客小明',
       avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
+      // 订单信息通过自定义消息发送
       orderInfo: JSON.stringify(currentOrder),
+      // 自定义字段，可以传递任何字段
       extra: JSON.stringify({
         type: 'type',
         test: 'test'

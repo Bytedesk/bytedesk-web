@@ -1098,12 +1098,16 @@ export default class BytedeskWeb {
         left: 0;
         bottom: 0;
         width: 100%;
-        height: 90vh;
+        height: 100vh;
+        height: 100dvh;
         display: none;
         z-index: 10000;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
         overflow: hidden;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
         transition: all ${this.config.animation?.duration}ms ${this.config.animation?.type};
       `;
     } else {
@@ -1133,8 +1137,8 @@ export default class BytedeskWeb {
       width: 100%;
       height: 100%;
       border: none;
-      display: block; // 添加这一行
-      vertical-align: bottom; // 添加这一行
+      display: block;
+      vertical-align: bottom;
     `;
     iframe.src = this.generateChatUrl();
     logger.debug("iframe.src: ", iframe.src);
@@ -1424,12 +1428,19 @@ export default class BytedeskWeb {
           left: "0",
           bottom: "0",
           width: "100%",
-          height: "90vh",
+          height: "100vh",
           borderTopLeftRadius: "12px",
           borderTopRightRadius: "12px",
           borderBottomLeftRadius: "0",
           borderBottomRightRadius: "0",
+          boxSizing: "border-box",
+          paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: "env(safe-area-inset-bottom)",
         });
+
+        // iOS/Safari 地址栏伸缩时，dvh 更贴近真实可视区域
+        // 不支持 dvh 的浏览器会忽略该值，从而保留上面的 100vh
+        this.window.style.height = "100dvh";
       } else {
         let width =
           this.windowState === "maximized"
