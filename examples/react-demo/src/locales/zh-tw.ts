@@ -45,6 +45,7 @@ export const zhTw = {
     apiHintPrefix: '呼叫程式：'
   },
   nav: {
+    more: '更多',
     localDemo: '⚙️ 基本設定',
     userInfoDemo: '👤 使用者資訊對接',
     goodsInfoDemo: '🛒 商品資訊對接',

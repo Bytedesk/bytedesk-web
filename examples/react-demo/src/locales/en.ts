@@ -45,6 +45,7 @@ export const en = {
     apiHintPrefix: 'API calls:'
   },
   nav: {
+    more: 'More',
     localDemo: '⚙️ Basic Setup',
     userInfoDemo: '👤 User Info',
     goodsInfoDemo: '🛒 Goods Info',

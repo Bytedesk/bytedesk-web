@@ -45,6 +45,7 @@ export const zhCn = {
     apiHintPrefix: '调用代码：'
   },
   nav: {
+    more: '更多',
     localDemo: '⚙️ 基本配置',
     userInfoDemo: '👤 用户信息对接',
     goodsInfoDemo: '🛒 商品信息对接',

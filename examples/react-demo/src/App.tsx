@@ -12,9 +12,9 @@
  *  联系：270580156@qq.com
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
-import { App as AntdApp, ConfigProvider, Layout, Select, Typography, theme as antdTheme } from 'antd';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useLayoutEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { App as AntdApp, Button, ConfigProvider, Dropdown, Layout, theme as antdTheme, type MenuProps } from 'antd';
 import LocalDemo from './pages/LocalDemo';
 import VipLevelDemo from './pages/vipLevelDemo';
 import GoodsInfoDemo from './pages/goodsInfoDemo';
@@ -167,9 +167,10 @@ function AppLayout({
   onThemeChange
 }: AppLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { token } = antdTheme.useToken();
 
-  const navLinks = [
+  const navLinks = useMemo(() => ([
     { path: '/', label: messages.nav.localDemo },
     { path: '/userInfo', label: messages.nav.userInfoDemo },
     { path: '/goodsInfo', label: messages.nav.goodsInfoDemo },
@@ -178,7 +179,73 @@ function AppLayout({
     { path: '/unreadCount', label: messages.nav.unreadCountDemo },
     { path: '/documentFeedback', label: messages.nav.documentFeedbackDemo },
     // { path: '/flightBooking', label: messages.nav.flightBookingDemo }
-  ];
+  ]), [messages]);
+
+  const NAV_GAP = 12;
+  const navContainerRef = useRef<HTMLElement | null>(null);
+  const measureItemRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const measureMoreRef = useRef<HTMLSpanElement | null>(null);
+  const [visibleNavCount, setVisibleNavCount] = useState(navLinks.length);
+
+  const setMeasureItemRef = useCallback((index: number) => (node: HTMLSpanElement | null) => {
+    measureItemRefs.current[index] = node;
+  }, []);
+
+  const computeVisibleCount = useCallback((containerWidth: number) => {
+    const widths = navLinks.map((_, index) => measureItemRefs.current[index]?.offsetWidth ?? 0);
+    const moreWidth = measureMoreRef.current?.offsetWidth ?? 0;
+
+    if (!containerWidth || widths.length === 0) {
+      return widths.length;
+    }
+
+    const sum = (values: number[]) => values.reduce((acc, value) => acc + value, 0);
+    for (let visible = widths.length; visible >= 0; visible -= 1) {
+      const overflow = widths.length - visible;
+      const visibleWidths = widths.slice(0, visible);
+      const visibleTotal = sum(visibleWidths) + (visible > 0 ? NAV_GAP * (visible - 1) : 0);
+      const extra = overflow > 0 ? NAV_GAP + moreWidth : 0;
+      if (visibleTotal + extra <= containerWidth) {
+        return visible;
+      }
+    }
+
+    return 0;
+  }, [navLinks]);
+
+  const recalcNav = useCallback(() => {
+    const container = navContainerRef.current;
+    if (!container) {
+      return;
+    }
+    const containerWidth = container.clientWidth;
+    const nextVisibleCount = computeVisibleCount(containerWidth);
+    setVisibleNavCount((prev) => (prev === nextVisibleCount ? prev : nextVisibleCount));
+  }, [computeVisibleCount]);
+
+  useLayoutEffect(() => {
+    recalcNav();
+
+    if (!isBrowser) {
+      return;
+    }
+
+    const container = navContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => {
+      recalcNav();
+    });
+    observer.observe(container);
+
+    window.addEventListener('resize', recalcNav);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', recalcNav);
+    };
+  }, [recalcNav, messages]);
 
   const getLinkStyle = (path: string) => {
     const isActive = location.pathname === path;
@@ -192,6 +259,23 @@ function AppLayout({
       transition: 'all 0.2s ease'
     };
   };
+
+  const visibleNavLinks = navLinks.slice(0, visibleNavCount);
+  const overflowNavLinks = navLinks.slice(visibleNavCount);
+  const overflowMenuItems: MenuProps['items'] = overflowNavLinks.map((item) => ({
+    key: item.path,
+    label: item.label
+  }));
+
+  const languageMenuItems: MenuProps['items'] = languageOptions.map((option) => ({
+    key: option.value,
+    label: option.label
+  }));
+
+  const themeMenuItems: MenuProps['items'] = themeOptions.map((option) => ({
+    key: option.value,
+    label: option.label
+  }));
 
   const githubUrl = 'https://github.com/Bytedesk/bytedesk-web';
   const siteUrlMap: Record<DemoLocale, string> = {
@@ -214,22 +298,88 @@ function AppLayout({
         }}
       >
         <nav
+          ref={navContainerRef}
           style={{
             flex: 1,
             minWidth: 0,
             display: 'flex',
             alignItems: 'center',
             gap: 12,
-            overflowX: 'auto',
+            overflowX: 'hidden',
             padding: '12px 0'
           }}
         >
-          {navLinks.map((item) => (
+          {visibleNavLinks.map((item) => (
             <Link key={item.path} to={item.path} style={getLinkStyle(item.path)}>
               {item.label}
             </Link>
           ))}
+
+          {overflowNavLinks.length > 0 && (
+            <Dropdown
+              trigger={['click']}
+              menu={{
+                items: overflowMenuItems,
+                onClick: ({ key }) => navigate(String(key))
+              }}
+            >
+              <Button
+                type="text"
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: 6,
+                  fontWeight: 600,
+                  color: token.colorText,
+                  height: 'auto'
+                }}
+                aria-label={messages.nav.more}
+              >
+                {messages.nav.more}
+              </Button>
+            </Dropdown>
+          )}
         </nav>
+
+        {/* Hidden measurement nodes for responsive nav overflow */}
+        <div
+          style={{
+            position: 'absolute',
+            left: -9999,
+            top: -9999,
+            visibility: 'hidden',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none'
+          }}
+        >
+          {navLinks.map((item, index) => (
+            <span
+              key={item.path}
+              ref={setMeasureItemRef(index)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '6px 12px',
+                borderRadius: 6,
+                fontWeight: 500
+              }}
+            >
+              {item.label}
+            </span>
+          ))}
+          <span
+            ref={measureMoreRef}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              padding: '6px 12px',
+              borderRadius: 6,
+              fontWeight: 600
+            }}
+          >
+            {messages.nav.more}
+          </span>
+        </div>
+
         <div
           style={{
             display: 'flex',
@@ -239,42 +389,79 @@ function AppLayout({
             flexWrap: 'wrap'
           }}
         >
-          <div
-            style={{
-              minWidth: 160,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 4
+          <Dropdown
+            trigger={['hover']}
+            menu={{
+              items: languageMenuItems,
+              selectable: true,
+              selectedKeys: [locale],
+              onClick: ({ key }) => onLocaleChange(String(key) as DemoLocale)
             }}
           >
-            <Typography.Text type="secondary" style={{ fontSize: 12, lineHeight: 1 }}>
-              {messages.common.languageLabel}
-            </Typography.Text>
-            <Select
-              value={locale}
-              options={languageOptions}
-              onChange={(value: DemoLocale) => onLocaleChange(value)}
-              style={{ width: '100%' }}
-            />
-          </div>
-          <div
-            style={{
-              minWidth: 180,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 4
+            <Button
+              type="text"
+              aria-label={messages.common.languageLabel}
+              style={{
+                width: 36,
+                height: 36,
+                padding: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 6,
+                color: token.colorText
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                <path
+                  d="M12 22a10 10 0 100-20 10 10 0 000 20zm0 0c2.761 0 5-4.477 5-10S14.761 2 12 2 7 6.477 7 12s2.239 10 5 10zm-9.5-10h19"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Button>
+          </Dropdown>
+
+          <Dropdown
+            trigger={['hover']}
+            menu={{
+              items: themeMenuItems,
+              selectable: true,
+              selectedKeys: [themeMode],
+              onClick: ({ key }) => onThemeChange(String(key) as ThemeMode)
             }}
           >
-            <Typography.Text type="secondary" style={{ fontSize: 12, lineHeight: 1 }}>
-              {messages.common.themeLabel}
-            </Typography.Text>
-            <Select
-              value={themeMode}
-              options={themeOptions}
-              onChange={(value: ThemeMode) => onThemeChange(value)}
-              style={{ width: '100%' }}
-            />
-          </div>
+            <Button
+              type="text"
+              aria-label={messages.common.themeLabel}
+              style={{
+                width: 36,
+                height: 36,
+                padding: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 6,
+                color: token.colorText
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                <path
+                  d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364-1.414 1.414M7.05 16.95l-1.414 1.414m0-11.314 1.414 1.414m11.314 11.314 1.414 1.414"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M12 17a5 5 0 100-10 5 5 0 000 10z"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                />
+              </svg>
+            </Button>
+          </Dropdown>
           <a
             href={githubUrl}
             target="_blank"
