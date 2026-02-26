@@ -50,6 +50,10 @@ Online customer service SDK, supporting multiple frameworks:
 
 ![unread](images/chat/unread_count.png)
 
+## doc feedback
+
+![unread](images/chat/doc-feedback.png)
+
 [中文文档](./readme.zh.md)
 
 - [![npm version](https://badge.fury.io/js/bytedesk-web.svg)](https://badge.fury.io/js/bytedesk-web)

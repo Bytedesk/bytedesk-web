@@ -49,6 +49,10 @@
 
 ![unread](images/chat/unread_count.png)
 
+## 文档反馈
+
+![unread](images/chat/doc-feedback.png)
+
 ## 文档反馈功能 ✨ 新功能
 
 文档反馈功能是一个创新性功能，允许用户直接针对页面内容提交精准的反馈意见。
@@ -195,7 +199,7 @@ const App = () => {
 
 ```bash
 yarn install 
-yarn demo:react    # Run React demo
+yarn demo:react    # Run React demo 
 yarn demo:vue      # Run Vue demo
 yarn demo:svelte   # Run Svelte demo
 yarn demo:vanilla  # Run Vanilla JS demo
