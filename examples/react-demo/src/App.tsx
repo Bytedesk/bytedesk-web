@@ -14,24 +14,29 @@
  */
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useLayoutEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { App as AntdApp, Button, ConfigProvider, Dropdown, Layout, theme as antdTheme, type MenuProps } from 'antd';
-import LocalDemo from './pages/LocalDemo';
-import VipLevelDemo from './pages/vipLevelDemo';
-import GoodsInfoDemo from './pages/goodsInfoDemo';
-import OrderInfoDemo from './pages/orderInfoDemo';
-import UserInfoDemo from './pages/userInfoDemo';
-import UnreadCountDemo from './pages/unreadCountDemo';
+import { App as AntdApp, Avatar, Button, ConfigProvider, Dropdown, Layout, theme as antdTheme, type MenuProps } from 'antd';
+
 import DocumentFeedbackDemo from './pages/DocumentFeedbackDemo';
 // import FlightBookingDemo from './pages/FlightBookingDemo';
 // @ts-ignore
 import type { Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
 import { getLocaleMessages, type LocaleMessages } from './locales';
+import { DEMO_ANONYMOUS_AVATAR_TEXT, DEMO_ANONYMOUS_KEY, DEMO_USER_PRESETS, type DemoUserKey, type DemoUserMenuKey, type DemoUserProfile } from './types/demo-user';
+import BasicDemo from './pages/BasicDemo';
+import GoodsInfoDemo from './pages/GoodsInfoDemo';
+import OrderInfoDemo from './pages/OrderInfoDemo';
+import ThreadHistoryDemo from './pages/ThreadHistoryDemo';
+import UnreadCountDemo from './pages/UnreadCountDemo';
+import UserInfoDemo from './pages/UserInfoDemo';
+import VipLevelDemo from './pages/VipLevelDemo';
 
 type DemoLocale = keyof LocaleMessages['common']['languageOptions'];
 type ThemeMode = keyof LocaleMessages['common']['themeOptions'];
 type ResolvedThemeMode = Exclude<ThemeMode, 'system'>;
 
 const THEME_STORAGE_KEY = 'bytedesk-react-demo-theme';
+const USER_STORAGE_KEY = 'bytedesk-react-demo-user';
+const USER_ANONYMOUS_STORAGE_KEY = 'bytedesk-react-demo-user-anonymous';
 const isBrowser = typeof window !== 'undefined';
 
 const getStoredThemeMode = (): ThemeMode => {
@@ -43,6 +48,24 @@ const getStoredThemeMode = (): ThemeMode => {
     return stored;
   }
   return 'light';
+};
+
+const getStoredUserKey = (): DemoUserKey => {
+  if (!isBrowser) {
+    return 'user1';
+  }
+  const stored = window.localStorage.getItem(USER_STORAGE_KEY) as DemoUserKey | null;
+  if (stored && (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).includes(stored)) {
+    return stored;
+  }
+  return 'user1';
+};
+
+const getStoredAnonymousMode = (): boolean => {
+  if (!isBrowser) {
+    return false;
+  }
+  return window.localStorage.getItem(USER_ANONYMOUS_STORAGE_KEY) === 'true';
 };
 
 const useSystemTheme = (): ResolvedThemeMode => {
@@ -95,6 +118,8 @@ function App() {
 function ThemedRouterApp() {
   const [locale, setLocale] = useState<DemoLocale>('zh-cn');
   const [themeMode, setThemeMode] = useState<ThemeMode>(getStoredThemeMode);
+  const [activeUserKey, setActiveUserKey] = useState<DemoUserKey>(getStoredUserKey);
+  const [isAnonymousMode, setIsAnonymousMode] = useState<boolean>(getStoredAnonymousMode);
   const systemTheme = useSystemTheme();
   const resolvedTheme: ResolvedThemeMode = themeMode === 'system' ? systemTheme : themeMode;
 
@@ -103,6 +128,18 @@ function ThemedRouterApp() {
       window.localStorage.setItem(THEME_STORAGE_KEY, themeMode);
     }
   }, [themeMode]);
+
+  useEffect(() => {
+    if (isBrowser) {
+      window.localStorage.setItem(USER_STORAGE_KEY, activeUserKey);
+    }
+  }, [activeUserKey]);
+
+  useEffect(() => {
+    if (isBrowser) {
+      window.localStorage.setItem(USER_ANONYMOUS_STORAGE_KEY, String(isAnonymousMode));
+    }
+  }, [isAnonymousMode]);
 
   const messages = useMemo(() => getLocaleMessages(locale as Language), [locale]);
 
@@ -127,6 +164,16 @@ function ThemedRouterApp() {
     }
   }), [resolvedTheme]);
 
+  const activeUserProfile = useMemo<DemoUserProfile>(() => {
+    const preset = DEMO_USER_PRESETS[activeUserKey];
+    return {
+      key: activeUserKey,
+      visitorUid: preset.visitorUid,
+      avatar: preset.avatar,
+      nickname: messages.pages.userInfoDemo.users[activeUserKey]
+    };
+  }, [activeUserKey, messages]);
+
   return (
     <ConfigProvider theme={themeConfig} componentSize="middle">
       <AntdApp>
@@ -137,8 +184,13 @@ function ThemedRouterApp() {
           themeOptions={themeOptions}
           themeMode={themeMode}
           resolvedTheme={resolvedTheme}
+          activeUserKey={activeUserKey}
+          activeUserProfile={activeUserProfile}
+          isAnonymousMode={isAnonymousMode}
           onLocaleChange={setLocale}
           onThemeChange={setThemeMode}
+          onActiveUserChange={setActiveUserKey}
+          onAnonymousModeChange={setIsAnonymousMode}
         />
       </AntdApp>
     </ConfigProvider>
@@ -149,34 +201,46 @@ interface AppLayoutProps {
   locale: DemoLocale;
   themeMode: ThemeMode;
   resolvedTheme: ResolvedThemeMode;
+  activeUserKey: DemoUserKey;
+  activeUserProfile: DemoUserProfile;
+  isAnonymousMode: boolean;
   messages: LocaleMessages;
   languageOptions: { value: DemoLocale; label: string }[];
   themeOptions: { value: ThemeMode; label: string }[];
   onLocaleChange: (nextLocale: DemoLocale) => void;
   onThemeChange: (nextTheme: ThemeMode) => void;
+  onActiveUserChange: (nextUser: DemoUserKey) => void;
+  onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
 function AppLayout({
   locale,
   themeMode,
   resolvedTheme,
+  activeUserKey,
+  activeUserProfile,
+  isAnonymousMode,
   messages,
   languageOptions,
   themeOptions,
   onLocaleChange,
-  onThemeChange
+  onThemeChange,
+  onActiveUserChange,
+  onAnonymousModeChange
 }: AppLayoutProps) {
+  const { message: messageApi } = AntdApp.useApp();
   const location = useLocation();
   const navigate = useNavigate();
   const { token } = antdTheme.useToken();
 
   const navLinks = useMemo(() => ([
-    { path: '/', label: messages.nav.localDemo },
+    { path: '/', label: messages.nav.basicDemo },
     { path: '/userInfo', label: messages.nav.userInfoDemo },
     { path: '/goodsInfo', label: messages.nav.goodsInfoDemo },
     { path: '/orderInfo', label: messages.nav.orderInfoDemo },
     { path: '/vipLevel', label: messages.nav.vipLevelDemo },
     { path: '/unreadCount', label: messages.nav.unreadCountDemo },
+    { path: '/threadHistory', label: messages.nav.threadHistoryDemo },
     { path: '/documentFeedback', label: messages.nav.documentFeedbackDemo },
     // { path: '/flightBooking', label: messages.nav.flightBookingDemo }
   ]), [messages]);
@@ -276,6 +340,33 @@ function AppLayout({
     key: option.value,
     label: option.label
   }));
+
+  const selectedUserMenuKey: DemoUserMenuKey = isAnonymousMode ? DEMO_ANONYMOUS_KEY : activeUserKey;
+
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: DEMO_ANONYMOUS_KEY,
+      label: (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          {selectedUserMenuKey === DEMO_ANONYMOUS_KEY && (
+            <span style={{ color: token.colorSuccess, fontWeight: 700 }}>●</span>
+          )}
+          <span>{messages.pages.userInfoDemo.anonymousUserLabel}</span>
+        </span>
+      )
+    },
+    ...(Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
+      key,
+      label: (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          {selectedUserMenuKey === key && (
+            <span style={{ color: token.colorSuccess, fontWeight: 700 }}>●</span>
+          )}
+          <span>{messages.pages.userInfoDemo.users[key]}</span>
+        </span>
+      )
+    }))
+  ];
 
   const githubUrl = 'https://github.com/Bytedesk/bytedesk-web';
   const siteUrlMap: Record<DemoLocale, string> = {
@@ -389,6 +480,57 @@ function AppLayout({
             flexWrap: 'wrap'
           }}
         >
+          {isAnonymousMode && (
+            <Button
+              type="text"
+              onClick={() => {
+                (window as any).bytedesk?.resetAnonymousVisitor?.();
+                messageApi.success(messages.common.resetAnonymousVisitorSuccess);
+              }}
+              style={{
+                borderRadius: 6,
+                color: token.colorWarning,
+                fontWeight: 600,
+                paddingInline: 10
+              }}
+            >
+              {messages.common.resetAnonymousVisitorLabel}
+            </Button>
+          )}
+
+          <Dropdown
+            trigger={['hover']}
+            menu={{
+              items: userMenuItems,
+              selectable: true,
+              selectedKeys: [selectedUserMenuKey],
+              onClick: ({ key }) => {
+                const menuKey = String(key) as DemoUserMenuKey;
+                if (menuKey === DEMO_ANONYMOUS_KEY) {
+                  onAnonymousModeChange(true);
+                  return;
+                }
+                onAnonymousModeChange(false);
+                onActiveUserChange(menuKey);
+              }
+            }}
+          >
+            {isAnonymousMode ? (
+              <Avatar
+                size={36}
+                style={{ cursor: 'pointer', border: `1px solid ${token.colorBorder}`, backgroundColor: token.colorFillSecondary, color: token.colorText }}
+              >
+                {DEMO_ANONYMOUS_AVATAR_TEXT}
+              </Avatar>
+            ) : (
+              <Avatar
+                src={activeUserProfile.avatar}
+                size={36}
+                style={{ cursor: 'pointer', border: `1px solid ${token.colorBorder}` }}
+              />
+            )}
+          </Dropdown>
+
           <Dropdown
             trigger={['hover']}
             menu={{
@@ -489,26 +631,30 @@ function AppLayout({
       </Layout.Header>
       <Layout.Content style={{ padding: 0, background: token.colorBgLayout }}>
         <Routes>
-          <Route path="/" element={<LocalDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />} />
+          <Route path="/" element={<BasicDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />} />
           <Route
             path="/userInfo"
-            element={<UserInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />}
+            element={<UserInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
           <Route
             path="/orderInfo"
-            element={<OrderInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />}
+            element={<OrderInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
           />
           <Route
             path="/goodsInfo"
-            element={<GoodsInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />}
+            element={<GoodsInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
           />
           <Route
             path="/vipLevel"
-            element={<VipLevelDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />}
+            element={<VipLevelDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
           <Route
             path="/unreadCount"
-            element={<UnreadCountDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />}
+            element={<UnreadCountDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
+          />
+          <Route
+            path="/threadHistory"
+            element={<ThreadHistoryDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
           <Route
             path="/documentFeedback"

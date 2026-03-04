@@ -16,12 +16,12 @@ import { Button, Card, Space, Typography, theme } from 'antd';
 
 const THEME_COLORS = ['#0066ff', '#f97316', '#10b981', '#8b5cf6'];
 
-interface LocalDemoProps {
+interface BasicDemoProps {
   locale: Language;
   themeMode: Theme['mode'];
 }
 
-const LocalDemo = ({ locale, themeMode }: LocalDemoProps) => {
+const BasicDemo = ({ locale, themeMode }: BasicDemoProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = theme.useToken();
   const [config, setConfig] = useState<BytedeskConfig>(() => ({
@@ -47,8 +47,8 @@ const LocalDemo = ({ locale, themeMode }: LocalDemoProps) => {
     bubbleConfig: {
       show: true,
       icon: '👋',
-      title: messages.pages.localDemo.bubbleTitle,
-      subtitle: messages.pages.localDemo.bubbleSubtitle
+      title: messages.pages.basicDemo.bubbleTitle,
+      subtitle: messages.pages.basicDemo.bubbleSubtitle
     },
     buttonConfig: {
       show: true,
@@ -67,7 +67,7 @@ const LocalDemo = ({ locale, themeMode }: LocalDemoProps) => {
     },
     locale,
     onVisitorInfo: (uid: string, visitorUid: string) => {
-      console.log('LocalDemo 收到访客信息:', { uid, visitorUid });
+      console.log('BasicDemo 收到访客信息:', { uid, visitorUid });
     }
   }));
 
@@ -81,14 +81,14 @@ const LocalDemo = ({ locale, themeMode }: LocalDemoProps) => {
       },
       bubbleConfig: {
         ...prevConfig.bubbleConfig,
-        title: messages.pages.localDemo.bubbleTitle,
-        subtitle: messages.pages.localDemo.bubbleSubtitle
+        title: messages.pages.basicDemo.bubbleTitle,
+        subtitle: messages.pages.basicDemo.bubbleSubtitle
       }
     }));
   }, [locale, themeMode, messages]);
 
   const handleInit = () => {
-    console.log('BytedeskReact initialized LocalDemo');
+    console.log('BytedeskReact initialized BasicDemo');
   };
 
   const handleThemeColorSwitch = () => {
@@ -115,11 +115,28 @@ const LocalDemo = ({ locale, themeMode }: LocalDemoProps) => {
     }));
   };
 
+  const handleToggleLoadHistory = () => {
+    setConfig((prevConfig: BytedeskConfig) => {
+      const currentLoadHistory = Boolean(prevConfig.chatConfig?.loadHistory);
+      return {
+        ...prevConfig,
+        chatConfig: {
+          ...(prevConfig.chatConfig || {
+            org: 'df_org_uid',
+            t: '2',
+            sid: 'df_rt_uid'
+          }),
+          loadHistory: !currentLoadHistory
+        }
+      };
+    });
+  };
+
   const docLinks = [
     { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/channel/react', label: messages.common.docLinks.react },
     { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/channel/vue', label: messages.common.docLinks.vue },
-    { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/LocalDemo.tsx', label: messages.common.docLinks.reactExample },
-    { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/LocalDemo.vue', label: messages.common.docLinks.vueExample }
+    { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/BasicDemo.tsx', label: messages.common.docLinks.reactExample },
+    { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/BasicDemo.vue', label: messages.common.docLinks.vueExample }
   ];
 
   const quickActions = [
@@ -146,18 +163,19 @@ const LocalDemo = ({ locale, themeMode }: LocalDemoProps) => {
 
   const placementLabel =
     config.placement === 'bottom-left'
-      ? messages.pages.localDemo.placement.bottomLeft
-      : messages.pages.localDemo.placement.bottomRight;
+      ? messages.pages.basicDemo.placement.bottomLeft
+      : messages.pages.basicDemo.placement.bottomRight;
 
-  const themeColorLabel = config.theme?.backgroundColor || messages.pages.localDemo.defaultColorLabel;
+  const themeColorLabel = config.theme?.backgroundColor || messages.pages.basicDemo.defaultColorLabel;
+  const loadHistoryEnabled = Boolean(config.chatConfig?.loadHistory);
 
   return (
     <PageContainer>
       <Card>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          <Typography.Title level={2} style={{ marginBottom: 0 }}>{messages.pages.localDemo.title}</Typography.Title>
+          <Typography.Title level={2} style={{ marginBottom: 0 }}>{messages.pages.basicDemo.title}</Typography.Title>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            {messages.pages.localDemo.intro}
+            {messages.pages.basicDemo.intro}
           </Typography.Paragraph>
           <Space direction="vertical" size={4}>
             {docLinks.map((link) => (
@@ -183,9 +201,18 @@ const LocalDemo = ({ locale, themeMode }: LocalDemoProps) => {
                 borderColor: config.theme?.backgroundColor || token.colorPrimary
               }}
             >
-              {messages.pages.localDemo.themeButtonLabel} ({themeColorLabel})
+              {messages.pages.basicDemo.themeButtonLabel} ({themeColorLabel})
+            </Button>
+            <Button type={loadHistoryEnabled ? 'primary' : 'default'} onClick={handleToggleLoadHistory}>
+              {messages.pages.basicDemo.loadHistoryLabel}: {loadHistoryEnabled
+                ? messages.pages.basicDemo.loadHistoryEnabled
+                : messages.pages.basicDemo.loadHistoryDisabled}
             </Button>
           </Space>
+          <Typography.Text type="secondary">
+            {messages.common.apiHintPrefix} {messages.pages.basicDemo.loadHistoryApiHintPrefix}
+            {loadHistoryEnabled ? 'true' : 'false'}
+          </Typography.Text>
         </Space>
       </Card>
 
@@ -199,4 +226,4 @@ const LocalDemo = ({ locale, themeMode }: LocalDemoProps) => {
   );
 };
 
-export default LocalDemo;
+export default BasicDemo;

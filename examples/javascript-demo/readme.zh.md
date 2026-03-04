@@ -32,6 +32,7 @@ Online customer service SDK, supporting multiple frameworks:
 <script src="https://www.weiyuai.cn/embed/bytedesk-web.js"></script>
 <script>
   const config = {
+    chatPath: '/chat', // 默认 /chat，历史会话页使用 /chat/thread
     placement: 'bottom-right',
     theme: {
       backgroundColor: '#0066FF',
@@ -46,4 +47,28 @@ Online customer service SDK, supporting multiple frameworks:
   const bytedesk = new BytedeskWeb(config);
   bytedesk.init();
 </script>
+```
+
+## 历史会话页面（`/chat/thread`）
+
+将 `chatPath` 设置为 `/chat/thread` 后，点击 icon 或调用 `showChat()` 会打开访客历史会话页面。
+
+```bash
+const config = {
+  chatPath: '/chat/thread',
+  chatConfig: {
+    org: 'df_org_uid',
+    t: '1',
+    sid: 'df_wg_uid',
+    visitorUid: 'visitor_001',
+    nickname: '访客小明',
+    avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
+  }
+};
+```
+
+也可以直接用 URL + 参数接入（参数与 `/chat` 一致）：
+
+```bash
+https://cdn.weiyuai.cn/chat/thread?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=%E8%AE%BF%E5%AE%A2%E5%B0%8F%E6%98%8E&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&lang=zh-cn&mode=light
 ```

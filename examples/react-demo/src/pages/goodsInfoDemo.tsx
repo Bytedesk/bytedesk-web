@@ -22,6 +22,7 @@ import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk
 // import { BytedeskConfig } from 'bytedesk-web';
 import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
+import type { DemoUserProfile } from '../types/demo-user';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -51,9 +52,11 @@ const GOODS_BASE: Pick<GoodsInfo, 'uid' | 'image' | 'price' | 'url' | 'extra'> =
 interface DemoPageProps {
     locale: Language;
     themeMode: BytedeskTheme['mode'];
+    selectedUser: DemoUserProfile;
+    isAnonymousMode: boolean;
 }
 
-const GoodsInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
+const GoodsInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const currentGoods = useMemo<GoodsInfo>(() => ({
         ...GOODS_BASE,
@@ -81,17 +84,21 @@ const GoodsInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
         bubbleConfig: {
             show: false,
             icon: '🚗',
-            title: messages.pages.localDemo.bubbleTitle,
-            subtitle: messages.pages.localDemo.bubbleSubtitle
+            title: messages.pages.basicDemo.bubbleTitle,
+            subtitle: messages.pages.basicDemo.bubbleSubtitle
         },
         chatConfig: {
             org: 'df_org_uid', // 替换为您的组织ID
             t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
             sid: 'df_wg_aftersales', // 替换为您的SID
             // 自定义用户信息
-            visitorUid: 'visitor_001',
-            nickname: '访客小明',
-            avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
+            ...(isAnonymousMode
+                ? {}
+                : {
+                    visitorUid: selectedUser.visitorUid,
+                    nickname: selectedUser.nickname,
+                    avatar: selectedUser.avatar
+                }),
             // 商品信息通过自定义消息发送
             goodsInfo: JSON.stringify({
                 uid: currentGoods.uid,
@@ -113,7 +120,7 @@ const GoodsInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
         theme: {
             mode: themeMode,
         },
-    }), [currentGoods, locale, messages, themeMode]);
+    }), [currentGoods, isAnonymousMode, locale, messages, selectedUser, themeMode]);
 
     // Bytedesk 接口控制函数
     const handleShowChat = () => {
@@ -128,7 +135,7 @@ const GoodsInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
 
     const docLinks = [
         { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/goodsinfo', label: messages.pages.goodsInfoDemo.docLinks.goodsDoc },
-        { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/goodsInfoDemo.tsx', label: messages.pages.goodsInfoDemo.docLinks.reactExample },
+        { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/GoodsInfoDemo.tsx', label: messages.pages.goodsInfoDemo.docLinks.reactExample },
         { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/goodsInfoDemo.vue', label: messages.pages.goodsInfoDemo.docLinks.vueExample }
     ];
 

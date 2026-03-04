@@ -399,7 +399,7 @@ const DocumentFeedbackDemo = ({ locale, themeMode }: DemoPageProps) => {
         />
       </Card>
 
-      <Card title={`✨ ${messages.pages.documentFeedbackDemo.highlightsTitle}`} bordered>
+      <Card title={`✨ ${messages.pages.documentFeedbackDemo.highlightsTitle}`} variant="outlined">
         <List
           dataSource={highlights}
           renderItem={(item) => (
@@ -410,7 +410,7 @@ const DocumentFeedbackDemo = ({ locale, themeMode }: DemoPageProps) => {
         />
       </Card>
 
-      <Card title={`🔧 ${messages.pages.documentFeedbackDemo.controlPanel.title}`} bordered>
+      <Card title={`🔧 ${messages.pages.documentFeedbackDemo.controlPanel.title}`} variant="outlined">
         <Space wrap>
           {controlButtons.map((button) => (
             <Button
@@ -430,7 +430,7 @@ const DocumentFeedbackDemo = ({ locale, themeMode }: DemoPageProps) => {
 
       <Row gutter={24} wrap>
         <Col xs={24} lg={16}>
-          <Card title={`📖 ${messages.pages.documentFeedbackDemo.exampleSection.title}`} bordered>
+          <Card title={`📖 ${messages.pages.documentFeedbackDemo.exampleSection.title}`} variant="outlined">
             {messages.pages.documentFeedbackDemo.exampleSection.paragraphs.map((paragraph, index) => (
               <Typography.Paragraph key={index}>
                 {paragraph}
@@ -445,7 +445,7 @@ const DocumentFeedbackDemo = ({ locale, themeMode }: DemoPageProps) => {
           </Card>
         </Col>
         <Col xs={24} lg={8}>
-          <Card title={`📋 ${messages.pages.documentFeedbackDemo.logs.title} (${feedbackLogs.length})`} bordered>
+          <Card title={`📋 ${messages.pages.documentFeedbackDemo.logs.title} (${feedbackLogs.length})`} variant="outlined">
             {feedbackLogs.length === 0 ? (
               <Typography.Text type="secondary">
                 {messages.pages.documentFeedbackDemo.logs.empty}

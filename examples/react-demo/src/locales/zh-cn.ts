@@ -13,6 +13,8 @@ export const zhCn = {
       system: '跟随系统'
     },
     officialSiteLabel: '官网',
+    resetAnonymousVisitorLabel: '重置匿名访客',
+    resetAnonymousVisitorSuccess: '匿名访客已重置',
     docLinks: {
       react: '查看 React 集成文档',
       vue: '查看 Vue 集成文档',
@@ -46,17 +48,18 @@ export const zhCn = {
   },
   nav: {
     more: '更多',
-    localDemo: '⚙️ 基本配置',
+    basicDemo: '⚙️ 基本配置',
     userInfoDemo: '👤 用户信息对接',
     goodsInfoDemo: '🛒 商品信息对接',
     orderInfoDemo: '📦 订单信息对接',
     vipLevelDemo: '👑 千人千面对接',
     unreadCountDemo: '🔔 未读消息数对接',
+    threadHistoryDemo: '🧵 历史会话演示',
     documentFeedbackDemo: '📝 文档反馈演示',
     flightBookingDemo: '✈️ 机票预定演示'
   },
   pages: {
-    localDemo: {
+    basicDemo: {
       title: '微语基本设置',
       intro: '通过下方按钮可以快速体验 Bytedesk Web SDK 的常见能力。',
       themeButtonLabel: '切换主题色',
@@ -66,6 +69,10 @@ export const zhCn = {
         bottomLeft: '左下角',
         bottomRight: '右下角'
       },
+      loadHistoryLabel: '加载历史消息',
+      loadHistoryEnabled: '开启',
+      loadHistoryDisabled: '关闭',
+      loadHistoryApiHintPrefix: 'chatConfig.loadHistory=',
       defaultColorLabel: '默认',
       currentConfigTitle: '当前配置',
       copyConfig: '复制配置 JSON'
@@ -76,6 +83,9 @@ export const zhCn = {
         '本示例演示如何通过配置参数传入用户信息（visitorUid、nickname、avatar）到客服组件中，点击下方按钮可以切换不同的用户。',
       switchUser: '切换用户',
       switchToUserLabel: '切换到 {{name}}',
+      switchAnonymousUserLabel: '切换到匿名用户',
+      anonymousUserLabel: '匿名用户',
+      anonymousUserHint: '当前为匿名测试：不传 visitorUid、nickname、avatar 等用户信息',
       currentUserTitle: '当前用户信息',
       currentUserIdLabel: '用户ID',
       currentUserNicknameLabel: '昵称',
@@ -96,7 +106,8 @@ export const zhCn = {
       apiHintPrefix: '调用代码：',
       users: {
         user1: '访客小明',
-        user2: '访客小红'
+        user2: '访客小红',
+        user3: '访客小李'
       }
     },
     goodsInfoDemo: {
@@ -196,6 +207,44 @@ export const zhCn = {
         '在需要时调用 getUnreadMessageCount() 以获取最新未读数。',
         '阅读完成后可调用 clearUnreadMessages() 将未读数清零。'
       ]
+    },
+    threadHistoryDemo: {
+      title: '访客历史会话拉取示例',
+      description: '参考 visitor 项目中的 ThreadList，演示如何让 SDK 图标点击后进入 /chat/thread 历史会话页面。',
+      bubbleTitle: '历史会话',
+      bubbleSubtitle: '点击查看历史会话列表',
+      anonymousUserLabel: '匿名用户',
+      anonymousUserHint: '当前为匿名测试：不传 visitorUid、nickname、avatar',
+      pathAlert: '本页已启用 chatPath=/chat/thread，点击右下角图标会打开历史会话页面而不是聊天页。',
+      currentPathLabel: '当前入口路径',
+      currentPathHint: '其余参数与 /chat 页面保持一致',
+      usageTitle: '演示说明',
+      usageNotes: [
+        '1. 配置 chatPath 为 /chat/thread 后，icon 点击和 showChat() 都会进入历史会话页面。',
+        '2. /chat/thread 使用与 /chat 相同的参数，例如 org、t、sid、visitorUid、nickname、avatar。',
+        '3. 支持直接拼接 URL + 参数方式接入，无需额外 SDK 调用。'
+      ],
+      buttons: {
+        openHistoryPage: '打开历史会话页面',
+        switchAnonymousUser: '切换到匿名用户'
+      },
+      urlGuideTitle: 'URL + 参数调用说明',
+      urlTemplateLabel: '通用 URL 模板',
+      urlParamsTitle: '参数说明（与 /chat 一致）',
+      urlParams: [
+        'org：组织 ID（必填）',
+        't：会话类型，0/1/2',
+        'sid：会话目标 ID（工作组/机器人/客服）',
+        'visitorUid：自定义访客 ID（推荐）',
+        'nickname/avatar：访客展示信息（可选）',
+        'lang/mode：语言与主题参数（可选）'
+      ],
+      sampleUrlLabel: '当前配置生成的示例 URL',
+      docLinks: {
+        reactDoc: '查看 React 集成文档',
+        visitorRef: '参考 visitor ThreadList 实现',
+        reactExample: 'React 历史会话演示源码'
+      }
     },
     documentFeedbackDemo: {
       title: '文档反馈演示',

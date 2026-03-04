@@ -14,19 +14,22 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 
-import { useMemo, useState } from 'react';
-import { Button, Card, Typography, Space, Avatar, Divider, Row, Col, Tag } from 'antd';
+import { useMemo } from 'react';
+import { Button, Card, Typography, Space, Divider, Row, Col, Tag, theme as antdTheme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
-import { getLocaleMessages, type LocaleMessages } from '../locales';
+import { getLocaleMessages } from '../locales';
+import CurrentUserProfile from '../components/CurrentUserProfile';
 import PageContainer from '../components/PageContainer';
+import type { DemoUserKey, DemoUserProfile } from '../types/demo-user';
 
 const { Title, Paragraph } = Typography;
 
 // 定义用户信息接口
 interface UserInfo {
+    key: DemoUserKey;
     visitorUid: string;
     nickname: string;
     avatar: string;
@@ -34,26 +37,30 @@ interface UserInfo {
 }
 
 type VipUserPreset = {
+    key: DemoUserKey;
     visitorUid: string;
     avatar: string;
     vipLevel: number;
-    nicknameKey: keyof LocaleMessages['pages']['vipLevelDemo']['users'];
+    nicknameKey: DemoUserKey;
 };
 
 const USER_PRESETS: VipUserPreset[] = [
     {
+        key: 'user1',
         visitorUid: 'visitor_001',
         avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
         vipLevel: 0,
         nicknameKey: 'user1'
     },
     {
+        key: 'user2',
         visitorUid: 'visitor_002',
         avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg',
         vipLevel: 1,
         nicknameKey: 'user2'
     },
     {
+        key: 'user3',
         visitorUid: 'visitor_003',
         avatar: 'https://weiyuai.cn/assets/images/avatar/03.jpg',
         vipLevel: 2,
@@ -64,22 +71,27 @@ const USER_PRESETS: VipUserPreset[] = [
 interface DemoPageProps {
     locale: Language;
     themeMode: BytedeskTheme['mode'];
+    selectedUser: DemoUserProfile;
+    isAnonymousMode: boolean;
+    onSelectUser: (nextUser: DemoUserKey) => void;
+    onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
-const VipLevelDemo = ({ locale, themeMode }: DemoPageProps) => {
+const VipLevelDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
+    const { token } = antdTheme.useToken();
     const users = useMemo<UserInfo[]>(() => USER_PRESETS.map((preset) => ({
+        key: preset.key,
         visitorUid: preset.visitorUid,
         avatar: preset.avatar,
         vipLevel: preset.vipLevel,
         nickname: messages.pages.vipLevelDemo.users[preset.nicknameKey]
     })), [messages]);
-    const [currentUserIndex, setCurrentUserIndex] = useState(0);
-    const currentUser = users[currentUserIndex] || users[0];
+    const currentUser = users.find((user) => user.key === selectedUser.key) || users[0];
     const docLinks = useMemo(
         () => [
             { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/viplevel', label: messages.pages.vipLevelDemo.docLinks.vipDoc },
-            { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/vipLevelDemo.tsx', label: messages.pages.vipLevelDemo.docLinks.reactExample },
+            { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/VipLevelDemo.tsx', label: messages.pages.vipLevelDemo.docLinks.reactExample },
             { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/vipLevelDemo.vue', label: messages.pages.vipLevelDemo.docLinks.vueExample }
         ],
         [messages]
@@ -109,18 +121,22 @@ const VipLevelDemo = ({ locale, themeMode }: DemoPageProps) => {
         bubbleConfig: {
             show: false,
             icon: '👋',
-            title: messages.pages.localDemo.bubbleTitle,
-            subtitle: messages.pages.localDemo.bubbleSubtitle
+            title: messages.pages.basicDemo.bubbleTitle,
+            subtitle: messages.pages.basicDemo.bubbleSubtitle
         },
         chatConfig: {
             org: 'df_org_uid',
             t: "1",
             sid: 'df_wg_uid',
             // 传入用户信息，包含vipLevel
-            visitorUid: currentUser.visitorUid,
-            nickname: currentUser.nickname,
-            avatar: currentUser.avatar,
-            vipLevel: String(currentUser.vipLevel),
+            ...(isAnonymousMode
+                ? {}
+                : {
+                    visitorUid: currentUser.visitorUid,
+                    nickname: currentUser.nickname,
+                    avatar: currentUser.avatar,
+                    vipLevel: String(currentUser.vipLevel)
+                }),
             // 自定义字段
             extra: JSON.stringify({
                 type: 'type',
@@ -131,12 +147,7 @@ const VipLevelDemo = ({ locale, themeMode }: DemoPageProps) => {
         theme: {
             mode: themeMode,
         },
-    }), [currentUser, locale, messages, themeMode]);
-
-    // 切换用户信息
-    const handleSwitchUser = (index: number) => {
-        setCurrentUserIndex(index);
-    };
+    }), [currentUser, isAnonymousMode, locale, messages, themeMode]);
 
     // Bytedesk 接口控制函数
     const handleShowChat = () => {
@@ -198,38 +209,59 @@ const VipLevelDemo = ({ locale, themeMode }: DemoPageProps) => {
 
             <Card>
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                    <div>
-                        <Title level={4}>{messages.pages.userInfoDemo.currentUserTitle}</Title>
-                        <Space>
-                            <Avatar src={currentUser.avatar} size={64} />
-                            <div>
-                                <Paragraph style={{ marginBottom: 4 }}>
-                                    {messages.pages.userInfoDemo.currentUserIdLabel}: {currentUser.visitorUid}
-                                </Paragraph>
-                                <Paragraph style={{ marginBottom: 4 }}>
-                                    {messages.pages.userInfoDemo.currentUserNicknameLabel}: {currentUser.nickname}
-                                </Paragraph>
+                    <CurrentUserProfile
+                        title={messages.pages.userInfoDemo.currentUserTitle}
+                        isAnonymousMode={isAnonymousMode}
+                        avatar={currentUser.avatar}
+                        anonymousIdText={messages.pages.userInfoDemo.anonymousUserHint}
+                        anonymousNicknameText={messages.pages.userInfoDemo.anonymousUserLabel}
+                        userIdLabel={messages.pages.userInfoDemo.currentUserIdLabel}
+                        userId={currentUser.visitorUid}
+                        userNicknameLabel={messages.pages.userInfoDemo.currentUserNicknameLabel}
+                        userNickname={currentUser.nickname}
+                        extraContent={
+                            !isAnonymousMode ? (
                                 <Paragraph style={{ marginBottom: 0 }}>
                                     {messages.pages.vipLevelDemo.vipLabel}:
                                     <Tag color={getVipLevelColor(currentUser.vipLevel)} style={{ marginLeft: 8 }}>
                                         {formatVipTag(currentUser.vipLevel)}
                                     </Tag>
                                 </Paragraph>
-                            </div>
-                        </Space>
-                    </div>
+                            ) : null
+                        }
+                    />
 
                     <Space wrap>
-                        {users.map((user, index) => (
+                        {users.map((user) => (
                             <Button
                                 key={user.visitorUid}
                                 type="primary"
-                                onClick={() => handleSwitchUser(index)}
-                                disabled={currentUser.visitorUid === user.visitorUid}
+                                onClick={() => {
+                                    if (!isAnonymousMode && selectedUser.key === user.key) {
+                                        return;
+                                    }
+                                    onAnonymousModeChange(false);
+                                    onSelectUser(user.key);
+                                }}
+                                style={!isAnonymousMode && selectedUser.key === user.key ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
                             >
                                 {formatSwitchLabel(user.nickname)}
+                                {!isAnonymousMode && selectedUser.key === user.key ? '【当前】' : ''}
                             </Button>
                         ))}
+                        <Button
+                            type={isAnonymousMode ? 'primary' : 'default'}
+                            onClick={() => {
+                                if (isAnonymousMode) {
+                                    return;
+                                }
+                                onAnonymousModeChange(true);
+                            }}
+                            style={isAnonymousMode ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
+                        >
+                            {messages.pages.userInfoDemo.switchAnonymousUserLabel}
+                            {isAnonymousMode ? '【当前】' : ''}
+                        </Button>
                     </Space>
                     <div style={{ textAlign: 'center' }}>
                         <Button type="primary" size="large" onClick={handleShowChat}>

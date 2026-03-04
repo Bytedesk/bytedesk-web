@@ -22,6 +22,7 @@ import {
   POST_MESSAGE_INVITE_VISITOR_ACCEPT,
   POST_MESSAGE_INVITE_VISITOR_REJECT,
   POST_MESSAGE_LOCALSTORAGE_RESPONSE,
+  POST_MESSAGE_RESET_ANONYMOUS_VISITOR,
   POST_MESSAGE_MAXIMIZE_WINDOW,
   POST_MESSAGE_MINIMIZE_WINDOW,
   POST_MESSAGE_RECEIVE_MESSAGE,
@@ -91,6 +92,7 @@ export default class BytedeskWeb {
       forceRefresh: false,
       htmlUrl: "https://cdn.weiyuai.cn/chat",
       apiUrl: "https://api.weiyuai.cn",
+      chatPath: "/chat",
       placement: "bottom-right",
       marginBottom: 20,
       marginSide: 20,
@@ -1153,20 +1155,11 @@ export default class BytedeskWeb {
     logger.debug("this.config: ", this.config, tab);
     const params = new URLSearchParams();
 
-    // 检查 localStorage 中的 uid 和 visitorUid，如果不为空则添加到URL参数中
-    const localUid = localStorage.getItem(BYTEDESK_UID);
-    const localVisitorUid = localStorage.getItem(BYTEDESK_VISITOR_UID);
-
-    if (localUid && localUid.trim() !== "") {
-      params.append("uid", localUid);
-    }
-
-    if (localVisitorUid && localVisitorUid.trim() !== "") {
-      params.append("visitorUid", localVisitorUid);
-    }
-
     // 添加聊天参数
     Object.entries(this.config.chatConfig || {}).forEach(([key, value]) => {
+      if (value === undefined || value === null || String(value).trim() === "") {
+        return;
+      }
       // 特殊处理 debug 参数
       if (key === "debug" && value === true) {
         params.append("debug", "1");
@@ -1235,9 +1228,26 @@ export default class BytedeskWeb {
     //   params.append("preload", "1");
     // }
 
-    const url = `${this.config.htmlUrl}?${params.toString()}`;
+    const baseUrl = this.getChatPageBaseUrl();
+    const url = `${baseUrl}?${params.toString()}`;
     logger.debug("chat url: ", url);
     return url;
+  }
+
+  private getChatPageBaseUrl(): string {
+    const normalizedPath = this.config.chatPath === "/chat/thread" ? "/chat/thread" : "/chat";
+    const rawHtmlUrl = (this.config.htmlUrl || "").trim();
+
+    if (!rawHtmlUrl) {
+      return normalizedPath;
+    }
+
+    const matchedChatPath = rawHtmlUrl.match(/\/chat(?:\/thread)?\/?$/);
+    if (matchedChatPath) {
+      return rawHtmlUrl.replace(/\/chat(?:\/thread)?\/?$/, normalizedPath);
+    }
+
+    return `${rawHtmlUrl.replace(/\/$/, "")}${normalizedPath}`;
   }
 
   private setupMessageListener() {
@@ -1303,6 +1313,12 @@ export default class BytedeskWeb {
     if (iframe && iframe.contentWindow) {
       iframe.contentWindow.postMessage(message, "*");
     }
+  }
+
+  resetAnonymousVisitor() {
+    localStorage.removeItem(BYTEDESK_UID);
+    localStorage.removeItem(BYTEDESK_VISITOR_UID);
+    this.sendMessageToIframe({ type: POST_MESSAGE_RESET_ANONYMOUS_VISITOR });
   }
 
   showChat(config?: Partial<BytedeskConfig>) {

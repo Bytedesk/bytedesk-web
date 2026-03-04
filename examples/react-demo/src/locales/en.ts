@@ -13,6 +13,8 @@ export const en = {
       system: 'System'
     },
     officialSiteLabel: 'Official site',
+    resetAnonymousVisitorLabel: 'Reset anonymous visitor',
+    resetAnonymousVisitorSuccess: 'Anonymous visitor reset',
     docLinks: {
       react: 'View React integration docs',
       vue: 'View Vue integration docs',
@@ -46,17 +48,18 @@ export const en = {
   },
   nav: {
     more: 'More',
-    localDemo: '⚙️ Basic Setup',
+    basicDemo: '⚙️ Basic Setup',
     userInfoDemo: '👤 User Info',
     goodsInfoDemo: '🛒 Goods Info',
     orderInfoDemo: '📦 Order Info',
     vipLevelDemo: '👑 Personalization',
     unreadCountDemo: '🔔 Unread Counter',
+    threadHistoryDemo: '🧵 Thread History',
     documentFeedbackDemo: '📝 Doc Feedback',
     flightBookingDemo: '✈️ Flight Booking'
   },
   pages: {
-    localDemo: {
+    basicDemo: {
       title: 'Bytedesk Basic Setup',
       intro: 'Use the quick actions below to experience common Bytedesk Web SDK features.',
       themeButtonLabel: 'Switch theme color',
@@ -66,6 +69,10 @@ export const en = {
         bottomLeft: 'Bottom Left',
         bottomRight: 'Bottom Right'
       },
+      loadHistoryLabel: 'Load history',
+      loadHistoryEnabled: 'ON',
+      loadHistoryDisabled: 'OFF',
+      loadHistoryApiHintPrefix: 'chatConfig.loadHistory=',
       defaultColorLabel: 'Default',
       currentConfigTitle: 'Current Config',
       copyConfig: 'Copy Config JSON'
@@ -76,6 +83,9 @@ export const en = {
         'Pass visitorUid, nickname, avatar and more through the config object so agents instantly recognize the user. Use the buttons to switch between mock users.',
       switchUser: 'Switch user',
       switchToUserLabel: 'Switch to {{name}}',
+      switchAnonymousUserLabel: 'Switch to anonymous user',
+      anonymousUserLabel: 'Anonymous user',
+      anonymousUserHint: 'Anonymous test mode: visitorUid, nickname, avatar and other user fields are omitted.',
       currentUserTitle: 'Current User',
       currentUserIdLabel: 'User ID',
       currentUserNicknameLabel: 'Nickname',
@@ -96,7 +106,8 @@ export const en = {
       apiHintPrefix: 'API calls:',
       users: {
         user1: 'Visitor Xiao Ming',
-        user2: 'Visitor Xiao Hong'
+        user2: 'Visitor Xiao Hong',
+        user3: 'Visitor Xiao Li'
       }
     },
     goodsInfoDemo: {
@@ -195,6 +206,44 @@ export const en = {
         'Use getUnreadMessageCount() whenever you need a fresh total.',
         'Call clearUnreadMessages() after the customer reads messages.'
       ]
+    },
+    threadHistoryDemo: {
+      title: 'Visitor Thread History Demo',
+      description: 'Based on the visitor ThreadList page, this demo opens /chat/thread from the SDK icon to load history threads.',
+      bubbleTitle: 'Thread History',
+      bubbleSubtitle: 'Click to open history list',
+      anonymousUserLabel: 'Anonymous User',
+      anonymousUserHint: 'Anonymous test mode: visitorUid, nickname, and avatar are omitted.',
+      pathAlert: 'This page enables chatPath=/chat/thread. Clicking the icon opens thread history instead of /chat.',
+      currentPathLabel: 'Current entry path',
+      currentPathHint: 'All other parameters are the same as /chat',
+      usageTitle: 'Demo notes',
+      usageNotes: [
+        '1. Set chatPath to /chat/thread so icon click and showChat() both enter thread history.',
+        '2. /chat/thread accepts the same params as /chat, such as org, t, sid, visitorUid, nickname, avatar.',
+        '3. You can integrate directly with URL + query params without extra SDK calls.'
+      ],
+      buttons: {
+        openHistoryPage: 'Open thread history page',
+        switchAnonymousUser: 'Switch to anonymous user'
+      },
+      urlGuideTitle: 'URL + Query usage',
+      urlTemplateLabel: 'Generic URL template',
+      urlParamsTitle: 'Parameter reference (same as /chat)',
+      urlParams: [
+        'org: organization ID (required)',
+        't: thread type, 0/1/2',
+        'sid: target thread ID (workgroup/bot/agent)',
+        'visitorUid: custom visitor ID (recommended)',
+        'nickname/avatar: visitor profile (optional)',
+        'lang/mode: locale and theme mode (optional)'
+      ],
+      sampleUrlLabel: 'Generated sample URL from current config',
+      docLinks: {
+        reactDoc: 'View React integration guide',
+        visitorRef: 'Visitor ThreadList reference',
+        reactExample: 'React thread history demo source'
+      }
     },
     documentFeedbackDemo: {
       title: 'Document Feedback Demo',

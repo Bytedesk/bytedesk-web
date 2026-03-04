@@ -11,13 +11,16 @@ import { BytedeskReact } from '@bytedesk/web/adapters/react';
 import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
 import { Button, Card, List, Space, Statistic, Typography, theme } from 'antd';
 import { getLocaleMessages } from '../locales';
+import type { DemoUserProfile } from '../types/demo-user';
 
 interface DemoPageProps {
     locale: Language;
     themeMode: BytedeskTheme['mode'];
+    selectedUser: DemoUserProfile;
+    isAnonymousMode: boolean;
 }
 
-const UnreadCountDemo = ({ locale, themeMode }: DemoPageProps) => {
+const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = theme.useToken();
     const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -39,9 +42,13 @@ const UnreadCountDemo = ({ locale, themeMode }: DemoPageProps) => {
             t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
             sid: 'df_wg_uid',
             // 自定义用户信息
-            visitorUid: 'visitor_001',
-            nickname: messages.pages.userInfoDemo.users.user1,
-            avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
+            ...(isAnonymousMode
+                ? {}
+                : {
+                    visitorUid: selectedUser.visitorUid,
+                    nickname: selectedUser.nickname,
+                    avatar: selectedUser.avatar
+                }),
         },
         theme: {
             mode: themeMode,
@@ -70,11 +77,21 @@ const UnreadCountDemo = ({ locale, themeMode }: DemoPageProps) => {
                 },
                 chatConfig: {
                     ...prevConfig.chatConfig,
-                    nickname: messages.pages.userInfoDemo.users.user1
+                    ...(isAnonymousMode
+                        ? {
+                            visitorUid: undefined,
+                            nickname: undefined,
+                            avatar: undefined
+                        }
+                        : {
+                            visitorUid: selectedUser.visitorUid,
+                            nickname: selectedUser.nickname,
+                            avatar: selectedUser.avatar
+                        })
                 }
             } as BytedeskConfig;
         });
-    }, [locale, messages, themeMode]);
+    }, [isAnonymousMode, locale, messages, selectedUser, themeMode]);
 
     const handleInit = () => {
         console.log('BytedeskReact initialized');
@@ -84,7 +101,7 @@ const UnreadCountDemo = ({ locale, themeMode }: DemoPageProps) => {
         () => [
             { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/channel/react', label: messages.pages.unreadCountDemo.docLinks.reactDoc },
             { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/channel/vue', label: messages.pages.unreadCountDemo.docLinks.vueDoc },
-            { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/unreadCountDemo.tsx', label: messages.pages.unreadCountDemo.docLinks.reactExample },
+            { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/UnreadCountDemo.tsx', label: messages.pages.unreadCountDemo.docLinks.reactExample },
             { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/unreadCountDemo.vue', label: messages.pages.unreadCountDemo.docLinks.vueExample }
         ],
         [messages]
@@ -139,7 +156,7 @@ const UnreadCountDemo = ({ locale, themeMode }: DemoPageProps) => {
     return (
         <div style={{ padding: 24 }}>
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                <Card title={messages.pages.unreadCountDemo.title} bodyStyle={{ paddingBottom: 8 }}>
+                <Card title={messages.pages.unreadCountDemo.title} styles={{ body: { paddingBottom: 8 } }}>
                     <Typography.Paragraph type="secondary" style={{ marginBottom: 16 }}>
                         {messages.pages.unreadCountDemo.description}
                     </Typography.Paragraph>
@@ -177,7 +194,7 @@ const UnreadCountDemo = ({ locale, themeMode }: DemoPageProps) => {
                     </Space>
                 </Card>
 
-                <Card title={messages.pages.unreadCountDemo.usageNotesTitle} bodyStyle={{ paddingBottom: 0 }}>
+                <Card title={messages.pages.unreadCountDemo.usageNotesTitle} styles={{ body: { paddingBottom: 0 } }}>
                     <List
                         dataSource={messages.pages.unreadCountDemo.usageNotes}
                         renderItem={(note) => (

@@ -44,6 +44,7 @@ import type { BytedeskConfig } from 'bytedesk-web/react';
 
 ```bash
 const config: BytedeskConfig = {
+  chatPath: '/chat', // default: /chat, thread history: /chat/thread
   placement: 'bottom-right',
   marginBottom: 20,
   marginSide: 20,
@@ -56,9 +57,49 @@ const config: BytedeskConfig = {
   chatConfig: {
     org: 'df_org_uid',  // Replace with your organization ID
     t: "2",
-    sid: 'df_rt_uid'      // Replace with your SID
+    sid: 'df_rt_uid',      // Replace with your SID
+    loadHistory: true      // allow loading history messages
   }
 };
+```
+
+### Load History (`chatConfig.loadHistory`)
+
+Set `chatConfig.loadHistory` to control whether historical messages are loaded in the chat page.
+
+```bash
+const config: BytedeskConfig = {
+  chatConfig: {
+    org: 'df_org_uid',
+    t: '2',
+    sid: 'df_rt_uid',
+    loadHistory: true // true: load history, false: only new messages
+  }
+};
+```
+
+### Thread History Page (`/chat/thread`)
+
+Set `chatPath` to `/chat/thread` to open the visitor history thread page when clicking the icon or calling `showChat()`.
+
+```bash
+const config: BytedeskConfig = {
+  chatPath: '/chat/thread',
+  chatConfig: {
+    org: 'df_org_uid',
+    t: '1',
+    sid: 'df_wg_uid',
+    visitorUid: 'visitor_001',
+    nickname: 'Visitor',
+    avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
+  }
+};
+```
+
+Direct URL usage (same params as `/chat`):
+
+```bash
+https://cdn.weiyuai.cn/chat/thread?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=Visitor&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&lang=en&mode=light
 ```
 
 ### Use Component
@@ -98,7 +139,14 @@ const App = () => {
 # show/hide invite dialog
 (window as any).bytedesk?.showInviteDialog();
 (window as any).bytedesk?.hideInviteDialog();
+
+# reset anonymous visitor (anonymous mode only)
+(window as any).bytedesk?.resetAnonymousVisitor?.();
 ```
+
+### Anonymous Reset Button
+
+In the React demo, the “Reset Anonymous User” button is shown only when the currently selected user is anonymous.
 
 ## Run Examples
 

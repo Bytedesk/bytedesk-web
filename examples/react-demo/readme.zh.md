@@ -44,6 +44,7 @@ import type { BytedeskConfig } from 'bytedesk-web/react';
 
 ```bash
 const config: BytedeskConfig = {
+  chatPath: '/chat', // 默认 /chat，历史会话页使用 /chat/thread
   placement: 'bottom-right',
   marginBottom: 20,
   marginSide: 20,
@@ -56,9 +57,49 @@ const config: BytedeskConfig = {
   chatConfig: {
     org: 'df_org_uid',  // 替换为您的组织ID
     t: "2",
-    sid: 'df_rt_uid'      // 替换为您的SID
+    sid: 'df_rt_uid',      // 替换为您的SID
+    loadHistory: true      // 是否允许加载历史消息
   }
 };
+```
+
+### 历史消息开关（`chatConfig.loadHistory`）
+
+通过 `chatConfig.loadHistory` 控制聊天页是否加载历史消息。
+
+```bash
+const config: BytedeskConfig = {
+  chatConfig: {
+    org: 'df_org_uid',
+    t: '2',
+    sid: 'df_rt_uid',
+    loadHistory: true // true: 加载历史消息，false: 仅显示新消息
+  }
+};
+```
+
+### 历史会话页面（`/chat/thread`）
+
+将 `chatPath` 设置为 `/chat/thread` 后，点击 icon 或调用 `showChat()` 会打开访客历史会话页面。
+
+```bash
+const config: BytedeskConfig = {
+  chatPath: '/chat/thread',
+  chatConfig: {
+    org: 'df_org_uid',
+    t: '1',
+    sid: 'df_wg_uid',
+    visitorUid: 'visitor_001',
+    nickname: '访客小明',
+    avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
+  }
+};
+```
+
+也可以直接用 URL + 参数接入（参数与 `/chat` 一致）：
+
+```bash
+https://cdn.weiyuai.cn/chat/thread?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=%E8%AE%BF%E5%AE%A2%E5%B0%8F%E6%98%8E&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&lang=zh-cn&mode=light
 ```
 
 ### 使用组件
@@ -102,7 +143,14 @@ const App = () => {
 # 显示/隐藏邀请对话框
 (window as any).bytedesk?.showInviteDialog();
 (window as any).bytedesk?.hideInviteDialog();
+
+# 重置匿名访客（仅匿名模式）
+(window as any).bytedesk?.resetAnonymousVisitor?.();
 ```
+
+### 匿名访客重置按钮说明
+
+React 示例中，“重置匿名用户”按钮仅在当前选中用户为匿名用户时显示。
 
 ## 运行示例
 

@@ -139,6 +139,7 @@ export interface BytedeskConfig {
   forceRefresh?: boolean; // 是否强制刷新页面
   apiUrl?: string; // API基础URL
   htmlUrl?: string; // Html基础URL
+  chatPath?: '/chat' | '/chat/thread'; // 聊天页面路径，默认 /chat；历史会话页使用 /chat/thread
   placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
   marginBottom?: number; // 底部边距
   marginSide?: number; // 侧边边距

@@ -83,6 +83,7 @@ import type { BytedeskConfig } from 'bytedesk-web/react';
 
 ```bash
 const config: BytedeskConfig = {
+  chatPath: '/chat', // default: /chat, thread history: /chat/thread
   placement: 'bottom-right',
   marginBottom: 20,
   marginSide: 20,
@@ -105,6 +106,31 @@ const config: BytedeskConfig = {
     sid: 'df_rt_uid'      // Replace with your SID
   }
 };
+```
+
+### Thread History Page (`/chat/thread`)
+
+Set `chatPath` to `/chat/thread` to make icon click and `showChat()` open the visitor thread history page.
+
+```bash
+const config: BytedeskConfig = {
+  htmlUrl: 'https://cdn.weiyuai.cn/chat',
+  chatPath: '/chat/thread',
+  chatConfig: {
+    org: 'df_org_uid',
+    t: '1',
+    sid: 'df_wg_uid',
+    visitorUid: 'visitor_001',
+    nickname: 'Visitor',
+    avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
+  }
+};
+```
+
+Direct URL integration (same query params as `/chat`):
+
+```bash
+https://cdn.weiyuai.cn/chat/thread?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=Visitor&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&lang=en&mode=light
 ```
 
 ### Use Component

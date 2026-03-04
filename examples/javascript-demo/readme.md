@@ -32,6 +32,7 @@ Online customer service SDK, supporting multiple frameworks:
 <script src="https://www.weiyuai.cn/embed/bytedesk-web.js"></script>
 <script>
   const config = {
+    chatPath: '/chat', // default: /chat, thread history: /chat/thread
     placement: 'bottom-right',
     theme: {
       backgroundColor: '#0066FF',
@@ -46,4 +47,28 @@ Online customer service SDK, supporting multiple frameworks:
   const bytedesk = new BytedeskWeb(config);
   bytedesk.init();
 </script>  
+```
+
+## Thread History Page (`/chat/thread`)
+
+Set `chatPath` to `/chat/thread` to open the visitor history thread page when clicking the icon or calling `showChat()`.
+
+```bash
+const config = {
+  chatPath: '/chat/thread',
+  chatConfig: {
+    org: 'df_org_uid',
+    t: '1',
+    sid: 'df_wg_uid',
+    visitorUid: 'visitor_001',
+    nickname: 'Visitor',
+    avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
+  }
+};
+```
+
+Direct URL usage (same params as `/chat`):
+
+```bash
+https://cdn.weiyuai.cn/chat/thread?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=Visitor&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&lang=en&mode=light
 ```

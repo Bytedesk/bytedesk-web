@@ -81,15 +81,15 @@ const InstallGuide = ({ locale }: InstallGuideProps) => {
     <Card style={{ marginTop: 40 }}>
       <Typography.Title level={3}>{guide.title}</Typography.Title>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <Card type="inner" title={guide.sections.installDeps.title} bordered>
+        <Card type="inner" title={guide.sections.installDeps.title} variant="outlined">
           {renderCode(guide.sections.installDeps.code)}
         </Card>
 
-        <Card type="inner" title={guide.sections.importComponent.title} bordered>
+        <Card type="inner" title={guide.sections.importComponent.title} variant="outlined">
           {renderCode(guide.sections.importComponent.code)}
         </Card>
 
-        <Card type="inner" title={guide.sections.config.title} bordered>
+        <Card type="inner" title={guide.sections.config.title} variant="outlined">
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
             <Typography.Text strong>{guide.sections.config.minimalTitle}</Typography.Text>
             {renderCode(guide.sections.config.minimalCode, true)}
@@ -99,11 +99,11 @@ const InstallGuide = ({ locale }: InstallGuideProps) => {
           </Space>
         </Card>
 
-        <Card type="inner" title={guide.sections.usage.title} bordered>
+        <Card type="inner" title={guide.sections.usage.title} variant="outlined">
           {renderCode(guide.sections.usage.code)}
         </Card>
 
-        <Card type="inner" title={guide.sections.methods.title} bordered>
+        <Card type="inner" title={guide.sections.methods.title} variant="outlined">
           <List
             dataSource={[...guide.sections.methods.list]}
             renderItem={(item: (typeof guide.sections.methods.list)[number]) => (
@@ -115,7 +115,7 @@ const InstallGuide = ({ locale }: InstallGuideProps) => {
           />
         </Card>
 
-        <Card type="inner" title={guide.sections.feedback.title} bordered>
+        <Card type="inner" title={guide.sections.feedback.title} variant="outlined">
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
             <Typography.Paragraph>{guide.sections.feedback.intro}</Typography.Paragraph>
             <List

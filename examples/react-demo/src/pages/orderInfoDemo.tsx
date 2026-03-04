@@ -22,6 +22,7 @@ import { BytedeskReact } from '@bytedesk/web/adapters/react';
 import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
 import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
+import type { DemoUserProfile } from '../types/demo-user';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -92,9 +93,11 @@ const ORDER_FLOW: OrderStatus[] = ['pending', 'paid', 'shipped', 'delivered'];
 interface DemoPageProps {
   locale: Language;
   themeMode: BytedeskTheme['mode'];
+  selectedUser: DemoUserProfile;
+  isAnonymousMode: boolean;
 }
 
-const OrderInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
+const OrderInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
 
   const currentOrder = useMemo<OrderInfo>(() => ({
@@ -105,7 +108,7 @@ const OrderInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
   const docLinks = useMemo(
     () => [
       { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/orderinfo', label: messages.pages.orderInfoDemo.docLinks.orderDoc },
-      { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/orderInfoDemo.tsx', label: messages.pages.orderInfoDemo.docLinks.reactExample },
+      { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/OrderInfoDemo.tsx', label: messages.pages.orderInfoDemo.docLinks.reactExample },
       { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/orderInfoDemo.vue', label: messages.pages.orderInfoDemo.docLinks.vueExample }
     ],
     [messages]
@@ -133,17 +136,21 @@ const OrderInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
     bubbleConfig: {
       show: false,
       icon: '📦',
-      title: messages.pages.localDemo.bubbleTitle,
-      subtitle: messages.pages.localDemo.bubbleSubtitle
+      title: messages.pages.basicDemo.bubbleTitle,
+      subtitle: messages.pages.basicDemo.bubbleSubtitle
     },
     chatConfig: {
       org: 'df_org_uid', // 替换为您的组织ID
       t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
       sid: 'df_wg_aftersales', // 替换为您的SID
       // 自定义用户信息
-      visitorUid: 'visitor_001',
-      nickname: '访客小明',
-      avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
+      ...(isAnonymousMode
+        ? {}
+        : {
+          visitorUid: selectedUser.visitorUid,
+          nickname: selectedUser.nickname,
+          avatar: selectedUser.avatar
+        }),
       // 订单信息通过自定义消息发送
       orderInfo: JSON.stringify(currentOrder),
       // 自定义字段，可以传递任何字段
@@ -156,7 +163,7 @@ const OrderInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
     theme: {
       mode: themeMode,
     }
-  }), [currentOrder, locale, messages, themeMode]);
+  }), [currentOrder, isAnonymousMode, locale, messages, selectedUser, themeMode]);
 
   const orderSteps = useMemo<StepProps[]>(
     () => {

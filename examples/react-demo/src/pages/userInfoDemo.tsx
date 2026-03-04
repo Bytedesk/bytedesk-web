@@ -14,8 +14,8 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 
-import { useState, useMemo } from 'react';
-import { Button, Card, Typography, Space, Avatar, Divider, Row, Col } from 'antd';
+import { useMemo } from 'react';
+import { Button, Card, Typography, Space, Divider, Row, Col, theme as antdTheme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -23,51 +23,32 @@ import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk
 // import { BytedeskReact } from 'bytedesk-web/react';
 // import { BytedeskConfig } from 'bytedesk-web';
 // import { useContext } from 'react';
-import { getLocaleMessages, type LocaleMessages } from '../locales';
+import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
+import CurrentUserProfile from '../components/CurrentUserProfile';
+import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
 
 const { Title, Paragraph } = Typography;
-
-// 定义用户信息接口
-interface UserInfo {
-    visitorUid: string;
-    nickname: string;
-    avatar: string;
-}
-
-type UserPreset = {
-    visitorUid: string;
-    avatar: string;
-    nicknameKey: keyof LocaleMessages['pages']['userInfoDemo']['users'];
-};
-
-const USER_PRESETS: UserPreset[] = [
-    {
-        visitorUid: 'visitor_001',
-        avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
-        nicknameKey: 'user1'
-    },
-    {
-        visitorUid: 'visitor_002',
-        avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg',
-        nicknameKey: 'user2'
-    }
-];
 
 interface DemoPageProps {
     locale: Language;
     themeMode: BytedeskTheme['mode'];
+    selectedUser: DemoUserProfile;
+    isAnonymousMode: boolean;
+    onSelectUser: (nextUser: DemoUserKey) => void;
+    onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
-const UserInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
+const UserInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
-    const users = useMemo<UserInfo[]>(() => USER_PRESETS.map((preset) => ({
-        visitorUid: preset.visitorUid,
-        avatar: preset.avatar,
-        nickname: messages.pages.userInfoDemo.users[preset.nicknameKey]
+    const { token } = antdTheme.useToken();
+    const users = useMemo(() => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
+        key,
+        visitorUid: DEMO_USER_PRESETS[key].visitorUid,
+        avatar: DEMO_USER_PRESETS[key].avatar,
+        nickname: messages.pages.userInfoDemo.users[key]
     })), [messages]);
-    const [currentUserIndex, setCurrentUserIndex] = useState(0);
-    const currentUser = users[currentUserIndex] || users[0];
+    const currentUser = selectedUser;
 
     // 配置客服组件
     const config = useMemo<BytedeskConfig>(() => ({
@@ -93,20 +74,24 @@ const UserInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
         bubbleConfig: {
             show: false,
             icon: '👋',
-            title: messages.pages.localDemo.bubbleTitle,
-            subtitle: messages.pages.localDemo.bubbleSubtitle
+            title: messages.pages.basicDemo.bubbleTitle,
+            subtitle: messages.pages.basicDemo.bubbleSubtitle
         },
         chatConfig: {
             org: 'df_org_uid', // 替换为您的组织ID
             t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
             sid: 'df_wg_uid', // 替换为您的SID
             // 传入用户信息
-            visitorUid: currentUser.visitorUid,
-            nickname: currentUser.nickname,
-            avatar: currentUser.avatar,
-            mobile: '13800138000',
-            email: 'test@test.com',
-            note: 'test',
+            ...(isAnonymousMode
+                ? {}
+                : {
+                    visitorUid: selectedUser.visitorUid,
+                    nickname: selectedUser.nickname,
+                    avatar: selectedUser.avatar,
+                    mobile: '13800138000',
+                    email: 'test@test.com',
+                    note: 'test'
+                }),
             // 自定义字段，可以传递任何字段
             extra: JSON.stringify({
                 type: 'type',
@@ -121,12 +106,7 @@ const UserInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
         onVisitorInfo: (uid: string, visitorUid: string) => {
             console.log('收到访客信息:', { uid, visitorUid });
         },
-    }), [locale, messages, currentUser, themeMode]);
-
-    // 切换用户信息
-    const handleSwitchUser = (index: number) => {
-        setCurrentUserIndex(index);
-    };
+    }), [locale, messages, isAnonymousMode, selectedUser, themeMode]);
 
     // Bytedesk 接口控制函数
     const handleShowChat = () => {
@@ -171,7 +151,7 @@ const UserInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
 
     const docLinks = [
         { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/userinfo', label: messages.pages.userInfoDemo.docLinks.userInfoDoc },
-        { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/userInfoDemo.tsx', label: messages.pages.userInfoDemo.docLinks.reactExample },
+        { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/UserInfoDemo.tsx', label: messages.pages.userInfoDemo.docLinks.reactExample },
         { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/userInfoDemo.vue', label: messages.pages.userInfoDemo.docLinks.vueExample }
     ];
 
@@ -207,32 +187,49 @@ const UserInfoDemo = ({ locale, themeMode }: DemoPageProps) => {
 
             <Card>
                     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                        <div>
-                            <Title level={4}>{messages.pages.userInfoDemo.currentUserTitle}</Title>
-                            <Space>
-                                <Avatar src={currentUser.avatar} size={64} />
-                                <div>
-                                    <Paragraph>
-                                        {messages.pages.userInfoDemo.currentUserIdLabel}: {currentUser.visitorUid}
-                                    </Paragraph>
-                                    <Paragraph>
-                                        {messages.pages.userInfoDemo.currentUserNicknameLabel}: {currentUser.nickname}
-                                    </Paragraph>
-                                </div>
-                            </Space>
-                        </div>
+                        <CurrentUserProfile
+                            title={messages.pages.userInfoDemo.currentUserTitle}
+                            isAnonymousMode={isAnonymousMode}
+                            avatar={currentUser.avatar}
+                            anonymousIdText={messages.pages.userInfoDemo.anonymousUserHint}
+                            anonymousNicknameText={messages.pages.userInfoDemo.anonymousUserLabel}
+                            userIdLabel={messages.pages.userInfoDemo.currentUserIdLabel}
+                            userId={currentUser.visitorUid}
+                            userNicknameLabel={messages.pages.userInfoDemo.currentUserNicknameLabel}
+                            userNickname={currentUser.nickname}
+                        />
 
                         <Space wrap>
-                            {users.map((user, index) => (
+                            {users.map((user) => (
                                 <Button
                                     key={user.visitorUid}
                                     type="primary"
-                                    onClick={() => handleSwitchUser(index)}
-                                    disabled={currentUser.visitorUid === user.visitorUid}
+                                    onClick={() => {
+                                        if (!isAnonymousMode && selectedUser.key === user.key) {
+                                            return;
+                                        }
+                                        onAnonymousModeChange(false);
+                                        onSelectUser(user.key);
+                                    }}
+                                    style={!isAnonymousMode && selectedUser.key === user.key ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
                                 >
                                     {formatSwitchUserLabel(user.nickname)}
+                                    {!isAnonymousMode && selectedUser.key === user.key ? '【当前】' : ''}
                                 </Button>
                             ))}
+                            <Button
+                                type={isAnonymousMode ? 'primary' : 'default'}
+                                onClick={() => {
+                                    if (isAnonymousMode) {
+                                        return;
+                                    }
+                                    onAnonymousModeChange(true);
+                                }}
+                                style={isAnonymousMode ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
+                            >
+                                {messages.pages.userInfoDemo.switchAnonymousUserLabel}
+                                {isAnonymousMode ? '【当前】' : ''}
+                            </Button>
                         </Space>
                         <div style={{ textAlign: 'center', marginTop: '16px' }}>
                             <Button type="primary" size="large" onClick={handleShowChat}>
