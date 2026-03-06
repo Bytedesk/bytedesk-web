@@ -99,8 +99,7 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
 
     const docLinks = useMemo(
         () => [
-            { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/channel/react', label: messages.pages.unreadCountDemo.docLinks.reactDoc },
-            { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/channel/vue', label: messages.pages.unreadCountDemo.docLinks.vueDoc },
+            { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/unread_count', label: messages.pages.unreadCountDemo.docLinks.unreadDoc },
             { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/UnreadCountDemo.tsx', label: messages.pages.unreadCountDemo.docLinks.reactExample },
             { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/unreadCountDemo.vue', label: messages.pages.unreadCountDemo.docLinks.vueExample }
         ],
@@ -143,6 +142,37 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
         [handleMarkAllRead, messages, updateUnreadCount]
     );
 
+    const apiBaseUrl = useMemo(() => config.apiUrl || 'https://api.weiyuai.cn', [config.apiUrl]);
+
+    const countApiTemplate = useMemo(
+        () => 'GET {{API_BASE}}/visitor/api/v1/message/unread/count?uid={uid}&visitorUid={visitorUid}&orgUid={orgUid}&client=WEB_FLOAT',
+        []
+    );
+
+    const clearApiTemplate = useMemo(
+        () => 'POST {{API_BASE}}/visitor/api/v1/message/unread/clear',
+        []
+    );
+
+    const countApiSampleUrl = useMemo(() => {
+        const params = new URLSearchParams();
+        params.append('uid', 'BYTEDESK_UID');
+        params.append('visitorUid', config.chatConfig?.visitorUid || selectedUser.visitorUid || 'visitor_001');
+        params.append('orgUid', config.chatConfig?.org || 'df_org_uid');
+        params.append('client', 'WEB_FLOAT');
+        return `${apiBaseUrl}/visitor/api/v1/message/unread/count?${params.toString()}`;
+    }, [apiBaseUrl, config.chatConfig?.org, config.chatConfig?.visitorUid, selectedUser.visitorUid]);
+
+    const clearApiSampleBody = useMemo(
+        () => JSON.stringify({
+            uid: 'BYTEDESK_UID',
+            visitorUid: config.chatConfig?.visitorUid || selectedUser.visitorUid || 'visitor_001',
+            orgUid: config.chatConfig?.org || 'df_org_uid',
+            client: 'WEB_FLOAT'
+        }, null, 2),
+        [config.chatConfig?.org, config.chatConfig?.visitorUid, selectedUser.visitorUid]
+    );
+
     useEffect(() => {
         updateUnreadCount();
 
@@ -156,21 +186,29 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
     return (
         <div style={{ padding: 24 }}>
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                <Card title={messages.pages.unreadCountDemo.title} styles={{ body: { paddingBottom: 8 } }}>
-                    <Typography.Paragraph type="secondary" style={{ marginBottom: 16 }}>
-                        {messages.pages.unreadCountDemo.description}
-                    </Typography.Paragraph>
-                    <List
-                        dataSource={docLinks}
-                        split={false}
-                        renderItem={(link) => (
-                            <List.Item key={link.href} style={{ padding: '6px 0' }}>
-                                <Typography.Link href={link.href} target="_blank" rel="noopener noreferrer">
+                <Card>
+                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                        <div>
+                            <Typography.Title level={2} style={{ marginBottom: 0 }}>
+                                {messages.pages.unreadCountDemo.title}
+                            </Typography.Title>
+                            <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                                {messages.pages.unreadCountDemo.description}
+                            </Typography.Paragraph>
+                        </div>
+                        <Space direction="vertical" size={4}>
+                            {docLinks.map((link) => (
+                                <Typography.Link
+                                    key={link.href}
+                                    href={link.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
                                     {link.label}
                                 </Typography.Link>
-                            </List.Item>
-                        )}
-                    />
+                            ))}
+                        </Space>
+                    </Space>
                 </Card>
 
                 <Card>
@@ -191,6 +229,44 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
                             {messages.common.apiHintPrefix} getUnreadMessageCount(), clearUnreadMessages()
                         </Typography.Text>
                         <BytedeskReact {...config} onInit={handleInit} />
+                    </Space>
+                </Card>
+
+                <Card title={messages.pages.unreadCountDemo.urlGuideTitle}>
+                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                        <Typography.Text strong>{messages.pages.unreadCountDemo.countApiLabel}</Typography.Text>
+                        <Typography.Paragraph copyable={{ text: countApiTemplate }} style={{ marginBottom: 0 }}>
+                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{countApiTemplate}</pre>
+                        </Typography.Paragraph>
+
+                        <Typography.Text strong>{messages.pages.unreadCountDemo.clearApiLabel}</Typography.Text>
+                        <Typography.Paragraph copyable={{ text: clearApiTemplate }} style={{ marginBottom: 0 }}>
+                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{clearApiTemplate}</pre>
+                        </Typography.Paragraph>
+
+                        <Typography.Text strong>{messages.pages.unreadCountDemo.urlParamsTitle}</Typography.Text>
+                        <List
+                            size="small"
+                            dataSource={messages.pages.unreadCountDemo.urlParams}
+                            renderItem={(item) => <List.Item>{item}</List.Item>}
+                        />
+
+                        <Typography.Text strong>{messages.pages.unreadCountDemo.sampleUrlLabel}</Typography.Text>
+                        <Typography.Paragraph copyable={{ text: countApiSampleUrl }} style={{ marginBottom: 0 }}>
+                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{countApiSampleUrl}</pre>
+                        </Typography.Paragraph>
+
+                        <Typography.Text strong>{messages.pages.unreadCountDemo.sampleBodyLabel}</Typography.Text>
+                        <Typography.Paragraph copyable={{ text: clearApiSampleBody }} style={{ marginBottom: 0 }}>
+                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{clearApiSampleBody}</pre>
+                        </Typography.Paragraph>
+
+                        <List
+                            size="small"
+                            header={messages.pages.unreadCountDemo.apiNotesTitle}
+                            dataSource={messages.pages.unreadCountDemo.apiNotes}
+                            renderItem={(item) => <List.Item>{item}</List.Item>}
+                        />
                     </Space>
                 </Card>
 

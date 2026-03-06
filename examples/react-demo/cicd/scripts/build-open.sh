@@ -17,7 +17,7 @@
 # 本地路径
 DIST=dist
 # 本地路径
-TARGET_DIST=/Users/ningjinpeng/Desktop/git/private/github/bytedesk-private/starter/src/main/resources/static/reactdemo
+TARGET_DIST=/Users/ningjinpeng/Desktop/git/private/github/bytedesk-1x/starter/src/main/resources/static/reactdemo
 
 # 清理 dist 目录
 echo "Cleaning dist directory..."

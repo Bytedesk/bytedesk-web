@@ -15,7 +15,7 @@
  */
 
 import { useMemo } from 'react';
-import { Button, Card, Typography, Space, Divider, Row, Col, Tag, theme as antdTheme } from 'antd';
+import { Button, Card, Typography, Space, Tag, List, theme as antdTheme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -180,7 +180,44 @@ const VipLevelDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
     const formatSwitchLabel = (name: string) =>
         messages.pages.vipLevelDemo.switchButtonLabel.replace('{{name}}', name);
 
-    const formatApiHint = (code: string) => `${messages.common.apiHintPrefix} ${code}`;
+    const urlTemplate = useMemo(() => {
+        return '{{BASE_URL}}/chat?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=普通体验账号&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&vipLevel=0&extra=%7B...%7D&lang=zh-cn&mode=light';
+    }, []);
+
+    const sampleUrl = useMemo(() => {
+        const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/chat(?:\/thread)?\/?$/, '');
+        const params = new URLSearchParams();
+        const appendIfPresent = (key: string, value: string | undefined) => {
+            if (value) {
+                params.append(key, value);
+            }
+        };
+
+        params.append('org', config.chatConfig?.org || '');
+        params.append('t', String(config.chatConfig?.t || '1'));
+        params.append('sid', String(config.chatConfig?.sid || ''));
+        appendIfPresent('visitorUid', config.chatConfig?.visitorUid);
+        appendIfPresent('nickname', config.chatConfig?.nickname);
+        appendIfPresent('avatar', config.chatConfig?.avatar);
+        appendIfPresent('vipLevel', String(config.chatConfig?.vipLevel || '0'));
+        appendIfPresent('extra', String(config.chatConfig?.extra || ''));
+        params.append('lang', locale);
+        params.append('mode', String(themeMode || 'light'));
+        return `${baseHtmlUrl}/chat?${params.toString()}`;
+    }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
+
+    const urlParams = messages.pages.vipLevelDemo.urlParams;
+
+    const vipPayload = useMemo(() => ({
+        vipLevel: String(currentUser.vipLevel),
+        extra: {
+            type: 'type',
+            test: 'test'
+        }
+    }), [currentUser.vipLevel]);
+
+    const vipPayloadJson = useMemo(() => JSON.stringify(vipPayload), [vipPayload]);
+    const vipPayloadEncoded = useMemo(() => encodeURIComponent(vipPayloadJson), [vipPayloadJson]);
 
     return (
         <PageContainer>
@@ -264,31 +301,63 @@ const VipLevelDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
                         </Button>
                     </Space>
                     <div style={{ textAlign: 'center' }}>
-                        <Button type="primary" size="large" onClick={handleShowChat}>
-                            {messages.pages.userInfoDemo.contactSupport}
-                        </Button>
+                        <Space>
+                            <Button type="primary" size="large" onClick={handleShowChat}>
+                                {messages.common.buttons.openChat}
+                            </Button>
+                            <Button size="large" onClick={handleHideChat}>
+                                {messages.common.buttons.closeChat}
+                            </Button>
+                        </Space>
                     </div>
                 </Space>
             </Card>
 
-            <Card>
-                <Title level={4}>{messages.pages.goodsInfoDemo.controlPanel.title}</Title>
-                <Divider />
-                <Row gutter={[16, 16]}>
-                    <Col span={12}>
-                        <Card size="small" title={messages.pages.goodsInfoDemo.controlPanel.chatWindow}>
-                            <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                                <Space>
-                                    <Button onClick={handleShowChat}>{messages.common.buttons.openChat}</Button>
-                                    <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
-                                </Space>
-                                <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                    {formatApiHint('bytedesk.showChat() / bytedesk.hideChat()')}
-                                </Typography.Text>
-                            </Space>
-                        </Card>
-                    </Col>
-                </Row>
+            <Card title={messages.pages.vipLevelDemo.urlGuideTitle}>
+                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                    <Typography.Text strong>{messages.pages.vipLevelDemo.urlTemplateLabel}</Typography.Text>
+                    <Typography.Paragraph copyable={{ text: urlTemplate }} style={{ marginBottom: 0 }}>
+                        <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{urlTemplate}</pre>
+                    </Typography.Paragraph>
+
+                    <Typography.Text strong>{messages.pages.vipLevelDemo.urlParamsTitle}</Typography.Text>
+                    <List
+                        size="small"
+                        dataSource={urlParams}
+                        renderItem={(item) => <List.Item>{item}</List.Item>}
+                    />
+
+                    <Typography.Text strong>{messages.pages.vipLevelDemo.sampleUrlLabel}</Typography.Text>
+                    <Typography.Paragraph copyable={{ text: sampleUrl }} style={{ marginBottom: 0 }}>
+                        <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
+                    </Typography.Paragraph>
+                </Space>
+            </Card>
+
+            <Card title={messages.pages.vipLevelDemo.payloadGuideTitle}>
+                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                    <Typography.Text strong>{messages.pages.vipLevelDemo.payloadObjectLabel}</Typography.Text>
+                    <Typography.Paragraph copyable={{ text: JSON.stringify(vipPayload, null, 2) }} style={{ marginBottom: 0 }}>
+                        <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{JSON.stringify(vipPayload, null, 2)}</pre>
+                    </Typography.Paragraph>
+
+                    <Typography.Text strong>{messages.pages.vipLevelDemo.payloadJsonLabel}</Typography.Text>
+                    <Typography.Paragraph copyable={{ text: vipPayloadJson }} style={{ marginBottom: 0 }}>
+                        <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{vipPayloadJson}</pre>
+                    </Typography.Paragraph>
+
+                    <Typography.Text strong>{messages.pages.vipLevelDemo.payloadEncodedLabel}</Typography.Text>
+                    <Typography.Paragraph copyable={{ text: vipPayloadEncoded }} style={{ marginBottom: 0 }}>
+                        <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{vipPayloadEncoded}</pre>
+                    </Typography.Paragraph>
+
+                    <List
+                        size="small"
+                        header={messages.pages.vipLevelDemo.payloadNotesTitle}
+                        dataSource={messages.pages.vipLevelDemo.payloadNotes}
+                        renderItem={(item) => <List.Item>{item}</List.Item>}
+                    />
+                </Space>
             </Card>
 
             <BytedeskReact {...config} />

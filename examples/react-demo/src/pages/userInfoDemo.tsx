@@ -15,7 +15,7 @@
  */
 
 import { useMemo } from 'react';
-import { Button, Card, Typography, Space, Divider, Row, Col, theme as antdTheme } from 'antd';
+import { Button, Card, Typography, Space, List, theme as antdTheme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -53,12 +53,12 @@ const UserInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
     // 配置客服组件
     const config = useMemo<BytedeskConfig>(() => ({
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
-        ...(process.env.NODE_ENV === 'development' 
-        ? { 
-            htmlUrl: 'http://127.0.0.1:9006', 
-            apiUrl: 'http://127.0.0.1:9003' 
-        } 
-        : {}),
+        ...(process.env.NODE_ENV === 'development'
+            ? {
+                htmlUrl: 'http://127.0.0.1:9006',
+                apiUrl: 'http://127.0.0.1:9003'
+            }
+            : {}),
         placement: 'bottom-right',
         autoPopup: false,
         forceRefresh: true,
@@ -119,38 +119,8 @@ const UserInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
         (window as any).bytedesk?.hideChat();
     };
 
-    const handleShowButton = () => {
-        console.log("showButton");
-        (window as any).bytedesk?.showButton();
-    };
-
-    const handleHideButton = () => {
-        console.log("hideButton");
-        (window as any).bytedesk?.hideButton();
-    };
-
-    const handleShowBubble = () => {
-        console.log("showBubble");
-        (window as any).bytedesk?.showBubble();
-    };
-
-    const handleHideBubble = () => {
-        console.log("hideBubble");
-        (window as any).bytedesk?.hideBubble();
-    };
-
-    const handleShowInviteDialog = () => {
-        console.log("showInviteDialog");
-        (window as any).bytedesk?.showInviteDialog();
-    };
-
-    const handleHideInviteDialog = () => {
-        console.log("hideInviteDialog");
-        (window as any).bytedesk?.hideInviteDialog();
-    };
-
     const docLinks = [
-        { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/userinfo', label: messages.pages.userInfoDemo.docLinks.userInfoDoc },
+        { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/user_info', label: messages.pages.userInfoDemo.docLinks.userInfoDoc },
         { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/UserInfoDemo.tsx', label: messages.pages.userInfoDemo.docLinks.reactExample },
         { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/userInfoDemo.vue', label: messages.pages.userInfoDemo.docLinks.vueExample }
     ];
@@ -158,147 +128,136 @@ const UserInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
     const formatSwitchUserLabel = (name: string) =>
         messages.pages.userInfoDemo.switchToUserLabel.replace('{{name}}', name);
 
-    const formatApiHint = (code: string) => `${messages.pages.userInfoDemo.apiHintPrefix} ${code}`;
+    const urlTemplate = useMemo(() => {
+        return '{{BASE_URL}}/chat?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=访客小明&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&mobile=13800138000&email=test%40test.com&note=test&lang=zh-cn&mode=light';
+    }, []);
 
-        return (
+    const sampleUrl = useMemo(() => {
+        const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/chat(?:\/thread)?\/?$/, '');
+        const params = new URLSearchParams();
+        const appendIfPresent = (key: string, value: string | undefined) => {
+            if (value) {
+                params.append(key, value);
+            }
+        };
+
+        params.append('org', config.chatConfig?.org || '');
+        params.append('t', String(config.chatConfig?.t || '1'));
+        params.append('sid', String(config.chatConfig?.sid || ''));
+        appendIfPresent('visitorUid', config.chatConfig?.visitorUid);
+        appendIfPresent('nickname', config.chatConfig?.nickname);
+        appendIfPresent('avatar', config.chatConfig?.avatar);
+        appendIfPresent('mobile', config.chatConfig?.mobile);
+        appendIfPresent('email', config.chatConfig?.email);
+        appendIfPresent('note', config.chatConfig?.note);
+        appendIfPresent('extra', config.chatConfig?.extra);
+        params.append('lang', locale);
+        params.append('mode', String(themeMode || 'light'));
+        return `${baseHtmlUrl}/chat?${params.toString()}`;
+    }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
+
+    const urlParams = messages.pages.userInfoDemo.urlParams;
+
+    return (
         <PageContainer>
             <Card>
                 <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                <div>
-                    <Title level={2} style={{ marginBottom: 0 }}>{messages.pages.userInfoDemo.title}</Title>
-                    <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                        {messages.pages.userInfoDemo.description}
-                    </Paragraph>
-                </div>
-                <Space direction="vertical" size={4}>
-                    {docLinks.map((link) => (
-                        <Typography.Link
-                            key={link.href}
-                            href={link.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {link.label}
-                        </Typography.Link>
-                    ))}
-                </Space>
+                    <div>
+                        <Title level={2} style={{ marginBottom: 0 }}>{messages.pages.userInfoDemo.title}</Title>
+                        <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                            {messages.pages.userInfoDemo.description}
+                        </Paragraph>
+                    </div>
+                    <Space direction="vertical" size={4}>
+                        {docLinks.map((link) => (
+                            <Typography.Link
+                                key={link.href}
+                                href={link.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {link.label}
+                            </Typography.Link>
+                        ))}
+                    </Space>
                 </Space>
             </Card>
 
             <Card>
-                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                        <CurrentUserProfile
-                            title={messages.pages.userInfoDemo.currentUserTitle}
-                            isAnonymousMode={isAnonymousMode}
-                            avatar={currentUser.avatar}
-                            anonymousIdText={messages.pages.userInfoDemo.anonymousUserHint}
-                            anonymousNicknameText={messages.pages.userInfoDemo.anonymousUserLabel}
-                            userIdLabel={messages.pages.userInfoDemo.currentUserIdLabel}
-                            userId={currentUser.visitorUid}
-                            userNicknameLabel={messages.pages.userInfoDemo.currentUserNicknameLabel}
-                            userNickname={currentUser.nickname}
-                        />
+                <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    <CurrentUserProfile
+                        title={messages.pages.userInfoDemo.currentUserTitle}
+                        isAnonymousMode={isAnonymousMode}
+                        avatar={currentUser.avatar}
+                        anonymousIdText={messages.pages.userInfoDemo.anonymousUserHint}
+                        anonymousNicknameText={messages.pages.userInfoDemo.anonymousUserLabel}
+                        userIdLabel={messages.pages.userInfoDemo.currentUserIdLabel}
+                        userId={currentUser.visitorUid}
+                        userNicknameLabel={messages.pages.userInfoDemo.currentUserNicknameLabel}
+                        userNickname={currentUser.nickname}
+                    />
 
-                        <Space wrap>
-                            {users.map((user) => (
-                                <Button
-                                    key={user.visitorUid}
-                                    type="primary"
-                                    onClick={() => {
-                                        if (!isAnonymousMode && selectedUser.key === user.key) {
-                                            return;
-                                        }
-                                        onAnonymousModeChange(false);
-                                        onSelectUser(user.key);
-                                    }}
-                                    style={!isAnonymousMode && selectedUser.key === user.key ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
-                                >
-                                    {formatSwitchUserLabel(user.nickname)}
-                                    {!isAnonymousMode && selectedUser.key === user.key ? '【当前】' : ''}
-                                </Button>
-                            ))}
+                    <Space wrap>
+                        {users.map((user) => (
                             <Button
-                                type={isAnonymousMode ? 'primary' : 'default'}
+                                key={user.visitorUid}
+                                type="primary"
                                 onClick={() => {
-                                    if (isAnonymousMode) {
+                                    if (!isAnonymousMode && selectedUser.key === user.key) {
                                         return;
                                     }
-                                    onAnonymousModeChange(true);
+                                    onAnonymousModeChange(false);
+                                    onSelectUser(user.key);
                                 }}
-                                style={isAnonymousMode ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
+                                style={!isAnonymousMode && selectedUser.key === user.key ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
                             >
-                                {messages.pages.userInfoDemo.switchAnonymousUserLabel}
-                                {isAnonymousMode ? '【当前】' : ''}
+                                {formatSwitchUserLabel(user.nickname)}
+                                {!isAnonymousMode && selectedUser.key === user.key ? '【当前】' : ''}
                             </Button>
-                        </Space>
-                        <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                            <Button type="primary" size="large" onClick={handleShowChat}>
-                                {messages.pages.userInfoDemo.contactSupport}
-                            </Button>
-                        </div>
+                        ))}
+                        <Button
+                            type={isAnonymousMode ? 'primary' : 'default'}
+                            onClick={() => {
+                                if (isAnonymousMode) {
+                                    return;
+                                }
+                                onAnonymousModeChange(true);
+                            }}
+                            style={isAnonymousMode ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
+                        >
+                            {messages.pages.userInfoDemo.switchAnonymousUserLabel}
+                            {isAnonymousMode ? '【当前】' : ''}
+                        </Button>
                     </Space>
-                </Card>
+                    <Space wrap>
+                        <Button type="primary" onClick={handleShowChat}>{messages.common.buttons.openChat}</Button>
+                        <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
+                    </Space>
+                </Space>
+            </Card>
 
-                <Card>
-                    <Title level={4}>{messages.pages.userInfoDemo.controlPanel.title}</Title>
-                    <Divider />
-                    <Row gutter={[16, 16]}>
-                        <Col span={12}>
-                            <Card size="small" title={messages.pages.userInfoDemo.controlPanel.chatWindow}>
-                                <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                                    <Space>
-                                        <Button onClick={handleShowChat}>{messages.common.buttons.openChat}</Button>
-                                        <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
-                                    </Space>
-                                    <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        {formatApiHint('bytedesk.showChat() / bytedesk.hideChat()')}
-                                    </Typography.Text>
-                                </Space>
-                            </Card>
-                        </Col>
-                        <Col span={12}>
-                            <Card size="small" title={messages.pages.userInfoDemo.controlPanel.button}>
-                                <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                                    <Space>
-                                        <Button onClick={handleShowButton}>{messages.common.buttons.showButton}</Button>
-                                        <Button onClick={handleHideButton}>{messages.common.buttons.hideButton}</Button>
-                                    </Space>
-                                    <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        {formatApiHint('bytedesk.showButton() / bytedesk.hideButton()')}
-                                    </Typography.Text>
-                                </Space>
-                            </Card>
-                        </Col>
-                        <Col span={12}>
-                            <Card size="small" title={messages.pages.userInfoDemo.controlPanel.bubble}>
-                                <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                                    <Space>
-                                        <Button onClick={handleShowBubble}>{messages.common.buttons.showBubble}</Button>
-                                        <Button onClick={handleHideBubble}>{messages.common.buttons.hideBubble}</Button>
-                                    </Space>
-                                    <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        {formatApiHint('bytedesk.showBubble() / bytedesk.hideBubble()')}
-                                    </Typography.Text>
-                                </Space>
-                            </Card>
-                        </Col>
-                        <Col span={12}>
-                            <Card size="small" title={messages.pages.userInfoDemo.controlPanel.invite}>
-                                <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                                    <Space>
-                                        <Button onClick={handleShowInviteDialog}>{messages.common.buttons.showInvite}</Button>
-                                        <Button onClick={handleHideInviteDialog}>{messages.common.buttons.hideInvite}</Button>
-                                    </Space>
-                                    <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        {formatApiHint('bytedesk.showInviteDialog() / bytedesk.hideInviteDialog()')}
-                                    </Typography.Text>
-                                </Space>
-                            </Card>
-                        </Col>
-                    </Row>
-                </Card>
+            <Card title={messages.pages.userInfoDemo.urlGuideTitle}>
+                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                    <Typography.Text strong>{messages.pages.userInfoDemo.urlTemplateLabel}</Typography.Text>
+                    <Typography.Paragraph copyable={{ text: urlTemplate }} style={{ marginBottom: 0 }}>
+                        <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{urlTemplate}</pre>
+                    </Typography.Paragraph>
 
-                <BytedeskReact {...config} />
+                    <Typography.Text strong>{messages.pages.userInfoDemo.urlParamsTitle}</Typography.Text>
+                    <List
+                        size="small"
+                        dataSource={urlParams}
+                        renderItem={(item) => <List.Item>{item}</List.Item>}
+                    />
+
+                    <Typography.Text strong>{messages.pages.userInfoDemo.sampleUrlLabel}</Typography.Text>
+                    <Typography.Paragraph copyable={{ text: sampleUrl }} style={{ marginBottom: 0 }}>
+                        <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
+                    </Typography.Paragraph>
+                </Space>
+            </Card>
+
+            <BytedeskReact {...config} />
         </PageContainer>
     );
 };

@@ -20,7 +20,7 @@ export default defineConfig({
   base: '/reactdemo',
   plugins: [react()],
   server: {
-    port: 9020
+    port: 9021
   },
   resolve: {
     alias: {

@@ -1135,6 +1135,8 @@ export default class BytedeskWeb {
 
     // 创建聊天界面
     const iframe = document.createElement("iframe");
+    // Allow speech input and related browser capabilities in embedded chat.
+    iframe.setAttribute("allow", "microphone *; camera *; autoplay *; clipboard-write *");
     iframe.style.cssText = `
       width: 100%;
       height: 100%;

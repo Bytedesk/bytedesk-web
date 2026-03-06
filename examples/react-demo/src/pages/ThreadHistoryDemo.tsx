@@ -75,8 +75,7 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, o
 
   const docLinks = useMemo(
     () => [
-      { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/channel/react', label: messages.pages.threadHistoryDemo.docLinks.reactDoc },
-    //   { href: 'https://github.com/Bytedesk/bytedesk-1x/frontend/apps/visitor/src/pages/Thread/index.tsx', label: messages.pages.threadHistoryDemo.docLinks.visitorRef },
+      { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/thread_history', label: messages.pages.threadHistoryDemo.docLinks.threadDoc },
       { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/ThreadHistoryDemo.tsx', label: messages.pages.threadHistoryDemo.docLinks.reactExample }
     ],
     [messages]

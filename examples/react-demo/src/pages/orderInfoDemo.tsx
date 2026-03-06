@@ -14,7 +14,7 @@
  */
 
 import { useMemo } from 'react';
-import { Button, Card, Typography, Space, Image, Divider, Row, Col, Tag, Steps, Descriptions } from 'antd';
+import { Button, Card, Typography, Space, Image, Divider, Row, Col, Tag, Steps, Descriptions, List } from 'antd';
 import type { StepProps } from 'antd/es/steps';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
@@ -107,7 +107,7 @@ const OrderInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: Dem
 
   const docLinks = useMemo(
     () => [
-      { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/orderinfo', label: messages.pages.orderInfoDemo.docLinks.orderDoc },
+      { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/order_info', label: messages.pages.orderInfoDemo.docLinks.orderDoc },
       { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/OrderInfoDemo.tsx', label: messages.pages.orderInfoDemo.docLinks.reactExample },
       { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/orderInfoDemo.vue', label: messages.pages.orderInfoDemo.docLinks.vueExample }
     ],
@@ -187,6 +187,49 @@ const OrderInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: Dem
 
   const handleShowChat = () => (window as any).bytedesk?.showChat();
   const handleHideChat = () => (window as any).bytedesk?.hideChat();
+
+  const urlTemplate = useMemo(() => {
+    return '{{BASE_URL}}/chat?org=df_org_uid&t=1&sid=df_wg_aftersales&visitorUid=visitor_001&nickname=访客小明&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&orderInfo=%7B...%7D&extra=%7B...%7D&lang=zh-cn&mode=light';
+  }, []);
+
+  const sampleUrl = useMemo(() => {
+    const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/chat(?:\/thread)?\/?$/, '');
+    const params = new URLSearchParams();
+    const appendIfPresent = (key: string, value: string | undefined) => {
+      if (value) {
+        params.append(key, value);
+      }
+    };
+
+    params.append('org', config.chatConfig?.org || '');
+    params.append('t', String(config.chatConfig?.t || '1'));
+    params.append('sid', String(config.chatConfig?.sid || ''));
+    appendIfPresent('visitorUid', config.chatConfig?.visitorUid);
+    appendIfPresent('nickname', config.chatConfig?.nickname);
+    appendIfPresent('avatar', config.chatConfig?.avatar);
+    appendIfPresent('orderInfo', String(config.chatConfig?.orderInfo || ''));
+    appendIfPresent('extra', String(config.chatConfig?.extra || ''));
+    params.append('lang', locale);
+    params.append('mode', String(themeMode || 'light'));
+    return `${baseHtmlUrl}/chat?${params.toString()}`;
+  }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
+
+  const urlParams = messages.pages.orderInfoDemo.urlParams;
+
+  const orderInfoPayload = useMemo(() => ({
+    uid: currentOrder.uid,
+    time: currentOrder.time,
+    status: currentOrder.status,
+    statusText: currentOrder.statusText,
+    goods: currentOrder.goods,
+    totalAmount: currentOrder.totalAmount,
+    shippingAddress: currentOrder.shippingAddress,
+    paymentMethod: currentOrder.paymentMethod,
+    extra: currentOrder.extra
+  }), [currentOrder]);
+
+  const orderInfoJson = useMemo(() => JSON.stringify(orderInfoPayload), [orderInfoPayload]);
+  const orderInfoEncoded = useMemo(() => encodeURIComponent(orderInfoJson), [orderInfoJson]);
 
   return (
     <PageContainer>
@@ -292,6 +335,53 @@ const OrderInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: Dem
             </Card>
           </Col>
         </Row>
+      </Card>
+
+      <Card title={messages.pages.orderInfoDemo.urlGuideTitle}>
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Text strong>{messages.pages.orderInfoDemo.urlTemplateLabel}</Typography.Text>
+          <Typography.Paragraph copyable={{ text: urlTemplate }} style={{ marginBottom: 0 }}>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{urlTemplate}</pre>
+          </Typography.Paragraph>
+
+          <Typography.Text strong>{messages.pages.orderInfoDemo.urlParamsTitle}</Typography.Text>
+          <List
+            size="small"
+            dataSource={urlParams}
+            renderItem={(item) => <List.Item>{item}</List.Item>}
+          />
+
+          <Typography.Text strong>{messages.pages.orderInfoDemo.sampleUrlLabel}</Typography.Text>
+          <Typography.Paragraph copyable={{ text: sampleUrl }} style={{ marginBottom: 0 }}>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
+          </Typography.Paragraph>
+        </Space>
+      </Card>
+
+      <Card title={messages.pages.orderInfoDemo.payloadGuideTitle}>
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Text strong>{messages.pages.orderInfoDemo.payloadObjectLabel}</Typography.Text>
+          <Typography.Paragraph copyable={{ text: JSON.stringify(orderInfoPayload, null, 2) }} style={{ marginBottom: 0 }}>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{JSON.stringify(orderInfoPayload, null, 2)}</pre>
+          </Typography.Paragraph>
+
+          <Typography.Text strong>{messages.pages.orderInfoDemo.payloadJsonLabel}</Typography.Text>
+          <Typography.Paragraph copyable={{ text: orderInfoJson }} style={{ marginBottom: 0 }}>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{orderInfoJson}</pre>
+          </Typography.Paragraph>
+
+          <Typography.Text strong>{messages.pages.orderInfoDemo.payloadEncodedLabel}</Typography.Text>
+          <Typography.Paragraph copyable={{ text: orderInfoEncoded }} style={{ marginBottom: 0 }}>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{orderInfoEncoded}</pre>
+          </Typography.Paragraph>
+
+          <List
+            size="small"
+            header={messages.pages.orderInfoDemo.payloadNotesTitle}
+            dataSource={messages.pages.orderInfoDemo.payloadNotes}
+            renderItem={(item) => <List.Item>{item}</List.Item>}
+          />
+        </Space>
       </Card>
 
       <BytedeskReact {...config} />

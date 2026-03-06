@@ -227,7 +227,7 @@ const App = () => {
 
 ```bash
 yarn install 
-yarn demo:react    # Run React demo
+yarn demo:react    # Run React demo 
 yarn demo:vue      # Run Vue demo
 yarn demo:svelte   # Run Svelte demo
 yarn demo:vanilla  # Run Vanilla JS demo

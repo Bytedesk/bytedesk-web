@@ -103,6 +103,20 @@ export const en = {
         bubble: 'Bubble controls',
         invite: 'Invite dialog controls'
       },
+      urlGuideTitle: 'URL + Query usage',
+      urlTemplateLabel: 'Generic URL template',
+      urlParamsTitle: 'Parameter reference (for /chat)',
+      urlParams: [
+        'org: organization ID (required)',
+        't: session type (0: one-to-one, 1: workgroup, 2: bot)',
+        'sid: target thread ID (workgroup/bot/agent)',
+        'visitorUid: custom visitor ID (recommended)',
+        'nickname/avatar: visitor profile (optional)',
+        'mobile/email/note: extra visitor info (optional)',
+        'extra: custom extension field, pass JSON string (optional)',
+        'lang/mode: locale and theme mode (optional)'
+      ],
+      sampleUrlLabel: 'Generated sample URL from current config',
       apiHintPrefix: 'API calls:',
       users: {
         user1: 'Visitor Xiao Ming',
@@ -133,7 +147,32 @@ export const en = {
       controlPanel: {
         title: 'Bytedesk Control Panel',
         chatWindow: 'Chat window controls'
-      }
+      },
+      urlGuideTitle: 'URL + Query usage',
+      urlTemplateLabel: 'Generic URL template',
+      urlParamsTitle: 'Parameter reference (for /chat)',
+      urlParams: [
+        'org: organization ID (required)',
+        't: session type (0: one-to-one, 1: workgroup, 2: bot)',
+        'sid: target thread ID (workgroup/bot/agent)',
+        'visitorUid: custom visitor ID (optional)',
+        'nickname/avatar: visitor profile (optional)',
+        'goodsInfo: goods payload as JSON string (recommended)',
+        'extra: extension payload as JSON string (optional)',
+        'lang/mode: locale and theme mode (optional)'
+      ],
+      sampleUrlLabel: 'Generated sample URL from current config',
+      payloadGuideTitle: 'goodsInfo composition and conversion',
+      payloadObjectLabel: 'Step 1: business object',
+      payloadJsonLabel: 'Step 2: JSON string (JSON.stringify)',
+      payloadEncodedLabel: 'Step 3: URL-encoded value (encodeURIComponent)',
+      payloadNotesTitle: 'Notes',
+      payloadNotes: [
+        'Build goodsInfo as an object first, then serialize it with JSON.stringify before passing to chatConfig.',
+        'For direct URL integration, pass encoded goodsInfo; URLSearchParams in SDK flow encodes automatically.',
+        'goodsInfo.extra is usually a JSON string for extra fields such as SKU and stock.',
+        'Keep key fields (uid/title/image/price) when payload gets large to avoid oversized URLs.'
+      ]
     },
     orderInfoDemo: {
       title: 'Order Info Integration Demo',
@@ -166,7 +205,32 @@ export const en = {
         paid: 'Paid',
         shipped: 'Shipped',
         delivered: 'Delivered'
-      }
+      },
+      urlGuideTitle: 'URL + Query usage',
+      urlTemplateLabel: 'Generic URL template',
+      urlParamsTitle: 'Parameter reference (for /chat)',
+      urlParams: [
+        'org: organization ID (required)',
+        't: session type (0: one-to-one, 1: workgroup, 2: bot)',
+        'sid: target thread ID (workgroup/bot/agent)',
+        'visitorUid: custom visitor ID (optional)',
+        'nickname/avatar: visitor profile (optional)',
+        'orderInfo: order payload as JSON string (recommended)',
+        'extra: extension payload as JSON string (optional)',
+        'lang/mode: locale and theme mode (optional)'
+      ],
+      sampleUrlLabel: 'Generated sample URL from current config',
+      payloadGuideTitle: 'orderInfo composition and conversion',
+      payloadObjectLabel: 'Step 1: business object',
+      payloadJsonLabel: 'Step 2: JSON string (JSON.stringify)',
+      payloadEncodedLabel: 'Step 3: URL-encoded value (encodeURIComponent)',
+      payloadNotesTitle: 'Notes',
+      payloadNotes: [
+        'Build a complete order object first, then serialize it with JSON.stringify before passing to chatConfig.',
+        'For direct URL integration, pass encoded orderInfo; URLSearchParams in SDK flow encodes automatically.',
+        'Keep essential fields in orderInfo.goods and orderInfo.shippingAddress for faster agent context.',
+        'Use stable enum values for status (e.g. paid/shipped), and use statusText for display text.'
+      ]
     },
     vipLevelDemo: {
       title: 'Personalization Demo',
@@ -185,15 +249,39 @@ export const en = {
         user1: 'Standard profile',
         user2: 'VIP 1 profile',
         user3: 'VIP 2 profile'
-      }
+      },
+      urlGuideTitle: 'URL + Query usage',
+      urlTemplateLabel: 'Generic URL template',
+      urlParamsTitle: 'Parameter reference',
+      urlParams: [
+        'org: organization ID (required)',
+        't: session type (0: one-to-one, 1: workgroup, 2: bot)',
+        'sid: target thread ID (workgroup/bot/agent)',
+        'visitorUid: custom visitor ID (recommended)',
+        'nickname/avatar: visitor profile (optional)',
+        'vipLevel: visitor VIP level (recommend integer 0-10)',
+        'extra: JSON string for custom fields (optional)',
+        'lang/mode: locale and theme mode (optional)'
+      ],
+      sampleUrlLabel: 'Generated sample URL from current config',
+      payloadGuideTitle: 'vipLevel composition and conversion',
+      payloadObjectLabel: 'Step 1: business object',
+      payloadJsonLabel: 'Step 2: JSON string (JSON.stringify)',
+      payloadEncodedLabel: 'Step 3: URL-encoded value (encodeURIComponent)',
+      payloadNotesTitle: 'Notes',
+      payloadNotes: [
+        'Use stable integer levels for vipLevel (such as 0-10) to align with segmentation strategy.',
+        'Build extra as an object first, then serialize with JSON.stringify before passing to chatConfig.',
+        'For direct URL integration, pass encoded extra; URLSearchParams in SDK flow encodes automatically.',
+        'When level changes, reinitialize the widget or refresh thread parameters to apply the new profile.'
+      ]
     },
     unreadCountDemo: {
       title: 'Unread Counter Demo',
       description: 'Call getUnreadMessageCount and clearUnreadMessages to stay in sync with the current user state.',
       currentCount: 'Current unread count',
       docLinks: {
-        reactDoc: 'View React integration guide',
-        vueDoc: 'View Vue integration guide',
+        unreadDoc: 'View unread count integration guide',
         reactExample: 'React unread counter example',
         vueExample: 'Vue unread counter example'
       },
@@ -205,6 +293,25 @@ export const en = {
       usageNotes: [
         'Use getUnreadMessageCount() whenever you need a fresh total.',
         'Call clearUnreadMessages() after the customer reads messages.'
+      ],
+      urlGuideTitle: 'API URL + parameter usage',
+      countApiLabel: 'Unread count endpoint (GET)',
+      clearApiLabel: 'Clear unread endpoint (POST)',
+      urlParamsTitle: 'Shared parameters (same as SDK internals)',
+      urlParams: [
+        'uid: system visitor UID (from local BYTEDESK_UID)',
+        'visitorUid: custom visitor UID from frontend (optional, recommended)',
+        'orgUid: organization ID (from chatConfig.org)',
+        'client: client type (SDK appends WEB_FLOAT automatically)'
+      ],
+      sampleUrlLabel: 'Sample URL for unread count request',
+      sampleBodyLabel: 'Sample POST body for clearing unread',
+      apiNotesTitle: 'Implementation notes',
+      apiNotes: [
+        'getUnreadMessageCount() maps to GET /visitor/api/v1/message/unread/count.',
+        'clearUnreadMessages() maps to POST /visitor/api/v1/message/unread/clear.',
+        'SDK reads BYTEDESK_UID from localStorage and combines it with chatConfig.visitorUid/chatConfig.org.',
+        'When uid is empty, getUnreadMessageCount() returns 0 directly without sending request.'
       ]
     },
     threadHistoryDemo: {
@@ -232,7 +339,7 @@ export const en = {
       urlParamsTitle: 'Parameter reference (same as /chat)',
       urlParams: [
         'org: organization ID (required)',
-        't: thread type, 0/1/2',
+        't: session type (0: one-to-one, 1: workgroup, 2: bot)',
         'sid: target thread ID (workgroup/bot/agent)',
         'visitorUid: custom visitor ID (recommended)',
         'nickname/avatar: visitor profile (optional)',
@@ -240,7 +347,7 @@ export const en = {
       ],
       sampleUrlLabel: 'Generated sample URL from current config',
       docLinks: {
-        reactDoc: 'View React integration guide',
+        threadDoc: 'View thread history integration guide',
         visitorRef: 'Visitor ThreadList reference',
         reactExample: 'React thread history demo source'
       }

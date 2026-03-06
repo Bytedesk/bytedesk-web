@@ -103,6 +103,20 @@ export const zhTw = {
         bubble: '氣泡控制',
         invite: '邀請對話框控制'
       },
+      urlGuideTitle: 'URL + 參數使用說明',
+      urlTemplateLabel: '通用 URL 範本',
+      urlParamsTitle: '參數說明（用於 /chat）',
+      urlParams: [
+        'org：組織 ID（必填）',
+        't：會話類型（0：一對一，1：工作組，2：機器人）',
+        'sid：會話目標 ID（工作組/機器人/客服）',
+        'visitorUid：自訂訪客 ID（建議）',
+        'nickname/avatar：訪客顯示資訊（選填）',
+        'mobile/email/note：使用者附加資訊（選填）',
+        'extra：自訂擴充欄位，建議傳 JSON 字串（選填）',
+        'lang/mode：語言與主題參數（選填）'
+      ],
+      sampleUrlLabel: '依目前設定產生的示例 URL',
       apiHintPrefix: '呼叫程式：',
       users: {
         user1: '訪客小明',
@@ -133,7 +147,32 @@ export const zhTw = {
       controlPanel: {
         title: '微語介面控制台',
         chatWindow: '聊天視窗控制'
-      }
+      },
+      urlGuideTitle: 'URL + 參數使用說明',
+      urlTemplateLabel: '通用 URL 範本',
+      urlParamsTitle: '參數說明（用於 /chat）',
+      urlParams: [
+        'org：組織 ID（必填）',
+        't：會話類型（0：一對一，1：工作組，2：機器人）',
+        'sid：會話目標 ID（工作組/機器人/客服）',
+        'visitorUid：自訂訪客 ID（選填）',
+        'nickname/avatar：訪客顯示資訊（選填）',
+        'goodsInfo：商品資訊 JSON 字串（建議）',
+        'extra：擴充欄位 JSON 字串（選填）',
+        'lang/mode：語言與主題參數（選填）'
+      ],
+      sampleUrlLabel: '依目前設定產生的示例 URL',
+      payloadGuideTitle: 'goodsInfo 參數組成與轉換',
+      payloadObjectLabel: 'Step 1：業務物件（Object）',
+      payloadJsonLabel: 'Step 2：JSON 字串（JSON.stringify）',
+      payloadEncodedLabel: 'Step 3：URL 編碼結果（encodeURIComponent）',
+      payloadNotesTitle: '轉換說明',
+      payloadNotes: [
+        '建議先以物件組裝 goodsInfo，再透過 JSON.stringify 傳入 chatConfig。',
+        'URL 直連可傳編碼後的 goodsInfo；使用 URLSearchParams 時會自動編碼。',
+        'goodsInfo.extra 通常為字串化 JSON，用於承載 sku、庫存等附加資訊。',
+        '若欄位過多，優先保留 uid/title/image/price 等核心欄位，避免 URL 過長。'
+      ]
     },
     orderInfoDemo: {
       title: '訂單資訊對接示範',
@@ -166,7 +205,32 @@ export const zhTw = {
         paid: '已付款',
         shipped: '已出貨',
         delivered: '已完成'
-      }
+      },
+      urlGuideTitle: 'URL + 參數使用說明',
+      urlTemplateLabel: '通用 URL 範本',
+      urlParamsTitle: '參數說明（用於 /chat）',
+      urlParams: [
+        'org：組織 ID（必填）',
+        't：會話類型（0：一對一，1：工作組，2：機器人）',
+        'sid：會話目標 ID（工作組/機器人/客服）',
+        'visitorUid：自訂訪客 ID（選填）',
+        'nickname/avatar：訪客顯示資訊（選填）',
+        'orderInfo：訂單資訊 JSON 字串（建議）',
+        'extra：擴充欄位 JSON 字串（選填）',
+        'lang/mode：語言與主題參數（選填）'
+      ],
+      sampleUrlLabel: '依目前設定產生的示例 URL',
+      payloadGuideTitle: 'orderInfo 參數組成與轉換',
+      payloadObjectLabel: 'Step 1：業務物件（Object）',
+      payloadJsonLabel: 'Step 2：JSON 字串（JSON.stringify）',
+      payloadEncodedLabel: 'Step 3：URL 編碼結果（encodeURIComponent）',
+      payloadNotesTitle: '轉換說明',
+      payloadNotes: [
+        '建議先組裝完整訂單物件，再透過 JSON.stringify 傳入 chatConfig。',
+        'URL 直連可傳編碼後的 orderInfo；使用 URLSearchParams 時會自動編碼。',
+        '建議在 orderInfo.goods 與 shippingAddress 中保留核心欄位，便於客服快速定位問題。',
+        'status 建議使用穩定列舉值（如 paid/shipped），statusText 用於顯示文案。'
+      ]
     },
     vipLevelDemo: {
       title: '千人千面示範',
@@ -185,15 +249,39 @@ export const zhTw = {
         user1: '一般體驗帳號',
         user2: 'VIP1 體驗帳號',
         user3: 'VIP2 體驗帳號'
-      }
+      },
+      urlGuideTitle: 'URL + 參數使用說明',
+      urlTemplateLabel: '通用 URL 範本',
+      urlParamsTitle: '參數說明',
+      urlParams: [
+        'org：組織 ID（必填）',
+        't：會話類型（0：一對一，1：工作組，2：機器人）',
+        'sid：會話目標 ID（工作組/機器人/客服）',
+        'visitorUid：自訂訪客 ID（建議）',
+        'nickname/avatar：訪客顯示資訊（選填）',
+        'vipLevel：訪客 VIP 等級（建議 0-10 整數）',
+        'extra：擴展欄位 JSON 字串（選填）',
+        'lang/mode：語言與主題參數（選填）'
+      ],
+      sampleUrlLabel: '依目前設定產生的示例 URL',
+      payloadGuideTitle: 'vipLevel 參數組成與轉換',
+      payloadObjectLabel: 'Step 1：業務物件（Object）',
+      payloadJsonLabel: 'Step 2：JSON 字串（JSON.stringify）',
+      payloadEncodedLabel: 'Step 3：URL 編碼結果（encodeURIComponent）',
+      payloadNotesTitle: '轉換說明',
+      payloadNotes: [
+        'vipLevel 建議使用穩定整數等級（如 0-10），便於客服端套用分層策略。',
+        'extra 建議先組裝為物件，再透過 JSON.stringify 傳入 chatConfig。',
+        'URL 直連可傳編碼後的 extra；使用 URLSearchParams 時會自動編碼。',
+        '當會員等級變更時，建議重新初始化元件或刷新會話參數。'
+      ]
     },
     unreadCountDemo: {
       title: '未讀訊息計數示範',
       description: '示範如何呼叫 getUnreadMessageCount 與 clearUnreadMessages 以同步目前使用者狀態。',
       currentCount: '目前未讀數',
       docLinks: {
-        reactDoc: '查看 React 集成文件',
-        vueDoc: '查看 Vue 集成文件',
+        unreadDoc: '查看未讀訊息對接文件',
         reactExample: 'React 未讀訊息範例程式',
         vueExample: 'Vue 未讀訊息範例程式'
       },
@@ -205,6 +293,25 @@ export const zhTw = {
       usageNotes: [
         '需要即時總數時呼叫 getUnreadMessageCount()。',
         '閱讀完成後可呼叫 clearUnreadMessages() 歸零未讀數。'
+      ],
+      urlGuideTitle: '介面 URL + 參數使用說明',
+      countApiLabel: '取得未讀數介面（GET）',
+      clearApiLabel: '清空未讀數介面（POST）',
+      urlParamsTitle: '共用參數說明（與 SDK 內部實作一致）',
+      urlParams: [
+        'uid：系統訪客 UID（來自本地 BYTEDESK_UID）',
+        'visitorUid：前端自訂訪客 UID（選填，建議傳）',
+        'orgUid：組織 ID（來自 chatConfig.org）',
+        'client：客戶端類型（SDK 內部固定追加 WEB_FLOAT）'
+      ],
+      sampleUrlLabel: '取得未讀數示例請求 URL',
+      sampleBodyLabel: '清空未讀數示例請求體（POST Body）',
+      apiNotesTitle: '實作說明',
+      apiNotes: [
+        'getUnreadMessageCount() 對應 GET /visitor/api/v1/message/unread/count。',
+        'clearUnreadMessages() 對應 POST /visitor/api/v1/message/unread/clear。',
+        'SDK 會先從 localStorage 讀取 BYTEDESK_UID，再結合 chatConfig.visitorUid/chatConfig.org 組裝參數。',
+        '當 uid 為空時，getUnreadMessageCount() 會直接回傳 0，不會發送請求。'
       ]
     },
     threadHistoryDemo: {
@@ -232,7 +339,7 @@ export const zhTw = {
       urlParamsTitle: '參數說明（與 /chat 一致）',
       urlParams: [
         'org：組織 ID（必填）',
-        't：會話類型，0/1/2',
+        't：會話類型（0：一對一，1：工作組，2：機器人）',
         'sid：會話目標 ID（工作組/機器人/客服）',
         'visitorUid：自訂訪客 ID（建議）',
         'nickname/avatar：訪客顯示資訊（選填）',
@@ -240,7 +347,7 @@ export const zhTw = {
       ],
       sampleUrlLabel: '依目前設定產生的示例 URL',
       docLinks: {
-        reactDoc: '查看 React 集成文件',
+        threadDoc: '查看歷史會話對接文件',
         visitorRef: '參考 visitor ThreadList 實作',
         reactExample: 'React 歷史會話示範原始碼'
       }

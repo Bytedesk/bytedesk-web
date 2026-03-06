@@ -103,6 +103,20 @@ export const zhCn = {
         bubble: '气泡消息控制',
         invite: '邀请对话框控制'
       },
+      urlGuideTitle: 'URL + 参数调用说明',
+      urlTemplateLabel: '通用 URL 模板',
+      urlParamsTitle: '参数说明（用于 /chat）',
+      urlParams: [
+        'org：组织 ID（必填）',
+        't：会话类型（0：一对一，1：工作组，2：机器人）',
+        'sid：会话目标 ID（工作组/机器人/客服）',
+        'visitorUid：自定义访客 ID（推荐）',
+        'nickname/avatar：访客展示信息（可选）',
+        'mobile/email/note：用户附加信息（可选）',
+        'extra：自定义扩展字段，建议传 JSON 字符串（可选）',
+        'lang/mode：语言与主题参数（可选）'
+      ],
+      sampleUrlLabel: '当前配置生成的示例 URL',
       apiHintPrefix: '调用代码：',
       users: {
         user1: '访客小明',
@@ -133,7 +147,32 @@ export const zhCn = {
       controlPanel: {
         title: '微语接口控制面板',
         chatWindow: '聊天窗口控制'
-      }
+      },
+      urlGuideTitle: 'URL + 参数调用说明',
+      urlTemplateLabel: '通用 URL 模板',
+      urlParamsTitle: '参数说明（用于 /chat）',
+      urlParams: [
+        'org：组织 ID（必填）',
+        't：会话类型（0：一对一，1：工作组，2：机器人）',
+        'sid：会话目标 ID（工作组/机器人/客服）',
+        'visitorUid：自定义访客 ID（可选）',
+        'nickname/avatar：访客展示信息（可选）',
+        'goodsInfo：商品信息 JSON 字符串（推荐）',
+        'extra：扩展字段 JSON 字符串（可选）',
+        'lang/mode：语言与主题参数（可选）'
+      ],
+      sampleUrlLabel: '当前配置生成的示例 URL',
+      payloadGuideTitle: 'goodsInfo 参数组成与转换',
+      payloadObjectLabel: 'Step 1：业务对象（Object）',
+      payloadJsonLabel: 'Step 2：JSON 字符串（JSON.stringify）',
+      payloadEncodedLabel: 'Step 3：URL 编码结果（encodeURIComponent）',
+      payloadNotesTitle: '转换说明',
+      payloadNotes: [
+        'goodsInfo 建议先按对象组装，再 JSON.stringify 后传入 chatConfig。',
+        'URL 直连场景可直接传编码后的 goodsInfo；SDK 内部使用 URLSearchParams 时会自动编码。',
+        'goodsInfo.extra 通常是字符串化 JSON，用于承载 sku/库存等附加字段。',
+        '若字段较多，优先保留 uid/title/image/price 等核心字段，避免 URL 过长。'
+      ]
     },
     orderInfoDemo: {
       title: '订单信息对接演示',
@@ -167,7 +206,32 @@ export const zhCn = {
         paid: '已支付',
         shipped: '已发货',
         delivered: '已完成'
-      }
+      },
+      urlGuideTitle: 'URL + 参数调用说明',
+      urlTemplateLabel: '通用 URL 模板',
+      urlParamsTitle: '参数说明（用于 /chat）',
+      urlParams: [
+        'org：组织 ID（必填）',
+        't：会话类型（0：一对一，1：工作组，2：机器人）',
+        'sid：会话目标 ID（工作组/机器人/客服）',
+        'visitorUid：自定义访客 ID（可选）',
+        'nickname/avatar：访客展示信息（可选）',
+        'orderInfo：订单信息 JSON 字符串（推荐）',
+        'extra：扩展字段 JSON 字符串（可选）',
+        'lang/mode：语言与主题参数（可选）'
+      ],
+      sampleUrlLabel: '当前配置生成的示例 URL',
+      payloadGuideTitle: 'orderInfo 参数组成与转换',
+      payloadObjectLabel: 'Step 1：业务对象（Object）',
+      payloadJsonLabel: 'Step 2：JSON 字符串（JSON.stringify）',
+      payloadEncodedLabel: 'Step 3：URL 编码结果（encodeURIComponent）',
+      payloadNotesTitle: '转换说明',
+      payloadNotes: [
+        'orderInfo 建议先组装完整订单对象，再 JSON.stringify 后传入 chatConfig。',
+        'URL 直连场景可传编码后的 orderInfo；使用 URLSearchParams 拼接时会自动编码。',
+        'orderInfo.goods 与 orderInfo.shippingAddress 建议保留关键字段，便于客服快速定位问题。',
+        'status 建议使用稳定枚举值（如 paid/shipped），statusText 用于展示文案。'
+      ]
     },
     vipLevelDemo: {
       title: '千人千面对接演示',
@@ -186,15 +250,39 @@ export const zhCn = {
         user1: '普通体验账号',
         user2: 'VIP1 体验账号',
         user3: 'VIP2 体验账号'
-      }
+      },
+      urlGuideTitle: 'URL + 参数调用说明',
+      urlTemplateLabel: '通用 URL 模板',
+      urlParamsTitle: '参数说明',
+      urlParams: [
+        'org：组织 ID（必填）',
+        't：会话类型（0：一对一，1：工作组，2：机器人）',
+        'sid：会话目标 ID（工作组/机器人/客服）',
+        'visitorUid：自定义访客 ID（推荐）',
+        'nickname/avatar：访客展示信息（可选）',
+        'vipLevel：访客 VIP 等级（建议传 0-10 的整数）',
+        'extra：扩展字段 JSON 字符串（可选）',
+        'lang/mode：语言与主题参数（可选）'
+      ],
+      sampleUrlLabel: '当前配置生成的示例 URL',
+      payloadGuideTitle: 'vipLevel 参数组成与转换',
+      payloadObjectLabel: 'Step 1：业务对象（Object）',
+      payloadJsonLabel: 'Step 2：JSON 字符串（JSON.stringify）',
+      payloadEncodedLabel: 'Step 3：URL 编码结果（encodeURIComponent）',
+      payloadNotesTitle: '转换说明',
+      payloadNotes: [
+        'vipLevel 建议使用稳定整数等级（如 0-10），便于客服侧命中分层策略。',
+        'extra 建议先组装对象，再 JSON.stringify 后传入 chatConfig。',
+        'URL 直连场景可传编码后的 extra；使用 URLSearchParams 拼接时会自动编码。',
+        '当用户等级变更时，建议重新初始化组件或刷新会话参数。'
+      ]
     },
     unreadCountDemo: {
       title: '微语未读消息计数示例',
       description: '演示如何调用 getUnreadMessageCount 与 clearUnreadMessages，保证页面与客服端状态一致。',
       currentCount: '当前未读消息数',
       docLinks: {
-        reactDoc: '查看 React 集成文档',
-        vueDoc: '查看 Vue 集成文档',
+        unreadDoc: '查看未读消息对接文档',
         reactExample: 'React 未读消息演示源码',
         vueExample: 'Vue 未读消息演示源码'
       },
@@ -206,6 +294,25 @@ export const zhCn = {
       usageNotes: [
         '在需要时调用 getUnreadMessageCount() 以获取最新未读数。',
         '阅读完成后可调用 clearUnreadMessages() 将未读数清零。'
+      ],
+      urlGuideTitle: '接口 URL + 参数调用说明',
+      countApiLabel: '获取未读数接口（GET）',
+      clearApiLabel: '清空未读数接口（POST）',
+      urlParamsTitle: '公共参数说明（与 SDK 内部实现一致）',
+      urlParams: [
+        'uid：系统访客 UID（来自本地 BYTEDESK_UID）',
+        'visitorUid：前端自定义访客 UID（可选，建议传）',
+        'orgUid：组织 ID（来自 chatConfig.org）',
+        'client：客户端类型（SDK 内部固定追加 WEB_FLOAT）'
+      ],
+      sampleUrlLabel: '获取未读数示例请求 URL',
+      sampleBodyLabel: '清空未读数示例请求体（POST Body）',
+      apiNotesTitle: '实现说明',
+      apiNotes: [
+        'getUnreadMessageCount() 对应 GET /visitor/api/v1/message/unread/count。',
+        'clearUnreadMessages() 对应 POST /visitor/api/v1/message/unread/clear。',
+        'SDK 会先从 localStorage 读取 BYTEDESK_UID，并结合 chatConfig.visitorUid/chatConfig.org 组装参数。',
+        '当 uid 为空时，getUnreadMessageCount() 会直接返回 0，不发起请求。'
       ]
     },
     threadHistoryDemo: {
@@ -233,7 +340,7 @@ export const zhCn = {
       urlParamsTitle: '参数说明（与 /chat 一致）',
       urlParams: [
         'org：组织 ID（必填）',
-        't：会话类型，0/1/2',
+        't：会话类型（0：一对一，1：工作组，2：机器人）',
         'sid：会话目标 ID（工作组/机器人/客服）',
         'visitorUid：自定义访客 ID（推荐）',
         'nickname/avatar：访客展示信息（可选）',
@@ -241,7 +348,7 @@ export const zhCn = {
       ],
       sampleUrlLabel: '当前配置生成的示例 URL',
       docLinks: {
-        reactDoc: '查看 React 集成文档',
+        threadDoc: '查看历史会话对接文档',
         visitorRef: '参考 visitor ThreadList 实现',
         reactExample: 'React 历史会话演示源码'
       }
