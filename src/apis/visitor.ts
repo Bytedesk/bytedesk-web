@@ -17,11 +17,13 @@ import request from "./request";
 
 // 第一步：初始化访客信息
 export async function initVisitor(params: VISITOR.VisitorRequest) {
+  const channel = params.channel || HTTP_CLIENT;
   return request<VISITOR.HttpInitResult>("/visitor/api/v1/init", {
     method: "POST",
     data: {
       ...params,
-      client: HTTP_CLIENT,
+      channel,
+      client: channel,
     },
   });
 }
@@ -29,21 +31,25 @@ export async function initVisitor(params: VISITOR.VisitorRequest) {
 
 // 第二步：请求会话
 export async function requestThread(params: VISITOR.VisitorRequest) {
+  const channel = params.channel || HTTP_CLIENT;
   return request<VISITOR.HttpThreadResult>("/visitor/api/v1/thread", {
     method: "POST",
     data: {
       ...params,
-      client: HTTP_CLIENT,
+      channel,
+      client: channel,
     },
   });
 }
 
 export async function browse(params: BROWSE.BrowseRequest) {
+  const channel = params.channel || HTTP_CLIENT;
   return request<BROWSE.HttpResult>("/visitor/api/v1/browse", {
     method: "POST",
     data: {
       ...params,
-      client: HTTP_CLIENT,
+      channel,
+      client: channel,
     },
   });
 }

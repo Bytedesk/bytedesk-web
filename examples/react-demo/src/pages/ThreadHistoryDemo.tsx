@@ -8,17 +8,19 @@ import { getLocaleMessages } from '../locales';
 import CurrentUserProfile from '../components/CurrentUserProfile';
 import PageContainer from '../components/PageContainer';
 import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
+import { formatChatConfigQuery, type DemoChatProfile } from '../types/chat-profile';
 
 interface DemoPageProps {
   locale: Language;
   themeMode: BytedeskTheme['mode'];
+  selectedChatProfile: DemoChatProfile;
   selectedUser: DemoUserProfile;
   isAnonymousMode: boolean;
   onSelectUser: (nextUser: DemoUserKey) => void;
   onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
-const ThreadHistoryDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
+const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = antdTheme.useToken();
   const users = useMemo(
@@ -56,9 +58,7 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, o
       height: 60
     },
     chatConfig: {
-      org: 'df_org_uid',
-      t: '1',
-      sid: 'df_wg_uid',
+      ...selectedChatProfile.chatConfig,
       ...(isAnonymousMode
         ? {}
         : {
@@ -71,7 +71,7 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, o
       mode: themeMode
     },
     locale
-  }), [isAnonymousMode, locale, messages, selectedUser, themeMode]);
+  }), [isAnonymousMode, locale, messages, selectedChatProfile, selectedUser, themeMode]);
 
   const docLinks = useMemo(
     () => [
@@ -82,8 +82,9 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, o
   );
 
   const urlTemplate = useMemo(() => {
-    return '{{BASE_URL}}/chat/thread?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=访客小明&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&lang=zh-cn&mode=light';
-  }, []);
+    const { org, t, sid } = selectedChatProfile.chatConfig;
+    return `{{BASE_URL}}/chat/thread?org=${org}&t=${t}&sid=${sid}&visitorUid=visitor_001&nickname=访客小明&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&lang=zh-cn&mode=light`;
+  }, [selectedChatProfile]);
 
   const sampleUrl = useMemo(() => {
     const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/chat(?:\/thread)?\/?$/, '');
@@ -106,6 +107,8 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, o
 
   const usageNotes = messages.pages.threadHistoryDemo.usageNotes;
   const urlParams = messages.pages.threadHistoryDemo.urlParams;
+  const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
+  const consultButtonLabel = '查看历史会话';
   const threadApiGuide = useMemo(() => {
     const endpoint = '/visitor/api/v1/threads';
     const apiHost = (config.apiUrl || 'https://{YOUR_API_HOST}').replace(/\/+$/, '');
@@ -221,14 +224,23 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, o
 
           <Space wrap>
             <Button type="primary" onClick={() => (window as any).bytedesk?.showChat()}>
-              {messages.pages.threadHistoryDemo.buttons.openHistoryPage}
+              {consultButtonLabel}
             </Button>
             <Button onClick={() => (window as any).bytedesk?.hideChat()}>{messages.common.buttons.closeChat}</Button>
           </Space>
 
-          <Typography.Text type="secondary">
-            {messages.common.apiHintPrefix} showChat() / hideChat()
-          </Typography.Text>
+          <Alert
+            type="info"
+            showIcon
+            message={`${messages.common.apiHintPrefix} showChat() / hideChat()`}
+            style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
+          />
+          <Alert
+            type="info"
+            showIcon
+            message={`咨询参数: ${chatConfigHint}`}
+            style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
+          />
 
           <List
             header={messages.pages.threadHistoryDemo.usageTitle}

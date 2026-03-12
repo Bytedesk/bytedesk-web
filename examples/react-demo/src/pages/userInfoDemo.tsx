@@ -15,7 +15,7 @@
  */
 
 import { useMemo } from 'react';
-import { Button, Card, Typography, Space, List, theme as antdTheme } from 'antd';
+import { Alert, Button, Card, Typography, Space, List, theme as antdTheme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -27,19 +27,21 @@ import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
 import CurrentUserProfile from '../components/CurrentUserProfile';
 import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
+import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 
 const { Title, Paragraph } = Typography;
 
 interface DemoPageProps {
     locale: Language;
     themeMode: BytedeskTheme['mode'];
+    selectedChatProfile: DemoChatProfile;
     selectedUser: DemoUserProfile;
     isAnonymousMode: boolean;
     onSelectUser: (nextUser: DemoUserKey) => void;
     onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
-const UserInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
+const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = antdTheme.useToken();
     const users = useMemo(() => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
@@ -78,9 +80,7 @@ const UserInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
             subtitle: messages.pages.basicDemo.bubbleSubtitle
         },
         chatConfig: {
-            org: 'df_org_uid', // 替换为您的组织ID
-            t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
-            sid: 'df_wg_uid', // 替换为您的SID
+            ...selectedChatProfile.chatConfig,
             // 传入用户信息
             ...(isAnonymousMode
                 ? {}
@@ -106,7 +106,7 @@ const UserInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
         onVisitorInfo: (uid: string, visitorUid: string) => {
             console.log('收到访客信息:', { uid, visitorUid });
         },
-    }), [locale, messages, isAnonymousMode, selectedUser, themeMode]);
+    }), [locale, messages, isAnonymousMode, selectedChatProfile, selectedUser, themeMode]);
 
     // Bytedesk 接口控制函数
     const handleShowChat = () => {
@@ -129,8 +129,9 @@ const UserInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
         messages.pages.userInfoDemo.switchToUserLabel.replace('{{name}}', name);
 
     const urlTemplate = useMemo(() => {
-        return '{{BASE_URL}}/chat?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=访客小明&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&mobile=13800138000&email=test%40test.com&note=test&lang=zh-cn&mode=light';
-    }, []);
+        const { org, t, sid } = selectedChatProfile.chatConfig;
+        return `{{BASE_URL}}/chat?org=${org}&t=${t}&sid=${sid}&visitorUid=visitor_001&nickname=访客小明&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&mobile=13800138000&email=test%40test.com&note=test&lang=zh-cn&mode=light`;
+    }, [selectedChatProfile]);
 
     const sampleUrl = useMemo(() => {
         const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/chat(?:\/thread)?\/?$/, '');
@@ -157,6 +158,8 @@ const UserInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
     }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
 
     const urlParams = messages.pages.userInfoDemo.urlParams;
+    const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
+    const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
 
     return (
         <PageContainer>
@@ -230,9 +233,10 @@ const UserInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
                         </Button>
                     </Space>
                     <Space wrap>
-                        <Button type="primary" onClick={handleShowChat}>{messages.common.buttons.openChat}</Button>
+                        <Button type="primary" onClick={handleShowChat}>{consultButtonLabel}</Button>
                         <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
                     </Space>
+                    <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }} />
                 </Space>
             </Card>
 

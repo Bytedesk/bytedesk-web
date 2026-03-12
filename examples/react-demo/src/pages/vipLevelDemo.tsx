@@ -15,7 +15,7 @@
  */
 
 import { useMemo } from 'react';
-import { Button, Card, Typography, Space, Tag, List, theme as antdTheme } from 'antd';
+import { Alert, Button, Card, Typography, Space, Tag, List, theme as antdTheme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -23,7 +23,8 @@ import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk
 import { getLocaleMessages } from '../locales';
 import CurrentUserProfile from '../components/CurrentUserProfile';
 import PageContainer from '../components/PageContainer';
-import type { DemoUserKey, DemoUserProfile } from '../types/demo-user';
+import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
+import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 
 const { Title, Paragraph } = Typography;
 
@@ -36,56 +37,25 @@ interface UserInfo {
     vipLevel: number;
 }
 
-type VipUserPreset = {
-    key: DemoUserKey;
-    visitorUid: string;
-    avatar: string;
-    vipLevel: number;
-    nicknameKey: DemoUserKey;
-};
-
-const USER_PRESETS: VipUserPreset[] = [
-    {
-        key: 'user1',
-        visitorUid: 'visitor_001',
-        avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
-        vipLevel: 0,
-        nicknameKey: 'user1'
-    },
-    {
-        key: 'user2',
-        visitorUid: 'visitor_002',
-        avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg',
-        vipLevel: 1,
-        nicknameKey: 'user2'
-    },
-    {
-        key: 'user3',
-        visitorUid: 'visitor_003',
-        avatar: 'https://weiyuai.cn/assets/images/avatar/03.jpg',
-        vipLevel: 2,
-        nicknameKey: 'user3'
-    }
-];
-
 interface DemoPageProps {
     locale: Language;
     themeMode: BytedeskTheme['mode'];
+    selectedChatProfile: DemoChatProfile;
     selectedUser: DemoUserProfile;
     isAnonymousMode: boolean;
     onSelectUser: (nextUser: DemoUserKey) => void;
     onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
-const VipLevelDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
+const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = antdTheme.useToken();
-    const users = useMemo<UserInfo[]>(() => USER_PRESETS.map((preset) => ({
-        key: preset.key,
-        visitorUid: preset.visitorUid,
-        avatar: preset.avatar,
-        vipLevel: preset.vipLevel,
-        nickname: messages.pages.vipLevelDemo.users[preset.nicknameKey]
+    const users = useMemo<UserInfo[]>(() => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
+        key,
+        visitorUid: DEMO_USER_PRESETS[key].visitorUid,
+        avatar: DEMO_USER_PRESETS[key].avatar,
+        vipLevel: DEMO_USER_PRESETS[key].vipLevel,
+        nickname: messages.pages.vipLevelDemo.users[key]
     })), [messages]);
     const currentUser = users.find((user) => user.key === selectedUser.key) || users[0];
     const docLinks = useMemo(
@@ -125,9 +95,7 @@ const VipLevelDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
             subtitle: messages.pages.basicDemo.bubbleSubtitle
         },
         chatConfig: {
-            org: 'df_org_uid',
-            t: "1",
-            sid: 'df_wg_uid',
+            ...selectedChatProfile.chatConfig,
             // 传入用户信息，包含vipLevel
             ...(isAnonymousMode
                 ? {}
@@ -147,7 +115,7 @@ const VipLevelDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
         theme: {
             mode: themeMode,
         },
-    }), [currentUser, isAnonymousMode, locale, messages, themeMode]);
+    }), [currentUser, isAnonymousMode, locale, messages, selectedChatProfile, themeMode]);
 
     // Bytedesk 接口控制函数
     const handleShowChat = () => {
@@ -181,8 +149,9 @@ const VipLevelDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
         messages.pages.vipLevelDemo.switchButtonLabel.replace('{{name}}', name);
 
     const urlTemplate = useMemo(() => {
-        return '{{BASE_URL}}/chat?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=普通体验账号&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&vipLevel=0&extra=%7B...%7D&lang=zh-cn&mode=light';
-    }, []);
+        const { org, t, sid } = selectedChatProfile.chatConfig;
+        return `{{BASE_URL}}/chat?org=${org}&t=${t}&sid=${sid}&visitorUid=visitor_001&nickname=普通体验账号&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&vipLevel=0&extra=%7B...%7D&lang=zh-cn&mode=light`;
+    }, [selectedChatProfile]);
 
     const sampleUrl = useMemo(() => {
         const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/chat(?:\/thread)?\/?$/, '');
@@ -218,6 +187,8 @@ const VipLevelDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
 
     const vipPayloadJson = useMemo(() => JSON.stringify(vipPayload), [vipPayload]);
     const vipPayloadEncoded = useMemo(() => encodeURIComponent(vipPayloadJson), [vipPayloadJson]);
+    const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
+    const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
 
     return (
         <PageContainer>
@@ -303,12 +274,15 @@ const VipLevelDemo = ({ locale, themeMode, selectedUser, isAnonymousMode, onSele
                     <div style={{ textAlign: 'center' }}>
                         <Space>
                             <Button type="primary" size="large" onClick={handleShowChat}>
-                                {messages.common.buttons.openChat}
+                                {consultButtonLabel}
                             </Button>
                             <Button size="large" onClick={handleHideChat}>
                                 {messages.common.buttons.closeChat}
                             </Button>
                         </Space>
+                        <div style={{ marginTop: 8 }}>
+                            <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }} />
+                        </div>
                     </div>
                 </Space>
             </Card>

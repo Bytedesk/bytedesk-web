@@ -10,17 +10,26 @@ export interface DemoUserProfile {
   nickname: string;
 }
 
-export const DEMO_USER_PRESETS: Record<DemoUserKey, Pick<DemoUserProfile, 'visitorUid' | 'avatar'>> = {
+export interface DemoUserPreset {
+  visitorUid: string;
+  avatar: string;
+  vipLevel: number;
+}
+
+export const DEMO_USER_PRESETS: Record<DemoUserKey, DemoUserPreset> = {
   user1: {
     visitorUid: 'visitor_001',
-    avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
+    avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
+    vipLevel: 0
   },
   user2: {
     visitorUid: 'visitor_002',
-    avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg'
+    avatar: 'https://weiyuai.cn/assets/images/avatar/01.jpg',
+    vipLevel: 1
   },
   user3: {
     visitorUid: 'visitor_003',
-    avatar: 'https://weiyuai.cn/assets/images/avatar/03.jpg'
+    avatar: 'https://weiyuai.cn/assets/images/avatar/03.jpg',
+    vipLevel: 2
   }
 };

@@ -2,318 +2,378 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-05-27 16:45:54
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-20 09:22:29
+ * @LastEditTime: 2026-03-11 10:40:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
- *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
- *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM –
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+ *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE
+ *  contact: 270580156@qq.com
  *  技术/商务联系：270580156@qq.com
- * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
+ * Copyright (c) 2025 by bytedesk.com, All Rights Reserved.
  */
-import { useMemo } from 'react';
-import { Button, Card, Typography, Space, Image, Divider, Row, Col, Tag, List } from 'antd';
+import { useMemo, useState } from 'react';
+import { Alert, Button, Card, Typography, Space, List, Tag, Select, Avatar } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
-// import { BytedeskReact } from 'bytedesk-web/react';
-// import { BytedeskConfig } from 'bytedesk-web';
 import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
 import type { DemoUserProfile } from '../types/demo-user';
+import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 
 const { Title, Paragraph, Text } = Typography;
 
-// 定义商品信息接口
-interface GoodsInfo {
-    uid: string;
-    title: string;
-    image: string;
-    description: string;
-    price: number;
-    url: string;
-    tagList: string[];
-    extra: string;
+interface DemoGoodsInfo {
+  uid: string;
+  title: string;
+  image: string;
+  description: string;
+  price: number;
+  url: string;
+  tagList: string[];
+  extra: string;
+  quantity: number;
+  shopUid: string;
+  shopDbUid: string;
 }
 
-const GOODS_BASE: Pick<GoodsInfo, 'uid' | 'image' | 'price' | 'url' | 'extra'> = {
-    uid: 'goods_001',
-    image: 'https://www.weiyuai.cn/assets/images/car/yu7.jpg',
-    price: 299900,
-    url: 'https://www.weiyuai.cn/assets/images/car/yu7.jpg',
-    extra: JSON.stringify({
-        extraText: 'goodsExtraText',
-        extraName: 'goodsExtraName'
-    })
-};
+interface DemoShop {
+  shopUid: string;
+  shopDbUid: string;
+  name: string;
+  goods: DemoGoodsInfo[];
+}
 
 interface DemoPageProps {
-    locale: Language;
-    themeMode: BytedeskTheme['mode'];
-    selectedUser: DemoUserProfile;
-    isAnonymousMode: boolean;
+  locale: Language;
+  themeMode: BytedeskTheme['mode'];
+  selectedChatProfile: DemoChatProfile;
+  selectedUser: DemoUserProfile;
+  isAnonymousMode: boolean;
 }
 
-const GoodsInfoDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: DemoPageProps) => {
-    const messages = useMemo(() => getLocaleMessages(locale), [locale]);
-    const currentGoods = useMemo<GoodsInfo>(() => ({
-        ...GOODS_BASE,
-        title: messages.pages.goodsInfoDemo.product.title,
-        description: messages.pages.goodsInfoDemo.product.description,
-        tagList: [...messages.pages.goodsInfoDemo.product.tags],
-        extra: GOODS_BASE.extra
-    }), [messages]);
+const GOODS_SHOPS: DemoShop[] = [
+  {
+    shopUid: 'shop_001',
+    shopDbUid: 'df_org_uid_shop_001',
+    name: '仰望汽车官方旗舰店',
+    goods: [
+      {
+        uid: 'goods_001',
+        title: '比亚迪 仰望U7 豪华纯电动轿车',
+        image: 'https://www.weiyuai.cn/assets/images/car/yu7.jpg',
+        description: '旗舰纯电轿车，续航与智能驾驶兼顾。',
+        price: 299900,
+        url: 'https://www.weiyuai.cn/shop/shop_001/goods/goods_001',
+        tagList: ['新能源', '豪华轿车', '智能驾驶'],
+        extra: JSON.stringify({ sku: 'goods_001', from: 'demo' }),
+        quantity: 1,
+        shopUid: 'shop_001',
+        shopDbUid: 'df_org_uid_shop_001'
+      },
+      {
+        uid: 'goods_002',
+        title: '蔚来 ET7 行政版',
+        image: 'https://www.weiyuai.cn/assets/images/car/yu7.jpg',
+        description: '高性能智能电动轿车，支持高速 NOA。',
+        price: 428000,
+        url: 'https://www.weiyuai.cn/shop/shop_001/goods/goods_002',
+        tagList: ['新能源', '高性能'],
+        extra: JSON.stringify({ sku: 'goods_002', from: 'demo' }),
+        quantity: 1,
+        shopUid: 'shop_001',
+        shopDbUid: 'df_org_uid_shop_001'
+      },
+      {
+        uid: 'goods_003',
+        title: '理想 L9 Max 家庭旗舰SUV',
+        image: 'https://www.weiyuai.cn/assets/images/car/yu7.jpg',
+        description: '大空间家庭 SUV，舒适与智能兼备。',
+        price: 459800,
+        url: 'https://www.weiyuai.cn/shop/shop_001/goods/goods_003',
+        tagList: ['家庭SUV', '大空间'],
+        extra: JSON.stringify({ sku: 'goods_003', from: 'demo' }),
+        quantity: 1,
+        shopUid: 'shop_001',
+        shopDbUid: 'df_org_uid_shop_001'
+      }
+    ]
+  },
+  {
+    shopUid: 'shop_002',
+    shopDbUid: 'df_org_uid_shop_002',
+    name: '星驰数码商城',
+    goods: [
+      {
+        uid: 'goods_004',
+        title: '星驰 XBook Pro 16',
+        image: 'https://www.weiyuai.cn/assets/images/avatar/01.jpg',
+        description: '16寸高性能轻薄本。',
+        price: 9999,
+        url: 'https://www.weiyuai.cn/shop/shop_002/goods/goods_004',
+        tagList: ['笔记本', '轻薄'],
+        extra: JSON.stringify({ sku: 'goods_004', from: 'demo' }),
+        quantity: 1,
+        shopUid: 'shop_002',
+        shopDbUid: 'df_org_uid_shop_002'
+      },
+      {
+        uid: 'goods_005',
+        title: '星驰 NoiseCancel Pro 耳机',
+        image: 'https://www.weiyuai.cn/assets/images/avatar/02.jpg',
+        description: '旗舰主动降噪耳机。',
+        price: 1599,
+        url: 'https://www.weiyuai.cn/shop/shop_002/goods/goods_005',
+        tagList: ['耳机', '主动降噪'],
+        extra: JSON.stringify({ sku: 'goods_005', from: 'demo' }),
+        quantity: 1,
+        shopUid: 'shop_002',
+        shopDbUid: 'df_org_uid_shop_002'
+      },
+      {
+        uid: 'goods_006',
+        title: '星驰 34寸电竞显示器',
+        image: 'https://www.weiyuai.cn/assets/images/avatar/03.jpg',
+        description: '超宽曲面，165Hz 刷新率。',
+        price: 2699,
+        url: 'https://www.weiyuai.cn/shop/shop_002/goods/goods_006',
+        tagList: ['显示器', '电竞'],
+        extra: JSON.stringify({ sku: 'goods_006', from: 'demo' }),
+        quantity: 1,
+        shopUid: 'shop_002',
+        shopDbUid: 'df_org_uid_shop_002'
+      }
+    ]
+  },
+  {
+    shopUid: 'shop_003',
+    shopDbUid: 'df_org_uid_shop_003',
+    name: '山海家居生活馆',
+    goods: [
+      {
+        uid: 'goods_007',
+        title: '山海原木餐桌',
+        image: 'https://www.weiyuai.cn/assets/images/avatar/01.jpg',
+        description: '环保原木，4-6人用餐。',
+        price: 3299,
+        url: 'https://www.weiyuai.cn/shop/shop_003/goods/goods_007',
+        tagList: ['家具', '原木'],
+        extra: JSON.stringify({ sku: 'goods_007', from: 'demo' }),
+        quantity: 1,
+        shopUid: 'shop_003',
+        shopDbUid: 'df_org_uid_shop_003'
+      },
+      {
+        uid: 'goods_008',
+        title: '山海护脊人体工学椅',
+        image: 'https://www.weiyuai.cn/assets/images/avatar/02.jpg',
+        description: '久坐舒适，支撑性更好。',
+        price: 1899,
+        url: 'https://www.weiyuai.cn/shop/shop_003/goods/goods_008',
+        tagList: ['人体工学', '办公椅'],
+        extra: JSON.stringify({ sku: 'goods_008', from: 'demo' }),
+        quantity: 1,
+        shopUid: 'shop_003',
+        shopDbUid: 'df_org_uid_shop_003'
+      },
+      {
+        uid: 'goods_009',
+        title: '山海静音床垫',
+        image: 'https://www.weiyuai.cn/assets/images/avatar/03.jpg',
+        description: '静音减震，提升睡眠质量。',
+        price: 2599,
+        url: 'https://www.weiyuai.cn/shop/shop_003/goods/goods_009',
+        tagList: ['床垫', '家居'],
+        extra: JSON.stringify({ sku: 'goods_009', from: 'demo' }),
+        quantity: 1,
+        shopUid: 'shop_003',
+        shopDbUid: 'df_org_uid_shop_003'
+      }
+    ]
+  }
+];
 
-    // 配置客服组件
-    const config = useMemo<BytedeskConfig>(() => ({
-        isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
-        ...(process.env.NODE_ENV === 'development' ? { htmlUrl: 'http://127.0.0.1:9006' } : {}),
-        placement: 'bottom-right',
-        autoPopup: false,
-        inviteConfig: {
-            show: false,
-            text: messages.pages.userInfoDemo.inviteText,
-        },
-        marginBottom: 20,
-        marginSide: 20,
-        buttonConfig: {
-            show: false,
-        },
-        bubbleConfig: {
-            show: false,
-            icon: '🚗',
-            title: messages.pages.basicDemo.bubbleTitle,
-            subtitle: messages.pages.basicDemo.bubbleSubtitle
-        },
-        chatConfig: {
-            org: 'df_org_uid', // 替换为您的组织ID
-            t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
-            sid: 'df_wg_aftersales', // 替换为您的SID
-            // 自定义用户信息
-            ...(isAnonymousMode
-                ? {}
-                : {
-                    visitorUid: selectedUser.visitorUid,
-                    nickname: selectedUser.nickname,
-                    avatar: selectedUser.avatar
-                }),
-            // 商品信息通过自定义消息发送
-            goodsInfo: JSON.stringify({
-                uid: currentGoods.uid,
-                title: currentGoods.title,
-                image: currentGoods.image,
-                description: currentGoods.description,
-                price: currentGoods.price,
-                url: currentGoods.url,
-                tagList: currentGoods.tagList,
-                extra: currentGoods.extra
-            }),
-            // 自定义字段，可以传递任何字段
-            extra: JSON.stringify({
-                type: 'type',
-                test: 'test'
-            })
-        },
-        locale,
-        theme: {
-            mode: themeMode,
-        },
-    }), [currentGoods, isAnonymousMode, locale, messages, selectedUser, themeMode]);
+const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
+  const messages = useMemo(() => getLocaleMessages(locale), [locale]);
+  const [selectedShopUid, setSelectedShopUid] = useState<string>(GOODS_SHOPS[0].shopUid);
+  const selectedShop = useMemo(
+    () => GOODS_SHOPS.find((shop) => shop.shopUid === selectedShopUid) || GOODS_SHOPS[0],
+    [selectedShopUid]
+  );
+  const [selectedGoodsUid, setSelectedGoodsUid] = useState<string>(selectedShop.goods[0].uid);
 
-    // Bytedesk 接口控制函数
-    const handleShowChat = () => {
-        console.log("showChat");
-        (window as any).bytedesk?.showChat();
-    };
+  const selectedGoods = useMemo(() => {
+    const hit = selectedShop.goods.find((goods) => goods.uid === selectedGoodsUid);
+    return hit || selectedShop.goods[0];
+  }, [selectedGoodsUid, selectedShop]);
 
-    const handleHideChat = () => {
-        console.log("hideChat");
-        (window as any).bytedesk?.hideChat();
-    };
+  const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
+  const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
 
-    const docLinks = [
-        { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/goods_info', label: messages.pages.goodsInfoDemo.docLinks.goodsDoc },
-        { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/GoodsInfoDemo.tsx', label: messages.pages.goodsInfoDemo.docLinks.reactExample },
-        { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/goodsInfoDemo.vue', label: messages.pages.goodsInfoDemo.docLinks.vueExample }
-    ];
+  const goodsInfoPayload = useMemo(
+    () => ({
+      uid: selectedGoods.uid,
+      title: selectedGoods.title,
+      image: selectedGoods.image,
+      description: selectedGoods.description,
+      price: selectedGoods.price,
+      url: selectedGoods.url,
+      tagList: selectedGoods.tagList,
+      extra: selectedGoods.extra,
+      quantity: selectedGoods.quantity,
+      shopUid: selectedShop.shopUid,
+      shopDbUid: selectedShop.shopDbUid
+    }),
+    [selectedGoods, selectedShop]
+  );
 
-    const formatApiHint = (code: string) => `${messages.common.apiHintPrefix} ${code}`;
+  const config = useMemo<BytedeskConfig>(() => ({
+    isDebug: true,
+    ...(process.env.NODE_ENV === 'development'
+      ? {
+          htmlUrl: 'http://127.0.0.1:9006',
+          apiUrl: 'http://127.0.0.1:9003'
+        }
+      : {}),
+    placement: 'bottom-right',
+    autoPopup: false,
+    inviteConfig: {
+      show: false,
+      text: messages.pages.userInfoDemo.inviteText
+    },
+    marginBottom: 20,
+    marginSide: 20,
+    buttonConfig: {
+      show: false
+    },
+    bubbleConfig: {
+      show: false,
+      icon: '🚗',
+      title: messages.pages.basicDemo.bubbleTitle,
+      subtitle: messages.pages.basicDemo.bubbleSubtitle
+    },
+    chatConfig: {
+      ...selectedChatProfile.chatConfig,
+      ...(isAnonymousMode
+        ? {}
+        : {
+            visitorUid: selectedUser.visitorUid,
+            nickname: selectedUser.nickname,
+            avatar: selectedUser.avatar
+          }),
+      goodsInfo: JSON.stringify(goodsInfoPayload),
+      extra: JSON.stringify({
+        type: 'type',
+        test: 'test',
+        shopUid: selectedShop.shopUid,
+        shopDbUid: selectedShop.shopDbUid
+      })
+    },
+    locale,
+    theme: {
+      mode: themeMode
+    }
+  }), [goodsInfoPayload, isAnonymousMode, locale, messages.pages.basicDemo.bubbleSubtitle, messages.pages.basicDemo.bubbleTitle, messages.pages.userInfoDemo.inviteText, selectedChatProfile.chatConfig, selectedShop.shopDbUid, selectedShop.shopUid, selectedUser.avatar, selectedUser.nickname, selectedUser.visitorUid, themeMode]);
 
-    const urlTemplate = useMemo(() => {
-        return '{{BASE_URL}}/chat?org=df_org_uid&t=1&sid=df_wg_aftersales&visitorUid=visitor_001&nickname=访客小明&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&goodsInfo=%7B...%7D&extra=%7B...%7D&lang=zh-cn&mode=light';
-    }, []);
+  const handleShowChat = () => (window as any).bytedesk?.showChat();
+  const handleHideChat = () => (window as any).bytedesk?.hideChat();
 
-    const sampleUrl = useMemo(() => {
-        const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/chat(?:\/thread)?\/?$/, '');
-        const params = new URLSearchParams();
-        const appendIfPresent = (key: string, value: string | undefined) => {
-            if (value) {
-                params.append(key, value);
-            }
-        };
+  const handleConsultGoods = (uid: string) => {
+    setSelectedGoodsUid(uid);
+    setTimeout(() => {
+      (window as any).bytedesk?.showChat();
+    }, 0);
+  };
 
-        params.append('org', config.chatConfig?.org || '');
-        params.append('t', String(config.chatConfig?.t || '1'));
-        params.append('sid', String(config.chatConfig?.sid || ''));
-        appendIfPresent('visitorUid', config.chatConfig?.visitorUid);
-        appendIfPresent('nickname', config.chatConfig?.nickname);
-        appendIfPresent('avatar', config.chatConfig?.avatar);
-        appendIfPresent('goodsInfo', String(config.chatConfig?.goodsInfo || ''));
-        appendIfPresent('extra', String(config.chatConfig?.extra || ''));
-        params.append('lang', locale);
-        params.append('mode', String(themeMode || 'light'));
-        return `${baseHtmlUrl}/chat?${params.toString()}`;
-    }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
+  return (
+    <PageContainer>
+      <Card>
+        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+          <Title level={2} style={{ marginBottom: 0 }}>{messages.pages.goodsInfoDemo.title}</Title>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>{messages.pages.goodsInfoDemo.description}</Paragraph>
+        </Space>
+      </Card>
 
-    const urlParams = messages.pages.goodsInfoDemo.urlParams;
+      <Card title="店铺与商品（紧凑列表）">
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Space wrap>
+            <Text strong>当前店铺</Text>
+            <Select
+              style={{ minWidth: 280 }}
+              value={selectedShop.shopUid}
+              options={GOODS_SHOPS.map((shop) => ({ value: shop.shopUid, label: `${shop.name} (${shop.shopUid})` }))}
+              onChange={(value) => {
+                setSelectedShopUid(value);
+                const nextShop = GOODS_SHOPS.find((shop) => shop.shopUid === value) || GOODS_SHOPS[0];
+                setSelectedGoodsUid(nextShop.goods[0].uid);
+              }}
+            />
+            <Tag color="blue">shopUid: {selectedShop.shopUid}</Tag>
+            <Tag>shopDbUid: {selectedShop.shopDbUid}</Tag>
+          </Space>
 
-    const goodsInfoPayload = useMemo(() => ({
-        uid: currentGoods.uid,
-        title: currentGoods.title,
-        image: currentGoods.image,
-        description: currentGoods.description,
-        price: currentGoods.price,
-        url: currentGoods.url,
-        tagList: currentGoods.tagList,
-        extra: currentGoods.extra
-    }), [currentGoods]);
+          <List
+            size="small"
+            dataSource={selectedShop.goods}
+            renderItem={(item) => {
+              const active = item.uid === selectedGoods.uid;
+              return (
+                <List.Item
+                  style={{
+                    padding: 8,
+                    borderRadius: 8,
+                    background: active ? 'rgba(24, 144, 255, 0.08)' : undefined,
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setSelectedGoodsUid(item.uid)}
+                >
+                  <List.Item.Meta
+                    avatar={<Avatar shape="square" size={40} src={item.image} />}
+                    title={<span>{item.title}</span>}
+                    description={
+                      <Space size={8} wrap>
+                        <Button
+                          type={active ? 'primary' : 'default'}
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleConsultGoods(item.uid);
+                          }}
+                        >
+                          咨询该商品
+                        </Button>
+                        <Text type="secondary">{item.uid}</Text>
+                        <Text strong>¥{item.price.toLocaleString()}</Text>
+                        {item.tagList.slice(0, 2).map((tag) => (
+                          <Tag key={`${item.uid}-${tag}`}>{tag}</Tag>
+                        ))}
+                      </Space>
+                    }
+                  />
+                </List.Item>
+              );
+            }}
+          />
 
-    const goodsInfoJson = useMemo(() => JSON.stringify(goodsInfoPayload), [goodsInfoPayload]);
-    const goodsInfoEncoded = useMemo(() => encodeURIComponent(goodsInfoJson), [goodsInfoJson]);
+          <Space wrap>
+            <Button type="primary" onClick={handleShowChat}>{consultButtonLabel}</Button>
+            <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
+            <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} />
+          </Space>
+        </Space>
+      </Card>
 
-    return (
-        <PageContainer>
-                <Card>
-                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                        <div>
-                                <Title level={2} style={{ marginBottom: 0 }}>{messages.pages.goodsInfoDemo.title}</Title>
-                                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                                        {messages.pages.goodsInfoDemo.description}
-                                </Paragraph>
-                        </div>
-                        <Space direction="vertical" size={4}>
-                                {docLinks.map((link) => (
-                                        <Typography.Link
-                                            key={link.href}
-                                            href={link.href}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            {link.label}
-                                        </Typography.Link>
-                                ))}
-                        </Space>
-                    </Space>
-                </Card>
+      <Card title="当前发送的商品参数">
+        <Typography.Paragraph copyable={{ text: JSON.stringify(goodsInfoPayload, null, 2) }} style={{ marginBottom: 0 }}>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{JSON.stringify(goodsInfoPayload, null, 2)}</pre>
+        </Typography.Paragraph>
+      </Card>
 
-                <Card>
-                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                        <div>
-                            <Title level={4}>{messages.pages.goodsInfoDemo.infoCardTitle}</Title>
-                            <Row gutter={24}>
-                                <Col span={12}>
-                                    <Image
-                                        src={currentGoods.image}
-                                        alt={currentGoods.title}
-                                        style={{ width: '100%', borderRadius: '8px' }}
-                                    />
-                                </Col>
-                                <Col span={12}>
-                                    <Space direction="vertical" size="middle">
-                                        <Title level={3}>{currentGoods.title}</Title>
-                                        <Space>
-                                            {currentGoods.tagList.map((tag, index) => (
-                                                <Tag key={index} color="blue">{tag}</Tag>
-                                            ))}
-                                        </Space>
-                                        <Paragraph>
-                                            <Text strong>{messages.pages.goodsInfoDemo.descriptionLabel}：</Text> {currentGoods.description}
-                                        </Paragraph>
-                                        <Text strong style={{ fontSize: '24px', color: '#f5222d' }}>
-                                            {messages.pages.goodsInfoDemo.priceLabel}: ¥{currentGoods.price.toLocaleString()}
-                                        </Text>
-                                        <Button type="primary" size="large" onClick={handleShowChat}>
-                                            {messages.pages.goodsInfoDemo.contactSupport}
-                                        </Button>
-                                    </Space>
-                                </Col>
-                            </Row>
-                        </div>
-                    </Space>
-                </Card>
-
-                <Card>
-                    <Title level={4}>{messages.pages.goodsInfoDemo.controlPanel.title}</Title>
-                    <Divider />
-                    <Row gutter={[16, 16]}>
-                        <Col span={12}>
-                            <Card size="small" title={messages.pages.goodsInfoDemo.controlPanel.chatWindow}>
-                                <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                                    <Space>
-                                        <Button onClick={handleShowChat}>{messages.common.buttons.openChat}</Button>
-                                        <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
-                                    </Space>
-                                    <Typography.Text type="secondary" style={{ fontSize: '12px' }}>
-                                        {formatApiHint('bytedesk.showChat() / bytedesk.hideChat()')}
-                                    </Typography.Text>
-                                </Space>
-                            </Card>
-                        </Col>
-                    </Row>
-                </Card>
-
-                <Card title={messages.pages.goodsInfoDemo.urlGuideTitle}>
-                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                        <Typography.Text strong>{messages.pages.goodsInfoDemo.urlTemplateLabel}</Typography.Text>
-                        <Typography.Paragraph copyable={{ text: urlTemplate }} style={{ marginBottom: 0 }}>
-                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{urlTemplate}</pre>
-                        </Typography.Paragraph>
-
-                        <Typography.Text strong>{messages.pages.goodsInfoDemo.urlParamsTitle}</Typography.Text>
-                        <List
-                            size="small"
-                            dataSource={urlParams}
-                            renderItem={(item) => <List.Item>{item}</List.Item>}
-                        />
-
-                        <Typography.Text strong>{messages.pages.goodsInfoDemo.sampleUrlLabel}</Typography.Text>
-                        <Typography.Paragraph copyable={{ text: sampleUrl }} style={{ marginBottom: 0 }}>
-                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
-                        </Typography.Paragraph>
-                    </Space>
-                </Card>
-
-                <Card title={messages.pages.goodsInfoDemo.payloadGuideTitle}>
-                    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                        <Typography.Text strong>{messages.pages.goodsInfoDemo.payloadObjectLabel}</Typography.Text>
-                        <Typography.Paragraph copyable={{ text: JSON.stringify(goodsInfoPayload, null, 2) }} style={{ marginBottom: 0 }}>
-                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{JSON.stringify(goodsInfoPayload, null, 2)}</pre>
-                        </Typography.Paragraph>
-
-                        <Typography.Text strong>{messages.pages.goodsInfoDemo.payloadJsonLabel}</Typography.Text>
-                        <Typography.Paragraph copyable={{ text: goodsInfoJson }} style={{ marginBottom: 0 }}>
-                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{goodsInfoJson}</pre>
-                        </Typography.Paragraph>
-
-                        <Typography.Text strong>{messages.pages.goodsInfoDemo.payloadEncodedLabel}</Typography.Text>
-                        <Typography.Paragraph copyable={{ text: goodsInfoEncoded }} style={{ marginBottom: 0 }}>
-                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{goodsInfoEncoded}</pre>
-                        </Typography.Paragraph>
-
-                        <List
-                            size="small"
-                            header={messages.pages.goodsInfoDemo.payloadNotesTitle}
-                            dataSource={messages.pages.goodsInfoDemo.payloadNotes}
-                            renderItem={(item) => <List.Item>{item}</List.Item>}
-                        />
-                    </Space>
-                </Card>
-
-                <BytedeskReact {...config} />
-        </PageContainer>
-    );
+      <BytedeskReact {...config} />
+    </PageContainer>
+  );
 };
 
 export default GoodsInfoDemo;

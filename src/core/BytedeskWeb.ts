@@ -323,6 +323,7 @@ export default class BytedeskWeb {
             mobile: String(this.config.chatConfig?.mobile || ""),
             email: String(this.config.chatConfig?.email || ""),
             note: String(this.config.chatConfig?.note || ""),
+            channel: String(this.config.chatConfig?.channel || ""),
             extra:
               typeof this.config.chatConfig?.extra === "string"
                 ? this.config.chatConfig.extra
@@ -465,6 +466,7 @@ export default class BytedeskWeb {
           this.config.chatConfig?.uid || localUid || ""
         ),
         orgUid: this.config.chatConfig?.org || "",
+        channel: String(this.config.chatConfig?.channel || ""),
       };
 
       // 如果visitorUid为空，则不执行browse

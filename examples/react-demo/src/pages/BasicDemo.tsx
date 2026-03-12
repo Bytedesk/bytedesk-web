@@ -12,18 +12,21 @@ import type { BytedeskConfig, Language, Theme } from '@bytedesk/web/types';
 import InstallGuide from '../components/InstallGuide';
 import PageContainer from '../components/PageContainer';
 import { getLocaleMessages } from '../locales';
-import { Button, Card, Space, Typography, theme } from 'antd';
+import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
+import { Alert, Button, Card, Space, Typography, theme } from 'antd';
 
 const THEME_COLORS = ['#0066ff', '#f97316', '#10b981', '#8b5cf6'];
 
 interface BasicDemoProps {
   locale: Language;
   themeMode: Theme['mode'];
+  selectedChatProfile: DemoChatProfile;
 }
 
-const BasicDemo = ({ locale, themeMode }: BasicDemoProps) => {
+const BasicDemo = ({ locale, themeMode, selectedChatProfile }: BasicDemoProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = theme.useToken();
+  const [lastActionApiHint, setLastActionApiHint] = useState<string>('');
   const [config, setConfig] = useState<BytedeskConfig>(() => ({
     isDebug: false,
     ...(process.env.NODE_ENV === 'development'
@@ -56,9 +59,7 @@ const BasicDemo = ({ locale, themeMode }: BasicDemoProps) => {
       height: 60
     },
     chatConfig: {
-      org: 'df_org_uid',
-      t: '2',
-      sid: 'df_rt_uid'
+      ...selectedChatProfile.chatConfig
     },
     theme: {
       mode: themeMode || 'light',
@@ -83,9 +84,13 @@ const BasicDemo = ({ locale, themeMode }: BasicDemoProps) => {
         ...prevConfig.bubbleConfig,
         title: messages.pages.basicDemo.bubbleTitle,
         subtitle: messages.pages.basicDemo.bubbleSubtitle
+      },
+      chatConfig: {
+        ...(prevConfig.chatConfig || {}),
+        ...selectedChatProfile.chatConfig
       }
     }));
-  }, [locale, themeMode, messages]);
+  }, [locale, themeMode, messages, selectedChatProfile]);
 
   const handleInit = () => {
     console.log('BytedeskReact initialized BasicDemo');
@@ -106,6 +111,7 @@ const BasicDemo = ({ locale, themeMode }: BasicDemoProps) => {
         }
       };
     });
+    setLastActionApiHint('setConfig({ theme: { backgroundColor } })');
   };
 
   const handlePlacementToggle = () => {
@@ -113,6 +119,7 @@ const BasicDemo = ({ locale, themeMode }: BasicDemoProps) => {
       ...prevConfig,
       placement: prevConfig.placement === 'bottom-left' ? 'bottom-right' : 'bottom-left'
     }));
+    setLastActionApiHint('setConfig({ placement: "bottom-left" | "bottom-right" })');
   };
 
   const handleToggleLoadHistory = () => {
@@ -121,15 +128,12 @@ const BasicDemo = ({ locale, themeMode }: BasicDemoProps) => {
       return {
         ...prevConfig,
         chatConfig: {
-          ...(prevConfig.chatConfig || {
-            org: 'df_org_uid',
-            t: '2',
-            sid: 'df_rt_uid'
-          }),
+          ...(prevConfig.chatConfig || selectedChatProfile.chatConfig),
           loadHistory: !currentLoadHistory
         }
       };
     });
+    setLastActionApiHint('setConfig({ chatConfig: { loadHistory: boolean } })');
   };
 
   const docLinks = [
@@ -139,26 +143,85 @@ const BasicDemo = ({ locale, themeMode }: BasicDemoProps) => {
     { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/BasicDemo.vue', label: messages.common.docLinks.vueExample }
   ];
 
+  const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
+
   const quickActions = [
-    { key: 'openChat', label: messages.common.buttons.openChat, handler: () => (window as any).bytedesk?.showChat() },
+    {
+      key: 'openChat',
+      label: consultButtonLabel,
+      handler: () => {
+        (window as any).bytedesk?.showChat();
+        setLastActionApiHint('bytedesk.showChat()');
+      }
+    },
     {
       key: 'openChatParams',
       label: messages.common.buttons.openChatWithParams,
-      handler: () => (window as any).bytedesk?.showChat({
-        chatConfig: {
-          org: 'df_org_uid',
-          t: '1',
-          sid: 'df_wg_uid'
-        }
-      })
+      handler: () => {
+        (window as any).bytedesk?.showChat({
+          chatConfig: {
+            ...selectedChatProfile.chatConfig
+          }
+        });
+        setLastActionApiHint(`bytedesk.showChat({ chatConfig: { ${chatConfigHint} } })`);
+      }
     },
-    { key: 'closeChat', label: messages.common.buttons.closeChat, handler: () => (window as any).bytedesk?.hideChat() },
-    { key: 'showButton', label: messages.common.buttons.showButton, handler: () => (window as any).bytedesk?.showButton() },
-    { key: 'hideButton', label: messages.common.buttons.hideButton, handler: () => (window as any).bytedesk?.hideButton() },
-    { key: 'showBubble', label: messages.common.buttons.showBubble, handler: () => (window as any).bytedesk?.showBubble() },
-    { key: 'hideBubble', label: messages.common.buttons.hideBubble, handler: () => (window as any).bytedesk?.hideBubble() },
-    { key: 'showInvite', label: messages.common.buttons.showInvite, handler: () => (window as any).bytedesk?.showInviteDialog() },
-    { key: 'hideInvite', label: messages.common.buttons.hideInvite, handler: () => (window as any).bytedesk?.hideInviteDialog() }
+    {
+      key: 'closeChat',
+      label: messages.common.buttons.closeChat,
+      handler: () => {
+        (window as any).bytedesk?.hideChat();
+        setLastActionApiHint('bytedesk.hideChat()');
+      }
+    },
+    {
+      key: 'showButton',
+      label: messages.common.buttons.showButton,
+      handler: () => {
+        (window as any).bytedesk?.showButton();
+        setLastActionApiHint('bytedesk.showButton()');
+      }
+    },
+    {
+      key: 'hideButton',
+      label: messages.common.buttons.hideButton,
+      handler: () => {
+        (window as any).bytedesk?.hideButton();
+        setLastActionApiHint('bytedesk.hideButton()');
+      }
+    },
+    {
+      key: 'showBubble',
+      label: messages.common.buttons.showBubble,
+      handler: () => {
+        (window as any).bytedesk?.showBubble();
+        setLastActionApiHint('bytedesk.showBubble()');
+      }
+    },
+    {
+      key: 'hideBubble',
+      label: messages.common.buttons.hideBubble,
+      handler: () => {
+        (window as any).bytedesk?.hideBubble();
+        setLastActionApiHint('bytedesk.hideBubble()');
+      }
+    },
+    {
+      key: 'showInvite',
+      label: messages.common.buttons.showInvite,
+      handler: () => {
+        (window as any).bytedesk?.showInviteDialog();
+        setLastActionApiHint('bytedesk.showInviteDialog()');
+      }
+    },
+    {
+      key: 'hideInvite',
+      label: messages.common.buttons.hideInvite,
+      handler: () => {
+        (window as any).bytedesk?.hideInviteDialog();
+        setLastActionApiHint('bytedesk.hideInviteDialog()');
+      }
+    },
   ];
 
   const placementLabel =
@@ -168,6 +231,7 @@ const BasicDemo = ({ locale, themeMode }: BasicDemoProps) => {
 
   const themeColorLabel = config.theme?.backgroundColor || messages.pages.basicDemo.defaultColorLabel;
   const loadHistoryEnabled = Boolean(config.chatConfig?.loadHistory);
+  const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
 
   return (
     <PageContainer>
@@ -209,10 +273,19 @@ const BasicDemo = ({ locale, themeMode }: BasicDemoProps) => {
                 : messages.pages.basicDemo.loadHistoryDisabled}
             </Button>
           </Space>
+          {lastActionApiHint && (
+            <Alert
+              type="info"
+              showIcon
+              message={`当前调用接口: ${lastActionApiHint}`}
+              style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
+            />
+          )}
           <Typography.Text type="secondary">
             {messages.common.apiHintPrefix} {messages.pages.basicDemo.loadHistoryApiHintPrefix}
             {loadHistoryEnabled ? 'true' : 'false'}
           </Typography.Text>
+          <Typography.Text type="secondary">咨询参数: {chatConfigHint}</Typography.Text>
         </Space>
       </Card>
 

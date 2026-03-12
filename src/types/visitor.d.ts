@@ -28,6 +28,7 @@ declare namespace VISITOR {
     email?: string;
     note?: string;
     lang?: string;
+    channel?: string;
     //
     browser?: string;
     os?: string;

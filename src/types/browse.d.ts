@@ -41,6 +41,7 @@ declare namespace BROWSE {
     // 
     visitorUid?: string; // 访客的系统uid，非自动生成
     orgUid?: string;
+    channel?: string;
   };
   //
   type HttpResult = {

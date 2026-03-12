@@ -55,6 +55,9 @@ export const en = {
     vipLevelDemo: '👑 Personalization',
     unreadCountDemo: '🔔 Unread Counter',
     threadHistoryDemo: '🧵 Thread History',
+    videoSupportDemo: '🎥 Video Support',
+    callCenterDemo: '📞 Call Center',
+    videoConferenceDemo: '🎬 Video Conference',
     documentFeedbackDemo: '📝 Doc Feedback',
     flightBookingDemo: '✈️ Flight Booking'
   },
@@ -350,6 +353,122 @@ export const en = {
         threadDoc: 'View thread history integration guide',
         visitorRef: 'Visitor ThreadList reference',
         reactExample: 'React thread history demo source'
+      }
+    },
+    videoSupportDemo: {
+      title: 'Video Support Demo',
+      description: 'Use a dedicated video support queue in chatConfig to let visitors request video-based customer service from the web entry.',
+      bubbleTitle: 'Video Support',
+      bubbleSubtitle: 'Connect with a video specialist',
+      anonymousUserHint: 'Anonymous test mode: visitorUid, nickname, and avatar are omitted.',
+      pathAlert: 'This page uses chatPath=/chat and a video-support sid. Click the icon to open the regular chat page in video support context.',
+      currentPathLabel: 'Current entry path',
+      currentPathHint: 'Route stays /chat; business scenario is identified by sid and t.',
+      usageTitle: 'Demo notes',
+      usageNotes: [
+        '1. Keep chatPath as /chat and set chatConfig.sid to your video support queue ID.',
+        '2. Pass visitor identity (visitorUid/nickname/avatar) whenever possible for faster agent verification.',
+        '3. You can open this scene via showChat() or direct URL query parameters.'
+      ],
+      buttons: {
+        openVideoSupport: 'Open video support',
+        switchAnonymousUser: 'Switch to anonymous user'
+      },
+      urlGuideTitle: 'URL + Query usage',
+      sampleUrlLabel: 'Generated sample URL from current config',
+      docLinks: {
+        reactDoc: 'View React integration docs',
+        vueDoc: 'View Vue integration docs',
+        reactExample: 'React video support demo source'
+      }
+    },
+    callCenterDemo: {
+      title: 'Call Center Demo',
+      description: 'Demonstrates how to route users into a call center workgroup by switching sid while keeping the standard chat page path.',
+      bubbleTitle: 'Call Center',
+      bubbleSubtitle: 'Queue and transfer ready',
+      anonymousUserHint: 'Anonymous test mode: visitorUid, nickname, and avatar are omitted.',
+      pathAlert: 'This page keeps chatPath=/chat and targets a call-center sid to simulate queue access from web entry.',
+      currentPathLabel: 'Current entry path',
+      currentPathHint: 'Route stays /chat; queue is determined by chatConfig.sid.',
+      usageTitle: 'Demo notes',
+      usageNotes: [
+        '1. Configure sid to your call center workgroup ID so all sessions enter the same queue.',
+        '2. Use different visitorUid values to simulate concurrent queue users.',
+        '3. For production, bind sid by business line (sales, support, after-sales) to improve routing.'
+      ],
+      buttons: {
+        openCallCenter: 'Open call center',
+        switchAnonymousUser: 'Switch to anonymous user'
+      },
+      urlGuideTitle: 'URL + Query usage',
+      sampleUrlLabel: 'Generated sample URL from current config',
+      docLinks: {
+        reactDoc: 'View React integration docs',
+        vueDoc: 'View Vue integration docs',
+        reactExample: 'React call center demo source'
+      },
+      runtime: {
+        title: 'Runtime Panel (SIP.js-inspired)',
+        description: 'Simulate connect, queue, assignment, and completion states to validate your call-center entry workflow quickly.',
+        statusLabels: {
+          sdkReady: 'SDK readiness',
+          queueState: 'Queue state',
+          activeSessionCount: 'Active sessions',
+          lastActionAt: 'Last action time'
+        },
+        statusValues: {
+          ready: 'Ready',
+          notReady: 'Not ready'
+        },
+        queueState: {
+          idle: 'Idle',
+          queueing: 'Queueing',
+          serving: 'Serving'
+        },
+        buttons: {
+          openQueue: 'Open queue entry',
+          simulateAssign: 'Simulate agent assignment',
+          completeSession: 'Complete current session',
+          clearLogs: 'Clear logs'
+        },
+        logTitle: 'Activity logs',
+        emptyLogs: 'No activity yet. Try the quick actions above.',
+        logTemplates: {
+          switchedAnonymous: 'Switched to anonymous mode.',
+          switchedUser: 'Switched visitor: {{name}}.',
+          openQueue: 'Opened call center entry and moved to queueing.',
+          closeQueue: 'Closed the chat panel.',
+          assignSession: 'Queue assignment simulated. Session is now serving.',
+          completeSession: 'Service completed and session closed.'
+        }
+      }
+    },
+    videoConferenceDemo: {
+      title: 'Video Conference Demo',
+      description: 'Demonstrates conference-style session access by assigning visitors to a dedicated meeting sid and opening chat as the entry panel.',
+      bubbleTitle: 'Video Conference',
+      bubbleSubtitle: 'Join meeting service',
+      anonymousUserHint: 'Anonymous test mode: visitorUid, nickname, and avatar are omitted.',
+      pathAlert: 'This page uses chatPath=/chat and switches sid to a meeting scenario, suitable for pre-meeting guidance workflows.',
+      currentPathLabel: 'Current entry path',
+      currentPathHint: 'Route stays /chat; conference context is provided by chatConfig.sid.',
+      usageTitle: 'Demo notes',
+      usageNotes: [
+        '1. Map each conference room or event to a distinct sid for clear traffic separation.',
+        '2. Include visitor profile fields to simplify host-side identity checks.',
+        '3. Use this mode as an entry layer before users move to your native video room.'
+      ],
+      buttons: {
+        openVideoConference: 'Open video conference',
+        switchAnonymousUser: 'Switch to anonymous user'
+      },
+      urlGuideTitle: 'URL + Query usage',
+      sampleUrlLabel: 'Generated sample URL from current config',
+      docLinks: {
+        reactDoc: 'View React integration docs',
+        vueDoc: 'View Vue integration docs',
+        reactExample: 'React video conference demo source'
       }
     },
     documentFeedbackDemo: {

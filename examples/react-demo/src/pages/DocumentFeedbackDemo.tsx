@@ -21,10 +21,12 @@ import { Alert, Button, Card, Col, List, Row, Space, Tag, Typography, theme } fr
 import InstallGuide from '../components/InstallGuide';
 import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
+import { formatChatConfigQuery, type DemoChatProfile } from '../types/chat-profile';
 
 interface DemoPageProps {
   locale: Language;
   themeMode: BytedeskTheme['mode'];
+  selectedChatProfile: DemoChatProfile;
 }
 
 type FeedbackLog = FeedbackData & {
@@ -47,7 +49,7 @@ const normalizeCategories = (input?: string | string[]) => {
     .filter(Boolean);
 };
 
-const DocumentFeedbackDemo = ({ locale, themeMode }: DemoPageProps) => {
+const DocumentFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = theme.useToken();
   const [feedbackLogs, setFeedbackLogs] = useState<FeedbackLog[]>([]);
@@ -110,9 +112,7 @@ const DocumentFeedbackDemo = ({ locale, themeMode }: DemoPageProps) => {
     },
     feedbackConfig: createFeedbackConfig(),
     chatConfig: {
-      org: 'df_org_uid',
-      t: '2',
-      sid: 'df_rt_uid'
+      ...selectedChatProfile.chatConfig
     },
     locale,
     theme: {
@@ -134,9 +134,13 @@ const DocumentFeedbackDemo = ({ locale, themeMode }: DemoPageProps) => {
             ...prevConfig.feedbackConfig,
             ...localizedConfig
           }
-        : localizedConfig
+        : localizedConfig,
+      chatConfig: {
+        ...(prevConfig.chatConfig || {}),
+        ...selectedChatProfile.chatConfig
+      }
     }));
-  }, [locale, messages, themeMode]);
+  }, [locale, messages, selectedChatProfile, themeMode]);
 
   const handleInit = () => {
     console.log('[DocumentFeedbackDemo] BytedeskReact initialized');
@@ -362,6 +366,7 @@ const DocumentFeedbackDemo = ({ locale, themeMode }: DemoPageProps) => {
     { label: messages.pages.documentFeedbackDemo.controlPanel.buttons.clearLogs, onClick: clearFeedbackLogs, color: '#6c757d' },
     { label: messages.pages.documentFeedbackDemo.controlPanel.buttons.inspectState, onClick: inspectRuntimeState, color: '#e83e8c' }
   ];
+  const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
 
   return (
     <PageContainer>
@@ -426,6 +431,12 @@ const DocumentFeedbackDemo = ({ locale, themeMode }: DemoPageProps) => {
         <Typography.Text type="secondary" style={{ display: 'block', marginTop: 12 }}>
           {messages.pages.documentFeedbackDemo.controlPanel.statusLabel}: {isInitialized ? messages.pages.documentFeedbackDemo.controlPanel.initialized : messages.pages.documentFeedbackDemo.controlPanel.initializing}
         </Typography.Text>
+        <Alert
+          type="info"
+          showIcon
+          style={{ marginTop: 8, alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
+          message={`咨询参数: ${chatConfigHint}`}
+        />
       </Card>
 
       <Row gutter={24} wrap>

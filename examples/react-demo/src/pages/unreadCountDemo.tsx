@@ -9,18 +9,20 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
-import { Button, Card, List, Space, Statistic, Typography, theme } from 'antd';
+import { Alert, Button, Card, List, Space, Statistic, Typography, theme } from 'antd';
 import { getLocaleMessages } from '../locales';
 import type { DemoUserProfile } from '../types/demo-user';
+import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 
 interface DemoPageProps {
     locale: Language;
     themeMode: BytedeskTheme['mode'];
+    selectedChatProfile: DemoChatProfile;
     selectedUser: DemoUserProfile;
     isAnonymousMode: boolean;
 }
 
-const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: DemoPageProps) => {
+const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = theme.useToken();
     const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -38,9 +40,7 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
         autoPopup: false,
         draggable: true,
         chatConfig: {
-            org: 'df_org_uid',
-            t: "1", // 0: 一对一对话；1：工作组对话；2：机器人对话
-            sid: 'df_wg_uid',
+            ...selectedChatProfile.chatConfig,
             // 自定义用户信息
             ...(isAnonymousMode
                 ? {}
@@ -77,6 +77,7 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
                 },
                 chatConfig: {
                     ...prevConfig.chatConfig,
+                    ...selectedChatProfile.chatConfig,
                     ...(isAnonymousMode
                         ? {
                             visitorUid: undefined,
@@ -91,7 +92,7 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
                 }
             } as BytedeskConfig;
         });
-    }, [isAnonymousMode, locale, messages, selectedUser, themeMode]);
+    }, [isAnonymousMode, locale, messages, selectedChatProfile, selectedUser, themeMode]);
 
     const handleInit = () => {
         console.log('BytedeskReact initialized');
@@ -120,13 +121,20 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
         });
     }, []);
 
+    const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
+
     const actionButtons = useMemo(
         () => [
             {
                 key: 'open',
-                label: messages.common.buttons.openChat,
+                label: consultButtonLabel,
                 type: 'primary' as const,
                 onClick: () => (window as any).bytedesk?.showChat()
+            },
+            {
+                key: 'close',
+                label: messages.common.buttons.closeChat,
+                onClick: () => (window as any).bytedesk?.hideChat()
             },
             {
                 key: 'markAllRead',
@@ -139,7 +147,7 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
                 onClick: updateUnreadCount
             }
         ],
-        [handleMarkAllRead, messages, updateUnreadCount]
+        [consultButtonLabel, handleMarkAllRead, messages, updateUnreadCount]
     );
 
     const apiBaseUrl = useMemo(() => config.apiUrl || 'https://api.weiyuai.cn', [config.apiUrl]);
@@ -183,6 +191,8 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
         };
     }, [updateUnreadCount]);
 
+    const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
+
     return (
         <div style={{ padding: 24 }}>
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -225,9 +235,13 @@ const UnreadCountDemo = ({ locale, themeMode, selectedUser, isAnonymousMode }: D
                                 </Button>
                             ))}
                         </Space>
-                        <Typography.Text type="secondary">
-                            {messages.common.apiHintPrefix} getUnreadMessageCount(), clearUnreadMessages()
-                        </Typography.Text>
+                        <Alert
+                            type="info"
+                            showIcon
+                            message={`${messages.common.apiHintPrefix} getUnreadMessageCount(), clearUnreadMessages()`}
+                            style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
+                        />
+                        <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }} />
                         <BytedeskReact {...config} onInit={handleInit} />
                     </Space>
                 </Card>

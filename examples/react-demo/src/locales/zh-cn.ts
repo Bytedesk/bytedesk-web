@@ -55,6 +55,9 @@ export const zhCn = {
     vipLevelDemo: '👑 千人千面对接',
     unreadCountDemo: '🔔 未读消息数对接',
     threadHistoryDemo: '🧵 历史会话演示',
+    videoSupportDemo: '🎥 视频客服演示',
+    callCenterDemo: '📞 呼叫中心演示',
+    videoConferenceDemo: '🎬 视频会议演示',
     documentFeedbackDemo: '📝 文档反馈演示',
     flightBookingDemo: '✈️ 机票预定演示'
   },
@@ -351,6 +354,122 @@ export const zhCn = {
         threadDoc: '查看历史会话对接文档',
         visitorRef: '参考 visitor ThreadList 实现',
         reactExample: 'React 历史会话演示源码'
+      }
+    },
+    videoSupportDemo: {
+      title: '视频客服演示',
+      description: '通过切换 chatConfig.sid 到视频客服工作组，演示网页入口如何进入视频客服接待场景。',
+      bubbleTitle: '视频客服',
+      bubbleSubtitle: '连接视频客服专席',
+      anonymousUserHint: '当前为匿名测试：不传 visitorUid、nickname、avatar',
+      pathAlert: '本页使用 chatPath=/chat，通过视频客服 sid 区分业务场景；点击图标会进入普通聊天页。',
+      currentPathLabel: '当前入口路径',
+      currentPathHint: '路径固定为 /chat，业务分流通过 sid 与 t 控制。',
+      usageTitle: '演示说明',
+      usageNotes: [
+        '1. 保持 chatPath=/chat，并将 chatConfig.sid 设置为视频客服队列 ID。',
+        '2. 建议传 visitorUid/nickname/avatar，便于客服快速识别访客身份。',
+        '3. 可通过 showChat() 或 URL 参数直连方式进入该场景。'
+      ],
+      buttons: {
+        openVideoSupport: '打开视频客服',
+        switchAnonymousUser: '切换到匿名用户'
+      },
+      urlGuideTitle: 'URL + 参数调用说明',
+      sampleUrlLabel: '当前配置生成的示例 URL',
+      docLinks: {
+        reactDoc: '查看 React 集成文档',
+        vueDoc: '查看 Vue 集成文档',
+        reactExample: 'React 视频客服演示源码'
+      }
+    },
+    callCenterDemo: {
+      title: '呼叫中心演示',
+      description: '通过切换 sid 到呼叫中心工作组，演示如何将网页访客统一路由到呼叫中心排队入口。',
+      bubbleTitle: '呼叫中心',
+      bubbleSubtitle: '排队与转接场景',
+      anonymousUserHint: '当前为匿名测试：不传 visitorUid、nickname、avatar',
+      pathAlert: '本页保持 chatPath=/chat，通过呼叫中心 sid 模拟统一排队入口。',
+      currentPathLabel: '当前入口路径',
+      currentPathHint: '路径固定为 /chat，排队队列由 chatConfig.sid 决定。',
+      usageTitle: '演示说明',
+      usageNotes: [
+        '1. 将 sid 配置为呼叫中心工作组 ID，可让会话进入同一排队池。',
+        '2. 使用不同 visitorUid 可模拟多访客并发进入队列。',
+        '3. 生产环境可按售前/售后/技术线拆分不同 sid。'
+      ],
+      buttons: {
+        openCallCenter: '打开呼叫中心',
+        switchAnonymousUser: '切换到匿名用户'
+      },
+      urlGuideTitle: 'URL + 参数调用说明',
+      sampleUrlLabel: '当前配置生成的示例 URL',
+      docLinks: {
+        reactDoc: '查看 React 集成文档',
+        vueDoc: '查看 Vue 集成文档',
+        reactExample: 'React 呼叫中心演示源码'
+      },
+      runtime: {
+        title: '运行面板（参考 SIP.js Demo）',
+        description: '模拟连接、排队、分配、完结等关键状态，帮助你快速验证呼叫中心入口联动逻辑。',
+        statusLabels: {
+          sdkReady: 'SDK 就绪状态',
+          queueState: '队列状态',
+          activeSessionCount: '活动会话数',
+          lastActionAt: '最近动作时间'
+        },
+        statusValues: {
+          ready: '已就绪',
+          notReady: '未就绪'
+        },
+        queueState: {
+          idle: '空闲',
+          queueing: '排队中',
+          serving: '服务中'
+        },
+        buttons: {
+          openQueue: '打开排队入口',
+          simulateAssign: '模拟分配坐席',
+          completeSession: '完成本次服务',
+          clearLogs: '清空日志'
+        },
+        logTitle: '事件日志',
+        emptyLogs: '暂无事件，先试试上方快捷动作。',
+        logTemplates: {
+          switchedAnonymous: '已切换为匿名模式。',
+          switchedUser: '已切换访客：{{name}}。',
+          openQueue: '已打开呼叫中心入口并进入排队。',
+          closeQueue: '已关闭聊天面板。',
+          assignSession: '模拟排队成功，已分配到坐席。',
+          completeSession: '服务完成，本次会话已结束。'
+        }
+      }
+    },
+    videoConferenceDemo: {
+      title: '视频会议演示',
+      description: '通过会议专用 sid 演示会议接入场景，聊天面板可作为会前引导和身份确认入口。',
+      bubbleTitle: '视频会议',
+      bubbleSubtitle: '进入会议服务',
+      anonymousUserHint: '当前为匿名测试：不传 visitorUid、nickname、avatar',
+      pathAlert: '本页使用 chatPath=/chat，并通过会议 sid 区分场景，适用于会前咨询与接入引导。',
+      currentPathLabel: '当前入口路径',
+      currentPathHint: '路径固定为 /chat，会议上下文由 chatConfig.sid 提供。',
+      usageTitle: '演示说明',
+      usageNotes: [
+        '1. 可按会议房间或活动场次分配不同 sid，便于流量隔离。',
+        '2. 建议传入访客身份字段，便于主持侧做入会前确认。',
+        '3. 该模式适合作为视频会议前置咨询入口，再跳转到你的会议系统。'
+      ],
+      buttons: {
+        openVideoConference: '打开视频会议',
+        switchAnonymousUser: '切换到匿名用户'
+      },
+      urlGuideTitle: 'URL + 参数调用说明',
+      sampleUrlLabel: '当前配置生成的示例 URL',
+      docLinks: {
+        reactDoc: '查看 React 集成文档',
+        vueDoc: '查看 Vue 集成文档',
+        reactExample: 'React 视频会议演示源码'
       }
     },
     documentFeedbackDemo: {

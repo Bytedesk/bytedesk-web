@@ -55,6 +55,7 @@ export interface ChatConfig {
   mobile?: string; // 自定义手机号，支持自定义
   email?: string; // 自定义邮箱，支持自定义
   note?: string; // 自定义备注，支持自定义
+  channel?: string; // 自定义渠道，优先使用 ChannelEnum 常量
   // 
   goodsInfo?: string; // 商品信息
   orderInfo?: string; // 订单信息

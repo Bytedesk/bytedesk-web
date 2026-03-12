@@ -22,6 +22,13 @@ import DocumentFeedbackDemo from './pages/DocumentFeedbackDemo';
 import type { Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
 import { getLocaleMessages, type LocaleMessages } from './locales';
 import { DEMO_ANONYMOUS_AVATAR_TEXT, DEMO_ANONYMOUS_KEY, DEMO_USER_PRESETS, type DemoUserKey, type DemoUserMenuKey, type DemoUserProfile } from './types/demo-user';
+import {
+  CHAT_PROFILE_STORAGE_KEY,
+  DEMO_CHAT_PROFILES,
+  DEMO_CHAT_PROFILE_KEYS,
+  type ChatProfileKey,
+  type DemoChatProfile
+} from './types/chat-profile';
 import BasicDemo from './pages/BasicDemo';
 import GoodsInfoDemo from './pages/GoodsInfoDemo';
 import OrderInfoDemo from './pages/OrderInfoDemo';
@@ -29,6 +36,9 @@ import ThreadHistoryDemo from './pages/ThreadHistoryDemo';
 import UnreadCountDemo from './pages/UnreadCountDemo';
 import UserInfoDemo from './pages/UserInfoDemo';
 import VipLevelDemo from './pages/VipLevelDemo';
+import CallCenterDemo from './pages/CallCenterDemo';
+import VideoConferenceDemo from './pages/VideoConferenceDemo';
+import VideoSupportDemo from './pages/VideoSupportDemo';
 
 type DemoLocale = keyof LocaleMessages['common']['languageOptions'];
 type ThemeMode = keyof LocaleMessages['common']['themeOptions'];
@@ -66,6 +76,17 @@ const getStoredAnonymousMode = (): boolean => {
     return false;
   }
   return window.localStorage.getItem(USER_ANONYMOUS_STORAGE_KEY) === 'true';
+};
+
+const getStoredChatProfileKey = (): ChatProfileKey => {
+  if (!isBrowser) {
+    return 'robot';
+  }
+  const stored = window.localStorage.getItem(CHAT_PROFILE_STORAGE_KEY) as ChatProfileKey | null;
+  if (stored && DEMO_CHAT_PROFILE_KEYS.includes(stored)) {
+    return stored;
+  }
+  return 'robot';
 };
 
 const useSystemTheme = (): ResolvedThemeMode => {
@@ -120,6 +141,7 @@ function ThemedRouterApp() {
   const [themeMode, setThemeMode] = useState<ThemeMode>(getStoredThemeMode);
   const [activeUserKey, setActiveUserKey] = useState<DemoUserKey>(getStoredUserKey);
   const [isAnonymousMode, setIsAnonymousMode] = useState<boolean>(getStoredAnonymousMode);
+  const [chatProfileKey, setChatProfileKey] = useState<ChatProfileKey>(getStoredChatProfileKey);
   const systemTheme = useSystemTheme();
   const resolvedTheme: ResolvedThemeMode = themeMode === 'system' ? systemTheme : themeMode;
 
@@ -140,6 +162,12 @@ function ThemedRouterApp() {
       window.localStorage.setItem(USER_ANONYMOUS_STORAGE_KEY, String(isAnonymousMode));
     }
   }, [isAnonymousMode]);
+
+  useEffect(() => {
+    if (isBrowser) {
+      window.localStorage.setItem(CHAT_PROFILE_STORAGE_KEY, chatProfileKey);
+    }
+  }, [chatProfileKey]);
 
   const messages = useMemo(() => getLocaleMessages(locale as Language), [locale]);
 
@@ -174,6 +202,11 @@ function ThemedRouterApp() {
     };
   }, [activeUserKey, messages]);
 
+  const selectedChatProfile = useMemo<DemoChatProfile>(
+    () => DEMO_CHAT_PROFILES[chatProfileKey],
+    [chatProfileKey]
+  );
+
   return (
     <ConfigProvider theme={themeConfig} componentSize="middle">
       <AntdApp>
@@ -187,10 +220,12 @@ function ThemedRouterApp() {
           activeUserKey={activeUserKey}
           activeUserProfile={activeUserProfile}
           isAnonymousMode={isAnonymousMode}
+          selectedChatProfile={selectedChatProfile}
           onLocaleChange={setLocale}
           onThemeChange={setThemeMode}
           onActiveUserChange={setActiveUserKey}
           onAnonymousModeChange={setIsAnonymousMode}
+          onChatProfileChange={setChatProfileKey}
         />
       </AntdApp>
     </ConfigProvider>
@@ -204,6 +239,7 @@ interface AppLayoutProps {
   activeUserKey: DemoUserKey;
   activeUserProfile: DemoUserProfile;
   isAnonymousMode: boolean;
+  selectedChatProfile: DemoChatProfile;
   messages: LocaleMessages;
   languageOptions: { value: DemoLocale; label: string }[];
   themeOptions: { value: ThemeMode; label: string }[];
@@ -211,6 +247,7 @@ interface AppLayoutProps {
   onThemeChange: (nextTheme: ThemeMode) => void;
   onActiveUserChange: (nextUser: DemoUserKey) => void;
   onAnonymousModeChange: (nextMode: boolean) => void;
+  onChatProfileChange: (nextProfileKey: ChatProfileKey) => void;
 }
 
 function AppLayout({
@@ -220,18 +257,21 @@ function AppLayout({
   activeUserKey,
   activeUserProfile,
   isAnonymousMode,
+  selectedChatProfile,
   messages,
   languageOptions,
   themeOptions,
   onLocaleChange,
   onThemeChange,
   onActiveUserChange,
-  onAnonymousModeChange
+  onAnonymousModeChange,
+  onChatProfileChange
 }: AppLayoutProps) {
   const { message: messageApi } = AntdApp.useApp();
   const location = useLocation();
   const navigate = useNavigate();
   const { token } = antdTheme.useToken();
+  const isDebugMode = process.env.NODE_ENV === 'development';
 
   const navLinks = useMemo(() => ([
     { path: '/', label: messages.nav.basicDemo },
@@ -241,9 +281,16 @@ function AppLayout({
     { path: '/vipLevel', label: messages.nav.vipLevelDemo },
     { path: '/unreadCount', label: messages.nav.unreadCountDemo },
     { path: '/threadHistory', label: messages.nav.threadHistoryDemo },
+    ...(isDebugMode
+      ? [
+        // { path: '/videoSupport', label: messages.nav.videoSupportDemo },
+        { path: '/callCenter', label: messages.nav.callCenterDemo },
+        // { path: '/videoConference', label: messages.nav.videoConferenceDemo }
+      ]
+      : []),
     { path: '/documentFeedback', label: messages.nav.documentFeedbackDemo },
     // { path: '/flightBooking', label: messages.nav.flightBookingDemo }
-  ]), [messages]);
+  ]), [isDebugMode, messages]);
 
   const NAV_GAP = 12;
   const navContainerRef = useRef<HTMLElement | null>(null);
@@ -367,6 +414,21 @@ function AppLayout({
       )
     }))
   ];
+
+  const chatProfileMenuItems: MenuProps['items'] = DEMO_CHAT_PROFILE_KEYS.map((key) => {
+    const profile = DEMO_CHAT_PROFILES[key];
+    return {
+      key,
+      label: (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          {selectedChatProfile.key === key && (
+            <span style={{ color: token.colorSuccess, fontWeight: 700 }}>●</span>
+          )}
+          <span>{profile.label}</span>
+        </span>
+      )
+    };
+  });
 
   const githubUrl = 'https://github.com/Bytedesk/bytedesk-web';
   const siteUrlMap: Record<DemoLocale, string> = {
@@ -534,6 +596,29 @@ function AppLayout({
           <Dropdown
             trigger={['hover']}
             menu={{
+              items: chatProfileMenuItems,
+              selectable: true,
+              selectedKeys: [selectedChatProfile.key],
+              onClick: ({ key }) => onChatProfileChange(String(key) as ChatProfileKey)
+            }}
+          >
+            <Button
+              type="text"
+              style={{
+                borderRadius: 6,
+                color: token.colorText,
+                fontWeight: 600,
+                paddingInline: 10,
+                maxWidth: 210
+              }}
+            >
+              {selectedChatProfile.label}
+            </Button>
+          </Dropdown>
+
+          <Dropdown
+            trigger={['hover']}
+            menu={{
               items: languageMenuItems,
               selectable: true,
               selectedKeys: [locale],
@@ -631,38 +716,50 @@ function AppLayout({
       </Layout.Header>
       <Layout.Content style={{ padding: 0, background: token.colorBgLayout }}>
         <Routes>
-          <Route path="/" element={<BasicDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />} />
+          <Route path="/" element={<BasicDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />} />
           <Route
             path="/userInfo"
-            element={<UserInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            element={<UserInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
           <Route
             path="/orderInfo"
-            element={<OrderInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
+            element={<OrderInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
           <Route
             path="/goodsInfo"
-            element={<GoodsInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
+            element={<GoodsInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
           />
           <Route
             path="/vipLevel"
-            element={<VipLevelDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            element={<VipLevelDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
           <Route
             path="/unreadCount"
-            element={<UnreadCountDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
+            element={<UnreadCountDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
           />
           <Route
             path="/threadHistory"
-            element={<ThreadHistoryDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            element={<ThreadHistoryDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+          />
+          <Route
+            path="/videoSupport"
+            element={<VideoSupportDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+          />
+          <Route
+            path="/callCenter"
+            element={<CallCenterDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+          />
+          <Route
+            path="/videoConference"
+            element={<VideoConferenceDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
           <Route
             path="/documentFeedback"
-            element={<DocumentFeedbackDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />}
+            element={<DocumentFeedbackDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}
           />
           {/* <Route
             path="/flightBooking"
-            element={<FlightBookingDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} />}
+            element={<FlightBookingDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}
           /> */}
         </Routes>
       </Layout.Content>

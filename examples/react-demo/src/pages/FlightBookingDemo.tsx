@@ -11,11 +11,13 @@ import { BytedeskReact } from '@bytedesk/web/adapters/react';
 import type { BytedeskConfig, Language, Theme } from '@bytedesk/web/types';
 import PageContainer from '../components/PageContainer';
 import { getLocaleMessages } from '../locales';
-import { Button, Card, Col, Descriptions, Divider, Row, Space, Steps, Tag, Typography, theme } from 'antd';
+import { Alert, Button, Card, Col, Descriptions, Divider, Row, Space, Steps, Tag, Typography, theme } from 'antd';
+import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 
 interface FlightBookingDemoProps {
   locale: Language;
   themeMode: Theme['mode'];
+  selectedChatProfile: DemoChatProfile;
 }
 
 interface FlightInfo {
@@ -58,7 +60,7 @@ interface BookingInfo {
   passengers: PassengerInfo[];
 }
 
-const FlightBookingDemo = ({ locale, themeMode }: FlightBookingDemoProps) => {
+const FlightBookingDemo = ({ locale, themeMode, selectedChatProfile }: FlightBookingDemoProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = theme.useToken();
   const pageMessages = messages.pages.flightBookingDemo;
@@ -134,9 +136,7 @@ const FlightBookingDemo = ({ locale, themeMode }: FlightBookingDemoProps) => {
       height: 60
     },
     chatConfig: {
-      org: 'df_org_uid',
-      t: '2',
-      sid: 'df_rt_uid',
+      ...selectedChatProfile.chatConfig,
       extra: JSON.stringify({
         type: 'flight_booking',
         bookingNo: bookingData.bookingNo,
@@ -167,9 +167,13 @@ const FlightBookingDemo = ({ locale, themeMode }: FlightBookingDemoProps) => {
         ...prevConfig.bubbleConfig,
         title: pageMessages.bubbleTitle,
         subtitle: pageMessages.bubbleSubtitle
+      },
+      chatConfig: {
+        ...(prevConfig.chatConfig || {}),
+        ...selectedChatProfile.chatConfig
       }
     }));
-  }, [locale, themeMode, pageMessages]);
+  }, [locale, pageMessages, selectedChatProfile, themeMode]);
 
   const handleInit = () => {
     console.log('BytedeskReact initialized FlightBookingDemo');
@@ -177,6 +181,10 @@ const FlightBookingDemo = ({ locale, themeMode }: FlightBookingDemoProps) => {
 
   const handleContactSupport = () => {
     (window as any).bytedesk?.showChat();
+  };
+
+  const handleCloseChat = () => {
+    (window as any).bytedesk?.hideChat();
   };
 
   const getStatusStep = (status: FlightInfo['status']) => {
@@ -214,6 +222,8 @@ const FlightBookingDemo = ({ locale, themeMode }: FlightBookingDemoProps) => {
     { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/channel/react', label: messages.common.docLinks.react },
     { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/channel/vue', label: messages.common.docLinks.vue }
   ];
+  const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
+  const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
 
   return (
     <PageContainer>
@@ -386,7 +396,10 @@ const FlightBookingDemo = ({ locale, themeMode }: FlightBookingDemoProps) => {
       <Card style={{ marginTop: 16 }}>
         <Space wrap>
           <Button type="primary" icon={<span>💬</span>} onClick={handleContactSupport}>
-            {pageMessages.buttons.contactSupport}
+            {consultButtonLabel}
+          </Button>
+          <Button icon={<span>🔒</span>} onClick={handleCloseChat}>
+            {messages.common.buttons.closeChat}
           </Button>
           <Button icon={<span>📋</span>}>
             {pageMessages.buttons.viewItinerary}
@@ -398,6 +411,9 @@ const FlightBookingDemo = ({ locale, themeMode }: FlightBookingDemoProps) => {
             {pageMessages.buttons.cancelBooking}
           </Button>
         </Space>
+        <div style={{ marginTop: 8 }}>
+          <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }} />
+        </div>
       </Card>
 
       <BytedeskReact {...config} onInit={handleInit} />
