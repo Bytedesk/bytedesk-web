@@ -13,7 +13,7 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 type Messages = {
-  [key in 'zh-cn' | 'zh-tw' | 'en']: {
+  [key in 'zh-cn' | 'zh-tw' | 'en' | 'ja' | 'ja-jp']: {
     title: string;
     bubble: {
       title: string;
@@ -114,6 +114,56 @@ export const messages: Messages = {
       animation: 'Animation',
       other: 'Other',
       embed: 'Embed Code'
+    }
+  },
+  'ja': {
+    title: 'オンラインサポート',
+    bubble: {
+      title: 'お困りですか？',
+      subtitle: 'クリックして会話を開始'
+    },
+    tabs: {
+      home: 'ホーム',
+      messages: 'メッセージ',
+      help: 'ヘルプ',
+      news: 'ニュース'
+    },
+    settings: {
+      position: '位置',
+      tabs: 'タブ',
+      bubble: 'バブル',
+      navbar: 'ナビゲーション',
+      theme: 'テーマ',
+      window: 'ウィンドウ',
+      margins: '余白',
+      animation: 'アニメーション',
+      other: 'その他',
+      embed: '埋め込みコード'
+    }
+  },
+  'ja-jp': {
+    title: 'オンラインサポート',
+    bubble: {
+      title: 'お困りですか？',
+      subtitle: 'クリックして会話を開始'
+    },
+    tabs: {
+      home: 'ホーム',
+      messages: 'メッセージ',
+      help: 'ヘルプ',
+      news: 'ニュース'
+    },
+    settings: {
+      position: '位置',
+      tabs: 'タブ',
+      bubble: 'バブル',
+      navbar: 'ナビゲーション',
+      theme: 'テーマ',
+      window: 'ウィンドウ',
+      margins: '余白',
+      animation: 'アニメーション',
+      other: 'その他',
+      embed: '埋め込みコード'
     }
   }
 }; 

@@ -26,6 +26,7 @@ import {
   CHAT_PROFILE_STORAGE_KEY,
   DEMO_CHAT_PROFILES,
   DEMO_CHAT_PROFILE_KEYS,
+  getChatProfileLabel,
   type ChatProfileKey,
   type DemoChatProfile
 } from './types/chat-profile';
@@ -37,8 +38,7 @@ import UnreadCountDemo from './pages/UnreadCountDemo';
 import UserInfoDemo from './pages/UserInfoDemo';
 import VipLevelDemo from './pages/VipLevelDemo';
 import CallCenterDemo from './pages/CallCenterDemo';
-import VideoConferenceDemo from './pages/VideoConferenceDemo';
-import VideoSupportDemo from './pages/VideoSupportDemo';
+import WebrtcDemo from './pages/WebrtcDemo';
 
 type DemoLocale = keyof LocaleMessages['common']['languageOptions'];
 type ThemeMode = keyof LocaleMessages['common']['themeOptions'];
@@ -125,7 +125,7 @@ const useSystemTheme = (): ResolvedThemeMode => {
   return systemTheme;
 };
 
-const LANGUAGE_LIST: DemoLocale[] = ['en', 'zh-cn', 'zh-tw'];
+const LANGUAGE_LIST: DemoLocale[] = ['en', 'zh-cn', 'zh-tw', 'ja-jp', 'ko-kr', 'vi-vn', 'ms-my', 'es-es', 'fr-fr'];
 const THEME_LIST: ThemeMode[] = ['light', 'dark', 'system'];
 
 function App() {
@@ -250,6 +250,10 @@ interface AppLayoutProps {
   onChatProfileChange: (nextProfileKey: ChatProfileKey) => void;
 }
 
+type NavLinkItem =
+  | { label: string; path: string; external?: false }
+  | { label: string; href: string; external: true };
+
 function AppLayout({
   locale,
   themeMode,
@@ -273,7 +277,7 @@ function AppLayout({
   const { token } = antdTheme.useToken();
   const isDebugMode = process.env.NODE_ENV === 'development';
 
-  const navLinks = useMemo(() => ([
+  const navLinks = useMemo<NavLinkItem[]>(() => ([
     { path: '/', label: messages.nav.basicDemo },
     { path: '/userInfo', label: messages.nav.userInfoDemo },
     { path: '/goodsInfo', label: messages.nav.goodsInfoDemo },
@@ -281,18 +285,17 @@ function AppLayout({
     { path: '/vipLevel', label: messages.nav.vipLevelDemo },
     { path: '/unreadCount', label: messages.nav.unreadCountDemo },
     { path: '/threadHistory', label: messages.nav.threadHistoryDemo },
+    { path: '/webrtcDemo', label: messages.nav.webrtcDemo },
     ...(isDebugMode
       ? [
-        // { path: '/videoSupport', label: messages.nav.videoSupportDemo },
         { path: '/callCenter', label: messages.nav.callCenterDemo },
-        // { path: '/videoConference', label: messages.nav.videoConferenceDemo }
       ]
       : []),
     { path: '/documentFeedback', label: messages.nav.documentFeedbackDemo },
-    // { path: '/flightBooking', label: messages.nav.flightBookingDemo }
+    { href: 'https://www.weiyuai.cn/demos/', label: 'AgentDemo', external: true as const },
   ]), [isDebugMode, messages]);
 
-  const NAV_GAP = 12;
+  const NAV_GAP = 4;
   const navContainerRef = useRef<HTMLElement | null>(null);
   const measureItemRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const measureMoreRef = useRef<HTMLSpanElement | null>(null);
@@ -358,23 +361,25 @@ function AppLayout({
     };
   }, [recalcNav, messages]);
 
-  const getLinkStyle = (path: string) => {
-    const isActive = location.pathname === path;
+  const getLinkStyle = (path?: string) => {
+    const isActive = !!path && location.pathname === path;
     return {
-      padding: '6px 12px',
+      padding: '4px 8px',
       borderRadius: 6,
       textDecoration: 'none',
+      fontSize: 13,
       fontWeight: isActive ? 600 : 500,
       color: isActive ? token.colorPrimary : token.colorText,
       backgroundColor: isActive ? token.colorFillSecondary : 'transparent',
-      transition: 'all 0.2s ease'
+      transition: 'all 0.2s ease',
+      whiteSpace: 'nowrap' as const
     };
   };
 
   const visibleNavLinks = navLinks.slice(0, visibleNavCount);
   const overflowNavLinks = navLinks.slice(visibleNavCount);
   const overflowMenuItems: MenuProps['items'] = overflowNavLinks.map((item) => ({
-    key: item.path,
+    key: item.external ? `external:${item.href}` : item.path,
     label: item.label
   }));
 
@@ -387,6 +392,28 @@ function AppLayout({
     key: option.value,
     label: option.label
   }));
+
+  const githubUrl = 'https://github.com/Bytedesk/bytedesk-web';
+  const giteeUrl = 'https://gitee.com/270580156/bytedesk-web';
+
+  const repoMenuItems: MenuProps['items'] = [
+    {
+      key: 'github',
+      label: (
+        <a href={githubUrl} target="_blank" rel="noreferrer" style={{ color: token.colorText }}>
+          GitHub
+        </a>
+      )
+    },
+    {
+      key: 'gitee',
+      label: (
+        <a href={giteeUrl} target="_blank" rel="noreferrer" style={{ color: token.colorText }}>
+          Gitee
+        </a>
+      )
+    }
+  ];
 
   const selectedUserMenuKey: DemoUserMenuKey = isAnonymousMode ? DEMO_ANONYMOUS_KEY : activeUserKey;
 
@@ -424,17 +451,22 @@ function AppLayout({
           {selectedChatProfile.key === key && (
             <span style={{ color: token.colorSuccess, fontWeight: 700 }}>●</span>
           )}
-          <span>{profile.label}</span>
+          <span>{getChatProfileLabel(profile, locale)}</span>
         </span>
       )
     };
   });
 
-  const githubUrl = 'https://github.com/Bytedesk/bytedesk-web';
   const siteUrlMap: Record<DemoLocale, string> = {
     en: 'https://www.weiyuai.cn/en/',
     'zh-cn': 'https://www.weiyuai.cn/',
-    'zh-tw': 'https://www.weiyuai.cn/zh-TW/'
+    'zh-tw': 'https://www.weiyuai.cn/zh-TW/',
+    'ja-jp': 'https://www.weiyuai.cn/en/',
+    'ko-kr': 'https://www.weiyuai.cn/en/',
+    'vi-vn': 'https://www.weiyuai.cn/en/',
+    'ms-my': 'https://www.weiyuai.cn/en/',
+    'es-es': 'https://www.weiyuai.cn/en/',
+    'fr-fr': 'https://www.weiyuai.cn/en/'
   };
   const currentSiteUrl = siteUrlMap[locale] || siteUrlMap['zh-cn'];
 
@@ -447,7 +479,10 @@ function AppLayout({
           padding: '0 24px',
           display: 'flex',
           alignItems: 'center',
-          gap: 16
+          gap: 16,
+          position: 'sticky',
+          top: 0,
+          zIndex: 999
         }}
       >
         <nav
@@ -457,15 +492,27 @@ function AppLayout({
             minWidth: 0,
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
+            gap: 4,
             overflowX: 'hidden',
             padding: '12px 0'
           }}
         >
           {visibleNavLinks.map((item) => (
-            <Link key={item.path} to={item.path} style={getLinkStyle(item.path)}>
-              {item.label}
-            </Link>
+            item.external ? (
+              <a
+                key={item.href}
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                style={getLinkStyle()}
+              >
+                {item.label}
+              </a>
+            ) : (
+              <Link key={item.path} to={item.path} style={getLinkStyle(item.path)}>
+                {item.label}
+              </Link>
+            )
           ))}
 
           {overflowNavLinks.length > 0 && (
@@ -473,7 +520,17 @@ function AppLayout({
               trigger={['click']}
               menu={{
                 items: overflowMenuItems,
-                onClick: ({ key }) => navigate(String(key))
+                onClick: ({ key }) => {
+                  const value = String(key);
+                  if (value.startsWith('external:')) {
+                    const href = value.replace('external:', '');
+                    if (isBrowser) {
+                      window.open(href, '_blank', 'noopener,noreferrer');
+                    }
+                    return;
+                  }
+                  navigate(value);
+                }
               }}
             >
               <Button
@@ -506,13 +563,14 @@ function AppLayout({
         >
           {navLinks.map((item, index) => (
             <span
-              key={item.path}
+              key={item.external ? item.href : item.path}
               ref={setMeasureItemRef(index)}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                padding: '6px 12px',
+                padding: '4px 8px',
                 borderRadius: 6,
+                fontSize: 13,
                 fontWeight: 500
               }}
             >
@@ -612,7 +670,7 @@ function AppLayout({
                 maxWidth: 210
               }}
             >
-              {selectedChatProfile.label}
+              {getChatProfileLabel(selectedChatProfile, locale)}
             </Button>
           </Dropdown>
 
@@ -689,34 +747,50 @@ function AppLayout({
               </svg>
             </Button>
           </Dropdown>
-          <a
-            href={githubUrl}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Bytedesk GitHub"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '6px 12px',
-              borderRadius: 6,
-              textDecoration: 'none',
-              fontWeight: 600,
-              color: token.colorPrimary,
-              backgroundColor: 'transparent',
-              transition: 'all 0.15s ease'
+
+          <Dropdown
+            trigger={['hover']}
+            menu={{
+              items: repoMenuItems
             }}
           >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-              <path d="M12 .297C5.373.297 0 5.67 0 12.297c0 5.292 3.438 9.776 8.205 11.366.6.111.82-.261.82-.58 0-.287-.011-1.046-.017-2.053-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.73.083-.73 1.205.085 1.84 1.238 1.84 1.238 1.07 1.835 2.807 1.305 3.492.998.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.931 0-1.31.469-2.381 1.235-3.221-.124-.303-.535-1.525.117-3.176 0 0 1.008-.323 3.301 1.23a11.52 11.52 0 013.003-.404c1.02.005 2.045.138 3.003.404 2.291-1.553 3.297-1.23 3.297-1.23.653 1.651.242 2.873.118 3.176.77.84 1.233 1.911 1.233 3.221 0 4.609-2.807 5.625-5.48 5.921.43.373.814 1.103.814 2.222 0 1.606-.015 2.903-.015 3.296 0 .322.216.697.825.579C20.565 22.07 24 17.587 24 12.297 24 5.67 18.627.297 12 .297z" />
-            </svg>
-            <span style={{ fontSize: 13 }}>GitHub</span>
-          </a>
+            <Button
+              type="text"
+              aria-label="Repository Links"
+              title="Repository Links"
+              style={{
+                width: 36,
+                height: 36,
+                padding: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 6,
+                color: token.colorPrimary
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M12 .297C5.373.297 0 5.67 0 12.297c0 5.292 3.438 9.776 8.205 11.366.6.111.82-.261.82-.58 0-.287-.011-1.046-.017-2.053-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.73.083-.73 1.205.085 1.84 1.238 1.84 1.238 1.07 1.835 2.807 1.305 3.492.998.108-.775.418-1.305.762-1.605-2.665-.303-5.467-1.332-5.467-5.931 0-1.31.469-2.381 1.235-3.221-.124-.303-.535-1.525.117-3.176 0 0 1.008-.323 3.301 1.23a11.52 11.52 0 013.003-.404c1.02.005 2.045.138 3.003.404 2.291-1.553 3.297-1.23 3.297-1.23.653 1.651.242 2.873.118 3.176.77.84 1.233 1.911 1.233 3.221 0 4.609-2.807 5.625-5.48 5.921.43.373.814 1.103.814 2.222 0 1.606-.015 2.903-.015 3.296 0 .322.216.697.825.579C20.565 22.07 24 17.587 24 12.297 24 5.67 18.627.297 12 .297z" />
+              </svg>
+            </Button>
+          </Dropdown>
         </div>
       </Layout.Header>
       <Layout.Content style={{ padding: 0, background: token.colorBgLayout }}>
         <Routes>
-          <Route path="/" element={<BasicDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />} />
+          <Route
+            path="/"
+            element={
+              <BasicDemo
+                locale={locale as Language}
+                themeMode={resolvedTheme as BytedeskTheme['mode']}
+                themePreference={themeMode}
+                selectedChatProfile={selectedChatProfile}
+                onLocaleChange={(nextLocale) => onLocaleChange(nextLocale as DemoLocale)}
+                onThemePreferenceChange={(nextTheme) => onThemeChange(nextTheme as ThemeMode)}
+              />
+            }
+          />
           <Route
             path="/userInfo"
             element={<UserInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
@@ -742,16 +816,12 @@ function AppLayout({
             element={<ThreadHistoryDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
           <Route
-            path="/videoSupport"
-            element={<VideoSupportDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            path="/webrtcDemo"
+            element={<WebrtcDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
           <Route
             path="/callCenter"
             element={<CallCenterDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
-          />
-          <Route
-            path="/videoConference"
-            element={<VideoConferenceDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
           <Route
             path="/documentFeedback"

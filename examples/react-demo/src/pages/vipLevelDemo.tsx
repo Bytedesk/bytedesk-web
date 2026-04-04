@@ -85,9 +85,11 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         },
         marginBottom: 20,
         marginSide: 20,
+        // 隐藏不显示悬浮按钮
         buttonConfig: {
             show: false,
         },
+        // 隐藏不显示气泡
         bubbleConfig: {
             show: false,
             icon: '👋',
@@ -188,7 +190,7 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     const vipPayloadJson = useMemo(() => JSON.stringify(vipPayload), [vipPayload]);
     const vipPayloadEncoded = useMemo(() => encodeURIComponent(vipPayloadJson), [vipPayloadJson]);
     const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
-    const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
+    const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
 
     return (
         <PageContainer>
@@ -271,18 +273,22 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                             {isAnonymousMode ? '【当前】' : ''}
                         </Button>
                     </Space>
-                    <div style={{ textAlign: 'center' }}>
-                        <Space>
-                            <Button type="primary" size="large" onClick={handleShowChat}>
-                                {consultButtonLabel}
-                            </Button>
-                            <Button size="large" onClick={handleHideChat}>
-                                {messages.common.buttons.closeChat}
-                            </Button>
-                        </Space>
-                        <div style={{ marginTop: 8 }}>
-                            <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }} />
-                        </div>
+                    <Space wrap>
+                        <Button type="primary" onClick={handleShowChat}>
+                            {consultButtonLabel}
+                        </Button>
+                        <Button onClick={handleHideChat}>
+                            {messages.common.buttons.closeChat}
+                        </Button>
+                        <Button onClick={() => window.open(sampleUrl, '_blank', 'width=420,height=680,resizable=yes,scrollbars=yes')}>
+                            {messages.common.buttons.openInNewWindow}
+                        </Button>
+                        <Button onClick={() => window.open(sampleUrl, '_blank')}>
+                            {messages.common.buttons.openInNewTab}
+                        </Button>
+                    </Space>
+                    <div style={{ marginTop: 8 }}>
+                        <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }} />
                     </div>
                 </Space>
             </Card>

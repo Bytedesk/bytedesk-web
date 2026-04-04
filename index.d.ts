@@ -40,6 +40,10 @@ declare module 'bytedesk-web/react' {
       icon?: string; // 气泡图标
       title?: string; // 气泡标题
       subtitle?: string; // 气泡副标题
+      messages?: Array<{ icon?: string; title?: string; subtitle?: string }>; // 多条气泡消息
+      autoRotate?: boolean; // 是否自动轮播消息
+      rotateInterval?: number; // 轮播间隔, 单位: 毫秒
+      switchMode?: 'fade' | 'slide-up' | 'ticker'; // 消息切换方式
     };
     buttonConfig?: {
       show?: boolean; // 是否显示按钮
@@ -139,6 +143,10 @@ declare module 'bytedesk-web/vue' {
       icon?: string; // 气泡图标
       title?: string; // 气泡标题
       subtitle?: string; // 气泡副标题
+      messages?: Array<{ icon?: string; title?: string; subtitle?: string }>; // 多条气泡消息
+      autoRotate?: boolean; // 是否自动轮播消息
+      rotateInterval?: number; // 轮播间隔, 单位: 毫秒
+      switchMode?: 'fade' | 'slide-up' | 'ticker'; // 消息切换方式
     };
     buttonConfig?: {
       show?: boolean; // 是否显示按钮
@@ -238,6 +246,10 @@ declare module 'bytedesk-web/svelte' {
       icon?: string; // 气泡图标
       title?: string; // 气泡标题
       subtitle?: string; // 气泡副标题
+      messages?: Array<{ icon?: string; title?: string; subtitle?: string }>; // 多条气泡消息
+      autoRotate?: boolean; // 是否自动轮播消息
+      rotateInterval?: number; // 轮播间隔, 单位: 毫秒
+      switchMode?: 'fade' | 'slide-up' | 'ticker'; // 消息切换方式
     };
     buttonConfig?: {
       show?: boolean; // 是否显示按钮
@@ -337,6 +349,10 @@ declare module 'bytedesk-web/angular' {
       icon?: string; // 气泡图标
       title?: string; // 气泡标题
       subtitle?: string; // 气泡副标题
+      messages?: Array<{ icon?: string; title?: string; subtitle?: string }>; // 多条气泡消息
+      autoRotate?: boolean; // 是否自动轮播消息
+      rotateInterval?: number; // 轮播间隔, 单位: 毫秒
+      switchMode?: 'fade' | 'slide-up' | 'ticker'; // 消息切换方式
     };
     buttonConfig?: {
       show?: boolean; // 是否显示按钮
@@ -440,6 +456,10 @@ declare module 'bytedesk-web/nextjs' {
       icon?: string; // 气泡图标
       title?: string; // 气泡标题
       subtitle?: string; // 气泡副标题
+      messages?: Array<{ icon?: string; title?: string; subtitle?: string }>; // 多条气泡消息
+      autoRotate?: boolean; // 是否自动轮播消息
+      rotateInterval?: number; // 轮播间隔, 单位: 毫秒
+      switchMode?: 'fade' | 'slide-up' | 'ticker'; // 消息切换方式
     };
     buttonConfig?: {
       show?: boolean; // 是否显示按钮

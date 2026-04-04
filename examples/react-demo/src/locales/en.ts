@@ -4,7 +4,13 @@ export const en = {
     languageOptions: {
       en: 'English',
       'zh-cn': 'Simplified Chinese',
-      'zh-tw': 'Traditional Chinese'
+      'zh-tw': 'Traditional Chinese',
+      'ja-jp': 'Japanese',
+      'ko-kr': 'Korean',
+      'vi-vn': 'Tiếng Việt',
+      'ms-my': 'Bahasa Melayu',
+      'es-es': 'Spanish',
+      'fr-fr': 'French'
     },
     themeLabel: 'Theme Mode',
     themeOptions: {
@@ -12,7 +18,7 @@ export const en = {
       dark: 'Dark',
       system: 'System'
     },
-    officialSiteLabel: 'Official site',
+    officialSiteLabel: 'Bytedesk Official Site',
     resetAnonymousVisitorLabel: 'Reset anonymous visitor',
     resetAnonymousVisitorSuccess: 'Anonymous visitor reset',
     docLinks: {
@@ -42,7 +48,9 @@ export const en = {
       reset: 'Reset',
       copy: 'Copy',
       submit: 'Submit',
-      cancel: 'Cancel'
+      cancel: 'Cancel',
+      openInNewWindow: 'Open in popup window',
+      openInNewTab: 'Open in new tab'
     },
     apiHintPrefix: 'API calls:'
   },
@@ -56,6 +64,7 @@ export const en = {
     unreadCountDemo: '🔔 Unread Counter',
     threadHistoryDemo: '🧵 Thread History',
     videoSupportDemo: '🎥 Video Support',
+    webrtcDemo: '📹 WebRTC Demo',
     callCenterDemo: '📞 Call Center',
     videoConferenceDemo: '🎬 Video Conference',
     documentFeedbackDemo: '📝 Doc Feedback',
@@ -65,7 +74,7 @@ export const en = {
     basicDemo: {
       title: 'Bytedesk Basic Setup',
       intro: 'Use the quick actions below to experience common Bytedesk Web SDK features.',
-      themeButtonLabel: 'Switch theme color',
+      themeButtonLabel: 'Switch nav color',
       bubbleTitle: 'Need help?',
       bubbleSubtitle: 'Click to start chat',
       placement: {
@@ -443,6 +452,53 @@ export const en = {
           completeSession: 'Service completed and session closed.'
         }
       }
+    },
+    webrtcDemo: {
+      title: 'Audio / Video Agent Demo',
+      description: 'Use the floating bubble button in the bottom-right corner to experience WebRTC real-time audio or video customer service. Call mode and visitor info are passed as URL parameters to the /webrtc page.',
+      modeLimitNotice: 'Robot mode is not supported for now. Only human audio agent and human video agent are supported.',
+      pathAlert: 'The floating button defaults to audio agent mode (audio=1&video=0). Use the buttons below to switch to video agent mode.',
+      currentPathLabel: 'Entry path',
+      currentPathHint: 'Route is always /webrtc; call type is controlled by the audio / video params.',
+      anonymousUserHint: 'Anonymous test mode: visitorUid, nickname, and avatar are omitted.',
+      callMode: 'Current call mode',
+      callModeAudio: '🎙️ Audio agent (audio=1, video=0)',
+      callModeVideo: '📹 Video agent (audio=1, video=1)',
+      bubbleTitleAudio: 'Audio Agent',
+      bubbleTitleVideo: 'Video Agent',
+      bubbleSubtitleAudio: 'Click to start audio call',
+      bubbleSubtitleVideo: 'Click to start video call',
+      docLinks: {
+        reactDoc: 'View React WebRTC docs',
+        vueDoc: 'View Vue WebRTC docs',
+        reactExample: 'React WebRTC demo source'
+      },
+      usageTitle: 'Demo notes',
+      usageNotes: [
+        '1. The floating button / bubble in the bottom-right is the WebRTC entry point — clicking it opens /webrtc inside an embedded window.',
+        '2. Audio agent (audio=1&video=0): microphone and speaker only — no camera needed.',
+        '3. Video agent (audio=1&video=1): camera and microphone are both enabled.',
+        '4. In production the CDN URL https://cdn.weiyuai.cn/webrtc is used by default; locally it points to http://127.0.0.1:9018/webrtc.',
+        '5. org, t, and sid share the same values as the chat integration — no extra setup required.'
+      ],
+      buttons: {
+        audioMode: '🎙️ Switch to audio agent',
+        videoMode: '📹 Switch to video agent',
+        switchAnonymousUser: 'Switch to anonymous user'
+      },
+      urlGuideTitle: 'URL + Parameter reference',
+      sampleUrlLabel: 'Sample URL for current config',
+      urlParamsTitle: 'Parameter reference',
+      urlParams: [
+        'org: organization ID (required)',
+        't: session type (0: one-to-one, 1: workgroup)',
+        'sid: agent / workgroup ID (required)',
+        'audio: enable audio (1 = on, 0 = off)',
+        'video: enable video (1 = on, 0 = off)',
+        'lang: locale (zh-cn, en, etc.)',
+        'visitorUid: custom visitor ID (optional)',
+        'nickname / avatar: visitor profile (optional)'
+      ]
     },
     videoConferenceDemo: {
       title: 'Video Conference Demo',

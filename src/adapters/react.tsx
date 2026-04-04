@@ -22,6 +22,29 @@ interface BytedeskReactProps extends BytedeskConfig {
   onInit?: () => void;
 }
 
+const normalizeConfigValue = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(normalizeConfigValue);
+  }
+
+  if (typeof value === 'function') {
+    return value.toString();
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.keys(value as Record<string, unknown>)
+      .sort()
+      .reduce<Record<string, unknown>>((result, key) => {
+        result[key] = normalizeConfigValue((value as Record<string, unknown>)[key]);
+        return result;
+      }, {});
+  }
+
+  return value;
+};
+
+const createConfigSignature = (config: BytedeskConfig) => JSON.stringify(normalizeConfigValue(config));
+
 export const BytedeskReact = ({ locale = 'zh-cn', ...props }: BytedeskReactProps) => {
   return (
     <IntlProvider 
@@ -40,6 +63,8 @@ let activeComponentCount = 0;
 
 const BytedeskComponent = (props: BytedeskReactProps) => {
   const bytedeskRef = useRef<BytedeskWeb | null>(null);
+  const { onInit, ...config } = props;
+  const configSignature = createConfigSignature(config);
 
   useEffect(() => {
     activeComponentCount++;
@@ -54,16 +79,16 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
 
     // 创建新的全局实例
     // console.log('BytedeskReact: 创建新的全局实例');
-    globalBytedeskInstance = new BytedeskWeb(props);
+    globalBytedeskInstance = new BytedeskWeb(config);
     bytedeskRef.current = globalBytedeskInstance;
     (window as any).bytedesk = globalBytedeskInstance;
     
     // 异步初始化，确保 window.bytedesk 在 onInit 调用前已设置
     globalBytedeskInstance.init().then(() => {
-      props.onInit?.();
+      onInit?.();
     }).catch((error) => {
       console.error('BytedeskWeb 初始化失败:', error);
-      props.onInit?.(); // 即使失败也调用 onInit，让组件知道初始化尝试已完成
+      onInit?.(); // 即使失败也调用 onInit，让组件知道初始化尝试已完成
     });
 
     return () => {
@@ -84,7 +109,7 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
         }, 100);
       }
     };
-  }, [props]);
+  }, [configSignature]);
 
 
 

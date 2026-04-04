@@ -232,7 +232,7 @@ yarn demo:vue      # Run Vue demo
 yarn demo:svelte   # Run Svelte demo
 yarn demo:vanilla  # Run Vanilla JS demo
 yarn demo:angular  # Run Angular demo
-yarn demo:nextjs   # Run Next.js demo
+yarn demo:nextjs   # Run Next.js demo 
 
 # JavaScript demo requires build first
 yarn build

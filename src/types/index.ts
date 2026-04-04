@@ -23,7 +23,19 @@ export interface BubbleConfig {
   icon?: string; // 气泡图标
   title?: string; // 气泡标题
   subtitle?: string; // 气泡副标题
+  messages?: BubbleMessageItem[]; // 多条气泡消息，配置后将优先按列表展示
+  autoRotate?: boolean; // 是否自动轮播 messages（默认 true）
+  rotateInterval?: number; // 轮播间隔，单位: 毫秒（默认 3000）
+  switchMode?: BubbleSwitchMode; // 多条消息切换方式
 }
+
+export interface BubbleMessageItem {
+  icon?: string; // 单条气泡图标
+  title?: string; // 单条气泡标题
+  subtitle?: string; // 单条气泡副标题
+}
+
+export type BubbleSwitchMode = 'fade' | 'slide-up' | 'ticker';
 
 export interface TabsConfig {
   home?: boolean; // 首页
@@ -140,7 +152,7 @@ export interface BytedeskConfig {
   forceRefresh?: boolean; // 是否强制刷新页面
   apiUrl?: string; // API基础URL
   htmlUrl?: string; // Html基础URL
-  chatPath?: '/chat' | '/chat/thread'; // 聊天页面路径，默认 /chat；历史会话页使用 /chat/thread
+  chatPath?: '/chat' | '/chat/thread' | '/webrtc'; // 聊天页面路径，默认 /chat；历史会话页使用 /chat/thread；WebRTC 客服使用 /webrtc
   placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
   marginBottom?: number; // 底部边距
   marginSide?: number; // 侧边边距
@@ -166,7 +178,7 @@ export interface BytedeskConfig {
   onVisitorInfo?: (uid: string, visitorUid: string) => void; // localStorage 数据回调
 }
 
-export type Language = 'zh-cn' | 'zh-tw' | 'en' | 'ja' | 'ko';
+export type Language = 'zh-cn' | 'zh-tw' | 'en' | 'ja' | 'ja-jp' | 'ko' | 'vi-vn' | 'ms-my';
 
 export interface LocaleMessages {
   [key: string]: {

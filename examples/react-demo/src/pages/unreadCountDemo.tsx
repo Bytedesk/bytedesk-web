@@ -121,7 +121,27 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
         });
     }, []);
 
-    const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
+    const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
+
+    const chatPageUrl = useMemo(() => {
+        const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/?chat(?:\/thread)?\/?$/, '');
+        const params = new URLSearchParams();
+        const appendIfPresent = (key: string, value: string | undefined) => {
+            if (value) {
+                params.append(key, value);
+            }
+        };
+
+        params.append('org', config.chatConfig?.org || '');
+        params.append('t', String(config.chatConfig?.t || '1'));
+        params.append('sid', String(config.chatConfig?.sid || ''));
+        appendIfPresent('visitorUid', config.chatConfig?.visitorUid);
+        appendIfPresent('nickname', config.chatConfig?.nickname);
+        appendIfPresent('avatar', config.chatConfig?.avatar);
+        params.append('lang', locale);
+        params.append('mode', String(themeMode || 'light'));
+        return `${baseHtmlUrl}/chat?${params.toString()}`;
+    }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
 
     const actionButtons = useMemo(
         () => [
@@ -137,6 +157,16 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
                 onClick: () => (window as any).bytedesk?.hideChat()
             },
             {
+                key: 'openInNewWindow',
+                label: messages.common.buttons.openInNewWindow,
+                onClick: () => window.open(chatPageUrl, '_blank', 'width=420,height=680,resizable=yes,scrollbars=yes')
+            },
+            {
+                key: 'openInNewTab',
+                label: messages.common.buttons.openInNewTab,
+                onClick: () => window.open(chatPageUrl, '_blank')
+            },
+            {
                 key: 'markAllRead',
                 label: messages.pages.unreadCountDemo.buttons.markAllRead,
                 onClick: handleMarkAllRead
@@ -147,7 +177,7 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
                 onClick: updateUnreadCount
             }
         ],
-        [consultButtonLabel, handleMarkAllRead, messages, updateUnreadCount]
+        [chatPageUrl, consultButtonLabel, handleMarkAllRead, messages, updateUnreadCount]
     );
 
     const apiBaseUrl = useMemo(() => config.apiUrl || 'https://api.weiyuai.cn', [config.apiUrl]);

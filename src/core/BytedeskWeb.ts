@@ -59,6 +59,18 @@ export default class BytedeskWeb {
   private lastSelectionText: string = "";
   private lastMouseEvent: MouseEvent | null = null;
   private lastSelectionRect: DOMRect | null = null;
+  private bubbleMessages: Array<{ icon?: string; title?: string; subtitle?: string }> = [];
+  private bubbleMessageIndex: number = 0;
+  private bubbleMessageTimer: number | null = null;
+  private bubbleMessageTransitionTimer: number | null = null;
+  private bubbleMessageViewportElement: HTMLElement | null = null;
+  private bubbleMessageContentElement: HTMLElement | null = null;
+  private bubblePendingMessageElement: HTMLElement | null = null;
+  private bubbleTickerTrackElement: HTMLElement | null = null;
+  private bubbleTickerStyleElement: HTMLStyleElement | null = null;
+  private bubbleIconElement: HTMLElement | null = null;
+  private bubbleTitleElement: HTMLElement | null = null;
+  private bubbleSubtitleElement: HTMLElement | null = null;
 
   constructor(config: BytedeskConfig) {
     this.config = {
@@ -740,6 +752,398 @@ export default class BytedeskWeb {
     return this.clearUnreadMessagesPromise;
   }
 
+  private getBubbleMessages(): Array<{ icon?: string; title?: string; subtitle?: string }> {
+    const messageList = this.config.bubbleConfig?.messages;
+    if (Array.isArray(messageList) && messageList.length > 0) {
+      const normalized = messageList.filter(
+        (item) => !!item && (!!item.icon || !!item.title || !!item.subtitle)
+      );
+      if (normalized.length > 0) {
+        return normalized;
+      }
+    }
+
+    return [
+      {
+        icon: this.config.bubbleConfig?.icon,
+        title: this.config.bubbleConfig?.title,
+        subtitle: this.config.bubbleConfig?.subtitle,
+      },
+    ];
+  }
+
+  private getBubbleSwitchMode() {
+    return this.config.bubbleConfig?.switchMode || 'fade';
+  }
+
+  private buildBubbleMessageContentNode(message: { icon?: string; title?: string; subtitle?: string }) {
+    const messageContent = document.createElement('div');
+    messageContent.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-direction: ${
+        this.config.placement === 'bottom-left' ? 'row' : 'row-reverse'
+      };
+      box-sizing: border-box;
+    `;
+    messageContent.setAttribute('data-bytedesk-bubble-content', 'true');
+    messageContent.setAttribute('data-placement', this.config.placement || 'bottom-right');
+
+    const iconSpan = document.createElement('span');
+    iconSpan.setAttribute('data-bytedesk-bubble-role', 'icon');
+    iconSpan.style.fontSize = '20px';
+    iconSpan.textContent = message.icon || '';
+    messageContent.appendChild(iconSpan);
+
+    const textDiv = document.createElement('div');
+    textDiv.style.cssText = 'min-width: 0; flex: 1;';
+
+    const title = document.createElement('div');
+    title.setAttribute('data-bytedesk-bubble-role', 'title');
+    title.style.fontWeight = 'bold';
+    title.style.color = this.config.theme?.mode === 'dark' ? '#e5e7eb' : '#1f2937';
+    title.style.marginBottom = '4px';
+    title.style.textAlign = this.config.placement === 'bottom-left' ? 'left' : 'right';
+    title.textContent = message.title || '';
+    textDiv.appendChild(title);
+
+    const subtitle = document.createElement('div');
+    subtitle.setAttribute('data-bytedesk-bubble-role', 'subtitle');
+    subtitle.style.fontSize = '0.9em';
+    subtitle.style.color = this.config.theme?.mode === 'dark' ? '#9ca3af' : '#4b5563';
+    subtitle.style.textAlign = this.config.placement === 'bottom-left' ? 'left' : 'right';
+    subtitle.textContent = message.subtitle || '';
+    textDiv.appendChild(subtitle);
+
+    messageContent.appendChild(textDiv);
+
+    return { messageContent, iconSpan, title, subtitle };
+  }
+
+  private buildBubbleTickerItemNode(
+    message: { icon?: string; title?: string; subtitle?: string },
+    fixedWidth?: number,
+    fixedHeight?: number
+  ) {
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `
+      position: relative;
+      width: ${fixedWidth ? `${fixedWidth}px` : 'auto'};
+      padding-bottom: 10px;
+      box-sizing: border-box;
+      display: block;
+    `;
+
+    const bubblePanel = document.createElement('div');
+    bubblePanel.style.cssText = `
+      background: ${this.config.theme?.mode === 'dark' ? '#1f2937' : 'white'};
+      color: ${this.config.theme?.mode === 'dark' ? '#e5e7eb' : '#1f2937'};
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      max-width: 220px;
+      position: relative;
+      box-sizing: border-box;
+      width: ${fixedWidth ? `${fixedWidth}px` : 'auto'};
+      min-height: ${fixedHeight ? `${fixedHeight - 10}px` : 'auto'};
+    `;
+
+    const { messageContent } = this.buildBubbleMessageContentNode(message);
+    if (fixedWidth) {
+      messageContent.style.width = `${Math.max(0, fixedWidth - 32)}px`;
+    }
+    bubblePanel.appendChild(messageContent);
+    wrapper.appendChild(bubblePanel);
+
+    return wrapper;
+  }
+
+  private destroyBubbleTicker() {
+    if (this.bubbleTickerStyleElement?.parentElement) {
+      this.bubbleTickerStyleElement.parentElement.removeChild(this.bubbleTickerStyleElement);
+    }
+    this.bubbleTickerStyleElement = null;
+    if (this.bubbleTickerTrackElement?.parentElement) {
+      this.bubbleTickerTrackElement.parentElement.removeChild(this.bubbleTickerTrackElement);
+    }
+    this.bubbleTickerTrackElement = null;
+  }
+
+  private setBubbleTickerRunning(running: boolean) {
+    if (this.bubbleTickerTrackElement) {
+      this.bubbleTickerTrackElement.style.animationPlayState = running ? 'running' : 'paused';
+    }
+  }
+
+  private initBubbleTicker(explicitMessageElement?: HTMLElement | null) {
+    const viewport = this.bubbleMessageViewportElement;
+    const messageElement = explicitMessageElement || (this.bubble as any)?.messageElement || viewport?.parentElement;
+    if (!(viewport instanceof HTMLElement)) {
+      return;
+    }
+
+    this.destroyBubbleTicker();
+    if (this.bubbleMessages.length <= 1) {
+      if (this.bubbleMessageContentElement && !viewport.contains(this.bubbleMessageContentElement)) {
+        viewport.appendChild(this.bubbleMessageContentElement);
+      }
+      this.renderBubbleMessage(0);
+      return;
+    }
+
+    if (!(messageElement instanceof HTMLElement)) {
+      return;
+    }
+
+    const measureHost = document.createElement('div');
+    measureHost.style.cssText = `
+      position: absolute;
+      visibility: hidden;
+      pointer-events: none;
+      left: 0;
+      top: 0;
+      z-index: -1;
+      width: max-content;
+      max-width: 220px;
+    `;
+    messageElement.appendChild(measureHost);
+
+    const measureNodes = this.bubbleMessages.map((message) => {
+      const item = this.buildBubbleTickerItemNode(message);
+      measureHost.appendChild(item);
+      return item;
+    });
+
+    const itemHeight = measureNodes.reduce((max, node) => Math.max(max, node.offsetHeight), 0);
+    const itemWidth = measureNodes.reduce((max, node) => Math.max(max, node.offsetWidth), 0);
+    messageElement.removeChild(measureHost);
+    if (!itemHeight || !itemWidth) {
+      return;
+    }
+
+    viewport.style.width = `${itemWidth}px`;
+    this.syncBubbleViewportHeight(itemHeight, false);
+    const track = document.createElement('div');
+    track.style.cssText = `
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: ${itemWidth}px;
+      will-change: transform;
+    `;
+
+    const duplicatedMessages = [...this.bubbleMessages, ...this.bubbleMessages];
+    duplicatedMessages.forEach((message) => {
+      const tickerItem = this.buildBubbleTickerItemNode(message, itemWidth, itemHeight);
+      tickerItem.style.height = `${itemHeight}px`;
+      tickerItem.style.minHeight = `${itemHeight}px`;
+      track.appendChild(tickerItem);
+    });
+
+    const halfTrackHeight = itemHeight * this.bubbleMessages.length;
+    const secondsPerItem = Math.max(1.6, Number(this.config.bubbleConfig?.rotateInterval || 3000) / 1000);
+    const animationDuration = secondsPerItem * this.bubbleMessages.length;
+    const keyframeName = `bytedeskBubbleTicker_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ${keyframeName} {
+        from { transform: translateY(0); }
+        to { transform: translateY(-${halfTrackHeight}px); }
+      }
+    `;
+    document.head.appendChild(style);
+    track.style.animation = `${keyframeName} ${animationDuration}s linear infinite`;
+    track.style.animationPlayState = 'paused';
+
+    viewport.appendChild(track);
+    this.bubbleTickerTrackElement = track;
+    this.bubbleTickerStyleElement = style;
+    this.bubbleMessageIndex = 0;
+  }
+
+  private renderBubbleMessage(index: number) {
+    if (!this.bubbleMessages.length) {
+      return;
+    }
+    if (this.getBubbleSwitchMode() === 'ticker') {
+      this.bubbleMessageIndex = ((index % this.bubbleMessages.length) + this.bubbleMessages.length) % this.bubbleMessages.length;
+      this.syncBubbleViewportHeight();
+      return;
+    }
+    if (!this.bubbleIconElement || !this.bubbleTitleElement || !this.bubbleSubtitleElement) {
+      return;
+    }
+
+    const total = this.bubbleMessages.length;
+    this.bubbleMessageIndex = ((index % total) + total) % total;
+    const current = this.bubbleMessages[this.bubbleMessageIndex];
+
+    this.bubbleIconElement.textContent = current.icon || '';
+    this.bubbleTitleElement.textContent = current.title || '';
+    this.bubbleSubtitleElement.textContent = current.subtitle || '';
+    this.syncBubbleViewportHeight();
+  }
+
+  private syncBubbleViewportHeight(targetHeight?: number, animate: boolean = false) {
+    if (!(this.bubbleMessageViewportElement instanceof HTMLElement)) {
+      return;
+    }
+
+    const contentHeight = targetHeight ?? this.bubbleMessageContentElement?.offsetHeight ?? 0;
+    if (!contentHeight) {
+      return;
+    }
+
+    this.bubbleMessageViewportElement.style.transition = animate ? 'height 0.3s ease' : 'none';
+    this.bubbleMessageViewportElement.style.height = `${contentHeight}px`;
+  }
+
+  private cleanupPendingBubbleMessage() {
+    if (this.bubblePendingMessageElement?.parentElement) {
+      this.bubblePendingMessageElement.parentElement.removeChild(this.bubblePendingMessageElement);
+    }
+    this.bubblePendingMessageElement = null;
+  }
+
+  private stopBubbleMessageTransition() {
+    if (this.bubbleMessageTransitionTimer !== null) {
+      window.clearTimeout(this.bubbleMessageTransitionTimer);
+      this.bubbleMessageTransitionTimer = null;
+    }
+    this.setBubbleTickerRunning(false);
+    this.cleanupPendingBubbleMessage();
+    if (this.bubbleMessageViewportElement) {
+      this.bubbleMessageViewportElement.style.transition = '';
+    }
+    if (this.bubbleMessageContentElement) {
+      this.bubbleMessageContentElement.style.transition = '';
+      this.bubbleMessageContentElement.style.transform = 'translateY(0)';
+      this.bubbleMessageContentElement.style.opacity = '1';
+    }
+  }
+
+  private transitionBubbleMessage(index: number) {
+    const messageElement = (this.bubble as any)?.messageElement;
+    if (!(messageElement instanceof HTMLElement) || messageElement.style.display === 'none') {
+      this.renderBubbleMessage(index);
+      return;
+    }
+
+    const switchMode = this.getBubbleSwitchMode();
+    if (switchMode === 'ticker') {
+      this.renderBubbleMessage(index);
+      this.setBubbleTickerRunning(true);
+      return;
+    }
+    this.stopBubbleMessageTransition();
+    if (switchMode === 'slide-up') {
+      const viewport = this.bubbleMessageViewportElement;
+      const currentContent = this.bubbleMessageContentElement;
+      if (!(viewport instanceof HTMLElement) || !(currentContent instanceof HTMLElement) || !currentContent.parentElement) {
+        this.renderBubbleMessage(index);
+        return;
+      }
+
+      const current = this.bubbleMessages[((index % this.bubbleMessages.length) + this.bubbleMessages.length) % this.bubbleMessages.length];
+      const nextContent = currentContent.cloneNode(true) as HTMLElement;
+      const nextIcon = nextContent.querySelector('[data-bytedesk-bubble-role="icon"]') as HTMLElement | null;
+      const nextTitle = nextContent.querySelector('[data-bytedesk-bubble-role="title"]') as HTMLElement | null;
+      const nextSubtitle = nextContent.querySelector('[data-bytedesk-bubble-role="subtitle"]') as HTMLElement | null;
+
+      if (nextIcon) nextIcon.textContent = current.icon || '';
+      if (nextTitle) nextTitle.textContent = current.title || '';
+      if (nextSubtitle) nextSubtitle.textContent = current.subtitle || '';
+
+      nextContent.style.position = 'absolute';
+      nextContent.style.left = '0';
+      nextContent.style.top = '0';
+      nextContent.style.width = '100%';
+      nextContent.style.transform = 'translateY(100%)';
+      nextContent.style.opacity = '1';
+      nextContent.style.transition = 'transform 0.3s ease';
+
+      currentContent.style.transition = 'transform 0.3s ease';
+      const currentHeight = currentContent.offsetHeight;
+      currentContent.parentElement.appendChild(nextContent);
+      const nextHeight = nextContent.offsetHeight;
+      this.syncBubbleViewportHeight(currentHeight, false);
+      this.bubblePendingMessageElement = nextContent;
+
+      window.requestAnimationFrame(() => {
+        this.syncBubbleViewportHeight(nextHeight, true);
+        currentContent.style.transform = 'translateY(-100%)';
+        nextContent.style.transform = 'translateY(0)';
+      });
+
+      this.bubbleMessageTransitionTimer = window.setTimeout(() => {
+        this.renderBubbleMessage(index);
+        currentContent.style.transition = '';
+        currentContent.style.transform = 'translateY(0)';
+        currentContent.style.opacity = '1';
+        this.syncBubbleViewportHeight(nextHeight, false);
+        this.cleanupPendingBubbleMessage();
+        this.bubbleMessageTransitionTimer = null;
+      }, 320);
+      return;
+    }
+
+    const currentHeight = this.bubbleMessageContentElement?.offsetHeight ?? 0;
+    this.syncBubbleViewportHeight(currentHeight, false);
+    messageElement.style.opacity = '0';
+    messageElement.style.transform = 'translateY(6px)';
+
+    this.bubbleMessageTransitionTimer = window.setTimeout(() => {
+      this.renderBubbleMessage(index);
+      const nextHeight = this.bubbleMessageContentElement?.offsetHeight ?? currentHeight;
+      this.syncBubbleViewportHeight(nextHeight, true);
+      messageElement.style.opacity = '1';
+      messageElement.style.transform = 'translateY(0)';
+      this.bubbleMessageTransitionTimer = null;
+    }, 180);
+  }
+
+  private stopBubbleMessageRotation() {
+    if (this.bubbleMessageTimer !== null) {
+      window.clearInterval(this.bubbleMessageTimer);
+      this.bubbleMessageTimer = null;
+    }
+    this.setBubbleTickerRunning(false);
+  }
+
+  private startBubbleMessageRotation() {
+    this.stopBubbleMessageRotation();
+
+    const autoRotate = this.config.bubbleConfig?.autoRotate !== false;
+    if (!autoRotate || this.bubbleMessages.length <= 1) {
+      return;
+    }
+
+    if (this.getBubbleSwitchMode() === 'ticker') {
+      if (!this.bubbleTickerTrackElement) {
+        this.initBubbleTicker((this.bubble as any)?.messageElement || this.bubbleMessageViewportElement?.parentElement);
+      }
+      this.setBubbleTickerRunning(true);
+      return;
+    }
+
+    const configuredInterval = Number(this.config.bubbleConfig?.rotateInterval || 3000);
+    const rotateInterval = Number.isFinite(configuredInterval)
+      ? Math.max(1000, configuredInterval)
+      : 3000;
+
+    this.bubbleMessageTimer = window.setInterval(() => {
+      const messageElement = (this.bubble as any)?.messageElement;
+      if (!(messageElement instanceof HTMLElement)) {
+        return;
+      }
+      if (messageElement.style.display === 'none') {
+        return;
+      }
+      this.transitionBubbleMessage(this.bubbleMessageIndex + 1);
+    }, rotateInterval);
+  }
+
   private createBubble() {
     // 检查气泡是否已存在
     if (this.bubble && document.body.contains(this.bubble)) {
@@ -773,101 +1177,106 @@ export default class BytedeskWeb {
     // 创建气泡消息
     let messageElement: HTMLElement | null = null;
     if (this.config.bubbleConfig?.show) {
+      const isTickerMode = this.getBubbleSwitchMode() === 'ticker';
       messageElement = document.createElement("div");
       messageElement.style.cssText = `
-        background: ${this.config.theme?.mode === "dark" ? "#1f2937" : "white"};
+        background: ${isTickerMode ? 'transparent' : this.config.theme?.mode === "dark" ? "#1f2937" : "white"};
         color: ${this.config.theme?.mode === "dark" ? "#e5e7eb" : "#1f2937"};
-        padding: 12px 16px;
-        border-radius: 8px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-        max-width: 220px;
+        padding: ${isTickerMode ? '0' : '12px 16px'};
+        border-radius: ${isTickerMode ? '0' : '8px'};
+        box-shadow: ${isTickerMode ? 'none' : '0 2px 12px rgba(0, 0, 0, 0.1)'};
+        max-width: ${isTickerMode ? 'none' : '220px'};
         margin-bottom: 8px;
         opacity: 0;
         transform: translateY(10px);
-        transition: all 0.3s ease;
+        transition: opacity 0.22s ease, transform 0.22s ease;
         position: relative;
       `;
 
-      // 添加图标和文本
-      const messageContent = document.createElement("div");
-      messageContent.style.cssText = `
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-direction: ${
-          this.config.placement === "bottom-left" ? "row" : "row-reverse"
-        };
-      `;
-      messageContent.setAttribute(
-        "data-placement",
-        this.config.placement || "bottom-right"
-      ); // 添加属性用于后续识别
-
-      const iconSpan = document.createElement("span");
-      iconSpan.textContent = this.config.bubbleConfig?.icon || "";
-      iconSpan.style.fontSize = "20px";
-      messageContent.appendChild(iconSpan);
-
-      const textDiv = document.createElement("div");
-      const title = document.createElement("div");
-      title.textContent = this.config.bubbleConfig?.title || "";
-      title.style.fontWeight = "bold";
-      title.style.color =
-        this.config.theme?.mode === "dark" ? "#e5e7eb" : "#1f2937";
-      title.style.marginBottom = "4px";
-      title.style.textAlign =
-        this.config.placement === "bottom-left" ? "left" : "right";
-      textDiv.appendChild(title);
-
-      const subtitle = document.createElement("div");
-      subtitle.textContent = this.config.bubbleConfig?.subtitle || "";
-      subtitle.style.fontSize = "0.9em";
-      subtitle.style.color =
-        this.config.theme?.mode === "dark" ? "#9ca3af" : "#4b5563";
-      subtitle.style.textAlign =
-        this.config.placement === "bottom-left" ? "left" : "right";
-      textDiv.appendChild(subtitle);
-
-      messageContent.appendChild(textDiv);
-      messageElement.appendChild(messageContent);
-
-      // 添加倒三角
-      const triangle = document.createElement("div");
-      triangle.style.cssText = `
-        position: absolute;
-        bottom: -6px;
-        ${
-          this.config.placement === "bottom-left" ? "left: 24px" : "right: 24px"
-        };
-        width: 12px;
-        height: 12px;
-        background: ${this.config.theme?.mode === "dark" ? "#1f2937" : "white"};
-        transform: rotate(45deg);
-        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      const messageViewport = document.createElement("div");
+      messageViewport.style.cssText = `
+        position: relative;
+        overflow: hidden;
       `;
 
-      // 添加一个白色背景遮罩，遮住三角形上方的阴影
-      const mask = document.createElement("div");
-      mask.style.cssText = `
-        position: absolute;
-        bottom: 0;
-        ${
-          this.config.placement === "bottom-left" ? "left: 18px" : "right: 18px"
-        };
-        width: 24px;
-        height: 12px;
-        background: ${this.config.theme?.mode === "dark" ? "#1f2937" : "white"};
-      `;
+      const {
+        messageContent,
+        iconSpan,
+        title,
+        subtitle,
+      } = this.buildBubbleMessageContentNode({
+        icon: this.config.bubbleConfig?.icon,
+        title: this.config.bubbleConfig?.title,
+        subtitle: this.config.bubbleConfig?.subtitle,
+      });
 
-      messageElement.appendChild(triangle);
-      messageElement.appendChild(mask);
+      if (!isTickerMode) {
+        messageViewport.appendChild(messageContent);
+      }
+    messageElement.appendChild(messageViewport);
+
+      if (!isTickerMode) {
+        // 添加倒三角
+        const triangle = document.createElement("div");
+        triangle.style.cssText = `
+          position: absolute;
+          bottom: -6px;
+          ${
+            this.config.placement === "bottom-left" ? "left: 24px" : "right: 24px"
+          };
+          width: 12px;
+          height: 12px;
+          background: ${this.config.theme?.mode === "dark" ? "#1f2937" : "white"};
+          transform: rotate(45deg);
+          box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        `;
+
+        // 添加一个白色背景遮罩，遮住三角形上方的阴影
+        const mask = document.createElement("div");
+        mask.style.cssText = `
+          position: absolute;
+          bottom: 0;
+          ${
+            this.config.placement === "bottom-left" ? "left: 18px" : "right: 18px"
+          };
+          width: 24px;
+          height: 12px;
+          background: ${this.config.theme?.mode === "dark" ? "#1f2937" : "white"};
+        `;
+
+        messageElement.appendChild(triangle);
+        messageElement.appendChild(mask);
+      }
       container.appendChild(messageElement);
+
+      this.bubbleMessages = this.getBubbleMessages();
+      this.bubbleMessageViewportElement = messageViewport;
+      this.bubbleMessageContentElement = messageContent;
+      this.bubbleIconElement = iconSpan;
+      this.bubbleTitleElement = title;
+      this.bubbleSubtitleElement = subtitle;
+      this.bubbleMessageIndex = 0;
+
+      if (this.getBubbleSwitchMode() === 'ticker') {
+        this.initBubbleTicker(messageElement);
+      } else {
+        this.renderBubbleMessage(0);
+      }
+
+      // 鼠标悬停在气泡提示上时暂停轮播，移出后恢复
+      messageElement.addEventListener('mouseenter', () => {
+        this.stopBubbleMessageRotation();
+      });
+      messageElement.addEventListener('mouseleave', () => {
+        this.startBubbleMessageRotation();
+      });
 
       // 显示动画
       setTimeout(() => {
         if (messageElement) {
           messageElement.style.opacity = "1";
           messageElement.style.transform = "translateY(0)";
+          this.startBubbleMessageRotation();
         }
       }, 500);
     }
@@ -1043,7 +1452,9 @@ export default class BytedeskWeb {
         // 隐藏气泡消息
         const messageElement = (this.bubble as any).messageElement;
         if (messageElement instanceof HTMLElement) {
+          this.stopBubbleMessageTransition();
           messageElement.style.display = "none";
+          this.stopBubbleMessageRotation();
         }
         this.showChat();
       }
@@ -1239,19 +1650,39 @@ export default class BytedeskWeb {
   }
 
   private getChatPageBaseUrl(): string {
-    const normalizedPath = this.config.chatPath === "/chat/thread" ? "/chat/thread" : "/chat";
+    // 支持自定义 chatPath（如 /webrtc）；未配置时默认 /chat
+    const chatPath = this.config.chatPath;
+    const normalizedPath =
+      chatPath === "/chat/thread" ? "/chat/thread" :
+      chatPath === "/chat" || !chatPath ? "/chat" :
+      chatPath; // 其余自定义路径（如 /webrtc）原样使用
     const rawHtmlUrl = (this.config.htmlUrl || "").trim();
+    const sanitizedHtmlUrl = rawHtmlUrl.replace(/\/$/, "");
 
     if (!rawHtmlUrl) {
       return normalizedPath;
     }
 
-    const matchedChatPath = rawHtmlUrl.match(/\/chat(?:\/thread)?\/?$/);
-    if (matchedChatPath) {
-      return rawHtmlUrl.replace(/\/chat(?:\/thread)?\/?$/, normalizedPath);
+    // 如果 htmlUrl 已经指向某个具体页面路径，则优先复用该路径，避免再拼接默认 /chat 导致地址错误。
+    // 对内置页面路径仍做归一化替换，兼容 /chat、/chat/thread、/webrtc 之间的切换。
+    const matchedBuiltinPath = sanitizedHtmlUrl.match(/\/(chat(?:\/thread)?|webrtc)\/?$/);
+    if (matchedBuiltinPath) {
+      return sanitizedHtmlUrl.replace(/\/(chat(?:\/thread)?|webrtc)\/?$/, normalizedPath);
     }
 
-    return `${rawHtmlUrl.replace(/\/$/, "")}${normalizedPath}`;
+    try {
+      const parsedUrl = new URL(rawHtmlUrl, window.location.origin);
+      if (parsedUrl.pathname && parsedUrl.pathname !== "/") {
+        return sanitizedHtmlUrl;
+      }
+    } catch {
+      // 非标准 URL（如相对路径）时，继续按字符串规则处理。
+      if (sanitizedHtmlUrl.startsWith("/")) {
+        return sanitizedHtmlUrl;
+      }
+    }
+
+    return `${sanitizedHtmlUrl}${normalizedPath}`;
   }
 
   private setupMessageListener() {
@@ -1511,6 +1942,19 @@ export default class BytedeskWeb {
 
   destroy() {
     this.isDestroyed = true;
+    this.stopBubbleMessageRotation();
+    this.stopBubbleMessageTransition();
+    this.destroyBubbleTicker();
+    this.bubbleMessageViewportElement = null;
+    this.bubbleMessageContentElement = null;
+    this.bubblePendingMessageElement = null;
+    this.bubbleTickerTrackElement = null;
+    this.bubbleTickerStyleElement = null;
+    this.bubbleIconElement = null;
+    this.bubbleTitleElement = null;
+    this.bubbleSubtitleElement = null;
+    this.bubbleMessages = [];
+    this.bubbleMessageIndex = 0;
     // 找到气泡容器的父元素
     const bubbleContainer = this.bubble?.parentElement;
     if (bubbleContainer && document.body.contains(bubbleContainer)) {
@@ -1745,6 +2189,7 @@ export default class BytedeskWeb {
         setTimeout(() => {
           messageElement.style.opacity = "1";
           messageElement.style.transform = "translateY(0)";
+          this.startBubbleMessageRotation();
         }, 100);
         logger.debug("showBubble: 气泡已显示");
       } else {
@@ -1759,6 +2204,8 @@ export default class BytedeskWeb {
     if (this.bubble) {
       const messageElement = (this.bubble as any).messageElement;
       if (messageElement instanceof HTMLElement) {
+        this.stopBubbleMessageRotation();
+        this.stopBubbleMessageTransition();
         messageElement.style.opacity = "0";
         messageElement.style.transform = "translateY(10px)";
         // 等待动画完成后隐藏

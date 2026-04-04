@@ -4,7 +4,13 @@ export const zhCn = {
     languageOptions: {
       en: 'English',
       'zh-cn': '简体中文',
-      'zh-tw': '繁体中文'
+      'zh-tw': '繁体中文',
+      'ja-jp': '日本語',
+      'ko-kr': '한국어',
+      'vi-vn': 'Tiếng Việt',
+      'ms-my': 'Bahasa Melayu',
+      'es-es': 'Español',
+      'fr-fr': 'Français'
     },
     themeLabel: '主题模式',
     themeOptions: {
@@ -12,7 +18,7 @@ export const zhCn = {
       dark: '深色',
       system: '跟随系统'
     },
-    officialSiteLabel: '官网',
+    officialSiteLabel: '微语官网',
     resetAnonymousVisitorLabel: '重置匿名访客',
     resetAnonymousVisitorSuccess: '匿名访客已重置',
     docLinks: {
@@ -42,7 +48,9 @@ export const zhCn = {
       reset: '重置',
       copy: '复制',
       submit: '提交',
-      cancel: '取消'
+      cancel: '取消',
+      openInNewWindow: '弹窗单独窗口',
+      openInNewTab: '打开新Tab页'
     },
     apiHintPrefix: '调用代码：'
   },
@@ -56,7 +64,8 @@ export const zhCn = {
     unreadCountDemo: '🔔 未读消息数对接',
     threadHistoryDemo: '🧵 历史会话演示',
     videoSupportDemo: '🎥 视频客服演示',
-    callCenterDemo: '📞 呼叫中心演示',
+    webrtcDemo: '📹 音视频客服演示',
+    callCenterDemo: '📞 电话客服演示',
     videoConferenceDemo: '🎬 视频会议演示',
     documentFeedbackDemo: '📝 文档反馈演示',
     flightBookingDemo: '✈️ 机票预定演示'
@@ -65,7 +74,7 @@ export const zhCn = {
     basicDemo: {
       title: '微语基本设置',
       intro: '通过下方按钮可以快速体验 Bytedesk Web SDK 的常见能力。',
-      themeButtonLabel: '切换主题色',
+      themeButtonLabel: '切换导航颜色',
       bubbleTitle: '需要帮助吗？',
       bubbleSubtitle: '点击开始对话',
       placement: {
@@ -384,7 +393,7 @@ export const zhCn = {
       }
     },
     callCenterDemo: {
-      title: '呼叫中心演示',
+      title: '电话客服演示',
       description: '通过切换 sid 到呼叫中心工作组，演示如何将网页访客统一路由到呼叫中心排队入口。',
       bubbleTitle: '呼叫中心',
       bubbleSubtitle: '排队与转接场景',
@@ -407,7 +416,7 @@ export const zhCn = {
       docLinks: {
         reactDoc: '查看 React 集成文档',
         vueDoc: '查看 Vue 集成文档',
-        reactExample: 'React 呼叫中心演示源码'
+        reactExample: 'React 电话客服演示源码'
       },
       runtime: {
         title: '运行面板（参考 SIP.js Demo）',
@@ -444,6 +453,53 @@ export const zhCn = {
           completeSession: '服务完成，本次会话已结束。'
         }
       }
+    },
+    webrtcDemo: {
+      title: '音视频客服演示',
+      description: '通过右下角悬浮按钮（bubble）体验 WebRTC 实时音视频通话客服，支持音频客服与视频客服两种模式，参数通过 URL 传递给 /webrtc 页面。',
+      modeLimitNotice: '暂不支持机器人模式，仅支持人工音频客服和人工视频客服。',
+      pathAlert: '右下角悬浮按钮默认触发音频客服（audio=1&video=0），可通过下方按钮切换为视频客服模式。',
+      currentPathLabel: '当前入口路径',
+      currentPathHint: '路径固定为 /webrtc，通话类型由 audio / video 参数决定。',
+      anonymousUserHint: '当前为匿名测试：不传 visitorUid、nickname、avatar',
+      callMode: '当前呼叫模式',
+      callModeAudio: '🎙️ 发起音频客服（audio=1,video=0）',
+      callModeVideo: '📹 发起视频客服（audio=1,video=1）',
+      bubbleTitleAudio: '音频客服',
+      bubbleTitleVideo: '视频客服',
+      bubbleSubtitleAudio: '点击连线音频客服',
+      bubbleSubtitleVideo: '点击连线视频客服',
+      docLinks: {
+        reactDoc: '查看 React 音视频客服文档',
+        vueDoc: '查看 Vue 音视频客服文档',
+        reactExample: 'React 音视频客服演示源码'
+      },
+      usageTitle: '演示说明',
+      usageNotes: [
+        '1. 右下角悬浮按钮/气泡 即为音视频客服入口，点击后在内嵌窗口中打开 /webrtc 页面。',
+        '2. 音频客服（audio=1&video=0）：仅使用麦克风和扬声器，无需摄像头。',
+        '3. 视频客服（audio=1&video=1）：同时开启摄像头与麦克风进行双向视频通话。',
+        '4. 生产环境默认使用 CDN 地址 https://cdn.weiyuai.cn/webrtc，本地开发使用 http://127.0.0.1:9018/webrtc。',
+        '5. org、t、sid 参数与聊天接口保持一致，无需额外对接配置。'
+      ],
+      buttons: {
+        audioMode: '🎙️ 切换为音频客服',
+        videoMode: '📹 切换为视频客服',
+        switchAnonymousUser: '切换到匿名用户'
+      },
+      urlGuideTitle: 'URL + 参数说明',
+      sampleUrlLabel: '当前配置生成的示例 URL',
+      urlParamsTitle: '参数说明',
+      urlParams: [
+        'org：组织 ID（必填）',
+        't：会话类型（0：一对一，1：工作组）',
+        'sid：客服 / 工作组 ID（必填）',
+        'audio：是否启用音频（1 启用，0 禁用）',
+        'video：是否启用视频（1 启用，0 禁用）',
+        'lang：语言（zh-cn / en 等）',
+        'visitorUid：自定义访客 ID（可选）',
+        'nickname / avatar：访客显示信息（可选）'
+      ]
     },
     videoConferenceDemo: {
       title: '视频会议演示',

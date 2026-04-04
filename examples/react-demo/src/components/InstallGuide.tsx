@@ -48,12 +48,10 @@
  */
 import { useMemo } from 'react';
 import { Alert, Card, List, Space, Typography, theme } from 'antd';
-// @ts-ignore
-import type { Language } from '@bytedesk/web/types';
-import { getLocaleMessages } from '../locales';
+import { getLocaleMessages, type DemoLanguage } from '../locales';
 
 interface InstallGuideProps {
-  locale: Language;
+  locale: DemoLanguage;
 }
 
 const codeStyle = (background: string, borderColor: string) => ({

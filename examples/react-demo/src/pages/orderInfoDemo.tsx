@@ -326,7 +326,7 @@ const DEMO_ORDERS: DemoOrderInfo[] = [
 
 const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
-  const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
+  const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
   const users = useMemo(
     () => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
@@ -401,10 +401,10 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     marginBottom: 20,
     marginSide: 20,
     buttonConfig: {
-      show: false
+      show: true
     },
     bubbleConfig: {
-      show: false,
+      show: true,
       icon: '📦',
       title: messages.pages.basicDemo.bubbleTitle,
       subtitle: messages.pages.basicDemo.bubbleSubtitle
@@ -458,6 +458,28 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
 
   const handleShowChat = () => (window as any).bytedesk?.showChat();
   const handleHideChat = () => (window as any).bytedesk?.hideChat();
+
+  const chatPageUrl = useMemo(() => {
+    const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/?chat(?:\/thread)?\/?$/, '');
+    const params = new URLSearchParams();
+    const appendIfPresent = (key: string, value: string | undefined) => {
+      if (value) {
+        params.append(key, value);
+      }
+    };
+
+    params.append('org', config.chatConfig?.org || '');
+    params.append('t', String(config.chatConfig?.t || '1'));
+    params.append('sid', String(config.chatConfig?.sid || ''));
+    appendIfPresent('visitorUid', config.chatConfig?.visitorUid);
+    appendIfPresent('nickname', config.chatConfig?.nickname);
+    appendIfPresent('avatar', config.chatConfig?.avatar);
+    appendIfPresent('orderInfo', String(config.chatConfig?.orderInfo || ''));
+    appendIfPresent('extra', String(config.chatConfig?.extra || ''));
+    params.append('lang', locale);
+    params.append('mode', String(themeMode || 'light'));
+    return `${baseHtmlUrl}/chat?${params.toString()}`;
+  }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
 
   const handleConsultOrder = (uid: string) => {
     setSelectedOrderUid(uid);
@@ -568,6 +590,12 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
         <Space wrap style={{ marginTop: 12 }}>
           <Button type="primary" onClick={handleShowChat}>{consultButtonLabel}</Button>
           <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
+          <Button onClick={() => window.open(chatPageUrl, '_blank', 'width=420,height=680,resizable=yes,scrollbars=yes')}>
+            {messages.common.buttons.openInNewWindow}
+          </Button>
+          <Button onClick={() => window.open(chatPageUrl, '_blank')}>
+            {messages.common.buttons.openInNewTab}
+          </Button>
           <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} />
         </Space>
       </Card>

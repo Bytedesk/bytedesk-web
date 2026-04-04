@@ -44,6 +44,7 @@ interface DemoPageProps {
 const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = antdTheme.useToken();
+    const bubbleNickname = isAnonymousMode ? messages.pages.userInfoDemo.anonymousUserLabel : selectedUser.nickname;
     const users = useMemo(() => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
         key,
         visitorUid: DEMO_USER_PRESETS[key].visitorUid,
@@ -71,12 +72,12 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         marginBottom: 20,
         marginSide: 20,
         buttonConfig: {
-            show: false,
+            show: true,
         },
         bubbleConfig: {
-            show: false,
+            show: true,
             icon: '👋',
-            title: messages.pages.basicDemo.bubbleTitle,
+            title: `${bubbleNickname} ${messages.pages.basicDemo.bubbleTitle}`,
             subtitle: messages.pages.basicDemo.bubbleSubtitle
         },
         chatConfig: {
@@ -159,7 +160,7 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
 
     const urlParams = messages.pages.userInfoDemo.urlParams;
     const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
-    const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
+    const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
 
     return (
         <PageContainer>
@@ -235,6 +236,12 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                     <Space wrap>
                         <Button type="primary" onClick={handleShowChat}>{consultButtonLabel}</Button>
                         <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
+                        <Button onClick={() => window.open(sampleUrl, '_blank', 'width=420,height=680,resizable=yes,scrollbars=yes')}>
+                            {messages.common.buttons.openInNewWindow}
+                        </Button>
+                        <Button onClick={() => window.open(sampleUrl, '_blank')}>
+                            {messages.common.buttons.openInNewTab}
+                        </Button>
                     </Space>
                     <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }} />
                 </Space>

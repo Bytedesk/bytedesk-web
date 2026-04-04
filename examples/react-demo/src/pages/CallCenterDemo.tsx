@@ -36,12 +36,10 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
 
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
-    ...(process.env.NODE_ENV === 'development'
-      ? {
-        htmlUrl: 'http://127.0.0.1:9006',
-        apiUrl: 'http://127.0.0.1:9003'
-      }
-      : {}),
+    htmlUrl: process.env.NODE_ENV === 'development'
+      ? 'http://127.0.0.1:9022/call'
+      : 'https://cdn.weiyuai.cn/call',
+    ...(process.env.NODE_ENV === 'development' ? { apiUrl: 'http://127.0.0.1:9003' } : {}),
     chatPath: '/chat',
     placement: 'bottom-right',
     marginBottom: 20,
@@ -85,25 +83,32 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
   );
 
   const sampleUrl = useMemo(() => {
-    const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/chat(?:\/thread)?\/?$/, '');
+    const baseHtmlUrl = process.env.NODE_ENV === 'development'
+      ? 'http://127.0.0.1:9022/call'
+      : 'https://cdn.weiyuai.cn/call';
     const params = new URLSearchParams();
     const appendIfPresent = (key: string, value: string | undefined) => {
       if (value) {
         params.append(key, value);
       }
     };
-    params.append('org', config.chatConfig?.org || '');
-    params.append('t', String(config.chatConfig?.t || '1'));
-    params.append('sid', String(config.chatConfig?.sid || ''));
-    appendIfPresent('visitorUid', config.chatConfig?.visitorUid);
-    appendIfPresent('nickname', config.chatConfig?.nickname);
-    appendIfPresent('avatar', config.chatConfig?.avatar);
+    params.append('org', selectedChatProfile.chatConfig.org);
+    params.append('t', String(selectedChatProfile.chatConfig.t));
+    params.append('sid', String(selectedChatProfile.chatConfig.sid));
+    if (!isAnonymousMode) {
+      appendIfPresent('visitorUid', selectedUser.visitorUid);
+      appendIfPresent('nickname', selectedUser.nickname);
+      appendIfPresent('avatar', selectedUser.avatar);
+    }
     params.append('lang', locale);
     params.append('mode', String(themeMode || 'light'));
-    return `${baseHtmlUrl}/chat?${params.toString()}`;
-  }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
+    return `${baseHtmlUrl}?${params.toString()}`;
+  }, [isAnonymousMode, locale, selectedChatProfile, selectedUser, themeMode]);
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
-  const consultButtonLabel = getConsultButtonLabel(selectedChatProfile);
+  const consultButtonLabel = useMemo(() => {
+    const defaultLabel = getConsultButtonLabel(selectedChatProfile, locale);
+    return locale === 'zh-cn' ? defaultLabel.replace(/^咨询/, '呼叫') : defaultLabel;
+  }, [locale, selectedChatProfile]);
 
   const formatSwitchUserLabel = (name: string) =>
     messages.pages.userInfoDemo.switchToUserLabel.replace('{{name}}', name);
@@ -137,7 +142,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Space align="center" wrap>
             <Typography.Text strong>{messages.pages.callCenterDemo.currentPathLabel}</Typography.Text>
-            <Tag color="processing">/chat</Tag>
+            <Tag color="processing">/call</Tag>
             <Typography.Text type="secondary">{messages.pages.callCenterDemo.currentPathHint}</Typography.Text>
           </Space>
 
@@ -193,6 +198,12 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
               {consultButtonLabel}
             </Button>
             <Button onClick={() => (window as any).bytedesk?.hideChat()}>{messages.common.buttons.closeChat}</Button>
+            <Button onClick={() => window.open(sampleUrl, '_blank', 'width=420,height=680,resizable=yes,scrollbars=yes')}>
+              {messages.common.buttons.openInNewWindow}
+            </Button>
+            <Button onClick={() => window.open(sampleUrl, '_blank')}>
+              {messages.common.buttons.openInNewTab}
+            </Button>
           </Space>
 
           <Alert

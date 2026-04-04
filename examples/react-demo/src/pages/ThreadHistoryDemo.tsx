@@ -227,6 +227,12 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
               {consultButtonLabel}
             </Button>
             <Button onClick={() => (window as any).bytedesk?.hideChat()}>{messages.common.buttons.closeChat}</Button>
+            <Button onClick={() => window.open(sampleUrl, '_blank', 'width=420,height=680,resizable=yes,scrollbars=yes')}>
+              {messages.common.buttons.openInNewWindow}
+            </Button>
+            <Button onClick={() => window.open(sampleUrl, '_blank')}>
+              {messages.common.buttons.openInNewTab}
+            </Button>
           </Space>
 
           <Alert

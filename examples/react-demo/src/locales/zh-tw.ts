@@ -4,7 +4,13 @@ export const zhTw = {
     languageOptions: {
       en: 'English',
       'zh-cn': '簡體中文',
-      'zh-tw': '繁體中文'
+      'zh-tw': '繁體中文',
+      'ja-jp': '日本語',
+      'ko-kr': '한국어',
+      'vi-vn': 'Tiếng Việt',
+      'ms-my': 'Bahasa Melayu',
+      'es-es': 'Español',
+      'fr-fr': 'Français'
     },
     themeLabel: '主題模式',
     themeOptions: {
@@ -12,7 +18,7 @@ export const zhTw = {
       dark: '深色',
       system: '跟隨系統'
     },
-    officialSiteLabel: '官方網站',
+    officialSiteLabel: '微語官方網站',
     resetAnonymousVisitorLabel: '重設匿名訪客',
     resetAnonymousVisitorSuccess: '匿名訪客已重設',
     docLinks: {
@@ -42,7 +48,9 @@ export const zhTw = {
       reset: '重設',
       copy: '複製',
       submit: '提交',
-      cancel: '取消'
+      cancel: '取消',
+      openInNewWindow: '彈窗獨立視窗',
+      openInNewTab: '在新分頁開啟'
     },
     apiHintPrefix: '呼叫程式：'
   },
@@ -56,7 +64,8 @@ export const zhTw = {
     unreadCountDemo: '🔔 未讀訊息對接',
     threadHistoryDemo: '🧵 歷史會話示範',
     videoSupportDemo: '🎥 影片客服示範',
-    callCenterDemo: '📞 呼叫中心示範',
+    webrtcDemo: '📹 音視訊客服示範',
+    callCenterDemo: '📞 电话客服示範',
     videoConferenceDemo: '🎬 視訊會議示範',
     documentFeedbackDemo: '📝 文件回饋示範',
     flightBookingDemo: '✈️ 機票預訂示範'
@@ -65,7 +74,7 @@ export const zhTw = {
     basicDemo: {
       title: '微語基本設定',
       intro: '透過下方按鈕即可快速體驗 Bytedesk Web SDK 的常見能力。',
-      themeButtonLabel: '切換主題色',
+      themeButtonLabel: '切換導航顏色',
       bubbleTitle: '需要幫忙嗎？',
       bubbleSubtitle: '點擊開始對話',
       placement: {
@@ -443,6 +452,53 @@ export const zhTw = {
           completeSession: '服務完成，本次會話已結束。'
         }
       }
+    },
+    webrtcDemo: {
+      title: '音視訊客服示範',
+      description: '透過右下角懸浮按鈕（bubble）體驗 WebRTC 即時音視訊通話客服，支援音訊客服與視訊客服兩種模式，參數透過 URL 傳遞給 /webrtc 頁面。',
+      modeLimitNotice: '暫不支援機器人模式，僅支援人工語音客服與人工視訊客服。',
+      pathAlert: '右下角懸浮按鈕預設觸發音訊客服（audio=1&video=0），可透過下方按鈕切換為視訊客服模式。',
+      currentPathLabel: '目前入口路徑',
+      currentPathHint: '路徑固定為 /webrtc，通話類型由 audio / video 參數決定。',
+      anonymousUserHint: '目前為匿名測試：不傳 visitorUid、nickname、avatar',
+      callMode: '目前呼叫模式',
+      callModeAudio: '🎙️ 音訊客服（audio=1,video=0）',
+      callModeVideo: '📹 視訊客服（audio=1,video=1）',
+      bubbleTitleAudio: '音訊客服',
+      bubbleTitleVideo: '視訊客服',
+      bubbleSubtitleAudio: '點擊連線音訊客服',
+      bubbleSubtitleVideo: '點擊連線視訊客服',
+      docLinks: {
+        reactDoc: '查看 React 音視訊客服文件',
+        vueDoc: '查看 Vue 音視訊客服文件',
+        reactExample: 'React 音視訊客服示範原始碼'
+      },
+      usageTitle: '示範說明',
+      usageNotes: [
+        '1. 右下角懸浮按鈕 / 氣泡即為音視訊客服入口，點擊後在內嵌視窗中開啟 /webrtc 頁面。',
+        '2. 音訊客服（audio=1&video=0）：僅使用麥克風和喇叭，無需攝影機。',
+        '3. 視訊客服（audio=1&video=1）：同時啟用攝影機與麥克風進行雙向視訊通話。',
+        '4. 正式環境預設使用 CDN 網址 https://cdn.weiyuai.cn/webrtc，本機開發使用 http://127.0.0.1:9018/webrtc。',
+        '5. org、t、sid 參數與聊天介面保持一致，無需額外對接設定。'
+      ],
+      buttons: {
+        audioMode: '🎙️ 切換為音訊客服',
+        videoMode: '📹 切換為視訊客服',
+        switchAnonymousUser: '切換為匿名使用者'
+      },
+      urlGuideTitle: 'URL + 參數說明',
+      sampleUrlLabel: '目前設定產生的示例 URL',
+      urlParamsTitle: '參數說明',
+      urlParams: [
+        'org：組織 ID（必填）',
+        't：會話類型（0：一對一，1：工作組）',
+        'sid：客服 / 工作組 ID（必填）',
+        'audio：是否啟用音訊（1 啟用，0 停用）',
+        'video：是否啟用視訊（1 啟用，0 停用）',
+        'lang：語言（zh-cn / en 等）',
+        'visitorUid：自訂訪客 ID（選填）',
+        'nickname / avatar：訪客顯示資訊（選填）'
+      ]
     },
     videoConferenceDemo: {
       title: '視訊會議示範',
