@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Alert, Button, Card, List, Space, Tag, Typography, theme as antdTheme } from 'antd';
+import { useCallback, useMemo, useState } from 'react';
+import { Alert, Button, Card, Input, List, Space, Tag, Typography, theme as antdTheme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -20,9 +20,62 @@ interface DemoPageProps {
   onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
+type AudioPreset = {
+  key: string;
+  label: string;
+  target: string;
+};
+
+type CallLaunchMode = 'embed' | 'window' | 'tab';
+
 const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = antdTheme.useToken();
+  const [customTarget, setCustomTarget] = useState('');
+  const [lastPopupUrl, setLastPopupUrl] = useState('');
+  const [lastLaunchMode, setLastLaunchMode] = useState<CallLaunchMode | null>(null);
+  const htmlBaseUrl = process.env.NODE_ENV === 'development'
+    ? 'http://127.0.0.1:9022'
+    : 'https://cdn.weiyuai.cn';
+
+  const audioPresets = useMemo<AudioPreset[]>(() => [
+    { key: 'echo', label: '回声 echo', target: 'echo' },
+    { key: '1000', label: '音频 1000', target: '1000' },
+    // { key: '1001', label: '音频 1001', target: '1001' },
+    // { key: '1002', label: '音频 1002', target: '1002' },
+    // { key: '1003', label: '音频 1003', target: '1003' },
+    // { key: '1004', label: '音频 1004', target: '1004' },
+    // { key: '1005', label: '音频 1005', target: '1005' }
+  ], []);
+
+  const audioAiPresets = useMemo<AudioPreset[]>(() => [
+    // { key: '9200', label: '音频AI 9200', target: '9200' },
+    { key: '9201', label: '音频AI 9201', target: '9201' },
+    // { key: '9203', label: '音频AI 9203', target: '9203' },
+    // { key: '92030', label: '音频AI 92030', target: '92030' },
+    // { key: '9295', label: '音频AI 9295', target: '9295' },
+    // { key: '9296', label: '音频AI 9296', target: '9296' },
+    // { key: '9297', label: '音频AI 9297', target: '9297' },
+    // { key: '9298', label: '音频AI 9298', target: '9298' },
+    // { key: '9299', label: '音频AI 9299', target: '9299' }
+  ], []);
+
+  const ivrPresets = useMemo<AudioPreset[]>(() => [
+    { key: '5000', label: 'IVR 5000', target: '5000' }
+  ], []);
+
+  const audioAiTargetSet = useMemo(() => new Set(audioAiPresets.map((preset) => preset.target)), [audioAiPresets]);
+  const ivrTargetSet = useMemo(() => new Set(ivrPresets.map((preset) => preset.target)), [ivrPresets]);
+
+  const getAudioCallDisplayName = useCallback((target?: string) => {
+    if (!target) {
+      return undefined;
+    }
+    if (ivrTargetSet.has(target)) {
+      return `IVR ${target}`;
+    }
+    return audioAiTargetSet.has(target) ? `音频AI ${target}` : `音频 ${target}`;
+  }, [audioAiTargetSet, ivrTargetSet]);
 
   const users = useMemo(
     () => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
@@ -36,11 +89,8 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
 
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
-    htmlUrl: process.env.NODE_ENV === 'development'
-      ? 'http://127.0.0.1:9022/call'
-      : 'https://cdn.weiyuai.cn/call',
+    htmlUrl: htmlBaseUrl,
     ...(process.env.NODE_ENV === 'development' ? { apiUrl: 'http://127.0.0.1:9003' } : {}),
-    chatPath: '/chat',
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,
@@ -55,7 +105,8 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
     buttonConfig: {
       show: true,
       width: 60,
-      height: 60
+      height: 60,
+      action: 'call'
     },
     chatConfig: {
       ...selectedChatProfile.chatConfig,
@@ -71,7 +122,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
       mode: themeMode
     },
     locale
-  }), [isAnonymousMode, locale, messages, selectedChatProfile, selectedUser, themeMode]);
+  }), [htmlBaseUrl, isAnonymousMode, locale, messages, selectedChatProfile, selectedUser, themeMode]);
 
   const docLinks = useMemo(
     () => [
@@ -83,9 +134,6 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
   );
 
   const sampleUrl = useMemo(() => {
-    const baseHtmlUrl = process.env.NODE_ENV === 'development'
-      ? 'http://127.0.0.1:9022/call'
-      : 'https://cdn.weiyuai.cn/call';
     const params = new URLSearchParams();
     const appendIfPresent = (key: string, value: string | undefined) => {
       if (value) {
@@ -100,10 +148,66 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
       appendIfPresent('nickname', selectedUser.nickname);
       appendIfPresent('avatar', selectedUser.avatar);
     }
+    params.append('audio', '1');
+    params.append('video', '0');
     params.append('lang', locale);
     params.append('mode', String(themeMode || 'light'));
-    return `${baseHtmlUrl}?${params.toString()}`;
-  }, [isAnonymousMode, locale, selectedChatProfile, selectedUser, themeMode]);
+    return `${htmlBaseUrl}/call?${params.toString()}`;
+  }, [htmlBaseUrl, isAnonymousMode, locale, selectedChatProfile, selectedUser, themeMode]);
+
+  const buildAudioCallUrl = useCallback((target?: string) => {
+    const url = new URL(sampleUrl);
+    url.searchParams.set('audio', '1');
+    url.searchParams.set('video', '0');
+    if (target) {
+      url.searchParams.set('target', target);
+      url.searchParams.set('callNumber', target);
+      url.searchParams.set('callDisplayName', getAudioCallDisplayName(target) || `Audio ${target}`);
+    }
+    return url.toString();
+  }, [getAudioCallDisplayName, sampleUrl]);
+
+  const openAudioCallWindow = useCallback((target?: string) => {
+    const nextUrl = buildAudioCallUrl(target);
+    setLastPopupUrl(nextUrl);
+    setLastLaunchMode('window');
+    window.open(nextUrl, '_blank', 'width=420,height=760,resizable=yes,scrollbars=yes');
+  }, [buildAudioCallUrl]);
+
+  const openAudioCallTab = useCallback((target?: string) => {
+    const nextUrl = buildAudioCallUrl(target);
+    setLastPopupUrl(nextUrl);
+    setLastLaunchMode('tab');
+    window.open(nextUrl, '_blank');
+  }, [buildAudioCallUrl]);
+
+  const showAudioCallPopup = useCallback((target?: string) => {
+    const popupUrl = buildAudioCallUrl(target);
+    setLastPopupUrl(popupUrl);
+    setLastLaunchMode('embed');
+    const widget = (window as any).bytedesk;
+    if (!widget?.showCall) {
+      openAudioCallWindow(target);
+      return;
+    }
+
+    widget.showCall({
+      forceRefresh: true,
+      chatConfig: {
+        ...config.chatConfig,
+        audio: 1,
+        video: 0,
+        ...(target
+          ? {
+              target,
+              callNumber: target,
+              callDisplayName: getAudioCallDisplayName(target) || `Audio ${target}`
+            }
+          : {})
+      }
+    });
+  }, [buildAudioCallUrl, config.chatConfig, getAudioCallDisplayName, openAudioCallWindow]);
+
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
   const consultButtonLabel = useMemo(() => {
     const defaultLabel = getConsultButtonLabel(selectedChatProfile, locale);
@@ -130,11 +234,6 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
               </Typography.Link>
             ))}
           </Space>
-          <Alert
-            type="info"
-            showIcon
-            message={messages.pages.callCenterDemo.pathAlert}
-          />
         </Space>
       </Card>
 
@@ -194,30 +293,106 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
           </Space>
 
           <Space wrap>
-            <Button type="primary" onClick={() => (window as any).bytedesk?.showChat()}>
+            <Button type="primary" onClick={() => showAudioCallPopup()}>
               {consultButtonLabel}
             </Button>
             <Button onClick={() => (window as any).bytedesk?.hideChat()}>{messages.common.buttons.closeChat}</Button>
-            <Button onClick={() => window.open(sampleUrl, '_blank', 'width=420,height=680,resizable=yes,scrollbars=yes')}>
+            <Button onClick={() => openAudioCallWindow()}>
               {messages.common.buttons.openInNewWindow}
             </Button>
-            <Button onClick={() => window.open(sampleUrl, '_blank')}>
+            <Button onClick={() => openAudioCallTab()}>
               {messages.common.buttons.openInNewTab}
             </Button>
           </Space>
 
+          <Card size="small" title="SIP/Freeswitch 呼叫演示按钮">
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                下面的按钮统一通过 /call 页面发起 SIP/Freeswitch 音频会话。已保留音频呼叫、音频 AI 机器人与 IVR 预置目标；如果 SDK 尚未初始化，则自动退回到新窗口打开 /call。
+              </Typography.Paragraph>
+              <Alert
+                type="info"
+                showIcon
+                message="参数说明：当前示例统一使用 audio=1&video=0 发起音频呼叫；showCall() 也使用同名参数。"
+                style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
+              />
+              <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                <Typography.Text strong>音频呼叫</Typography.Text>
+                <Space wrap>
+                  {audioPresets.map((preset) => (
+                    <Button key={preset.key} type="primary" onClick={() => showAudioCallPopup(preset.target)}>
+                      {preset.label}
+                    </Button>
+                  ))}
+                </Space>
+              </Space>
+              <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                <Typography.Text strong>音频AI 机器人</Typography.Text>
+                <Space wrap>
+                  {audioAiPresets.map((preset) => (
+                    <Button key={preset.key} onClick={() => showAudioCallPopup(preset.target)}>
+                      {preset.label}
+                    </Button>
+                  ))}
+                </Space>
+              </Space>
+              <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                <Typography.Text strong>IVR 测试</Typography.Text>
+                <Space wrap>
+                  {ivrPresets.map((preset) => (
+                    <Button key={preset.key} onClick={() => showAudioCallPopup(preset.target)}>
+                      {preset.label}
+                    </Button>
+                  ))}
+                </Space>
+              </Space>
+              <Space.Compact>
+                <Input
+                  value={customTarget}
+                  onChange={(event) => setCustomTarget(event.target.value)}
+                  placeholder="输入自定义分机，例如 1006"
+                  style={{ width: 220 }}
+                />
+                <Button type="primary" onClick={() => showAudioCallPopup(customTarget || undefined)}>
+                  嵌入式呼叫
+                </Button>
+                <Button onClick={() => showAudioCallPopup(customTarget || undefined)}>
+                  弹窗音频呼叫
+                </Button>
+                <Button onClick={() => openAudioCallTab(customTarget || undefined)}>
+                  音频新标签页
+                </Button>
+              </Space.Compact>
+            </Space>
+          </Card>
+
           <Alert
             type="info"
             showIcon
-            message={`${messages.common.apiHintPrefix} showChat() / hideChat()`}
+            message={`${messages.common.apiHintPrefix} showCall() / hideChat()`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
           <Alert
             type="info"
             showIcon
-            message={`咨询参数: ${chatConfigHint}`}
+            message={`咨询参数: ${chatConfigHint}；当前呼叫示例统一传入 audio=1&video=0`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
+          <Space align="center" size={8}>
+            <Typography.Text strong>最近呼叫 URL</Typography.Text>
+            {lastLaunchMode ? (
+              <Tag color="blue">
+                {lastLaunchMode === 'embed' ? '嵌入式弹窗' : lastLaunchMode === 'window' ? '新窗口' : '新标签页'}
+              </Tag>
+            ) : null}
+          </Space>
+          {lastPopupUrl ? (
+            <Typography.Paragraph copyable={{ text: lastPopupUrl }} style={{ marginBottom: 0 }}>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{lastPopupUrl}</pre>
+            </Typography.Paragraph>
+          ) : (
+            <Typography.Text type="secondary">点击嵌入式呼叫、新窗口或新标签页按钮后，将在这里显示对应 URL</Typography.Text>
+          )}
 
           <List
             header={messages.pages.callCenterDemo.usageTitle}
@@ -232,6 +407,16 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
           <Typography.Text strong>{messages.pages.callCenterDemo.sampleUrlLabel}</Typography.Text>
           <Typography.Paragraph copyable={{ text: sampleUrl }} style={{ marginBottom: 0 }}>
             <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
+          </Typography.Paragraph>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            当前示例 URL 默认附带 audio=1、video=0，可直接按音频会话打开。
+          </Typography.Paragraph>
+          <Typography.Text strong>音频示例 URL</Typography.Text>
+          <Typography.Paragraph copyable={{ text: buildAudioCallUrl('1000') }} style={{ marginBottom: 0 }}>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{buildAudioCallUrl('1000')}</pre>
+          </Typography.Paragraph>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            音频示例参数：audio=1、video=0，可选附加 target、callNumber、callDisplayName。
           </Typography.Paragraph>
         </Space>
       </Card>

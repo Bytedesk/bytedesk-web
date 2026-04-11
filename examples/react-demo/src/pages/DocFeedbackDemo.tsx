@@ -49,9 +49,12 @@ const normalizeCategories = (input?: string | string[]) => {
     .filter(Boolean);
 };
 
-const DocumentFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPageProps) => {
+const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = theme.useToken();
+  const htmlBaseUrl = process.env.NODE_ENV === 'development'
+    ? 'http://127.0.0.1:9006'
+    : 'https://cdn.weiyuai.cn';
   const [feedbackLogs, setFeedbackLogs] = useState<FeedbackLog[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -88,9 +91,9 @@ const DocumentFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPa
 
   const [config, setConfig] = useState<BytedeskConfig>(() => ({
     isDebug: true,
+    htmlUrl: htmlBaseUrl,
     ...(process.env.NODE_ENV === 'development'
       ? {
-          htmlUrl: 'http://127.0.0.1:9006',
           apiUrl: 'http://127.0.0.1:9003'
         }
       : {}),
@@ -108,7 +111,8 @@ const DocumentFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPa
     buttonConfig: {
       show: true,
       width: 60,
-      height: 60
+      height: 60,
+      action: 'chat'
     },
     feedbackConfig: createFeedbackConfig(),
     chatConfig: {
@@ -512,4 +516,4 @@ const DocumentFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPa
   );
 };
 
-export default DocumentFeedbackDemo;
+export default DocFeedbackDemo;

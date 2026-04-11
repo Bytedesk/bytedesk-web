@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Avatar, Button, Card, List, Select, Space, Tag, Typography } from 'antd';
+import { Alert, Avatar, Button, Card, List, Select, Space, Table, Tag, Typography } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -326,6 +326,9 @@ const DEMO_ORDERS: DemoOrderInfo[] = [
 
 const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
+  const htmlBaseUrl = process.env.NODE_ENV === 'development'
+    ? 'http://127.0.0.1:9006'
+    : 'https://cdn.weiyuai.cn';
   const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
   const users = useMemo(
@@ -386,9 +389,9 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
 
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
+    htmlUrl: htmlBaseUrl,
     ...(process.env.NODE_ENV === 'development'
       ? {
-          htmlUrl: 'http://127.0.0.1:9006',
           apiUrl: 'http://127.0.0.1:9003'
         }
       : {}),
@@ -401,7 +404,8 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     marginBottom: 20,
     marginSide: 20,
     buttonConfig: {
-      show: true
+      show: true,
+      action: 'chat'
     },
     bubbleConfig: {
       show: true,
@@ -441,6 +445,7 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     }
   }), [
     isAnonymousMode,
+    htmlBaseUrl,
     locale,
     messages.pages.basicDemo.bubbleSubtitle,
     messages.pages.basicDemo.bubbleTitle,
@@ -488,6 +493,16 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     }, 0);
   };
 
+  const rawUrlParams = useMemo(() => Array.from(new URL(chatPageUrl).searchParams.entries()), [chatPageUrl]);
+  const requiredUrlParams = useMemo(() => new Set(['org', 't', 'sid']), []);
+  const urlParamPurposeMap = useMemo<Record<string, string>>(() => ({
+    ...messages.pages.orderInfoDemo.urlParamPurposes
+  } as Record<string, string>), [messages.pages.orderInfoDemo.urlParamPurposes]);
+  const urlParams = useMemo(
+    () => rawUrlParams.map(([key, value]) => ({ key, value, purpose: urlParamPurposeMap[key] || '—' })),
+    [rawUrlParams, urlParamPurposeMap]
+  );
+
   const selectedUserKey = isAnonymousMode ? undefined : selectedUser.key;
 
   return (
@@ -496,13 +511,13 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
         <Space direction="vertical" size="small" style={{ width: '100%' }}>
           <Title level={2} style={{ marginBottom: 0 }}>{messages.pages.orderInfoDemo.title}</Title>
           <Paragraph type="secondary" style={{ marginBottom: 0 }}>{messages.pages.orderInfoDemo.description}</Paragraph>
-          <Tag color="blue">当前 demo-user: {selectedUser.visitorUid}</Tag>
+          <Tag color="blue">{messages.pages.orderInfoDemo.currentDemoUserLabel}: {selectedUser.visitorUid}</Tag>
         </Space>
       </Card>
 
-      <Card title="订单列表（紧凑）">
+      <Card title={messages.pages.orderInfoDemo.orderListCardTitle}>
         <Space wrap style={{ marginBottom: 12 }}>
-          <Text strong>当前用户</Text>
+          <Text strong>{messages.pages.orderInfoDemo.currentUserLabel}</Text>
           <Select
             style={{ minWidth: 280 }}
             value={selectedUserKey}
@@ -531,7 +546,7 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
             }}
           >
             {messages.pages.userInfoDemo.switchAnonymousUserLabel}
-            {isAnonymousMode ? '【当前】' : ''}
+            {isAnonymousMode ? messages.pages.orderInfoDemo.currentIndicator : ''}
           </Button>
         </Space>
 
@@ -539,7 +554,7 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
           <List
             size="small"
             dataSource={orderList}
-            locale={{ emptyText: '当前用户暂无订单' }}
+            locale={{ emptyText: messages.pages.orderInfoDemo.noOrdersText }}
             renderItem={(item) => {
               const active = item.uid === selectedOrder?.uid;
               return (
@@ -565,7 +580,7 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
                             handleConsultOrder(item.uid);
                           }}
                         >
-                          咨询该订单
+                          {messages.pages.orderInfoDemo.consultOrderBtn}
                         </Button>
                         <Tag color="blue">{item.statusText}</Tag>
                         <Text strong>¥{item.totalAmount.toLocaleString()}</Text>
@@ -582,7 +597,7 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
           <Alert
             type="info"
             showIcon
-            message="匿名用户无订单数据，当前咨询不会携带订单参数"
+            message={messages.pages.orderInfoDemo.anonymousNoOrderAlert}
             style={{ marginBottom: 8 }}
           />
         )}
@@ -596,17 +611,76 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
           <Button onClick={() => window.open(chatPageUrl, '_blank')}>
             {messages.common.buttons.openInNewTab}
           </Button>
-          <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} />
+          <Alert type="info" showIcon message={`${messages.pages.orderInfoDemo.consultParamsLabel}: ${chatConfigHint}`} />
         </Space>
       </Card>
 
       {orderInfoPayload ? (
-        <Card title="当前发送的订单参数">
-          <Typography.Paragraph copyable={{ text: JSON.stringify(orderInfoPayload, null, 2) }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{JSON.stringify(orderInfoPayload, null, 2)}</pre>
-          </Typography.Paragraph>
+        <Card title={messages.pages.orderInfoDemo.orderPayloadCardTitle}>
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Typography.Paragraph copyable={{ text: JSON.stringify(orderInfoPayload, null, 2) }} style={{ marginBottom: 0 }}>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{JSON.stringify(orderInfoPayload, null, 2)}</pre>
+            </Typography.Paragraph>
+            <Typography.Text type="secondary">{messages.pages.orderInfoDemo.orderStringifyHint}</Typography.Text>
+            <Typography.Paragraph
+              copyable={{ text: `chatConfig: {\n  orderInfo: JSON.stringify(orderInfoPayload),\n}`, tooltips: false }}
+              style={{ margin: 0, fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace', fontSize: 12, background: 'rgba(0,0,0,0.04)', padding: '10px 12px', borderRadius: 6 }}
+            >{`chatConfig: {\n  orderInfo: JSON.stringify(orderInfoPayload),\n}`}</Typography.Paragraph>
+          </Space>
         </Card>
       ) : null}
+
+      <Card title={messages.pages.orderInfoDemo.urlParamsCardTitle}>
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Typography.Text type="secondary">{messages.pages.orderInfoDemo.standaloneUrlLabel}</Typography.Text>
+          <Typography.Paragraph
+            copyable={{ text: chatPageUrl, tooltips: false }}
+            style={{ margin: 0, fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace', fontSize: 12, background: 'rgba(0,0,0,0.04)', padding: '10px 12px', borderRadius: 6, wordBreak: 'break-all' }}
+          >
+            {chatPageUrl}
+          </Typography.Paragraph>
+          <Table
+            size="small"
+            bordered
+            pagination={false}
+            rowKey="key"
+            dataSource={urlParams}
+            columns={[
+              {
+                title: messages.pages.orderInfoDemo.paramNameCol,
+                dataIndex: 'key',
+                key: 'key',
+                render: (value: string) => (
+                  <Space size={6}>
+                    <Typography.Text copyable={{ tooltips: false }}>{value}</Typography.Text>
+                    <Tag color={requiredUrlParams.has(value) ? 'error' : 'default'}>
+                      {requiredUrlParams.has(value) ? messages.pages.orderInfoDemo.requiredLabel : messages.pages.orderInfoDemo.optionalLabel}
+                    </Tag>
+                  </Space>
+                ),
+              },
+              {
+                title: messages.pages.orderInfoDemo.paramValueCol,
+                dataIndex: 'value',
+                key: 'value',
+                render: (value: string) => (
+                  <Typography.Text copyable={{ tooltips: false }}>{value}</Typography.Text>
+                ),
+              },
+              {
+                title: messages.pages.orderInfoDemo.paramPurposeCol,
+                dataIndex: 'purpose',
+                key: 'purpose',
+              },
+            ]}
+          />
+          <Typography.Text type="secondary">{messages.pages.orderInfoDemo.orderUrlHint}</Typography.Text>
+          <Typography.Paragraph
+            copyable={{ text: `const params = new URLSearchParams();\nparams.append('orderInfo', JSON.stringify(orderInfoPayload));\nconst url = \`https://cdn.weiyuai.cn/chat?\${params.toString()}\`;`, tooltips: false }}
+            style={{ margin: 0, fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace', fontSize: 12, background: 'rgba(0,0,0,0.04)', padding: '10px 12px', borderRadius: 6 }}
+          >{`const params = new URLSearchParams();\nparams.append('orderInfo', JSON.stringify(orderInfoPayload));\nconst url = \`https://cdn.weiyuai.cn/chat?\${params.toString()}\`;`}</Typography.Paragraph>
+        </Space>
+      </Card>
 
       <BytedeskReact {...config} />
     </PageContainer>

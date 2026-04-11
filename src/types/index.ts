@@ -112,6 +112,9 @@ export interface ButtonConfig {
   // size?: number; // 按钮大小
   width?: number; // 按钮宽度
   height?: number; // 按钮高度
+  action?: 'chat' | 'thread' | 'webrtc' | 'call'; // 按钮点击后触发的内置会话类型
+  previewImageUrl?: string; // 鼠标悬浮时展示的图片地址，例如企业微信二维码
+  previewImageAlt?: string; // 悬浮图片说明文案
   onClick?: () => void; // 点击回调
 }
 
@@ -151,8 +154,11 @@ export interface BytedeskConfig {
   isDebug?: boolean; // 是否开启调试模式
   forceRefresh?: boolean; // 是否强制刷新页面
   apiUrl?: string; // API基础URL
-  htmlUrl?: string; // Html基础URL
-  chatPath?: '/chat' | '/chat/thread' | '/webrtc'; // 聊天页面路径，默认 /chat；历史会话页使用 /chat/thread；WebRTC 客服使用 /webrtc
+  htmlUrl?: string; // Html基础URL，推荐传站点根地址
+  chatPath?: string; // 文本聊天页面路径，默认 /chat
+  threadPath?: string; // 历史会话页面路径，默认 /chat/thread
+  webrtcPath?: string; // 音视频通话页面路径，默认 /webrtc
+  callPath?: string; // 呼叫中心页面路径，默认 /call
   placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
   marginBottom?: number; // 底部边距
   marginSide?: number; // 侧边边距
@@ -164,6 +170,7 @@ export interface BytedeskConfig {
   tabsConfig?: TabsConfig; // 标签配置
   bubbleConfig?: BubbleConfig; // 气泡配置
   buttonConfig?: ButtonConfig; // 按钮配置
+  buttonsConfig?: ButtonConfig[]; // 多按钮配置，配置后优先按数组渲染多个入口按钮
   feedbackConfig?: FeedbackConfig; // 文档反馈配置
   chatConfig?: ChatConfig; // 聊天配置
   browseConfig?: BrowseConfig; // 浏览配置
@@ -178,7 +185,7 @@ export interface BytedeskConfig {
   onVisitorInfo?: (uid: string, visitorUid: string) => void; // localStorage 数据回调
 }
 
-export type Language = 'zh-cn' | 'zh-tw' | 'en' | 'ja' | 'ja-jp' | 'ko' | 'vi-vn' | 'ms-my';
+export type Language = 'zh-cn' | 'zh-tw' | 'en' | 'ja' | 'ja-jp' | 'ko' | 'ko-kr' | 'vi-vn' | 'ms-my' | 'es-es' | 'fr-fr';
 
 export interface LocaleMessages {
   [key: string]: {

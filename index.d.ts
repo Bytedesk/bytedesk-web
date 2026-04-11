@@ -1,12 +1,27 @@
 declare module 'bytedesk-web/react' {
   import { FC } from 'react';
 
+  export interface ButtonConfig {
+    show?: boolean;
+    icon?: string;
+    text?: string;
+    width?: number;
+    height?: number;
+    action?: 'chat' | 'thread' | 'webrtc' | 'call';
+    previewImageUrl?: string;
+    previewImageAlt?: string;
+    onClick?: () => void;
+  }
+
   export interface BytedeskConfig {
     isDebug?: boolean; // 是否开启调试模式
     forceRefresh?: boolean; // 是否强制刷新页面
     apiUrl?: string; // API基础URL
-    htmlUrl?: string; // Html基础URL
-    chatPath?: '/chat' | '/chat/thread'; // 聊天页面路径，默认 /chat；历史会话页使用 /chat/thread
+    htmlUrl?: string; // Html基础URL，推荐传站点根地址
+    chatPath?: string; // 文本聊天页面路径，默认 /chat
+    threadPath?: string; // 历史会话页面路径，默认 /chat/thread
+    webrtcPath?: string; // 音视频通话页面路径，默认 /webrtc
+    callPath?: string; // 呼叫中心页面路径，默认 /call
     placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
     marginBottom?: number; // 底部边距
     marginSide?: number; // 侧边边距
@@ -45,14 +60,8 @@ declare module 'bytedesk-web/react' {
       rotateInterval?: number; // 轮播间隔, 单位: 毫秒
       switchMode?: 'fade' | 'slide-up' | 'ticker'; // 消息切换方式
     };
-    buttonConfig?: {
-      show?: boolean; // 是否显示按钮
-      icon?: string; // 按钮图标
-      text?: string; // 按钮文本
-      width?: number; // 按钮宽度
-      height?: number; // 按钮高度
-      onClick?: () => void; // 点击回调
-    };
+    buttonConfig?: ButtonConfig; // 单按钮配置
+    buttonsConfig?: ButtonConfig[]; // 多按钮配置，配置后优先按数组渲染多个入口按钮
     chatConfig?: {
       org: string; // 组织ID
       t: string; // 类型
@@ -104,12 +113,27 @@ declare module 'bytedesk-web/react' {
 declare module 'bytedesk-web/vue' {
   import { DefineComponent } from 'vue';
 
+  export interface ButtonConfig {
+    show?: boolean;
+    icon?: string;
+    text?: string;
+    width?: number;
+    height?: number;
+    action?: 'chat' | 'thread' | 'webrtc' | 'call';
+    previewImageUrl?: string;
+    previewImageAlt?: string;
+    onClick?: () => void;
+  }
+
   export interface BytedeskConfig {
     isDebug?: boolean; // 是否开启调试模式
     forceRefresh?: boolean; // 是否强制刷新页面
     apiUrl?: string; // API基础URL
-    htmlUrl?: string; // Html基础URL
-    chatPath?: '/chat' | '/chat/thread'; // 聊天页面路径，默认 /chat；历史会话页使用 /chat/thread
+    htmlUrl?: string; // Html基础URL，推荐传站点根地址
+    chatPath?: string; // 文本聊天页面路径，默认 /chat
+    threadPath?: string; // 历史会话页面路径，默认 /chat/thread
+    webrtcPath?: string; // 音视频通话页面路径，默认 /webrtc
+    callPath?: string; // 呼叫中心页面路径，默认 /call
     placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
     marginBottom?: number; // 底部边距
     marginSide?: number; // 侧边边距
@@ -148,14 +172,8 @@ declare module 'bytedesk-web/vue' {
       rotateInterval?: number; // 轮播间隔, 单位: 毫秒
       switchMode?: 'fade' | 'slide-up' | 'ticker'; // 消息切换方式
     };
-    buttonConfig?: {
-      show?: boolean; // 是否显示按钮
-      icon?: string; // 按钮图标
-      text?: string; // 按钮文本
-      width?: number; // 按钮宽度
-      height?: number; // 按钮高度
-      onClick?: () => void; // 点击回调
-    };
+    buttonConfig?: ButtonConfig; // 单按钮配置
+    buttonsConfig?: ButtonConfig[]; // 多按钮配置，配置后优先按数组渲染多个入口按钮
     chatConfig?: {
       org: string; // 组织ID
       t: string; // 类型
@@ -207,12 +225,27 @@ declare module 'bytedesk-web/vue' {
 declare module 'bytedesk-web/svelte' {
   import type { SvelteComponent } from 'svelte';
 
+  export interface ButtonConfig {
+    show?: boolean;
+    icon?: string;
+    text?: string;
+    width?: number;
+    height?: number;
+    action?: 'chat' | 'thread' | 'webrtc' | 'call';
+    previewImageUrl?: string;
+    previewImageAlt?: string;
+    onClick?: () => void;
+  }
+
   export interface BytedeskConfig {
     isDebug?: boolean; // 是否开启调试模式
     forceRefresh?: boolean; // 是否强制刷新页面
     apiUrl?: string; // API基础URL
-    htmlUrl?: string; // Html基础URL
-    chatPath?: '/chat' | '/chat/thread'; // 聊天页面路径，默认 /chat；历史会话页使用 /chat/thread
+    htmlUrl?: string; // Html基础URL，推荐传站点根地址
+    chatPath?: string; // 文本聊天页面路径，默认 /chat
+    threadPath?: string; // 历史会话页面路径，默认 /chat/thread
+    webrtcPath?: string; // 音视频通话页面路径，默认 /webrtc
+    callPath?: string; // 呼叫中心页面路径，默认 /call
     placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
     marginBottom?: number; // 底部边距
     marginSide?: number; // 侧边边距
@@ -251,14 +284,8 @@ declare module 'bytedesk-web/svelte' {
       rotateInterval?: number; // 轮播间隔, 单位: 毫秒
       switchMode?: 'fade' | 'slide-up' | 'ticker'; // 消息切换方式
     };
-    buttonConfig?: {
-      show?: boolean; // 是否显示按钮
-      icon?: string; // 按钮图标
-      text?: string; // 按钮文本
-      width?: number; // 按钮宽度
-      height?: number; // 按钮高度
-      onClick?: () => void; // 点击回调
-    };
+    buttonConfig?: ButtonConfig; // 单按钮配置
+    buttonsConfig?: ButtonConfig[]; // 多按钮配置，配置后优先按数组渲染多个入口按钮
     chatConfig?: {
       org: string; // 组织ID
       t: string; // 类型
@@ -310,12 +337,27 @@ declare module 'bytedesk-web/svelte' {
 declare module 'bytedesk-web/angular' {
   import { Component } from '@angular/core';
 
+  export interface ButtonConfig {
+    show?: boolean;
+    icon?: string;
+    text?: string;
+    width?: number;
+    height?: number;
+    action?: 'chat' | 'thread' | 'webrtc' | 'call';
+    previewImageUrl?: string;
+    previewImageAlt?: string;
+    onClick?: () => void;
+  }
+
   export interface BytedeskConfig {
     isDebug?: boolean; // 是否开启调试模式
     forceRefresh?: boolean; // 是否强制刷新页面
     apiUrl?: string; // API基础URL
-    htmlUrl?: string; // Html基础URL
-    chatPath?: '/chat' | '/chat/thread'; // 聊天页面路径，默认 /chat；历史会话页使用 /chat/thread
+    htmlUrl?: string; // Html基础URL，推荐传站点根地址
+    chatPath?: string; // 文本聊天页面路径，默认 /chat
+    threadPath?: string; // 历史会话页面路径，默认 /chat/thread
+    webrtcPath?: string; // 音视频通话页面路径，默认 /webrtc
+    callPath?: string; // 呼叫中心页面路径，默认 /call
     placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
     marginBottom?: number; // 底部边距
     marginSide?: number; // 侧边边距
@@ -354,14 +396,8 @@ declare module 'bytedesk-web/angular' {
       rotateInterval?: number; // 轮播间隔, 单位: 毫秒
       switchMode?: 'fade' | 'slide-up' | 'ticker'; // 消息切换方式
     };
-    buttonConfig?: {
-      show?: boolean; // 是否显示按钮
-      icon?: string; // 按钮图标
-      text?: string; // 按钮文本
-      width?: number; // 按钮宽度
-      height?: number; // 按钮高度
-      onClick?: () => void; // 点击回调
-    };
+    buttonConfig?: ButtonConfig; // 单按钮配置
+    buttonsConfig?: ButtonConfig[]; // 多按钮配置，配置后优先按数组渲染多个入口按钮
     chatConfig?: {
       org: string; // 组织ID
       t: string; // 类型
@@ -416,13 +452,28 @@ declare module 'bytedesk-web/angular' {
 
 declare module 'bytedesk-web/nextjs' {
   import { FC } from 'react';
+
+  export interface ButtonConfig {
+    show?: boolean;
+    icon?: string;
+    text?: string;
+    width?: number;
+    height?: number;
+    action?: 'chat' | 'thread' | 'webrtc' | 'call';
+    previewImageUrl?: string;
+    previewImageAlt?: string;
+    onClick?: () => void;
+  }
   
   export interface BytedeskConfig {
     isDebug?: boolean; // 是否开启调试模式
     forceRefresh?: boolean; // 是否强制刷新页面
     apiUrl?: string; // API基础URL
-    htmlUrl?: string; // Html基础URL
-    chatPath?: '/chat' | '/chat/thread'; // 聊天页面路径，默认 /chat；历史会话页使用 /chat/thread
+    htmlUrl?: string; // Html基础URL，推荐传站点根地址
+    chatPath?: string; // 文本聊天页面路径，默认 /chat
+    threadPath?: string; // 历史会话页面路径，默认 /chat/thread
+    webrtcPath?: string; // 音视频通话页面路径，默认 /webrtc
+    callPath?: string; // 呼叫中心页面路径，默认 /call
     placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
     marginBottom?: number; // 底部边距
     marginSide?: number; // 侧边边距
@@ -461,14 +512,8 @@ declare module 'bytedesk-web/nextjs' {
       rotateInterval?: number; // 轮播间隔, 单位: 毫秒
       switchMode?: 'fade' | 'slide-up' | 'ticker'; // 消息切换方式
     };
-    buttonConfig?: {
-      show?: boolean; // 是否显示按钮
-      icon?: string; // 按钮图标
-      text?: string; // 按钮文本
-      width?: number; // 按钮宽度
-      height?: number; // 按钮高度
-      onClick?: () => void; // 点击回调
-    };
+    buttonConfig?: ButtonConfig; // 单按钮配置
+    buttonsConfig?: ButtonConfig[]; // 多按钮配置，配置后优先按数组渲染多个入口按钮
     chatConfig?: {
       org: string; // 组织ID
       t: string; // 类型

@@ -14,7 +14,8 @@ export const esEs = {
       'vi-vn': 'Tiếng Việt',
       'ms-my': 'Bahasa Melayu',
       'es-es': 'Español',
-      'fr-fr': 'Francés'
+      'fr-fr': 'Francés',
+      'th-th': 'Tailandés (Tailandia)'
     },
     themeLabel: 'Modo de tema',
     themeOptions: {
@@ -72,6 +73,7 @@ export const esEs = {
     threadHistoryDemo: '🧵 Historial de conversaciones',
     webrtcDemo: '📹 Demo WebRTC',
     callCenterDemo: '📞 Centro de llamadas',
+    proactiveDemo: '🎯 Captacion proactiva',
     videoConferenceDemo: '🎬 Videoconferencia',
     documentFeedbackDemo: '📝 Comentarios del documento',
     flightBookingDemo: '✈️ Reserva de vuelos'
@@ -83,16 +85,22 @@ export const esEs = {
       title: 'Configuracion basica de Bytedesk',
       intro: 'Usa las acciones rapidas de abajo para probar las funciones comunes del SDK Web de Bytedesk.',
       themeButtonLabel: 'Cambiar color de navegacion',
+      themeTextButtonLabel: 'Cambiar color del texto de navegacion',
       bubbleTitle: 'Necesitas ayuda?',
       bubbleSubtitle: 'Haz clic para iniciar el chat',
       placement: {
         bottomLeft: 'Abajo a la izquierda',
         bottomRight: 'Abajo a la derecha'
       },
+      navbarLabel: 'Ocultar navegacion superior',
+      navbarHidden: 'ACTIVADO',
+      navbarShown: 'DESACTIVADO',
+      navbarParamPurpose: 'Indica si se oculta la barra de navegacion superior. navbar=0 oculta la navegacion.',
       loadHistoryLabel: 'Cargar historial',
       loadHistoryEnabled: 'ACTIVADO',
       loadHistoryDisabled: 'DESACTIVADO',
       defaultColorLabel: 'Predeterminado',
+      defaultTextColorLabel: 'Predeterminado',
       currentConfigTitle: 'Configuracion actual',
       copyConfig: 'Copiar JSON de configuracion'
     },
@@ -383,7 +391,7 @@ export const esEs = {
       anonymousUserHint: 'Modo de prueba anonimo: se omiten visitorUid, nickname y avatar.',
       pathAlert: 'Esta pagina mantiene chatPath=/chat y apunta a un sid de call center para simular el acceso a la cola desde la entrada web.',
       currentPathLabel: 'Ruta de entrada actual',
-      currentPathHint: 'La ruta sigue siendo /chat; la cola la determina chatConfig.sid.',
+      currentPathHint: 'La ruta sigue siendo /call; la cola la determina chatConfig.sid.',
       usageTitle: 'Notas del demo',
       usageNotes: [
         '1. Configura sid con el ID de tu grupo de call center para que todas las sesiones entren en la misma cola.',

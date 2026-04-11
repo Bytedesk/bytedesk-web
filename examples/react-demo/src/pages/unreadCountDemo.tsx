@@ -25,12 +25,15 @@ interface DemoPageProps {
 const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = theme.useToken();
+    const htmlBaseUrl = process.env.NODE_ENV === 'development'
+        ? 'http://127.0.0.1:9006'
+        : 'https://cdn.weiyuai.cn';
     const [unreadCount, setUnreadCount] = useState<number>(0);
     const [config, setConfig] = useState<BytedeskConfig>({
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
+        htmlUrl: htmlBaseUrl,
         ...(process.env.NODE_ENV === 'development' 
         ? { 
-            htmlUrl: 'http://127.0.0.1:9006', 
             apiUrl: 'http://127.0.0.1:9003' 
         } 
         : {}),
@@ -39,6 +42,10 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
         marginSide: 20,
         autoPopup: false,
         draggable: true,
+        buttonConfig: {
+            show: true,
+            action: 'chat'
+        },
         chatConfig: {
             ...selectedChatProfile.chatConfig,
             // 自定义用户信息

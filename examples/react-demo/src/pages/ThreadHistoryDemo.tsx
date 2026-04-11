@@ -23,6 +23,9 @@ interface DemoPageProps {
 const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = antdTheme.useToken();
+  const htmlBaseUrl = process.env.NODE_ENV === 'development'
+    ? 'http://127.0.0.1:9006'
+    : 'https://cdn.weiyuai.cn';
   const users = useMemo(
     () => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
       key,
@@ -34,13 +37,8 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
   );
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
-    ...(process.env.NODE_ENV === 'development'
-      ? {
-        htmlUrl: 'http://127.0.0.1:9006',
-        apiUrl: 'http://127.0.0.1:9003'
-      }
-      : {}),
-    chatPath: '/chat/thread',
+    htmlUrl: htmlBaseUrl,
+    ...(process.env.NODE_ENV === 'development' ? { apiUrl: 'http://127.0.0.1:9003' } : {}),
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,
@@ -55,7 +53,8 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
     buttonConfig: {
       show: true,
       width: 60,
-      height: 60
+      height: 60,
+      action: 'thread'
     },
     chatConfig: {
       ...selectedChatProfile.chatConfig,
@@ -71,7 +70,7 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
       mode: themeMode
     },
     locale
-  }), [isAnonymousMode, locale, messages, selectedChatProfile, selectedUser, themeMode]);
+  }), [htmlBaseUrl, isAnonymousMode, locale, messages, selectedChatProfile, selectedUser, themeMode]);
 
   const docLinks = useMemo(
     () => [
@@ -87,7 +86,6 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
   }, [selectedChatProfile]);
 
   const sampleUrl = useMemo(() => {
-    const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/chat(?:\/thread)?\/?$/, '');
     const params = new URLSearchParams();
     const appendIfPresent = (key: string, value: string | undefined) => {
       if (value) {
@@ -102,8 +100,8 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
     appendIfPresent('avatar', config.chatConfig?.avatar);
     params.append('lang', locale);
     params.append('mode', String(themeMode || 'light'));
-    return `${baseHtmlUrl}/chat/thread?${params.toString()}`;
-  }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
+    return `${htmlBaseUrl}/chat/thread?${params.toString()}`;
+  }, [config.chatConfig, htmlBaseUrl, locale, themeMode]);
 
   const usageNotes = messages.pages.threadHistoryDemo.usageNotes;
   const urlParams = messages.pages.threadHistoryDemo.urlParams;
@@ -159,11 +157,6 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
               </Typography.Link>
             ))}
           </Space>
-          <Alert
-            type="info"
-            showIcon
-            message={messages.pages.threadHistoryDemo.pathAlert}
-          />
         </Space>
       </Card>
 
@@ -223,7 +216,7 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
           </Space>
 
           <Space wrap>
-            <Button type="primary" onClick={() => (window as any).bytedesk?.showChat()}>
+            <Button type="primary" onClick={() => (window as any).bytedesk?.showThread()}>
               {consultButtonLabel}
             </Button>
             <Button onClick={() => (window as any).bytedesk?.hideChat()}>{messages.common.buttons.closeChat}</Button>
@@ -238,7 +231,7 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
           <Alert
             type="info"
             showIcon
-            message={`${messages.common.apiHintPrefix} showChat() / hideChat()`}
+            message={`${messages.common.apiHintPrefix} showThread() / hideChat()`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
           <Alert

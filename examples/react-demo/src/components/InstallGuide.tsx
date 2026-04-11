@@ -52,6 +52,7 @@ import { getLocaleMessages, type DemoLanguage } from '../locales';
 
 interface InstallGuideProps {
   locale: DemoLanguage;
+  showFeedback?: boolean;
 }
 
 const codeStyle = (background: string, borderColor: string) => ({
@@ -64,7 +65,7 @@ const codeStyle = (background: string, borderColor: string) => ({
   whiteSpace: 'pre-wrap'
 }) as const;
 
-const InstallGuide = ({ locale }: InstallGuideProps) => {
+const InstallGuide = ({ locale, showFeedback = true }: InstallGuideProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = theme.useToken();
   const guide = messages.components.installGuide;
@@ -113,24 +114,26 @@ const InstallGuide = ({ locale }: InstallGuideProps) => {
           />
         </Card>
 
-        <Card type="inner" title={guide.sections.feedback.title} variant="outlined">
-          <Space direction="vertical" size="small" style={{ width: '100%' }}>
-            <Typography.Paragraph>{guide.sections.feedback.intro}</Typography.Paragraph>
-            <List
-              size="small"
-              dataSource={[...guide.sections.feedback.bullets]}
-              renderItem={(text: (typeof guide.sections.feedback.bullets)[number]) => (
-                <List.Item style={{ paddingInline: 0 }}>{text}</List.Item>
-              )}
-            />
-            <Alert
-              type="info"
-              showIcon
-              message={guide.sections.feedback.tip}
-              description={renderCode(guide.sections.feedback.tipCommand, true)}
-            />
-          </Space>
-        </Card>
+        {showFeedback && (
+          <Card type="inner" title={guide.sections.feedback.title} variant="outlined">
+            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+              <Typography.Paragraph>{guide.sections.feedback.intro}</Typography.Paragraph>
+              <List
+                size="small"
+                dataSource={[...guide.sections.feedback.bullets]}
+                renderItem={(text: (typeof guide.sections.feedback.bullets)[number]) => (
+                  <List.Item style={{ paddingInline: 0 }}>{text}</List.Item>
+                )}
+              />
+              <Alert
+                type="info"
+                showIcon
+                message={guide.sections.feedback.tip}
+                description={renderCode(guide.sections.feedback.tipCommand, true)}
+              />
+            </Space>
+          </Card>
+        )}
       </Space>
     </Card>
   );

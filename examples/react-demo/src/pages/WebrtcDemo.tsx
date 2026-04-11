@@ -34,9 +34,14 @@ const WebrtcDemo = ({
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = antdTheme.useToken();
   const m = messages.pages.webrtcDemo;
+  const htmlBaseUrl = process.env.NODE_ENV === 'development'
+    ? 'http://127.0.0.1:9018'
+    : 'https://cdn.weiyuai.cn';
 
   // 当前呼叫模式：默认音频客服
   const [callMode, setCallMode] = useState<CallMode>('audio');
+
+  const isRobotMode = selectedChatProfile.key === 'robot';
 
   const users = useMemo(
     () =>
@@ -61,18 +66,15 @@ const WebrtcDemo = ({
   /**
    * BytedeskReact config：
    * - htmlUrl: CDN/本地基础域（不含路径）
-   * - chatPath: '/webrtc' — getChatPageBaseUrl 会拼出 {htmlUrl}/webrtc，最终 iframe URL 为
+   * - webrtcPath 默认是 /webrtc，因此最终 iframe URL 为
    *   dev:  http://127.0.0.1:9018/webrtc?params
    *   prod: https://cdn.weiyuai.cn/webrtc?params
    * - chatConfig 里传 audio / video 扩展字段，generateChatUrl 会自动拼到 URL 参数
    */
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
-    htmlUrl: process.env.NODE_ENV === 'development'
-      ? 'http://127.0.0.1:9018'
-      : 'https://cdn.weiyuai.cn',
+    htmlUrl: htmlBaseUrl,
     ...(process.env.NODE_ENV === 'development' ? { apiUrl: 'http://127.0.0.1:9003' } : {}),
-    chatPath: '/webrtc',
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,
@@ -88,6 +90,7 @@ const WebrtcDemo = ({
       show: true,
       width: 60,
       height: 60,
+      action: 'webrtc',
     },
     chatConfig: {
       ...selectedChatProfile.chatConfig,
@@ -107,13 +110,10 @@ const WebrtcDemo = ({
       mode: themeMode,
     },
     locale,
-  }), [callMode, isAnonymousMode, locale, m, selectedChatProfile, selectedUser, themeMode]);
+  }), [callMode, htmlBaseUrl, isAnonymousMode, locale, m, selectedChatProfile, selectedUser, themeMode]);
 
   /** 构建示例 URL（与 BytedeskReact 实际生成的 iframe URL 一致） */
   const sampleUrl = useMemo(() => {
-    const baseHtmlUrl = process.env.NODE_ENV === 'development'
-      ? 'http://127.0.0.1:9018/webrtc'
-      : 'https://cdn.weiyuai.cn/webrtc';
     const params = new URLSearchParams();
     params.append('org', selectedChatProfile.chatConfig.org);
     params.append('t', String(selectedChatProfile.chatConfig.t));
@@ -128,8 +128,8 @@ const WebrtcDemo = ({
     params.append('navbar', '1');
     params.append('lang', locale);
     params.append('mode', String(themeMode || 'light'));
-    return `${baseHtmlUrl}?${params.toString()}`;
-  }, [callMode, isAnonymousMode, locale, selectedChatProfile, selectedUser, themeMode]);
+    return `${htmlBaseUrl}/webrtc?${params.toString()}`;
+  }, [callMode, htmlBaseUrl, isAnonymousMode, locale, selectedChatProfile, selectedUser, themeMode]);
 
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
 
@@ -154,7 +154,6 @@ const WebrtcDemo = ({
               </Typography.Link>
             ))}
           </Space>
-          <Alert type="warning" showIcon message={m.modeLimitNotice} />
           <Alert type="info" showIcon message={m.pathAlert} />
         </Space>
       </Card>
@@ -225,44 +224,57 @@ const WebrtcDemo = ({
           <Space wrap>
             <Button
               type={callMode === 'audio' ? 'primary' : 'default'}
-              style={callMode === 'audio' ? { backgroundColor: token.colorPrimary, borderColor: token.colorPrimary } : undefined}
+              disabled={isRobotMode}
+              style={!isRobotMode && callMode === 'audio' ? { backgroundColor: token.colorPrimary, borderColor: token.colorPrimary } : undefined}
               onClick={() => setCallMode('audio')}
             >
               {m.buttons.audioMode}
-              {callMode === 'audio' ? '【当前】' : ''}
+              {!isRobotMode && callMode === 'audio' ? '【当前】' : ''}
             </Button>
             <Button
               type={callMode === 'video' ? 'primary' : 'default'}
-              style={callMode === 'video' ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
+              disabled={isRobotMode}
+              style={!isRobotMode && callMode === 'video' ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
               onClick={() => setCallMode('video')}
             >
               {m.buttons.videoMode}
-              {callMode === 'video' ? '【当前】' : ''}
+              {!isRobotMode && callMode === 'video' ? '【当前】' : ''}
             </Button>
           </Space>
 
           {/* 控制 BytedeskReact 显示/隐藏 */}
           <Space wrap>
-            <Button type="primary" onClick={() => (window as any).bytedesk?.showChat()}>
+            <Button
+              type="primary"
+              disabled={isRobotMode}
+              onClick={() => (window as any).bytedesk?.showWebrtc()}
+            >
               {callMode === 'audio' ? m.callModeAudio : m.callModeVideo}
             </Button>
             <Button onClick={() => (window as any).bytedesk?.hideChat()}>
               {messages.common.buttons.closeChat}
             </Button>
             <Button
+              disabled={isRobotMode}
               onClick={() => window.open(sampleUrl, '_blank', 'width=420,height=680,resizable=yes,scrollbars=yes')}
             >
               {messages.common.buttons.openInNewWindow}
             </Button>
-            <Button onClick={() => window.open(sampleUrl, '_blank')}>
+            <Button
+              disabled={isRobotMode}
+              onClick={() => window.open(sampleUrl, '_blank')}
+            >
               {messages.common.buttons.openInNewTab}
             </Button>
           </Space>
+          {isRobotMode && (
+            <Alert type="warning" showIcon message={m.modeLimitNotice} />
+          )}
 
           <Alert
             type="info"
             showIcon
-            message={`${messages.common.apiHintPrefix} showChat() / hideChat()`}
+            message={`${messages.common.apiHintPrefix} showWebrtc() / hideChat()`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
           <Alert

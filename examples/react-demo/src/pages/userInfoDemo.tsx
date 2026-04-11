@@ -44,6 +44,9 @@ interface DemoPageProps {
 const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = antdTheme.useToken();
+    const htmlBaseUrl = process.env.NODE_ENV === 'development'
+        ? 'http://127.0.0.1:9006'
+        : 'https://cdn.weiyuai.cn';
     const bubbleNickname = isAnonymousMode ? messages.pages.userInfoDemo.anonymousUserLabel : selectedUser.nickname;
     const users = useMemo(() => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
         key,
@@ -56,9 +59,9 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     // 配置客服组件
     const config = useMemo<BytedeskConfig>(() => ({
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
+        htmlUrl: htmlBaseUrl,
         ...(process.env.NODE_ENV === 'development'
             ? {
-                htmlUrl: 'http://127.0.0.1:9006',
                 apiUrl: 'http://127.0.0.1:9003'
             }
             : {}),
@@ -73,6 +76,7 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         marginSide: 20,
         buttonConfig: {
             show: true,
+            action: 'chat',
         },
         bubbleConfig: {
             show: true,
@@ -107,7 +111,7 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         onVisitorInfo: (uid: string, visitorUid: string) => {
             console.log('收到访客信息:', { uid, visitorUid });
         },
-    }), [locale, messages, isAnonymousMode, selectedChatProfile, selectedUser, themeMode]);
+    }), [htmlBaseUrl, locale, messages, isAnonymousMode, selectedChatProfile, selectedUser, themeMode]);
 
     // Bytedesk 接口控制函数
     const handleShowChat = () => {

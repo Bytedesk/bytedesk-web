@@ -50,6 +50,9 @@ interface DemoPageProps {
 const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = antdTheme.useToken();
+    const htmlBaseUrl = process.env.NODE_ENV === 'development'
+        ? 'http://127.0.0.1:9006'
+        : 'https://cdn.weiyuai.cn';
     const users = useMemo<UserInfo[]>(() => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
         key,
         visitorUid: DEMO_USER_PRESETS[key].visitorUid,
@@ -70,9 +73,9 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     // 配置客服组件
     const config = useMemo<BytedeskConfig>(() => ({
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
+        htmlUrl: htmlBaseUrl,
         ...(process.env.NODE_ENV === 'development' 
         ? { 
-            htmlUrl: 'http://127.0.0.1:9006', 
             apiUrl: 'http://127.0.0.1:9003' 
         } 
         : {}),
@@ -88,6 +91,7 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         // 隐藏不显示悬浮按钮
         buttonConfig: {
             show: false,
+            action: 'chat',
         },
         // 隐藏不显示气泡
         bubbleConfig: {
@@ -117,7 +121,7 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         theme: {
             mode: themeMode,
         },
-    }), [currentUser, isAnonymousMode, locale, messages, selectedChatProfile, themeMode]);
+    }), [currentUser, htmlBaseUrl, isAnonymousMode, locale, messages, selectedChatProfile, themeMode]);
 
     // Bytedesk 接口控制函数
     const handleShowChat = () => {

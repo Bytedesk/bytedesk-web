@@ -27,12 +27,16 @@ import {
   POST_MESSAGE_MINIMIZE_WINDOW,
   POST_MESSAGE_RECEIVE_MESSAGE,
 } from "../utils/constants";
-import type { BytedeskConfig } from "../types";
+import type { ButtonConfig, BytedeskConfig } from "../types";
 import logger, { setGlobalConfig } from "../utils/logger";
 
 export default class BytedeskWeb {
   private config: BytedeskConfig;
   private bubble: HTMLElement | null = null;
+  private bubbleContainer: HTMLElement | null = null;
+  private buttonElements: HTMLButtonElement[] = [];
+  private buttonPreviewElement: HTMLElement | null = null;
+  private buttonPreviewHideTimer: number | null = null;
   private window: HTMLElement | null = null;
   private inviteDialog: HTMLElement | null = null;
   private contextMenu: HTMLElement | null = null;
@@ -97,14 +101,256 @@ export default class BytedeskWeb {
     }
   }
 
+  private mergeConfig(nextConfig: Partial<BytedeskConfig>): BytedeskConfig {
+    return {
+      ...this.config,
+      ...nextConfig,
+      inviteConfig: {
+        ...(this.config.inviteConfig || {}),
+        ...(nextConfig.inviteConfig || {}),
+      },
+      tabsConfig: {
+        ...(this.config.tabsConfig || {}),
+        ...(nextConfig.tabsConfig || {}),
+      },
+      bubbleConfig: {
+        ...(this.config.bubbleConfig || {}),
+        ...(nextConfig.bubbleConfig || {}),
+      },
+      buttonConfig: {
+        ...(this.config.buttonConfig || {}),
+        ...(nextConfig.buttonConfig || {}),
+      },
+      feedbackConfig: {
+        ...(this.config.feedbackConfig || {}),
+        ...(nextConfig.feedbackConfig || {}),
+      },
+      chatConfig: nextConfig.chatConfig
+        ? {
+            ...(this.config.chatConfig || ({} as NonNullable<BytedeskConfig["chatConfig"]>)),
+            ...nextConfig.chatConfig,
+          }
+        : this.config.chatConfig,
+      browseConfig: {
+        ...(this.config.browseConfig || {}),
+        ...(nextConfig.browseConfig || {}),
+      },
+      animation: {
+        ...(this.config.animation || {}),
+        ...(nextConfig.animation || {}),
+      },
+      window: {
+        ...(this.config.window || {}),
+        ...(nextConfig.window || {}),
+      },
+      theme: {
+        ...(this.config.theme || {}),
+        ...(nextConfig.theme || {}),
+      },
+      buttonsConfig: nextConfig.buttonsConfig ?? this.config.buttonsConfig,
+    };
+  }
+
+  private refreshFloatingUi() {
+    const inviteWasVisible = !!(
+      this.inviteDialog &&
+      document.body.contains(this.inviteDialog) &&
+      this.inviteDialog.style.display !== "none"
+    );
+
+    this.stopBubbleMessageRotation();
+    this.stopBubbleMessageTransition();
+    this.destroyBubbleTicker();
+    this.hideButtonPreview();
+
+    if (this.bubbleContainer && document.body.contains(this.bubbleContainer)) {
+      this.bubbleContainer.remove();
+    }
+    this.bubbleContainer = null;
+    this.bubble = null;
+    this.buttonElements = [];
+    this.bubbleMessageViewportElement = null;
+    this.bubbleMessageContentElement = null;
+    this.bubblePendingMessageElement = null;
+    this.bubbleTickerTrackElement = null;
+    this.bubbleTickerStyleElement = null;
+    this.bubbleIconElement = null;
+    this.bubbleTitleElement = null;
+    this.bubbleSubtitleElement = null;
+    this.bubbleMessages = [];
+    this.bubbleMessageIndex = 0;
+
+    if (this.inviteDialog && document.body.contains(this.inviteDialog)) {
+      this.inviteDialog.remove();
+    }
+    this.inviteDialog = null;
+
+    this.createBubble();
+    this.createInviteDialog();
+    if (inviteWasVisible) {
+      this.showInviteDialog();
+    }
+  }
+
+  private updateChatWindowLayout() {
+    if (!this.window) {
+      return;
+    }
+
+    const isMobile = window.innerWidth <= 768;
+    const maxWidth = window.innerWidth;
+    const maxHeight = window.innerHeight;
+
+    if (isMobile) {
+      Object.assign(this.window.style, {
+        left: "0",
+        right: "auto",
+        bottom: "0",
+        width: "100%",
+        height: "100vh",
+        borderTopLeftRadius: "12px",
+        borderTopRightRadius: "12px",
+        borderBottomLeftRadius: "0",
+        borderBottomRightRadius: "0",
+        boxSizing: "border-box",
+        paddingTop: "env(safe-area-inset-top)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      });
+      this.window.style.height = "100dvh";
+      return;
+    }
+
+    const width = Math.min(
+      this.config.window?.width || maxWidth * 0.9,
+      maxWidth * 0.9
+    );
+    const height = Math.min(
+      this.config.window?.height || maxHeight * 0.9,
+      maxHeight * 0.9
+    );
+
+    Object.assign(this.window.style, {
+      width: `${width}px`,
+      height: `${height}px`,
+      left: this.config.placement === "bottom-left" ? `${this.config.marginSide}px` : "auto",
+      right: this.config.placement === "bottom-right" ? `${this.config.marginSide}px` : "auto",
+      bottom: `${this.config.marginBottom}px`,
+      borderRadius: "12px",
+      boxSizing: "border-box",
+      paddingTop: "",
+      paddingBottom: "",
+    });
+  }
+
+  private refreshChatIframeUrl() {
+    if (!this.window) {
+      return;
+    }
+    const iframe = this.window.querySelector("iframe") as HTMLIFrameElement | null;
+    if (!iframe) {
+      return;
+    }
+    iframe.src = this.generateChatUrl();
+  }
+
+  public setTheme(themeConfig: Partial<NonNullable<BytedeskConfig["theme"]>>) {
+    this.setConfig({
+      theme: {
+        ...(this.config.theme || {}),
+        ...themeConfig,
+      },
+    });
+  }
+
+  public setConfig(nextConfig: Partial<BytedeskConfig>) {
+    const previousConfig = this.config;
+    this.config = this.mergeConfig(nextConfig);
+
+    const nextAction = this.getPrimaryActionFromConfig(nextConfig);
+    const hasExplicitChatPath = Object.prototype.hasOwnProperty.call(nextConfig, "chatPath");
+    const hasButtonConfigUpdate = Object.prototype.hasOwnProperty.call(nextConfig, "buttonConfig");
+    if (!hasExplicitChatPath) {
+      if (nextAction) {
+        this.syncChatPathByAction(nextAction);
+      } else if (hasButtonConfigUpdate) {
+        this.syncChatPathByAction("chat");
+      }
+    }
+
+    setGlobalConfig(this.config);
+
+    if (nextConfig.apiUrl && nextConfig.apiUrl !== previousConfig.apiUrl) {
+      this.setupApiUrl();
+    }
+
+    const hasFloatingUi = !!(
+      (this.bubbleContainer && document.body.contains(this.bubbleContainer)) ||
+      (this.inviteDialog && document.body.contains(this.inviteDialog))
+    );
+    if (hasFloatingUi) {
+      this.refreshFloatingUi();
+    }
+
+    if (this.window && document.body.contains(this.window)) {
+      this.updateChatWindowLayout();
+
+      const shouldRefreshIframe = Boolean(
+        nextConfig.theme ||
+        nextConfig.locale ||
+        nextConfig.chatConfig ||
+        nextConfig.htmlUrl ||
+        nextConfig.chatPath ||
+        nextConfig.threadPath ||
+        nextConfig.webrtcPath ||
+        nextConfig.callPath
+      );
+
+      if (shouldRefreshIframe) {
+        this.refreshChatIframeUrl();
+      }
+    }
+
+    this.config.onConfigChange?.(this.config);
+  }
+
+  private getPrimaryActionFromConfig(nextConfig: Partial<BytedeskConfig>): "chat" | "thread" | "webrtc" | "call" | null {
+    const singleAction = nextConfig.buttonConfig?.action;
+    if (singleAction && ["chat", "thread", "webrtc", "call"].includes(singleAction)) {
+      return singleAction as "chat" | "thread" | "webrtc" | "call";
+    }
+
+    return null;
+  }
+
+  private syncChatPathByAction(action: "chat" | "thread" | "webrtc" | "call") {
+    switch (action) {
+      case "thread":
+        this.config.chatPath = this.normalizePath(this.config.threadPath, "/chat/thread");
+        break;
+      case "webrtc":
+        this.config.chatPath = this.normalizePath(this.config.webrtcPath, "/webrtc");
+        break;
+      case "call":
+        this.config.chatPath = this.normalizePath(this.config.callPath, "/call");
+        break;
+      case "chat":
+      default:
+        this.config.chatPath = "/chat";
+        break;
+    }
+  }
+
   private getDefaultConfig(): BytedeskConfig {
     return {
       isDebug: false,
       // isPreload: false,
       forceRefresh: false,
-      htmlUrl: "https://cdn.weiyuai.cn/chat",
+      htmlUrl: "https://cdn.weiyuai.cn",
       apiUrl: "https://api.weiyuai.cn",
       chatPath: "/chat",
+      threadPath: "/chat/thread",
+      webrtcPath: "/webrtc",
+      callPath: "/call",
       placement: "bottom-right",
       marginBottom: 20,
       marginSide: 20,
@@ -182,6 +428,301 @@ export default class BytedeskWeb {
     } as BytedeskConfig;
   }
 
+  private getEffectiveButtonConfigs(): ButtonConfig[] {
+    const multiButtons = Array.isArray(this.config.buttonsConfig)
+      ? this.config.buttonsConfig.filter((item) => !!item)
+      : [];
+
+    if (multiButtons.length > 0) {
+      return multiButtons;
+    }
+
+    return [this.config.buttonConfig || {}];
+  }
+
+  private hasVisibleButtons(): boolean {
+    return this.getEffectiveButtonConfigs().some((buttonConfig) => buttonConfig.show !== false);
+  }
+
+  private isMultiButtonLayout(buttonConfigs?: ButtonConfig[]): boolean {
+    const effectiveConfigs = buttonConfigs || this.getEffectiveButtonConfigs();
+    return effectiveConfigs.filter((buttonConfig) => buttonConfig.show !== false).length > 1;
+  }
+
+  private applyConfiguredButtonVisibility() {
+    const buttonConfigs = this.getEffectiveButtonConfigs();
+    this.buttonElements.forEach((buttonElement, index) => {
+      const buttonConfig = buttonConfigs[index];
+      buttonElement.style.display = buttonConfig?.show === false ? "none" : "flex";
+    });
+  }
+
+  private hideBubbleMessageElement() {
+    const messageElement = (this.bubble as any)?.messageElement;
+    if (messageElement instanceof HTMLElement) {
+      this.stopBubbleMessageTransition();
+      messageElement.style.display = "none";
+      this.stopBubbleMessageRotation();
+    }
+  }
+
+  private triggerButtonAction(buttonConfig: ButtonConfig) {
+    if (buttonConfig.onClick) {
+      buttonConfig.onClick();
+      return;
+    }
+
+    switch (buttonConfig.action) {
+      case "thread":
+        this.showThread();
+        break;
+      case "webrtc":
+        this.showWebrtc();
+        break;
+      case "call":
+        this.showCall();
+        break;
+      case "chat":
+      default:
+        this.showChat();
+        break;
+    }
+  }
+
+  private hideButtonPreview() {
+    if (this.buttonPreviewHideTimer) {
+      window.clearTimeout(this.buttonPreviewHideTimer);
+      this.buttonPreviewHideTimer = null;
+    }
+    if (this.buttonPreviewElement?.parentElement) {
+      this.buttonPreviewElement.parentElement.removeChild(this.buttonPreviewElement);
+    }
+    this.buttonPreviewElement = null;
+  }
+
+  private cancelButtonPreviewHide() {
+    if (this.buttonPreviewHideTimer) {
+      window.clearTimeout(this.buttonPreviewHideTimer);
+      this.buttonPreviewHideTimer = null;
+    }
+  }
+
+  private scheduleHideButtonPreview() {
+    this.cancelButtonPreviewHide();
+    this.buttonPreviewHideTimer = window.setTimeout(() => {
+      this.hideButtonPreview();
+    }, 120);
+  }
+
+  private showButtonPreview(buttonElement: HTMLElement, buttonConfig: ButtonConfig) {
+    if (!buttonConfig.previewImageUrl) {
+      this.hideButtonPreview();
+      return;
+    }
+
+    this.hideButtonPreview();
+
+    const previewElement = document.createElement("div");
+    const isDarkMode = this.config.theme?.mode === "dark";
+    const previewImage = document.createElement("img");
+    const previewLabel = document.createElement("div");
+    const buttonRect = buttonElement.getBoundingClientRect();
+    const previewWidth = 180;
+    const offset = 14;
+    const top = Math.min(
+      Math.max(12, buttonRect.top + buttonRect.height / 2 - 110),
+      Math.max(12, window.innerHeight - 232)
+    );
+    const left = this.config.placement === "bottom-left"
+      ? Math.min(window.innerWidth - previewWidth - 12, buttonRect.right + offset)
+      : Math.max(12, buttonRect.left - previewWidth - offset);
+
+    previewElement.style.cssText = `
+      position: fixed;
+      top: ${top}px;
+      left: ${left}px;
+      width: ${previewWidth}px;
+      padding: 10px;
+      border-radius: 16px;
+      background: ${isDarkMode ? "rgba(17, 24, 39, 0.96)" : "rgba(255, 255, 255, 0.98)"};
+      box-shadow: 0 12px 32px rgba(0, 0, 0, ${isDarkMode ? "0.34" : "0.18"});
+      border: 1px solid ${isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.08)"};
+      z-index: 10001;
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      cursor: pointer;
+    `;
+
+    previewImage.src = buttonConfig.previewImageUrl;
+    previewImage.alt = buttonConfig.previewImageAlt || buttonConfig.text || "preview image";
+    previewImage.style.cssText = `
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      background: white;
+      border-radius: 12px;
+      display: block;
+    `;
+
+    previewLabel.textContent = buttonConfig.previewImageAlt || buttonConfig.text || "";
+    previewLabel.style.cssText = `
+      color: ${isDarkMode ? "#e5e7eb" : "#0f172a"};
+      font-size: 12px;
+      line-height: 1.4;
+      text-align: center;
+      word-break: break-word;
+    `;
+
+    previewElement.appendChild(previewImage);
+    if (previewLabel.textContent) {
+      previewElement.appendChild(previewLabel);
+    }
+
+    previewElement.addEventListener("mouseenter", () => {
+      this.cancelButtonPreviewHide();
+    });
+
+    previewElement.addEventListener("mouseleave", () => {
+      this.scheduleHideButtonPreview();
+    });
+
+    previewElement.addEventListener("click", () => {
+      window.open(buttonConfig.previewImageUrl, "_blank", "noopener,noreferrer");
+    });
+
+    document.body.appendChild(previewElement);
+    this.buttonPreviewElement = previewElement;
+  }
+
+  private createButtonElement(
+    buttonConfig: ButtonConfig,
+    messageElement: HTMLElement | null,
+    options?: {
+      isMultiLayout?: boolean;
+      isLastButton?: boolean;
+    }
+  ): HTMLButtonElement {
+    const buttonElement = document.createElement("button");
+    const isMultiLayout = options?.isMultiLayout === true;
+    const baseButtonWidth = buttonConfig.width || 60;
+    const baseButtonHeight = buttonConfig.height || 60;
+    const squareSize = Math.max(baseButtonWidth, baseButtonHeight);
+    const buttonWidth = isMultiLayout ? squareSize : baseButtonWidth;
+    const buttonHeight = isMultiLayout ? squareSize : baseButtonHeight;
+    const borderRadius = isMultiLayout ? 0 : Math.min(buttonWidth, buttonHeight) / 2;
+    const isDarkMode = this.config.theme?.mode === "dark";
+    const defaultBackgroundColor = isDarkMode ? "#3B82F6" : "#0066FF";
+    const buttonBackgroundColor = this.config.theme?.backgroundColor || defaultBackgroundColor;
+    const buttonTextColor = this.config.theme?.textColor || "#ffffff";
+    const buttonBoxShadow = isMultiLayout
+      ? "none"
+      : `0 4px 16px rgba(0, 0, 0, ${isDarkMode ? "0.3" : "0.12"})`;
+    const buttonBorderBottom = isMultiLayout && !options?.isLastButton
+      ? `1px solid rgba(255, 255, 255, ${isDarkMode ? "0.14" : "0.28"})`
+      : "none";
+    const buttonHoverTransform = isMultiLayout ? "translateY(-1px)" : "scale(1.1)";
+
+    buttonElement.style.cssText = `
+      background-color: ${isMultiLayout ? "transparent" : buttonBackgroundColor};
+      width: ${buttonWidth}px;
+      height: ${buttonHeight}px;
+      border-radius: ${borderRadius}px;
+      border: none;
+      border-bottom: ${buttonBorderBottom};
+      cursor: ${this.config.draggable ? "move" : "pointer"};
+      display: ${buttonConfig.show === false ? "none" : "flex"};
+      align-items: center;
+      justify-content: center;
+      box-shadow: ${buttonBoxShadow};
+      transition: all 0.3s ease;
+      outline: none;
+      position: relative;
+      user-select: none;
+      padding: 0;
+    `;
+
+    const buttonContent = document.createElement("div");
+    buttonContent.style.cssText = `
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: ${isMultiLayout && buttonConfig.text ? "column" : "row"};
+      gap: ${isMultiLayout ? "4px" : "8px"};
+      width: 100%;
+      height: 100%;
+    `;
+
+    if (buttonConfig.icon) {
+      const iconElement = document.createElement("span");
+      iconElement.textContent = buttonConfig.icon;
+      iconElement.style.fontSize = `${buttonHeight * (isMultiLayout ? 0.34 : 0.4)}px`;
+      iconElement.style.lineHeight = "1";
+      buttonContent.appendChild(iconElement);
+    } else {
+      const bubbleIcon = document.createElement("div");
+      bubbleIcon.innerHTML = `
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.663 3.04094 17.0829 4.73812 18.875L2.72681 21.1705C2.44361 21.4937 2.67314 22 3.10288 22H12Z" fill="white"/>
+        </svg>
+      `;
+      buttonContent.appendChild(bubbleIcon);
+    }
+
+    if (buttonConfig.text) {
+      const textElement = document.createElement("span");
+      textElement.textContent = buttonConfig.text;
+      textElement.style.cssText = `
+        color: ${buttonTextColor};
+        font-size: ${buttonHeight * (isMultiLayout ? 0.16 : 0.25)}px;
+        white-space: nowrap;
+        line-height: 1.1;
+        text-align: center;
+        max-width: ${isMultiLayout ? `${buttonWidth - 8}px` : "none"};
+        overflow: hidden;
+        text-overflow: ellipsis;
+      `;
+      buttonContent.appendChild(textElement);
+    }
+
+    buttonElement.appendChild(buttonContent);
+    buttonElement.addEventListener("mouseenter", () => {
+      this.cancelButtonPreviewHide();
+      buttonElement.style.transform = buttonHoverTransform;
+      if (isMultiLayout) {
+        buttonElement.style.backgroundColor = "rgba(255, 255, 255, 0.12)";
+      }
+      if (buttonConfig.previewImageUrl) {
+        this.showButtonPreview(buttonElement, buttonConfig);
+      }
+    });
+    buttonElement.addEventListener("mouseleave", () => {
+      buttonElement.style.transform = "scale(1)";
+      if (isMultiLayout) {
+        buttonElement.style.backgroundColor = "transparent";
+      }
+      if (buttonConfig.previewImageUrl) {
+        this.scheduleHideButtonPreview();
+      }
+    });
+    buttonElement.addEventListener("click", () => {
+      if (!this.isDragging) {
+        logger.debug("bubble click", buttonConfig.action || "chat");
+        if (messageElement instanceof HTMLElement) {
+          this.hideBubbleMessageElement();
+        }
+        this.triggerButtonAction(buttonConfig);
+      }
+    });
+    buttonElement.addEventListener("contextmenu", (e) => {
+      this.showContextMenu(e);
+    });
+    (buttonElement as any).messageElement = messageElement;
+
+    return buttonElement;
+  }
+
   async init() {
     if (this.isDestroyed) {
       logger.warn("BytedeskWeb 已销毁，跳过初始化");
@@ -189,7 +730,7 @@ export default class BytedeskWeb {
     }
 
     // 只有在按钮显示时才自动请求 browse / 未读数等接口
-    const shouldAutoRequest = this.config.buttonConfig?.show !== false;
+    const shouldAutoRequest = this.hasVisibleButtons();
 
     // 初始化访客信息
     await this._initVisitor();
@@ -641,9 +1182,8 @@ export default class BytedeskWeb {
     logger.debug("showUnreadBadge() 被调用，count:", count);
     
     // 检查按钮配置，如果 buttonConfig.show 为 false，则不显示角标
-    const buttonConfig = this.config.buttonConfig || {};
-    if (buttonConfig.show === false) {
-      logger.debug("showUnreadBadge: buttonConfig.show 为 false，不显示角标");
+    if (!this.hasVisibleButtons()) {
+      logger.debug("showUnreadBadge: 当前没有可见按钮，不显示角标");
       return;
     }
     
@@ -1156,6 +1696,11 @@ export default class BytedeskWeb {
       logger.debug("createBubble: 清理已存在的 bubble 引用");
       this.bubble = null;
     }
+    if (this.bubbleContainer && !document.body.contains(this.bubbleContainer)) {
+      logger.debug("createBubble: 清理已存在的 bubbleContainer 引用");
+      this.bubbleContainer = null;
+    }
+    this.buttonElements = [];
 
     // 创建气泡容器
     const container = document.createElement("div");
@@ -1281,106 +1826,56 @@ export default class BytedeskWeb {
       }, 500);
     }
 
-    // 创建按钮
-    this.bubble = document.createElement("button");
-    const buttonConfig = this.config.buttonConfig || {};
-    const buttonWidth = buttonConfig.width || 60;
-    const buttonHeight = buttonConfig.height || 60;
-    // 使用较小的值来计算圆角，确保在宽高不等时也能保持好看的圆角效果
-    const borderRadius = Math.min(buttonWidth, buttonHeight) / 2;
-
-    // 根据主题模式选择合适的背景色
+    const buttonConfigs = this.getEffectiveButtonConfigs();
+    const buttonsWrapper = document.createElement("div");
+    const isMultiLayout = this.isMultiButtonLayout(buttonConfigs);
     const isDarkMode = this.config.theme?.mode === "dark";
     const defaultBackgroundColor = isDarkMode ? "#3B82F6" : "#0066FF";
-    const buttonBackgroundColor =
-      this.config.theme?.backgroundColor || defaultBackgroundColor;
-
-    this.bubble.style.cssText = `
-      background-color: ${buttonBackgroundColor};
-      width: ${buttonWidth}px;
-      height: ${buttonHeight}px;
-      border-radius: ${borderRadius}px;
-      border: none;
-      cursor: ${this.config.draggable ? "move" : "pointer"};
-      display: ${buttonConfig.show === false ? "none" : "flex"};
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, ${isDarkMode ? "0.3" : "0.12"});
-      transition: all 0.3s ease;
-      outline: none;
-      position: relative;
-      user-select: none;
-    `;
-
-    // 添加按钮内容
-    const buttonContent = document.createElement("div");
-    buttonContent.style.cssText = `
+    const buttonsWrapperBackgroundColor = this.config.theme?.backgroundColor || defaultBackgroundColor;
+    buttonsWrapper.style.cssText = `
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      flex-direction: column;
+      align-items: ${
+        this.config.placement === "bottom-left" ? "flex-start" : "flex-end"
+      };
+      gap: ${isMultiLayout ? "0" : "10px"};
+      background: ${isMultiLayout ? buttonsWrapperBackgroundColor : "transparent"};
+      border-radius: ${isMultiLayout ? "18px" : "0"};
+      overflow: ${isMultiLayout ? "hidden" : "visible"};
+      box-shadow: ${isMultiLayout ? `0 10px 28px rgba(0, 0, 0, ${isDarkMode ? "0.32" : "0.16"})` : "none"};
     `;
-
-    // 添加图标
-    if (buttonConfig.icon) {
-      const iconElement = document.createElement("span");
-      iconElement.textContent = buttonConfig.icon;
-      // 使用高度作为基准来设置图标大小
-      iconElement.style.fontSize = `${buttonHeight * 0.4}px`;
-      buttonContent.appendChild(iconElement);
-    } else {
-      // 默认图标
-      const bubbleIcon = document.createElement("div");
-      bubbleIcon.innerHTML = `
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.663 3.04094 17.0829 4.73812 18.875L2.72681 21.1705C2.44361 21.4937 2.67314 22 3.10288 22H12Z" 
-                fill="white"/>
-        </svg>
-      `;
-      buttonContent.appendChild(bubbleIcon);
-    }
-
-    // 添加文本
-    if (buttonConfig.text) {
-      const textElement = document.createElement("span");
-      textElement.textContent = buttonConfig.text;
-      textElement.style.cssText = `
-        color: ${this.config.theme?.textColor || "#ffffff"};
-        font-size: ${buttonHeight * 0.25}px;
-        white-space: nowrap;
-      `;
-      buttonContent.appendChild(textElement);
-    }
-
-    this.bubble.appendChild(buttonContent);
-
-    // 添加悬停效果
-    this.bubble!.addEventListener("mouseenter", () => {
-      this.bubble!.style.transform = "scale(1.1)";
-    });
-    this.bubble!.addEventListener("mouseleave", () => {
-      this.bubble!.style.transform = "scale(1)";
+  buttonConfigs.forEach((buttonConfig, index) => {
+      const buttonElement = this.createButtonElement(buttonConfig, messageElement, {
+        isMultiLayout,
+        isLastButton: index === buttonConfigs.length - 1,
+      });
+      this.buttonElements.push(buttonElement);
+      if (index === 0) {
+        this.bubble = buttonElement;
+      }
+      buttonsWrapper.appendChild(buttonElement);
     });
 
-    // 先将按钮添加到容器
-    container.appendChild(this.bubble);
+    container.appendChild(buttonsWrapper);
 
     // 只有在 draggable 为 true 时才添加拖拽功能
-    if (this.config.draggable) {
+    if (this.config.draggable && this.buttonElements.length > 0) {
       let startX = 0;
       let startY = 0;
       let initialX = 0;
       let initialY = 0;
 
-      this.bubble.addEventListener("mousedown", (e) => {
-        if (e.button !== 0) return;
-        this.isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        initialX = container.offsetLeft;
-        initialY = container.offsetTop;
+      this.buttonElements.forEach((buttonElement) => {
+        buttonElement.addEventListener("mousedown", (e) => {
+          if (e.button !== 0) return;
+          this.isDragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          initialX = container.offsetLeft;
+          initialY = container.offsetTop;
 
-        container.style.transition = "none";
+          container.style.transition = "none";
+        });
       });
 
       document.addEventListener("mousemove", (e) => {
@@ -1445,31 +1940,9 @@ export default class BytedeskWeb {
       });
     }
 
-    // 修改点击事件，只在非拖动时触发
-    this.bubble.addEventListener("click", () => {
-      if (!this.isDragging) {
-        logger.debug("bubble click");
-        // 隐藏气泡消息
-        const messageElement = (this.bubble as any).messageElement;
-        if (messageElement instanceof HTMLElement) {
-          this.stopBubbleMessageTransition();
-          messageElement.style.display = "none";
-          this.stopBubbleMessageRotation();
-        }
-        this.showChat();
-      }
-    });
-
-    // 保存气泡消息引用
-    (this.bubble as any).messageElement = messageElement;
-
     // 最后将容器添加到 body
     document.body.appendChild(container);
-
-    // 添加右键菜单事件
-    this.bubble.addEventListener("contextmenu", (e) => {
-      this.showContextMenu(e);
-    });
+    this.bubbleContainer = container;
 
     // 点击其他地方时隐藏右键菜单
     document.addEventListener("click", () => {
@@ -1649,13 +2122,17 @@ export default class BytedeskWeb {
     return url;
   }
 
+  private normalizePath(path?: string, fallback: string = "/chat"): string {
+    const legacyPath = (path || "").trim();
+    if (legacyPath) {
+      return legacyPath.startsWith("/") ? legacyPath : `/${legacyPath}`;
+    }
+
+    return fallback;
+  }
+
   private getChatPageBaseUrl(): string {
-    // 支持自定义 chatPath（如 /webrtc）；未配置时默认 /chat
-    const chatPath = this.config.chatPath;
-    const normalizedPath =
-      chatPath === "/chat/thread" ? "/chat/thread" :
-      chatPath === "/chat" || !chatPath ? "/chat" :
-      chatPath; // 其余自定义路径（如 /webrtc）原样使用
+    const normalizedPath = this.normalizePath(this.config.chatPath, "/chat");
     const rawHtmlUrl = (this.config.htmlUrl || "").trim();
     const sanitizedHtmlUrl = rawHtmlUrl.replace(/\/$/, "");
 
@@ -1664,10 +2141,10 @@ export default class BytedeskWeb {
     }
 
     // 如果 htmlUrl 已经指向某个具体页面路径，则优先复用该路径，避免再拼接默认 /chat 导致地址错误。
-    // 对内置页面路径仍做归一化替换，兼容 /chat、/chat/thread、/webrtc 之间的切换。
-    const matchedBuiltinPath = sanitizedHtmlUrl.match(/\/(chat(?:\/thread)?|webrtc)\/?$/);
+    // 对内置页面路径仍做归一化替换，兼容 /chat、/chat/thread、/webrtc、/call 之间的切换。
+    const matchedBuiltinPath = sanitizedHtmlUrl.match(/\/(chat(?:\/thread)?|webrtc|call)\/?$/);
     if (matchedBuiltinPath) {
-      return sanitizedHtmlUrl.replace(/\/(chat(?:\/thread)?|webrtc)\/?$/, normalizedPath);
+      return sanitizedHtmlUrl.replace(/\/(chat(?:\/thread)?|webrtc|call)\/?$/, normalizedPath);
     }
 
     try {
@@ -1831,9 +2308,8 @@ export default class BytedeskWeb {
       }
 
       this.isVisible = false;
-      if (this.bubble) {
-        this.bubble.style.display =
-          this.config.buttonConfig?.show === false ? "none" : "inline-flex";
+      if (this.buttonElements.length > 0) {
+        this.applyConfiguredButtonVisibility();
         const messageElement = (this.bubble as any).messageElement;
         if (messageElement instanceof HTMLElement) {
           messageElement.style.display =
@@ -1842,6 +2318,27 @@ export default class BytedeskWeb {
       }
       this.config.onHideChat?.();
     }
+  }
+
+  showThread(config?: Partial<BytedeskConfig>) {
+    return this.showChat({
+      ...config,
+      chatPath: this.normalizePath(config?.threadPath || this.config.threadPath, "/chat/thread"),
+    });
+  }
+
+  showWebrtc(config?: Partial<BytedeskConfig>) {
+    return this.showChat({
+      ...config,
+      chatPath: this.normalizePath(config?.webrtcPath || this.config.webrtcPath, "/webrtc"),
+    });
+  }
+
+  showCall(config?: Partial<BytedeskConfig>) {
+    return this.showChat({
+      ...config,
+      chatPath: this.normalizePath(config?.callPath || this.config.callPath, "/call"),
+    });
   }
 
   private minimizeWindow() {
@@ -1956,11 +2453,13 @@ export default class BytedeskWeb {
     this.bubbleMessages = [];
     this.bubbleMessageIndex = 0;
     // 找到气泡容器的父元素
-    const bubbleContainer = this.bubble?.parentElement;
-    if (bubbleContainer && document.body.contains(bubbleContainer)) {
-      document.body.removeChild(bubbleContainer);
-      this.bubble = null;
+    if (this.bubbleContainer && document.body.contains(this.bubbleContainer)) {
+      document.body.removeChild(this.bubbleContainer);
     }
+    this.hideButtonPreview();
+    this.bubbleContainer = null;
+    this.bubble = null;
+    this.buttonElements = [];
 
     // 移除聊天窗口
     if (this.window && document.body.contains(this.window)) {
@@ -2155,13 +2654,15 @@ export default class BytedeskWeb {
 
   showButton() {
     // 检查按钮是否已经显示
-    if (this.bubble && this.bubble.style.display !== "none") {
+    if (this.buttonElements.length > 0 && this.buttonElements.every((buttonElement) => buttonElement.style.display !== "none")) {
       logger.debug("showButton: 按钮已经显示，无需重复显示");
       return;
     }
     
-    if (this.bubble) {
-      this.bubble.style.display = "inline-flex";
+    if (this.buttonElements.length > 0) {
+      this.buttonElements.forEach((buttonElement) => {
+        buttonElement.style.display = "flex";
+      });
       logger.debug("showButton: 按钮已显示");
     } else {
       logger.debug("showButton: bubble 不存在，需要先创建");
@@ -2169,8 +2670,10 @@ export default class BytedeskWeb {
   }
 
   hideButton() {
-    if (this.bubble) {
-      this.bubble.style.display = "none";
+    if (this.buttonElements.length > 0) {
+      this.buttonElements.forEach((buttonElement) => {
+        buttonElement.style.display = "none";
+      });
     }
   }
 

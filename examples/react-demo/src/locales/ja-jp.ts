@@ -14,7 +14,8 @@ export const jaJp = {
       'vi-vn': 'Tiếng Việt',
       'ms-my': 'Bahasa Melayu',
       'es-es': 'スペイン語',
-      'fr-fr': 'フランス語'
+      'fr-fr': 'フランス語',
+      'th-th': 'タイ語（タイ）'
     },
     themeLabel: 'テーマ',
     themeOptions: {
@@ -73,6 +74,7 @@ export const jaJp = {
     videoSupportDemo: '🎥 ビデオサポート',
     webrtcDemo: '📹 WebRTC デモ',
     callCenterDemo: '📞 コールセンター',
+    proactiveDemo: '🎯 プロアクティブ獲得',
     videoConferenceDemo: '🎬 ビデオ会議',
     documentFeedbackDemo: '📝 ドキュメントフィードバック',
     flightBookingDemo: '✈️ 航空券予約'
@@ -84,16 +86,22 @@ export const jaJp = {
       title: 'Bytedesk 基本設定',
       intro: '下のクイックアクションで Bytedesk Web SDK の代表的な機能をすぐに試せます。',
       themeButtonLabel: 'ナビ色を切り替え',
+      themeTextButtonLabel: 'ナビ文字色を切り替え',
       bubbleTitle: 'お困りですか？',
       bubbleSubtitle: 'クリックして会話を開始',
       placement: {
         bottomLeft: '左下',
         bottomRight: '右下'
       },
+      navbarLabel: '上部ナビを隠す',
+      navbarHidden: 'オン',
+      navbarShown: 'オフ',
+      navbarParamPurpose: '上部ナビゲーションバーを非表示にするかどうかです。navbar=0 で非表示になります。',
       loadHistoryLabel: '履歴メッセージを読み込む',
       loadHistoryEnabled: 'オン',
       loadHistoryDisabled: 'オフ',
       defaultColorLabel: 'デフォルト',
+      defaultTextColorLabel: 'デフォルト',
       currentConfigTitle: '現在の設定',
       copyConfig: '設定 JSON をコピー'
     },
@@ -272,7 +280,7 @@ export const jaJp = {
       anonymousUserHint: '匿名テストモード: visitorUid、nickname、avatar は送信されません。',
       pathAlert: 'このページでは chatPath=/chat を維持しつつ、call-center 用 sid に接続してキューアクセスを再現します。',
       currentPathLabel: '現在の入り口パス',
-      currentPathHint: 'ルートは /chat のままで、chatConfig.sid がキューを決定します。',
+      currentPathHint: 'ルートは /call のままで、chatConfig.sid がキューを決定します。',
       usageTitle: 'デモメモ',
       buttons: {
         openCallCenter: 'コールセンターを開く',

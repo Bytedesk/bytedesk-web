@@ -14,7 +14,8 @@ export const koKr = {
       'vi-vn': '베트남어',
       'ms-my': '말레이어',
       'es-es': '스페인어',
-      'fr-fr': '프랑스어'
+      'fr-fr': '프랑스어',
+      'th-th': '태국어(태국)'
     },
     themeLabel: '테마 모드',
     themeOptions: {
@@ -73,6 +74,7 @@ export const koKr = {
     videoSupportDemo: '🎥 영상 상담',
     webrtcDemo: '📹 WebRTC 데모',
     callCenterDemo: '📞 콜센터',
+    proactiveDemo: '🎯 능동 고객 확보',
     videoConferenceDemo: '🎬 화상 회의',
     documentFeedbackDemo: '📝 문서 피드백',
     flightBookingDemo: '✈️ 항공권 예약'
@@ -84,16 +86,22 @@ export const koKr = {
       title: 'Bytedesk 기본 설정',
       intro: '아래 빠른 동작 버튼으로 Bytedesk Web SDK의 주요 기능을 체험할 수 있습니다.',
       themeButtonLabel: '네비게이션 색상 변경',
+      themeTextButtonLabel: '네비게이션 글자색 변경',
       bubbleTitle: '도움이 필요하신가요?',
       bubbleSubtitle: '클릭해서 대화를 시작하세요',
       placement: {
         bottomLeft: '왼쪽 아래',
         bottomRight: '오른쪽 아래'
       },
+      navbarLabel: '상단 네비 숨기기',
+      navbarHidden: 'ON',
+      navbarShown: 'OFF',
+      navbarParamPurpose: '상단 내비게이션 바를 숨길지 여부입니다. navbar=0 이면 숨깁니다.',
       loadHistoryLabel: '대화 이력 로드',
       loadHistoryEnabled: 'ON',
       loadHistoryDisabled: 'OFF',
       defaultColorLabel: '기본값',
+      defaultTextColorLabel: '기본값',
       currentConfigTitle: '현재 설정',
       copyConfig: '설정 JSON 복사'
     },

@@ -13,7 +13,7 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved.
  */
 import { useMemo, useState } from 'react';
-import { Alert, Button, Card, Typography, Space, List, Tag, Select, Avatar } from 'antd';
+import { Alert, Avatar, Button, Card, List, Select, Space, Table, Tag, Typography } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -197,6 +197,9 @@ const GOODS_SHOPS: DemoShop[] = [
 
 const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
+  const htmlBaseUrl = process.env.NODE_ENV === 'development'
+    ? 'http://127.0.0.1:9006'
+    : 'https://cdn.weiyuai.cn';
   const [selectedShopUid, setSelectedShopUid] = useState<string>(GOODS_SHOPS[0].shopUid);
   const selectedShop = useMemo(
     () => GOODS_SHOPS.find((shop) => shop.shopUid === selectedShopUid) || GOODS_SHOPS[0],
@@ -231,9 +234,9 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
 
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
+    htmlUrl: htmlBaseUrl,
     ...(process.env.NODE_ENV === 'development'
       ? {
-          htmlUrl: 'http://127.0.0.1:9006',
           apiUrl: 'http://127.0.0.1:9003'
         }
       : {}),
@@ -246,7 +249,8 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     marginBottom: 20,
     marginSide: 20,
     buttonConfig: {
-      show: true
+      show: true,
+      action: 'chat'
     },
     bubbleConfig: {
       show: true,
@@ -275,7 +279,7 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     theme: {
       mode: themeMode
     }
-  }), [goodsInfoPayload, isAnonymousMode, locale, messages.pages.basicDemo.bubbleSubtitle, messages.pages.basicDemo.bubbleTitle, messages.pages.userInfoDemo.inviteText, selectedChatProfile.chatConfig, selectedShop.shopDbUid, selectedShop.shopUid, selectedUser.avatar, selectedUser.nickname, selectedUser.visitorUid, themeMode]);
+  }), [goodsInfoPayload, htmlBaseUrl, isAnonymousMode, locale, messages.pages.basicDemo.bubbleSubtitle, messages.pages.basicDemo.bubbleTitle, messages.pages.userInfoDemo.inviteText, selectedChatProfile.chatConfig, selectedShop.shopDbUid, selectedShop.shopUid, selectedUser.avatar, selectedUser.nickname, selectedUser.visitorUid, themeMode]);
 
   const handleShowChat = () => (window as any).bytedesk?.showChat();
   const handleHideChat = () => (window as any).bytedesk?.hideChat();
@@ -309,6 +313,16 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     }, 0);
   };
 
+  const rawUrlParams = useMemo(() => Array.from(new URL(chatPageUrl).searchParams.entries()), [chatPageUrl]);
+  const requiredUrlParams = useMemo(() => new Set(['org', 't', 'sid']), []);
+  const urlParamPurposeMap = useMemo<Record<string, string>>(() => ({
+    ...messages.pages.goodsInfoDemo.urlParamPurposes
+  } as Record<string, string>), [messages.pages.goodsInfoDemo.urlParamPurposes]);
+  const urlParams = useMemo(
+    () => rawUrlParams.map(([key, value]) => ({ key, value, purpose: urlParamPurposeMap[key] || '—' })),
+    [rawUrlParams, urlParamPurposeMap]
+  );
+
   return (
     <PageContainer>
       <Card>
@@ -318,10 +332,10 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
         </Space>
       </Card>
 
-      <Card title="店铺与商品（紧凑列表）">
+      <Card title={messages.pages.goodsInfoDemo.shopGoodsCardTitle}>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Space wrap>
-            <Text strong>当前店铺</Text>
+            <Text strong>{messages.pages.goodsInfoDemo.currentShopLabel}</Text>
             <Select
               style={{ minWidth: 280 }}
               value={selectedShop.shopUid}
@@ -364,7 +378,7 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
                             handleConsultGoods(item.uid);
                           }}
                         >
-                          咨询该商品
+                          {messages.pages.goodsInfoDemo.consultGoodsBtn}
                         </Button>
                         <Text type="secondary">{item.uid}</Text>
                         <Text strong>¥{item.price.toLocaleString()}</Text>
@@ -388,15 +402,74 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
             <Button onClick={() => window.open(chatPageUrl, '_blank')}>
               {messages.common.buttons.openInNewTab}
             </Button>
-            <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} />
+            <Alert type="info" showIcon message={`${messages.pages.goodsInfoDemo.consultParamsLabel}: ${chatConfigHint}`} />
           </Space>
         </Space>
       </Card>
 
-      <Card title="当前发送的商品参数">
-        <Typography.Paragraph copyable={{ text: JSON.stringify(goodsInfoPayload, null, 2) }} style={{ marginBottom: 0 }}>
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{JSON.stringify(goodsInfoPayload, null, 2)}</pre>
-        </Typography.Paragraph>
+      <Card title={messages.pages.goodsInfoDemo.goodsPayloadCardTitle}>
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Typography.Paragraph copyable={{ text: JSON.stringify(goodsInfoPayload, null, 2) }} style={{ marginBottom: 0 }}>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{JSON.stringify(goodsInfoPayload, null, 2)}</pre>
+          </Typography.Paragraph>
+          <Typography.Text type="secondary">{messages.pages.goodsInfoDemo.goodsStringifyHint}</Typography.Text>
+          <Typography.Paragraph
+            copyable={{ text: `chatConfig: {\n  goodsInfo: JSON.stringify(goodsInfoPayload),\n}`, tooltips: false }}
+            style={{ margin: 0, fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace', fontSize: 12, background: 'rgba(0,0,0,0.04)', padding: '10px 12px', borderRadius: 6 }}
+          >{`chatConfig: {\n  goodsInfo: JSON.stringify(goodsInfoPayload),\n}`}</Typography.Paragraph>
+        </Space>
+      </Card>
+
+      <Card title={messages.pages.goodsInfoDemo.urlParamsCardTitle}>
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <Typography.Text type="secondary">{messages.pages.goodsInfoDemo.standaloneUrlLabel}</Typography.Text>
+          <Typography.Paragraph
+            copyable={{ text: chatPageUrl, tooltips: false }}
+            style={{ margin: 0, fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace', fontSize: 12, background: 'rgba(0,0,0,0.04)', padding: '10px 12px', borderRadius: 6, wordBreak: 'break-all' }}
+          >
+            {chatPageUrl}
+          </Typography.Paragraph>
+          <Table
+            size="small"
+            bordered
+            pagination={false}
+            rowKey="key"
+            dataSource={urlParams}
+            columns={[
+              {
+                title: messages.pages.goodsInfoDemo.paramNameCol,
+                dataIndex: 'key',
+                key: 'key',
+                render: (value: string) => (
+                  <Space size={6}>
+                    <Typography.Text copyable={{ tooltips: false }}>{value}</Typography.Text>
+                    <Tag color={requiredUrlParams.has(value) ? 'error' : 'default'}>
+                      {requiredUrlParams.has(value) ? messages.pages.goodsInfoDemo.requiredLabel : messages.pages.goodsInfoDemo.optionalLabel}
+                    </Tag>
+                  </Space>
+                ),
+              },
+              {
+                title: messages.pages.goodsInfoDemo.paramValueCol,
+                dataIndex: 'value',
+                key: 'value',
+                render: (value: string) => (
+                  <Typography.Text copyable={{ tooltips: false }}>{value}</Typography.Text>
+                ),
+              },
+              {
+                title: messages.pages.goodsInfoDemo.paramPurposeCol,
+                dataIndex: 'purpose',
+                key: 'purpose',
+              },
+            ]}
+          />
+          <Typography.Text type="secondary">{messages.pages.goodsInfoDemo.goodsUrlHint}</Typography.Text>
+          <Typography.Paragraph
+            copyable={{ text: `const params = new URLSearchParams();\nparams.append('goodsInfo', JSON.stringify(goodsInfoPayload));\nconst url = \`https://cdn.weiyuai.cn/chat?\${params.toString()}\`;`, tooltips: false }}
+            style={{ margin: 0, fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace', fontSize: 12, background: 'rgba(0,0,0,0.04)', padding: '10px 12px', borderRadius: 6 }}
+          >{`const params = new URLSearchParams();\nparams.append('goodsInfo', JSON.stringify(goodsInfoPayload));\nconst url = \`https://cdn.weiyuai.cn/chat?\${params.toString()}\`;`}</Typography.Paragraph>
+        </Space>
       </Card>
 
       <BytedeskReact {...config} />

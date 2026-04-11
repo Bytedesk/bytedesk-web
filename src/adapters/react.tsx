@@ -63,33 +63,36 @@ let activeComponentCount = 0;
 
 const BytedeskComponent = (props: BytedeskReactProps) => {
   const bytedeskRef = useRef<BytedeskWeb | null>(null);
+  const didCallInitRef = useRef(false);
   const { onInit, ...config } = props;
   const configSignature = createConfigSignature(config);
 
   useEffect(() => {
     activeComponentCount++;
-    
-    // 为了确保配置正确应用，我们总是销毁现有实例并重新创建
-    if (globalBytedeskInstance) {
-      // console.log('BytedeskReact: 销毁现有实例以应用新配置');
-      globalBytedeskInstance.destroy();
-      globalBytedeskInstance = null;
-      delete (window as any).bytedesk;
-    }
 
-    // 创建新的全局实例
-    // console.log('BytedeskReact: 创建新的全局实例');
-    globalBytedeskInstance = new BytedeskWeb(config);
-    bytedeskRef.current = globalBytedeskInstance;
-    (window as any).bytedesk = globalBytedeskInstance;
-    
-    // 异步初始化，确保 window.bytedesk 在 onInit 调用前已设置
-    globalBytedeskInstance.init().then(() => {
-      onInit?.();
-    }).catch((error) => {
-      console.error('BytedeskWeb 初始化失败:', error);
-      onInit?.(); // 即使失败也调用 onInit，让组件知道初始化尝试已完成
-    });
+    if (!globalBytedeskInstance) {
+      globalBytedeskInstance = new BytedeskWeb(config);
+      bytedeskRef.current = globalBytedeskInstance;
+      (window as any).bytedesk = globalBytedeskInstance;
+
+      globalBytedeskInstance.init().then(() => {
+        didCallInitRef.current = true;
+        onInit?.();
+      }).catch((error) => {
+        console.error('BytedeskWeb 初始化失败:', error);
+        didCallInitRef.current = true;
+        onInit?.();
+      });
+    } else {
+      bytedeskRef.current = globalBytedeskInstance;
+      (window as any).bytedesk = globalBytedeskInstance;
+      globalBytedeskInstance.setConfig(config);
+
+      if (!didCallInitRef.current) {
+        didCallInitRef.current = true;
+        onInit?.();
+      }
+    }
 
     return () => {
       activeComponentCount--;

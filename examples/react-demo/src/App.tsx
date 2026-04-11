@@ -16,7 +16,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate 
 import { useEffect, useLayoutEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { App as AntdApp, Avatar, Button, ConfigProvider, Dropdown, Layout, theme as antdTheme, type MenuProps } from 'antd';
 
-import DocumentFeedbackDemo from './pages/DocumentFeedbackDemo';
+import DocFeedbackDemo from './pages/DocFeedbackDemo';
 // import FlightBookingDemo from './pages/FlightBookingDemo';
 // @ts-ignore
 import type { Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
@@ -39,6 +39,7 @@ import UserInfoDemo from './pages/UserInfoDemo';
 import VipLevelDemo from './pages/VipLevelDemo';
 import CallCenterDemo from './pages/CallCenterDemo';
 import WebrtcDemo from './pages/WebrtcDemo';
+import ProactiveDemo from './pages/ProactiveDemo';
 
 type DemoLocale = keyof LocaleMessages['common']['languageOptions'];
 type ThemeMode = keyof LocaleMessages['common']['themeOptions'];
@@ -125,7 +126,7 @@ const useSystemTheme = (): ResolvedThemeMode => {
   return systemTheme;
 };
 
-const LANGUAGE_LIST: DemoLocale[] = ['en', 'zh-cn', 'zh-tw', 'ja-jp', 'ko-kr', 'vi-vn', 'ms-my', 'es-es', 'fr-fr'];
+const LANGUAGE_LIST: DemoLocale[] = ['en', 'zh-cn', 'zh-tw', 'ja-jp', 'ko-kr', 'vi-vn', 'ms-my', 'es-es', 'fr-fr', 'th-th'];
 const THEME_LIST: ThemeMode[] = ['light', 'dark', 'system'];
 
 function App() {
@@ -282,13 +283,14 @@ function AppLayout({
     { path: '/userInfo', label: messages.nav.userInfoDemo },
     { path: '/goodsInfo', label: messages.nav.goodsInfoDemo },
     { path: '/orderInfo', label: messages.nav.orderInfoDemo },
+    { path: '/webrtcDemo', label: messages.nav.webrtcDemo },
     { path: '/vipLevel', label: messages.nav.vipLevelDemo },
     { path: '/unreadCount', label: messages.nav.unreadCountDemo },
     { path: '/threadHistory', label: messages.nav.threadHistoryDemo },
-    { path: '/webrtcDemo', label: messages.nav.webrtcDemo },
     ...(isDebugMode
       ? [
         { path: '/callCenter', label: messages.nav.callCenterDemo },
+        { path: '/proactive', label: messages.nav.proactiveDemo },
       ]
       : []),
     { path: '/documentFeedback', label: messages.nav.documentFeedbackDemo },
@@ -823,9 +825,15 @@ function AppLayout({
             path="/callCenter"
             element={<CallCenterDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
           />
+          {isDebugMode && (
+            <Route
+              path="/proactive"
+              element={<ProactiveDemo />}
+            />
+          )}
           <Route
             path="/documentFeedback"
-            element={<DocumentFeedbackDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}
+            element={<DocFeedbackDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}
           />
           {/* <Route
             path="/flightBooking"

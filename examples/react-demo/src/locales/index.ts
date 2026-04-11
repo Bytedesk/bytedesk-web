@@ -5,11 +5,12 @@ import { frFr } from './fr-fr';
 import { jaJp } from './ja-jp';
 import { koKr } from './ko-kr';
 import { msMy } from './ms-my';
+import { thTh } from './th-th';
 import { viVn } from './vi-vn';
 import { zhCn } from './zh-cn';
 import { zhTw } from './zh-tw';
 
-export type DemoLanguage = Language | 'es-es' | 'fr-fr' | 'ko-kr';
+export type DemoLanguage = Language | 'es-es' | 'fr-fr' | 'ko-kr' | 'th-th';
 
 type WidenLiteral<T> =
   T extends string ? string :
@@ -32,7 +33,8 @@ export const localeMessages: Record<DemoLanguage, LocaleMessages> = {
   'ko': koKr,
   'ko-kr': koKr,
   'vi-vn': viVn,
-  'ms-my': msMy
+  'ms-my': msMy,
+  'th-th': thTh
 } as const;
 
 export const getLocaleMessages = (locale: DemoLanguage): LocaleMessages => {

@@ -14,7 +14,8 @@ export const frFr = {
       'vi-vn': 'Tiếng Việt',
       'ms-my': 'Bahasa Melayu',
       'es-es': 'Espagnol',
-      'fr-fr': 'Français'
+      'fr-fr': 'Français',
+      'th-th': 'Thai (Thailande)'
     },
     themeLabel: 'Mode de theme',
     themeOptions: {
@@ -72,6 +73,7 @@ export const frFr = {
     threadHistoryDemo: '🧵 Historique des conversations',
     webrtcDemo: '📹 Demo WebRTC',
     callCenterDemo: '📞 Centre d appels',
+    proactiveDemo: '🎯 Acquisition proactive',
     videoConferenceDemo: '🎬 Visioconference',
     documentFeedbackDemo: '📝 Retour sur document',
     flightBookingDemo: '✈️ Reservation de vol'
@@ -83,16 +85,22 @@ export const frFr = {
       title: 'Configuration de base Bytedesk',
       intro: 'Utilisez les actions rapides ci-dessous pour tester les fonctions courantes du SDK Web Bytedesk.',
       themeButtonLabel: 'Changer la couleur de navigation',
+      themeTextButtonLabel: 'Changer la couleur du texte de navigation',
       bubbleTitle: 'Besoin d aide ?',
       bubbleSubtitle: 'Cliquez pour commencer la conversation',
       placement: {
         bottomLeft: 'En bas a gauche',
         bottomRight: 'En bas a droite'
       },
+      navbarLabel: 'Masquer la navigation haute',
+      navbarHidden: 'ACTIVE',
+      navbarShown: 'DESACTIVE',
+      navbarParamPurpose: 'Indique si la barre de navigation superieure est masquee. navbar=0 masque la navigation.',
       loadHistoryLabel: 'Charger l historique',
       loadHistoryEnabled: 'ACTIVE',
       loadHistoryDisabled: 'DESACTIVE',
       defaultColorLabel: 'Par defaut',
+      defaultTextColorLabel: 'Par defaut',
       currentConfigTitle: 'Configuration actuelle',
       copyConfig: 'Copier le JSON de configuration'
     },
@@ -187,6 +195,32 @@ export const frFr = {
         'goodsInfo.extra est generalement une chaine JSON pour des champs supplementaires comme SKU et stock.',
         'Conservez les champs cles (uid/title/image/price) lorsque la charge utile est grande afin d eviter des URLs trop longues.'
       ],
+      shopGoodsCardTitle: 'Boutique & Produits (liste compacte)',
+      currentShopLabel: 'Boutique actuelle',
+      consultGoodsBtn: 'Consulter ce produit',
+      consultParamsLabel: 'Params de consultation',
+      goodsPayloadCardTitle: 'Payload produit actuel',
+      goodsStringifyHint: 'Comment convertir l objet produit en chaine et le passer a la config :',
+      urlParamsCardTitle: 'Parametres URL actuels',
+      standaloneUrlLabel: 'URL fenetre seule / nouvel onglet',
+      paramNameCol: 'Nom du parametre',
+      paramValueCol: 'Valeur actuelle',
+      paramPurposeCol: 'Description',
+      requiredLabel: 'Obligatoire',
+      optionalLabel: 'Optionnel',
+      goodsUrlHint: 'Comment ajouter les parametres produit a l URL :',
+      urlParamPurposes: {
+        org: 'Identifiant locataire (Org UID)',
+        t: 'Type de session : t=0 un-a-un, t=1 groupe, t=2 bot',
+        sid: 'UID agent / groupe / bot',
+        visitorUid: 'Identifiant unique visiteur',
+        nickname: 'Pseudo visiteur',
+        avatar: 'URL avatar visiteur',
+        goodsInfo: 'Infos produit (chaine JSON), inclut titre, image, prix, lien. Utiliser JSON.stringify avant de transmettre',
+        extra: 'Params d extension personnalises (JSON)',
+        lang: 'Langue de l interface',
+        mode: 'Mode theme de couleur (light / dark / auto)',
+      },
       product: {
         ...en.pages.goodsInfoDemo.product,
         title: 'BYD Yangwang U7 EV de luxe',
@@ -383,7 +417,7 @@ export const frFr = {
       anonymousUserHint: 'Mode de test anonyme : visitorUid, nickname et avatar sont omis.',
       pathAlert: 'Cette page conserve chatPath=/chat et cible un sid de centre d appels pour simuler l acces a la file depuis l entree web.',
       currentPathLabel: 'Chemin d entree actuel',
-      currentPathHint: 'Le chemin reste /chat ; la file depend de chatConfig.sid.',
+      currentPathHint: 'Le chemin reste /call ; la file depend de chatConfig.sid.',
       usageTitle: 'Notes du demo',
       usageNotes: [
         '1. Configurez sid avec l ID de votre groupe centre d appels afin que toutes les sessions entrent dans la meme file.',
