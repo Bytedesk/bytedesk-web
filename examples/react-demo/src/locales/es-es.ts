@@ -15,7 +15,7 @@ export const esEs = {
       'ms-my': 'Bahasa Melayu',
       'es-es': 'Español',
       'fr-fr': 'Francés',
-      'th-th': 'Tailandés (Tailandia)'
+      'th-th': 'ไทย'
     },
     themeLabel: 'Modo de tema',
     themeOptions: {

@@ -468,7 +468,8 @@ function AppLayout({
     'vi-vn': 'https://www.weiyuai.cn/en/',
     'ms-my': 'https://www.weiyuai.cn/en/',
     'es-es': 'https://www.weiyuai.cn/en/',
-    'fr-fr': 'https://www.weiyuai.cn/en/'
+    'fr-fr': 'https://www.weiyuai.cn/en/',
+    'th-th': 'https://www.weiyuai.cn/en/'
   };
   const currentSiteUrl = siteUrlMap[locale] || siteUrlMap['zh-cn'];
 

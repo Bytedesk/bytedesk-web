@@ -11,7 +11,7 @@ export const zhCn = {
       'ms-my': 'Bahasa Melayu',
       'es-es': 'Español',
       'fr-fr': 'Français',
-      'th-th': '泰语（泰国）'
+      'th-th': 'ไทย'
     },
     themeLabel: '主题模式',
     themeOptions: {

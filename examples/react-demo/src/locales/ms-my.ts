@@ -11,7 +11,7 @@ export const msMy = {
       'ms-my': 'Bahasa Melayu',
       'es-es': 'Bahasa Sepanyol',
       'fr-fr': 'Bahasa Perancis',
-      'th-th': 'Bahasa Thai (Thailand)'
+      'th-th': 'ไทย'
     },
     themeLabel: 'Mod tema',
     themeOptions: {

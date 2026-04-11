@@ -318,9 +318,20 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
   const urlParamPurposeMap = useMemo<Record<string, string>>(() => ({
     ...messages.pages.goodsInfoDemo.urlParamPurposes
   } as Record<string, string>), [messages.pages.goodsInfoDemo.urlParamPurposes]);
+
+  const encodeHintText = locale === 'en'
+    ? 'If you manually build URL strings, encode this parameter value with encodeURIComponent.'
+    : '若手动拼接 URL，请对该参数值使用 encodeURIComponent 编码。';
+
+  const needsManualEncoding = (key: string) => ['nickname', 'avatar', 'goodsInfo', 'extra'].includes(key);
+
+  const withEncodeHint = (key: string, purpose: string) => (
+    needsManualEncoding(key) ? `${purpose} ${encodeHintText}` : purpose
+  );
+
   const urlParams = useMemo(
-    () => rawUrlParams.map(([key, value]) => ({ key, value, purpose: urlParamPurposeMap[key] || '—' })),
-    [rawUrlParams, urlParamPurposeMap]
+    () => rawUrlParams.map(([key, value]) => ({ key, value, purpose: withEncodeHint(key, urlParamPurposeMap[key] || '—') })),
+    [rawUrlParams, urlParamPurposeMap, encodeHintText]
   );
 
   return (

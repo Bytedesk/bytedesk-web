@@ -11,7 +11,7 @@ export const en = {
       'ms-my': 'Bahasa Melayu',
       'es-es': 'Spanish',
       'fr-fr': 'French',
-      'th-th': 'Thai (Thailand)'
+      'th-th': 'ไทย'
     },
     themeLabel: 'Theme Mode',
     themeOptions: {

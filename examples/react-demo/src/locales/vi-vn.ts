@@ -11,7 +11,7 @@ export const viVn = {
       'ms-my': 'Bahasa Melayu',
       'es-es': 'Tieng Tay Ban Nha',
       'fr-fr': 'Tieng Phap',
-      'th-th': 'Tieng Thai (Thai Lan)'
+      'th-th': 'ไทย'
     },
     themeLabel: 'Che do giao dien',
     themeOptions: {

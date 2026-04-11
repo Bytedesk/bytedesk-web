@@ -1694,21 +1694,34 @@ const BasicDemo = ({
     loadHistory: fieldDocCopy.fields['chat.loadHistory'],
   }), [fieldDocCopy, messages.pages.basicDemo.navbarParamPurpose]);
 
+  const popupParamEncodingHint = locale === LANG_EN
+    ? 'If you manually build URL strings, encode parameter values with encodeURIComponent.'
+    : '若手动拼接 URL，请对参数值使用 encodeURIComponent 编码。';
+
+  const popupParamNeedsEncoding = (key: string) => key === 'backgroundColor' || key === 'textColor';
+
+  const withEncodingHint = (key: string, purpose: string) => (
+    popupParamNeedsEncoding(key) ? `${purpose} ${popupParamEncodingHint}` : purpose
+  );
+
   const popupUrlParams = useMemo(() => {
     const urlParamMap = new Map(rawPopupUrlParams);
     const rows = rawPopupUrlParams.map(([key, value]) => ({
       key,
       value,
-      purpose: popupParamPurposeMap[key as keyof typeof popupParamPurposeMap] || localizedCopy.popupParamUnknownPurpose,
+      purpose: withEncodingHint(
+        key,
+        popupParamPurposeMap[key as keyof typeof popupParamPurposeMap] || localizedCopy.popupParamUnknownPurpose
+      ),
     }));
     // navbar 和 loadHistory 始终显示在参数说明表格中
     for (const k of ['navbar', 'loadHistory'] as const) {
       if (!urlParamMap.has(k)) {
-        rows.push({ key: k, value: '-', purpose: popupParamPurposeMap[k] });
+        rows.push({ key: k, value: '-', purpose: withEncodingHint(k, popupParamPurposeMap[k]) });
       }
     }
     return rows;
-  }, [localizedCopy.popupParamUnknownPurpose, popupParamPurposeMap, rawPopupUrlParams]);
+  }, [localizedCopy.popupParamUnknownPurpose, popupParamEncodingHint, popupParamPurposeMap, rawPopupUrlParams]);
 
   const configDocSections = useMemo(
     () => buildConfigDocSections(configGuideCopy, fieldDocCopy),

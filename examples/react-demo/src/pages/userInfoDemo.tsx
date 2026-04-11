@@ -165,6 +165,9 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     const urlParams = messages.pages.userInfoDemo.urlParams;
     const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
     const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
+    const manualEncodeHint = locale === 'en'
+        ? 'When manually building URL strings, use encodeURIComponent for nickname, avatar, email, note, and extra.'
+        : '手动拼接 URL 时，建议对 nickname、avatar、email、note、extra 使用 encodeURIComponent 编码。';
 
     return (
         <PageContainer>
@@ -264,6 +267,7 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                         dataSource={urlParams}
                         renderItem={(item) => <List.Item>{item}</List.Item>}
                     />
+                    <Typography.Text type="secondary">{manualEncodeHint}</Typography.Text>
 
                     <Typography.Text strong>{messages.pages.userInfoDemo.sampleUrlLabel}</Typography.Text>
                     <Typography.Paragraph copyable={{ text: sampleUrl }} style={{ marginBottom: 0 }}>

@@ -15,7 +15,7 @@ export const jaJp = {
       'ms-my': 'Bahasa Melayu',
       'es-es': 'スペイン語',
       'fr-fr': 'フランス語',
-      'th-th': 'タイ語（タイ）'
+      'th-th': 'ไทย'
     },
     themeLabel: 'テーマ',
     themeOptions: {

@@ -15,7 +15,7 @@ export const koKr = {
       'ms-my': '말레이어',
       'es-es': '스페인어',
       'fr-fr': '프랑스어',
-      'th-th': '태국어(태국)'
+      'th-th': 'ไทย'
     },
     themeLabel: '테마 모드',
     themeOptions: {

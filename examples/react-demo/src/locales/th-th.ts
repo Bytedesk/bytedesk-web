@@ -16,7 +16,7 @@ export const thTh = {
       'ms-my': 'มาเลย์',
       'es-es': 'สเปน',
       'fr-fr': 'ฝรั่งเศส',
-      'th-th': 'ไทย (ประเทศไทย)'
+      'th-th': 'ไทย'
     },
     themeLabel: 'โหมดธีม',
     themeOptions: {
