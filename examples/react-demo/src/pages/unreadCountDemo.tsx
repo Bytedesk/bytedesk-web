@@ -13,6 +13,7 @@ import { Alert, Button, Card, InputNumber, List, Space, Statistic, Typography, t
 import { getLocaleMessages } from '../locales';
 import type { DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
+import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 
 interface DemoPageProps {
     locale: Language;
@@ -27,19 +28,17 @@ type UnreadBadgeDisplayMode = 'hidden' | 'dot' | 'count';
 const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = theme.useToken();
-    const htmlBaseUrl = process.env.NODE_ENV === 'development'
-        ? 'http://127.0.0.1:9006'
-        : 'https://cdn.weiyuai.cn';
+    const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
     const [unreadCount, setUnreadCount] = useState<number>(0);
     const [manualUnreadCount, setManualUnreadCount] = useState<number>(8);
     const [badgeDisplayMode, setBadgeDisplayMode] = useState<UnreadBadgeDisplayMode>('hidden');
     const [config, setConfig] = useState<BytedeskConfig>({
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
         htmlUrl: htmlBaseUrl,
-        ...(process.env.NODE_ENV === 'development' 
-        ? { 
-            apiUrl: 'http://127.0.0.1:9003' 
-        } 
+        ...(demoApiUrl
+        ? {
+            apiUrl: demoApiUrl
+        }
         : {}),
         placement: 'bottom-right',
         marginBottom: 20,

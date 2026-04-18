@@ -21,6 +21,7 @@ import DocFeedbackDemo from './pages/DocFeedbackDemo';
 // @ts-ignore
 import type { Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
 import { getLocaleMessages, type LocaleMessages } from './locales';
+import { isDevDemo } from './utils/env';
 import { DEMO_ANONYMOUS_AVATAR_TEXT, DEMO_ANONYMOUS_KEY, DEMO_USER_PRESETS, type DemoUserKey, type DemoUserMenuKey, type DemoUserProfile } from './types/demo-user';
 import {
   CHAT_PROFILE_STORAGE_KEY,
@@ -341,7 +342,7 @@ function AppLayout({
   const location = useLocation();
   const navigate = useNavigate();
   const { token } = antdTheme.useToken();
-  const isDebugMode = process.env.NODE_ENV === 'development';
+  const isDebugMode = isDevDemo;
 
   const navLinks = useMemo<NavLinkItem[]>(() => ([
     { path: '/', label: messages.nav.basicDemo },
@@ -899,12 +900,10 @@ function AppLayout({
               element={<ProactiveDemo />}
             />
           )}
-          {isDebugMode && (
-            <Route
-              path="/voiceagent"
-              element={<VoiceAgentDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
-            />
-          )}
+          <Route
+            path="/voiceagent"
+            element={<VoiceAgentDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+          />
           <Route
             path="/documentFeedback"
             element={<DocFeedbackDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}

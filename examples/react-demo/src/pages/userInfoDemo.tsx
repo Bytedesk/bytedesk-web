@@ -28,6 +28,7 @@ import PageContainer from '../components/PageContainer';
 import CurrentUserProfile from '../components/CurrentUserProfile';
 import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
+import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 
 const { Title, Paragraph } = Typography;
 
@@ -44,9 +45,7 @@ interface DemoPageProps {
 const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = antdTheme.useToken();
-    const htmlBaseUrl = process.env.NODE_ENV === 'development'
-        ? 'http://127.0.0.1:9006'
-        : 'https://cdn.weiyuai.cn';
+    const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
     const bubbleNickname = isAnonymousMode ? messages.pages.userInfoDemo.anonymousUserLabel : selectedUser.nickname;
     const users = useMemo(() => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
         key,
@@ -60,9 +59,9 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     const config = useMemo<BytedeskConfig>(() => ({
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
         htmlUrl: htmlBaseUrl,
-        ...(process.env.NODE_ENV === 'development'
+        ...(demoApiUrl
             ? {
-                apiUrl: 'http://127.0.0.1:9003'
+                apiUrl: demoApiUrl
             }
             : {}),
         placement: 'bottom-right',

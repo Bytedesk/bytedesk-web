@@ -23,6 +23,7 @@ import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
 import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
+import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -326,9 +327,7 @@ const DEMO_ORDERS: DemoOrderInfo[] = [
 
 const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
-  const htmlBaseUrl = process.env.NODE_ENV === 'development'
-    ? 'http://127.0.0.1:9006'
-    : 'https://cdn.weiyuai.cn';
+  const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
   const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
   const autoSendLabel = locale === 'en' ? 'Initial business card delivery' : '初始业务卡片发送方式';
@@ -401,9 +400,9 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
     htmlUrl: htmlBaseUrl,
-    ...(process.env.NODE_ENV === 'development'
+    ...(demoApiUrl
       ? {
-          apiUrl: 'http://127.0.0.1:9003'
+          apiUrl: demoApiUrl
         }
       : {}),
     placement: 'bottom-right',

@@ -22,6 +22,7 @@ import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
 import type { DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
+import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -197,9 +198,7 @@ const GOODS_SHOPS: DemoShop[] = [
 
 const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
-  const htmlBaseUrl = process.env.NODE_ENV === 'development'
-    ? 'http://127.0.0.1:9006'
-    : 'https://cdn.weiyuai.cn';
+  const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
   const [selectedShopUid, setSelectedShopUid] = useState<string>(GOODS_SHOPS[0].shopUid);
   const selectedShop = useMemo(
     () => GOODS_SHOPS.find((shop) => shop.shopUid === selectedShopUid) || GOODS_SHOPS[0],
@@ -246,9 +245,9 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
     htmlUrl: htmlBaseUrl,
-    ...(process.env.NODE_ENV === 'development'
+    ...(demoApiUrl
       ? {
-          apiUrl: 'http://127.0.0.1:9003'
+          apiUrl: demoApiUrl
         }
       : {}),
     placement: 'bottom-right',

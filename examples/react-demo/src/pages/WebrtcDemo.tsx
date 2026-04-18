@@ -9,6 +9,7 @@ import CurrentUserProfile from '../components/CurrentUserProfile';
 import PageContainer from '../components/PageContainer';
 import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, type DemoChatProfile } from '../types/chat-profile';
+import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 
 type CallMode = 'audio' | 'video';
 
@@ -34,9 +35,7 @@ const WebrtcDemo = ({
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = antdTheme.useToken();
   const m = messages.pages.webrtcDemo;
-  const htmlBaseUrl = process.env.NODE_ENV === 'development'
-    ? 'http://127.0.0.1:9018'
-    : 'https://cdn.weiyuai.cn';
+  const htmlBaseUrl = getDemoHtmlBaseUrl(9018);
 
   // 当前呼叫模式：默认音频客服
   const [callMode, setCallMode] = useState<CallMode>('audio');
@@ -74,7 +73,7 @@ const WebrtcDemo = ({
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
     htmlUrl: htmlBaseUrl,
-    ...(process.env.NODE_ENV === 'development' ? { apiUrl: 'http://127.0.0.1:9003' } : {}),
+    ...(demoApiUrl ? { apiUrl: demoApiUrl } : {}),
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,

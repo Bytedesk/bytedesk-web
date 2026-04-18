@@ -9,6 +9,7 @@ import CurrentUserProfile from '../components/CurrentUserProfile';
 import PageContainer from '../components/PageContainer';
 import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
+import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 
 interface DemoPageProps {
   locale: Language;
@@ -34,9 +35,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
   const [customTarget, setCustomTarget] = useState('');
   const [lastPopupUrl, setLastPopupUrl] = useState('');
   const [lastLaunchMode, setLastLaunchMode] = useState<CallLaunchMode | null>(null);
-  const htmlBaseUrl = process.env.NODE_ENV === 'development'
-    ? 'http://127.0.0.1:9022'
-    : 'https://cdn.weiyuai.cn';
+  const htmlBaseUrl = getDemoHtmlBaseUrl(9022);
 
   const audioPresets = useMemo<AudioPreset[]>(() => [
     { key: 'echo', label: '回声 echo', target: 'echo' },
@@ -90,7 +89,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
     htmlUrl: htmlBaseUrl,
-    ...(process.env.NODE_ENV === 'development' ? { apiUrl: 'http://127.0.0.1:9003' } : {}),
+    ...(demoApiUrl ? { apiUrl: demoApiUrl } : {}),
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,

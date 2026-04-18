@@ -29,6 +29,7 @@ import {
   buildMinimalConfigExample,
   buildRecommendedConfigExample,
 } from './basic-demo/examples';
+import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 import {
   LANG_EN,
   TEXT_COLORS,
@@ -93,15 +94,9 @@ const BasicDemo = ({
 }: BasicDemoProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = theme.useToken();
-  const chatHtmlBaseUrl = process.env.NODE_ENV === 'development'
-    ? 'http://127.0.0.1:9006'
-    : 'https://cdn.weiyuai.cn';
-  const webrtcHtmlBaseUrl = process.env.NODE_ENV === 'development'
-    ? 'http://127.0.0.1:9018'
-    : 'https://cdn.weiyuai.cn';
-  const callHtmlBaseUrl = process.env.NODE_ENV === 'development'
-    ? 'http://127.0.0.1:9022'
-    : 'https://cdn.weiyuai.cn';
+  const chatHtmlBaseUrl = getDemoHtmlBaseUrl(9006);
+  const webrtcHtmlBaseUrl = getDemoHtmlBaseUrl(9018);
+  const callHtmlBaseUrl = getDemoHtmlBaseUrl(9022);
   const [lastActionApiHint, setLastActionApiHint] = useState<string>('');
   const [isMultiBubbleDemo, setIsMultiBubbleDemo] = useState<boolean>(true);
   const [bubbleSwitchMode, setBubbleSwitchMode] = useState<'fade' | 'slide-up' | 'ticker'>('fade');
@@ -203,10 +198,10 @@ const BasicDemo = ({
 
   const [config, setConfig] = useState<BytedeskConfig>(() => ({
     isDebug: false,
-    ...(process.env.NODE_ENV === 'development'
+    ...(demoApiUrl
       ? {
         htmlUrl: chatHtmlBaseUrl,
-        apiUrl: 'http://127.0.0.1:9003'
+        apiUrl: demoApiUrl
       }
       : { htmlUrl: chatHtmlBaseUrl }),
     placement: 'bottom-right',

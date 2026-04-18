@@ -22,6 +22,7 @@ import InstallGuide from '../components/InstallGuide';
 import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
 import { formatChatConfigQuery, type DemoChatProfile } from '../types/chat-profile';
+import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 
 interface DemoPageProps {
   locale: Language;
@@ -52,9 +53,7 @@ const normalizeCategories = (input?: string | string[]) => {
 const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = theme.useToken();
-  const htmlBaseUrl = process.env.NODE_ENV === 'development'
-    ? 'http://127.0.0.1:9006'
-    : 'https://cdn.weiyuai.cn';
+  const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
   const [feedbackLogs, setFeedbackLogs] = useState<FeedbackLog[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -92,9 +91,9 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
   const [config, setConfig] = useState<BytedeskConfig>(() => ({
     isDebug: true,
     htmlUrl: htmlBaseUrl,
-    ...(process.env.NODE_ENV === 'development'
+    ...(demoApiUrl
       ? {
-          apiUrl: 'http://127.0.0.1:9003'
+          apiUrl: demoApiUrl
         }
       : {}),
     placement: 'bottom-right',

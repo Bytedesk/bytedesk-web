@@ -9,6 +9,7 @@ import PageContainer from '../components/PageContainer';
 import { getLocaleMessages } from '../locales';
 import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, type DemoChatProfile } from '../types/chat-profile';
+import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 
 interface VoiceAgentDemoProps {
   locale: Language;
@@ -32,9 +33,7 @@ const VoiceAgentDemo = ({
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const m = messages.pages.voiceAgentDemo;
   const { token } = antdTheme.useToken();
-  const htmlBaseUrl = process.env.NODE_ENV === 'development'
-    ? 'http://127.0.0.1:9006'
-    : 'https://cdn.weiyuai.cn';
+  const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
 
   const users = useMemo(
     () =>
@@ -59,7 +58,7 @@ const VoiceAgentDemo = ({
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
     htmlUrl: htmlBaseUrl,
-    ...(process.env.NODE_ENV === 'development' ? { apiUrl: 'http://127.0.0.1:9003' } : {}),
+    ...(demoApiUrl ? { apiUrl: demoApiUrl } : {}),
     chatPath: '/chat/voice',
     placement: 'bottom-right',
     marginBottom: 20,
