@@ -1,14 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": "./src",
     "paths": {
+      "@/*": ["../../src/*"],
       "@bytedesk/web/*": ["../../src/*"],
-      "@bytedesk/web/types": ["./types/bytedesk-web"]
+      "@bytedesk/web/types": ["./src/types/bytedesk-web"]
     },
     "types": ["node", "vite/client", "react", "react-dom"],
     "jsx": "react-jsx"
   },
-  "include": ["src"],
+  "include": ["src", "../../src/types/**/*.d.ts", "../../index.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

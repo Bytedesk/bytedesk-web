@@ -19,6 +19,8 @@ export interface BasicDemoLocalizedCopy {
   bubbleWebrtcSubtitle: string;
   multiBubbleLabel: string;
   switchModeLabel: string;
+  customTitleLabel: string;
+  carryBrowseInfoLabel: string;
   apiMessageLabel: string;
   consultParamsLabel: string;
   entrySelectorLabel: string;
@@ -135,6 +137,8 @@ export const getLocalizedCopy = (
         bubbleWebrtcSubtitle: 'Dich vu audio va video da san sang',
         multiBubbleLabel: `Demo nhieu bong: ${isMultiBubbleDemo ? 'BAT' : 'TAT'}`,
         switchModeLabel: `Kieu chuyen bong: ${bubbleSwitchMode === 'fade' ? 'Mo dan' : bubbleSwitchMode === 'slide-up' ? 'Truot len' : 'Bang thong bao'}`,
+        customTitleLabel: 'Tieu de tuy chinh',
+        carryBrowseInfoLabel: 'Mang thong tin browse',
         apiMessageLabel: 'API hien tai:',
         consultParamsLabel: 'Tham so tu van:',
         entrySelectorLabel: 'Demo nhieu loi vao',
@@ -161,6 +165,8 @@ export const getLocalizedCopy = (
         bubbleWebrtcSubtitle: 'Perkhidmatan audio dan video sedia digunakan',
         multiBubbleLabel: `Demo berbilang gelembung: ${isMultiBubbleDemo ? 'HIDUP' : 'MATI'}`,
         switchModeLabel: `Mod pertukaran gelembung: ${bubbleSwitchMode === 'fade' ? 'Pudar' : bubbleSwitchMode === 'slide-up' ? 'Gelongsor naik' : 'Pita ticker'}`,
+        customTitleLabel: 'Tajuk tersuai',
+        carryBrowseInfoLabel: 'Bawa maklumat browse',
         apiMessageLabel: 'API semasa:',
         consultParamsLabel: 'Parameter rundingan:',
         entrySelectorLabel: 'Demo pelbagai pintu masuk',
@@ -187,6 +193,8 @@ export const getLocalizedCopy = (
         bubbleWebrtcSubtitle: 'Servicio de audio y video listo',
         multiBubbleLabel: `Demo de multiples globos: ${isMultiBubbleDemo ? 'ACTIVADO' : 'DESACTIVADO'}`,
         switchModeLabel: `Cambio de globo: ${bubbleSwitchMode === 'fade' ? 'Desvanecer' : bubbleSwitchMode === 'slide-up' ? 'Deslizar hacia arriba' : 'Ticker'}`,
+        customTitleLabel: 'Titulo personalizado',
+        carryBrowseInfoLabel: 'Incluir informacion de browse',
         apiMessageLabel: 'API actual:',
         consultParamsLabel: 'Parametros de consulta:',
         entrySelectorLabel: 'Demo de entradas multiples',
@@ -213,6 +221,8 @@ export const getLocalizedCopy = (
         bubbleWebrtcSubtitle: 'Service audio et video pret',
         multiBubbleLabel: `Demo multi-bulles : ${isMultiBubbleDemo ? 'ACTIVEE' : 'DESACTIVEE'}`,
         switchModeLabel: `Changement de bulle : ${bubbleSwitchMode === 'fade' ? 'Fondu' : bubbleSwitchMode === 'slide-up' ? 'Glissement vers le haut' : 'Bandeau'}`,
+        customTitleLabel: 'Titre personnalise',
+        carryBrowseInfoLabel: 'Inclure les infos browse',
         apiMessageLabel: 'API actuelle :',
         consultParamsLabel: 'Parametres de consultation :',
         entrySelectorLabel: 'Demo multi-entrees',
@@ -239,6 +249,8 @@ export const getLocalizedCopy = (
         bubbleWebrtcSubtitle: 'Audio and video service ready',
         multiBubbleLabel: `Multi Bubble Demo: ${isMultiBubbleDemo ? 'ON' : 'OFF'}`,
         switchModeLabel: `Bubble Switch: ${bubbleSwitchMode === 'fade' ? 'Fade' : bubbleSwitchMode === 'slide-up' ? 'Slide Up' : 'Ticker'}`,
+        customTitleLabel: 'Custom title',
+        carryBrowseInfoLabel: 'Carry browse info',
         apiMessageLabel: 'Current API:',
         consultParamsLabel: 'Consultation params:',
         entrySelectorLabel: 'Multi-entry demo',
@@ -265,6 +277,8 @@ export const getLocalizedCopy = (
         bubbleWebrtcSubtitle: '音声・映像サポートの準備ができています',
         multiBubbleLabel: `マルチバブルデモ: ${isMultiBubbleDemo ? 'オン' : 'オフ'}`,
         switchModeLabel: `バブル切替: ${bubbleSwitchMode === 'fade' ? 'フェード' : bubbleSwitchMode === 'slide-up' ? '上方向スライド' : 'ティッカー'}`,
+        customTitleLabel: 'カスタム title',
+        carryBrowseInfoLabel: 'browse 情報を付与',
         apiMessageLabel: '現在の API:',
         consultParamsLabel: '相談パラメータ:',
         entrySelectorLabel: '複数入口デモ',
@@ -291,6 +305,8 @@ export const getLocalizedCopy = (
         bubbleWebrtcSubtitle: '음성 및 영상 서비스가 준비되었습니다',
         multiBubbleLabel: `멀티 버블 데모: ${isMultiBubbleDemo ? '켜짐' : '꺼짐'}`,
         switchModeLabel: `버블 전환: ${bubbleSwitchMode === 'fade' ? '페이드' : bubbleSwitchMode === 'slide-up' ? '위로 슬라이드' : '티커'}`,
+        customTitleLabel: '커스텀 title',
+        carryBrowseInfoLabel: 'browse 정보 포함',
         apiMessageLabel: '현재 API:',
         consultParamsLabel: '상담 파라미터:',
         entrySelectorLabel: '다중 진입 데모',
@@ -317,6 +333,8 @@ export const getLocalizedCopy = (
         bubbleWebrtcSubtitle: '音訊與視訊客服已就緒',
         multiBubbleLabel: `多氣泡輪播示範：${isMultiBubbleDemo ? '開啟' : '關閉'}`,
         switchModeLabel: `氣泡切換方式：${bubbleSwitchMode === 'fade' ? '淡入淡出' : bubbleSwitchMode === 'slide-up' ? '向上滾動' : '連續公告欄'}`,
+        customTitleLabel: '自訂 title',
+        carryBrowseInfoLabel: '攜帶 browse 資訊',
         apiMessageLabel: '目前呼叫介面:',
         consultParamsLabel: '諮詢參數:',
         entrySelectorLabel: '多入口示範',
@@ -343,6 +361,8 @@ export const getLocalizedCopy = (
         bubbleWebrtcSubtitle: '音频与视频客服已就绪',
         multiBubbleLabel: `多气泡轮播演示：${isMultiBubbleDemo ? '开启' : '关闭'}`,
         switchModeLabel: `气泡切换方式：${bubbleSwitchMode === 'fade' ? '淡入淡出' : bubbleSwitchMode === 'slide-up' ? '向上滚动' : '连续公告栏'}`,
+        customTitleLabel: '自定义 title',
+        carryBrowseInfoLabel: '携带 browse 信息',
         apiMessageLabel: '当前调用接口:',
         consultParamsLabel: '咨询参数:',
         entrySelectorLabel: '多入口演示',

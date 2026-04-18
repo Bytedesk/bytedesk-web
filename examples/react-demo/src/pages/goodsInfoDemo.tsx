@@ -206,6 +206,7 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     [selectedShopUid]
   );
   const [selectedGoodsUid, setSelectedGoodsUid] = useState<string>(selectedShop.goods[0].uid);
+  const [autoSendBizInfo, setAutoSendBizInfo] = useState(true);
 
   const selectedGoods = useMemo(() => {
     const hit = selectedShop.goods.find((goods) => goods.uid === selectedGoodsUid);
@@ -214,6 +215,16 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
 
   const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
+  const autoSendLabel = locale === 'en' ? 'Initial business card delivery' : '初始业务卡片发送方式';
+  const autoSendOptions = locale === 'en'
+    ? [
+        { value: '1', label: 'Send automatically' },
+        { value: '0', label: 'Preview and send manually' }
+      ]
+    : [
+        { value: '1', label: '自动发送' },
+        { value: '0', label: '弹窗确认后发送' }
+      ];
 
   const goodsInfoPayload = useMemo(
     () => ({
@@ -268,6 +279,7 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
             avatar: selectedUser.avatar
           }),
       goodsInfo: JSON.stringify(goodsInfoPayload),
+      autoSendBizInfo: autoSendBizInfo ? '1' : '0',
       extra: JSON.stringify({
         type: 'type',
         test: 'test',
@@ -279,7 +291,7 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     theme: {
       mode: themeMode
     }
-  }), [goodsInfoPayload, htmlBaseUrl, isAnonymousMode, locale, messages.pages.basicDemo.bubbleSubtitle, messages.pages.basicDemo.bubbleTitle, messages.pages.userInfoDemo.inviteText, selectedChatProfile.chatConfig, selectedShop.shopDbUid, selectedShop.shopUid, selectedUser.avatar, selectedUser.nickname, selectedUser.visitorUid, themeMode]);
+  }), [autoSendBizInfo, goodsInfoPayload, htmlBaseUrl, isAnonymousMode, locale, messages.pages.basicDemo.bubbleSubtitle, messages.pages.basicDemo.bubbleTitle, messages.pages.userInfoDemo.inviteText, selectedChatProfile.chatConfig, selectedShop.shopDbUid, selectedShop.shopUid, selectedUser.avatar, selectedUser.nickname, selectedUser.visitorUid, themeMode]);
 
   const handleShowChat = () => (window as any).bytedesk?.showChat();
   const handleHideChat = () => (window as any).bytedesk?.hideChat();
@@ -300,6 +312,7 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     appendIfPresent('nickname', config.chatConfig?.nickname);
     appendIfPresent('avatar', config.chatConfig?.avatar);
     appendIfPresent('goodsInfo', String(config.chatConfig?.goodsInfo || ''));
+    appendIfPresent('autoSendBizInfo', String((config.chatConfig as any)?.autoSendBizInfo || ''));
     appendIfPresent('extra', String(config.chatConfig?.extra || ''));
     params.append('lang', locale);
     params.append('mode', String(themeMode || 'light'));
@@ -316,7 +329,10 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
   const rawUrlParams = useMemo(() => Array.from(new URL(chatPageUrl).searchParams.entries()), [chatPageUrl]);
   const requiredUrlParams = useMemo(() => new Set(['org', 't', 'sid']), []);
   const urlParamPurposeMap = useMemo<Record<string, string>>(() => ({
-    ...messages.pages.goodsInfoDemo.urlParamPurposes
+    ...messages.pages.goodsInfoDemo.urlParamPurposes,
+    autoSendBizInfo: locale === 'en'
+      ? 'Whether goods or order cards are sent automatically when chat initializes. Use 0 for manual confirmation.'
+      : '控制商品或订单卡片是否在会话初始化后自动发送；传 0 时改为弹窗确认发送。'
   } as Record<string, string>), [messages.pages.goodsInfoDemo.urlParamPurposes]);
 
   const encodeHintText = locale === 'en'
@@ -359,6 +375,13 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
             />
             <Tag color="blue">shopUid: {selectedShop.shopUid}</Tag>
             <Tag>shopDbUid: {selectedShop.shopDbUid}</Tag>
+            <Text strong>{autoSendLabel}</Text>
+            <Select
+              style={{ minWidth: 220 }}
+              value={autoSendBizInfo ? '1' : '0'}
+              options={autoSendOptions}
+              onChange={(value) => setAutoSendBizInfo(value === '1')}
+            />
           </Space>
 
           <List

@@ -40,15 +40,42 @@ import VipLevelDemo from './pages/VipLevelDemo';
 import CallCenterDemo from './pages/CallCenterDemo';
 import WebrtcDemo from './pages/WebrtcDemo';
 import ProactiveDemo from './pages/ProactiveDemo';
+import VoiceAgentDemo from './pages/VoiceAgentDemo';
 
 type DemoLocale = keyof LocaleMessages['common']['languageOptions'];
 type ThemeMode = keyof LocaleMessages['common']['themeOptions'];
 type ResolvedThemeMode = Exclude<ThemeMode, 'system'>;
 
+const LANGUAGE_LIST: DemoLocale[] = ['en', 'zh-cn', 'zh-tw', 'ja-jp', 'ko-kr', 'vi-vn', 'ms-my', 'es-es', 'fr-fr', 'th-th'];
+const THEME_LIST: ThemeMode[] = ['light', 'dark', 'system'];
+const DEFAULT_LOCALE: DemoLocale = 'zh-cn';
+
 const THEME_STORAGE_KEY = 'bytedesk-react-demo-theme';
 const USER_STORAGE_KEY = 'bytedesk-react-demo-user';
 const USER_ANONYMOUS_STORAGE_KEY = 'bytedesk-react-demo-user-anonymous';
 const isBrowser = typeof window !== 'undefined';
+
+const isDemoLocale = (value: string | null): value is DemoLocale => {
+  return !!value && LANGUAGE_LIST.includes(value as DemoLocale);
+};
+
+const getLocaleFromSearch = (search: string): DemoLocale | null => {
+  const lang = new URLSearchParams(search).get('lang');
+  return isDemoLocale(lang) ? lang : null;
+};
+
+const getInitialLocale = (): DemoLocale => {
+  if (!isBrowser) {
+    return DEFAULT_LOCALE;
+  }
+  return getLocaleFromSearch(window.location.search) ?? DEFAULT_LOCALE;
+};
+
+const getSearchWithLocale = (search: string, locale: DemoLocale): string => {
+  const params = new URLSearchParams(search);
+  params.set('lang', locale);
+  return `?${params.toString()}`;
+};
 
 const getStoredThemeMode = (): ThemeMode => {
   if (!isBrowser) {
@@ -126,8 +153,18 @@ const useSystemTheme = (): ResolvedThemeMode => {
   return systemTheme;
 };
 
-const LANGUAGE_LIST: DemoLocale[] = ['en', 'zh-cn', 'zh-tw', 'ja-jp', 'ko-kr', 'vi-vn', 'ms-my', 'es-es', 'fr-fr', 'th-th'];
-const THEME_LIST: ThemeMode[] = ['light', 'dark', 'system'];
+const DEMO_PAGE_TITLES: Record<DemoLocale, string> = {
+  en: 'Bytedesk ReactDemo',
+  'zh-cn': '微语 ReactDemo',
+  'zh-tw': '微語 ReactDemo',
+  'ja-jp': 'Bytedesk Reactデモ',
+  'ko-kr': 'Bytedesk React데모',
+  'vi-vn': 'Bản demo React Bytedesk',
+  'ms-my': 'Demo React Bytedesk',
+  'es-es': 'Demo de React de Bytedesk',
+  'fr-fr': 'Démo React Bytedesk',
+  'th-th': 'เดโม React Bytedesk'
+};
 
 function App() {
   return (
@@ -138,13 +175,34 @@ function App() {
 }
 
 function ThemedRouterApp() {
-  const [locale, setLocale] = useState<DemoLocale>('zh-cn');
+  const location = useLocation();
+  const navigate = useNavigate();
   const [themeMode, setThemeMode] = useState<ThemeMode>(getStoredThemeMode);
   const [activeUserKey, setActiveUserKey] = useState<DemoUserKey>(getStoredUserKey);
   const [isAnonymousMode, setIsAnonymousMode] = useState<boolean>(getStoredAnonymousMode);
   const [chatProfileKey, setChatProfileKey] = useState<ChatProfileKey>(getStoredChatProfileKey);
   const systemTheme = useSystemTheme();
+  const locale = useMemo<DemoLocale>(() => {
+    if (!isBrowser) {
+      return DEFAULT_LOCALE;
+    }
+    return getLocaleFromSearch(location.search) ?? getInitialLocale();
+  }, [location.search]);
   const resolvedTheme: ResolvedThemeMode = themeMode === 'system' ? systemTheme : themeMode;
+
+  const handleLocaleChange = useCallback((nextLocale: DemoLocale) => {
+    if (nextLocale === locale) {
+      return;
+    }
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: getSearchWithLocale(location.search, nextLocale)
+      },
+      { replace: true }
+    );
+  }, [locale, location.pathname, location.search, navigate]);
 
   useEffect(() => {
     if (isBrowser) {
@@ -171,6 +229,13 @@ function ThemedRouterApp() {
   }, [chatProfileKey]);
 
   const messages = useMemo(() => getLocaleMessages(locale as Language), [locale]);
+
+  useEffect(() => {
+    if (!isBrowser) {
+      return;
+    }
+    document.title = DEMO_PAGE_TITLES[locale] || DEMO_PAGE_TITLES['zh-cn'];
+  }, [locale]);
 
   const languageOptions = useMemo(() => (
     LANGUAGE_LIST.map((code) => ({
@@ -222,7 +287,7 @@ function ThemedRouterApp() {
           activeUserProfile={activeUserProfile}
           isAnonymousMode={isAnonymousMode}
           selectedChatProfile={selectedChatProfile}
-          onLocaleChange={setLocale}
+          onLocaleChange={handleLocaleChange}
           onThemeChange={setThemeMode}
           onActiveUserChange={setActiveUserKey}
           onAnonymousModeChange={setIsAnonymousMode}
@@ -287,9 +352,10 @@ function AppLayout({
     { path: '/vipLevel', label: messages.nav.vipLevelDemo },
     { path: '/unreadCount', label: messages.nav.unreadCountDemo },
     { path: '/threadHistory', label: messages.nav.threadHistoryDemo },
+    { path: '/voiceagent', label: messages.nav.voiceAgentDemo },
+    { path: '/callCenter', label: messages.nav.callCenterDemo },
     ...(isDebugMode
       ? [
-        { path: '/callCenter', label: messages.nav.callCenterDemo },
         { path: '/proactive', label: messages.nav.proactiveDemo },
       ]
       : []),
@@ -380,6 +446,7 @@ function AppLayout({
 
   const visibleNavLinks = navLinks.slice(0, visibleNavCount);
   const overflowNavLinks = navLinks.slice(visibleNavCount);
+  const currentSearch = location.search;
   const overflowMenuItems: MenuProps['items'] = overflowNavLinks.map((item) => ({
     key: item.external ? `external:${item.href}` : item.path,
     label: item.label
@@ -512,7 +579,7 @@ function AppLayout({
                 {item.label}
               </a>
             ) : (
-              <Link key={item.path} to={item.path} style={getLinkStyle(item.path)}>
+              <Link key={item.path} to={{ pathname: item.path, search: currentSearch }} style={getLinkStyle(item.path)}>
                 {item.label}
               </Link>
             )
@@ -532,7 +599,7 @@ function AppLayout({
                     }
                     return;
                   }
-                  navigate(value);
+                  navigate({ pathname: value, search: currentSearch });
                 }
               }}
             >
@@ -830,6 +897,12 @@ function AppLayout({
             <Route
               path="/proactive"
               element={<ProactiveDemo />}
+            />
+          )}
+          {isDebugMode && (
+            <Route
+              path="/voiceagent"
+              element={<VoiceAgentDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
             />
           )}
           <Route

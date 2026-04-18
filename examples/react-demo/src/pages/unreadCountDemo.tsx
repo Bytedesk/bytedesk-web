@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
-import { Alert, Button, Card, List, Space, Statistic, Typography, theme } from 'antd';
+import { Alert, Button, Card, InputNumber, List, Space, Statistic, Typography, theme } from 'antd';
 import { getLocaleMessages } from '../locales';
 import type { DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
@@ -22,6 +22,8 @@ interface DemoPageProps {
     isAnonymousMode: boolean;
 }
 
+type UnreadBadgeDisplayMode = 'hidden' | 'dot' | 'count';
+
 const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = theme.useToken();
@@ -29,6 +31,8 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
         ? 'http://127.0.0.1:9006'
         : 'https://cdn.weiyuai.cn';
     const [unreadCount, setUnreadCount] = useState<number>(0);
+    const [manualUnreadCount, setManualUnreadCount] = useState<number>(8);
+    const [badgeDisplayMode, setBadgeDisplayMode] = useState<UnreadBadgeDisplayMode>('hidden');
     const [config, setConfig] = useState<BytedeskConfig>({
         isDebug: true, // 是否开启调试模式, 默认: false, 生产环境请设置为false
         htmlUrl: htmlBaseUrl,
@@ -118,6 +122,7 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
         (window as any).bytedesk?.getUnreadMessageCount().then((count: number) => {
             console.log('刷新后未读消息数：', count);
             setUnreadCount(count);
+            setBadgeDisplayMode(count > 0 ? 'count' : 'hidden');
         });
     }, []);
 
@@ -125,7 +130,27 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
         (window as any).bytedesk?.clearUnreadMessages().then((count: number) => {
             console.log('所有消息已标记为已读:', count);
             setUnreadCount(count);
+            setBadgeDisplayMode('hidden');
         });
+    }, []);
+
+    const handleSetManualUnreadCount = useCallback(() => {
+        const nextCount = Math.max(0, Math.floor(Number(manualUnreadCount) || 0));
+        (window as any).bytedesk?.setUnreadMessageCount(nextCount);
+        setUnreadCount(nextCount);
+        setBadgeDisplayMode(nextCount > 0 ? 'count' : 'hidden');
+    }, [manualUnreadCount]);
+
+    const handleShowUnreadDot = useCallback(() => {
+        (window as any).bytedesk?.showUnreadDot();
+        setUnreadCount(0);
+        setBadgeDisplayMode('dot');
+    }, []);
+
+    const handleClearUnreadBadge = useCallback(() => {
+        (window as any).bytedesk?.clearUnreadBadge();
+        setUnreadCount(0);
+        setBadgeDisplayMode('hidden');
     }, []);
 
     const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
@@ -196,6 +221,21 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
 
     const clearApiTemplate = useMemo(
         () => 'POST {{API_BASE}}/visitor/api/v1/message/unread/clear',
+        []
+    );
+
+    const manualCountApiTemplate = useMemo(
+        () => '(window as any).bytedesk?.setUnreadMessageCount(8)',
+        []
+    );
+
+    const unreadDotApiTemplate = useMemo(
+        () => '(window as any).bytedesk?.showUnreadDot()',
+        []
+    );
+
+    const clearBadgeApiTemplate = useMemo(
+        () => '(window as any).bytedesk?.clearUnreadBadge()',
         []
     );
 
@@ -272,10 +312,33 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
                                 </Button>
                             ))}
                         </Space>
+                        <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                            <Typography.Text strong>{messages.pages.unreadCountDemo.manualTitle}</Typography.Text>
+                            <Space wrap>
+                                <InputNumber
+                                    min={0}
+                                    value={manualUnreadCount}
+                                    onChange={(value) => setManualUnreadCount(typeof value === 'number' ? value : 0)}
+                                    addonBefore={messages.pages.unreadCountDemo.manualCountLabel}
+                                />
+                                <Button onClick={handleSetManualUnreadCount}>
+                                    {messages.pages.unreadCountDemo.buttons.applyManualCount}
+                                </Button>
+                                <Button onClick={handleShowUnreadDot}>
+                                    {messages.pages.unreadCountDemo.buttons.showDot}
+                                </Button>
+                                <Button onClick={handleClearUnreadBadge}>
+                                    {messages.pages.unreadCountDemo.buttons.clearBadge}
+                                </Button>
+                            </Space>
+                            <Typography.Text type="secondary">
+                                {`${messages.pages.unreadCountDemo.currentBadgeMode}: ${messages.pages.unreadCountDemo.badgeModes[badgeDisplayMode]}`}
+                            </Typography.Text>
+                        </Space>
                         <Alert
                             type="info"
                             showIcon
-                            message={`${messages.common.apiHintPrefix} getUnreadMessageCount(), clearUnreadMessages()`}
+                            message={`${messages.common.apiHintPrefix} getUnreadMessageCount(), clearUnreadMessages(), setUnreadMessageCount(), showUnreadDot(), clearUnreadBadge()`}
                             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
                         />
                         <Alert type="info" showIcon message={`咨询参数: ${chatConfigHint}`} style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }} />
@@ -293,6 +356,21 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
                         <Typography.Text strong>{messages.pages.unreadCountDemo.clearApiLabel}</Typography.Text>
                         <Typography.Paragraph copyable={{ text: clearApiTemplate }} style={{ marginBottom: 0 }}>
                             <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{clearApiTemplate}</pre>
+                        </Typography.Paragraph>
+
+                        <Typography.Text strong>{messages.pages.unreadCountDemo.manualCountApiLabel}</Typography.Text>
+                        <Typography.Paragraph copyable={{ text: manualCountApiTemplate }} style={{ marginBottom: 0 }}>
+                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{manualCountApiTemplate}</pre>
+                        </Typography.Paragraph>
+
+                        <Typography.Text strong>{messages.pages.unreadCountDemo.showDotApiLabel}</Typography.Text>
+                        <Typography.Paragraph copyable={{ text: unreadDotApiTemplate }} style={{ marginBottom: 0 }}>
+                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{unreadDotApiTemplate}</pre>
+                        </Typography.Paragraph>
+
+                        <Typography.Text strong>{messages.pages.unreadCountDemo.clearBadgeApiLabel}</Typography.Text>
+                        <Typography.Paragraph copyable={{ text: clearBadgeApiTemplate }} style={{ marginBottom: 0 }}>
+                            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{clearBadgeApiTemplate}</pre>
                         </Typography.Paragraph>
 
                         <Typography.Text strong>{messages.pages.unreadCountDemo.urlParamsTitle}</Typography.Text>

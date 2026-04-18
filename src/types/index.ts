@@ -59,6 +59,7 @@ export interface ChatConfig {
   org: string; // 组织ID
   t: string; // 类型
   sid: string; // 会话ID
+  title?: string; // 自定义当前聊天页面浏览器tab标题
   // 
   uid?: string; // 系统自动生成用户ID，不要自定义
   visitorUid?: string; // 自定义访客Uid，支持自定义
@@ -83,9 +84,10 @@ export interface ChatConfig {
 } 
 
 export interface BrowseConfig {
-  referrer?: string; // 来源  
+  referer?: string; // 来源，将被序列化到 browse.referer
+  referrer?: string; // referer 兼容别名
   url?: string; // 页面URL
-  title?: string; // 页面标题
+  title?: string; // 来源页面标题，将被序列化到 browse.title
   [key: string]: string | number | undefined;
 }
 

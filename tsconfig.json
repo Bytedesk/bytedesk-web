@@ -21,14 +21,14 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Paths */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "bytedesk-web/*": ["node_modules/bytedesk-web/*"]
+      "@/*": ["./src/*"],
+      "bytedesk-web/*": ["./node_modules/bytedesk-web/*"]
     },
 
     /* Type Declarations */
     "declaration": true,
+    "rootDir": "./src",
     "declarationDir": "./dist/types",
     "emitDeclarationOnly": true,
     "sourceMap": true,

@@ -1,4 +1,5 @@
 import { en } from './en';
+import { zhCn } from './zh-cn';
 
 export const thTh = {
   ...en,
@@ -44,12 +45,17 @@ export const thTh = {
   },
   pages: {
     ...en.pages,
+    voiceAgentDemo: {
+      ...en.pages.voiceAgentDemo,
+      title: 'เดโมผู้ช่วยเสียง'
+    },
     basicDemo: {
       ...en.pages.basicDemo,
       title: 'การตั้งค่าพื้นฐาน Bytedesk',
       intro: 'ใช้ปุ่มลัดด้านล่างเพื่อทดลองฟีเจอร์หลักของ Bytedesk Web SDK',
       currentConfigTitle: 'การตั้งค่าปัจจุบัน',
-      copyConfig: 'คัดลอก JSON การตั้งค่า'
+      copyConfig: 'คัดลอก JSON การตั้งค่า',
+      fieldDocs: zhCn.pages.basicDemo.fieldDocs
     },
     userInfoDemo: {
       ...en.pages.userInfoDemo,

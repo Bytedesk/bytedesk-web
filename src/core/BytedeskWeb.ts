@@ -29,9 +29,12 @@ import {
 } from "../utils/constants";
 import type { ButtonConfig, BytedeskConfig } from "../types";
 import logger, { setGlobalConfig } from "../utils/logger";
+import { serializeBrowseConfig } from "./browseUrl";
 
 export default class BytedeskWeb {
   private config: BytedeskConfig;
+  private unreadBadgeMode: "hidden" | "dot" | "count" = "hidden";
+  private unreadBadgeCount: number = 0;
   private bubble: HTMLElement | null = null;
   private bubbleContainer: HTMLElement | null = null;
   private buttonElements: HTMLButtonElement[] = [];
@@ -1110,14 +1113,7 @@ export default class BytedeskWeb {
           const response = await getUnreadMessageCount(params);
           // logger.debug("获取未读消息数:", response.data, params);
           if (response.data?.code === 200) {
-            if (response?.data?.data && response?.data?.data > 0) {
-              // logger.debug('未读消息数:', response.data.data);
-              // 在bubble按钮显示未读数目
-              this.showUnreadBadge(response.data.data);
-            } else {
-              // 没有未读消息时，清除数字角标
-              this.clearUnreadBadge();
-            }
+            this.setUnreadMessageCount(response.data.data || 0);
             // 将结果返回
             return response.data.data || 0;
           } else {
@@ -1177,74 +1173,97 @@ export default class BytedeskWeb {
     return this._initVisitor();
   }
 
-  // 显示未读消息数角标
-  private showUnreadBadge(count: number) {
-    logger.debug("showUnreadBadge() 被调用，count:", count);
-    
-    // 检查按钮配置，如果 buttonConfig.show 为 false，则不显示角标
-    if (!this.hasVisibleButtons()) {
-      logger.debug("showUnreadBadge: 当前没有可见按钮，不显示角标");
-      return;
-    }
-    
+  private removeUnreadBadgeElement() {
     if (!this.bubble) {
-      logger.debug("showUnreadBadge: bubble 不存在");
-      return;
-    }
-
-    // 检查是否已经有角标，有则更新，没有则创建
-    let badge = this.bubble.querySelector(
-      ".bytedesk-unread-badge"
-    ) as HTMLElement;
-
-    if (!badge) {
-      logger.debug("showUnreadBadge: 创建新的角标");
-      // 创建未读消息角标
-      badge = document.createElement("div");
-      badge.className = "bytedesk-unread-badge";
-      badge.style.cssText = `
-        position: absolute;
-        top: -8px;
-        right: -8px;
-        min-width: 18px;
-        height: 18px;
-        padding: 0 4px;
-        background: #ff4d4f;
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        border: 2px solid white;
-      `;
-      this.bubble.appendChild(badge);
-    } else {
-      logger.debug("showUnreadBadge: 更新现有角标");
-    }
-
-    // 更新数字
-    badge.textContent = count > 99 ? "99+" : count.toString();
-    logger.debug("showUnreadBadge: 角标数字已更新为", badge.textContent);
-  }
-
-  // 清除未读消息数角标
-  private clearUnreadBadge() {
-    // logger.debug("clearUnreadBadge() 被调用");
-    if (!this.bubble) {
-      logger.debug("clearUnreadBadge: bubble 不存在");
       return;
     }
 
     const badge = this.bubble.querySelector(".bytedesk-unread-badge");
     if (badge) {
-      // logger.debug("clearUnreadBadge: 找到角标，正在移除");
       badge.remove();
-    } else {
-      logger.debug("clearUnreadBadge: 未找到角标");
     }
+  }
+
+  private renderUnreadBadge() {
+    logger.debug("renderUnreadBadge() 被调用", {
+      mode: this.unreadBadgeMode,
+      count: this.unreadBadgeCount,
+    });
+
+    if (!this.hasVisibleButtons()) {
+      this.removeUnreadBadgeElement();
+      logger.debug("renderUnreadBadge: 当前没有可见按钮，不显示角标");
+      return;
+    }
+
+    if (!this.bubble) {
+      logger.debug("renderUnreadBadge: bubble 不存在");
+      return;
+    }
+
+    if (this.unreadBadgeMode === "hidden") {
+      this.removeUnreadBadgeElement();
+      return;
+    }
+
+    let badge = this.bubble.querySelector(
+      ".bytedesk-unread-badge"
+    ) as HTMLElement | null;
+
+    if (!badge) {
+      badge = document.createElement("div");
+      badge.className = "bytedesk-unread-badge";
+      this.bubble.appendChild(badge);
+    }
+
+    const isCountMode = this.unreadBadgeMode === "count";
+    badge.style.cssText = `
+      position: absolute;
+      top: -4px;
+      right: 2px;
+      min-width: ${isCountMode ? "18px" : "10px"};
+      width: ${isCountMode ? "auto" : "10px"};
+      height: ${isCountMode ? "18px" : "10px"};
+      padding: ${isCountMode ? "0 4px" : "0"};
+      background: #ff4d4f;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      border: 2px solid white;
+      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 1;
+    `;
+    badge.textContent = isCountMode ? (this.unreadBadgeCount > 99 ? "99+" : this.unreadBadgeCount.toString()) : "";
+  }
+
+  public setUnreadMessageCount(count: number): number {
+    const normalizedCount = Number.isFinite(count)
+      ? Math.max(0, Math.floor(count))
+      : 0;
+
+    this.unreadBadgeCount = normalizedCount;
+    this.unreadBadgeMode = normalizedCount > 0 ? "count" : "hidden";
+    this.renderUnreadBadge();
+    return normalizedCount;
+  }
+
+  public showUnreadDot(): void {
+    this.unreadBadgeCount = 0;
+    this.unreadBadgeMode = "dot";
+    this.renderUnreadBadge();
+  }
+
+  public clearUnreadBadge(): void {
+    this.unreadBadgeCount = 0;
+    this.unreadBadgeMode = "hidden";
+    this.removeUnreadBadgeElement();
   }
 
   // 清空未读消息
@@ -1856,6 +1875,8 @@ export default class BytedeskWeb {
       buttonsWrapper.appendChild(buttonElement);
     });
 
+    this.renderUnreadBadge();
+
     container.appendChild(buttonsWrapper);
 
     // 只有在 draggable 为 true 时才添加拖拽功能
@@ -2097,10 +2118,11 @@ export default class BytedeskWeb {
       }
     });
 
-    // 添加浏览参数
-    Object.entries(this.config.browseConfig || {}).forEach(([key, value]) => {
-      params.append(key, String(value));
-    });
+    // 添加浏览参数，统一合并到 browse JSON 参数中
+    const browsePayload = serializeBrowseConfig(this.config.browseConfig);
+    if (browsePayload) {
+      params.append("browse", browsePayload);
+    }
 
     // 添加基本参数
     // params.append('tab', tab);

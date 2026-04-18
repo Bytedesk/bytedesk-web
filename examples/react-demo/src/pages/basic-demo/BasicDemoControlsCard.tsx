@@ -17,12 +17,15 @@ type LocalizedCopy = {
   popupParamPurposeTitle: string;
   multiBubbleLabel: string;
   switchModeLabel: string;
+  customTitleLabel: string;
+  carryBrowseInfoLabel: string;
 };
 
 type QuickAction = {
   key: string;
   label: string;
   handler: () => void;
+  type?: 'primary' | 'default';
 };
 
 type PopupParam = {
@@ -64,6 +67,8 @@ interface BasicDemoControlsCardProps {
   loadHistoryLabel: string;
   loadHistoryEnabledLabel: string;
   loadHistoryDisabledLabel: string;
+  customTitleEnabled: boolean;
+  carryBrowseInfoEnabled: boolean;
   localizedCopy: LocalizedCopy;
   chatConfigHint: string;
   qrCodeImageUrl: string;
@@ -85,6 +90,8 @@ interface BasicDemoControlsCardProps {
   onEntryDeselect: NonNullable<MenuProps['onDeselect']>;
   onNavbarToggle: () => void;
   onLoadHistoryToggle: () => void;
+  onCustomTitleToggle: () => void;
+  onCarryBrowseInfoToggle: () => void;
   onMultiBubbleToggle: () => void;
   onBubbleSwitchModeToggle: () => void;
   onLocaleSwitch: (nextLocale: DemoLanguage) => void;
@@ -124,6 +131,8 @@ const BasicDemoControlsCard = ({
   loadHistoryLabel,
   loadHistoryEnabledLabel,
   loadHistoryDisabledLabel,
+  customTitleEnabled,
+  carryBrowseInfoEnabled,
   localizedCopy,
   chatConfigHint,
   qrCodeImageUrl,
@@ -145,11 +154,22 @@ const BasicDemoControlsCard = ({
   onEntryDeselect,
   onNavbarToggle,
   onLoadHistoryToggle,
+  onCustomTitleToggle,
+  onCarryBrowseInfoToggle,
   onMultiBubbleToggle,
   onBubbleSwitchModeToggle,
   onLocaleSwitch,
   onQrCodeImageUrlChange,
 }: BasicDemoControlsCardProps) => {
+  const featuredQuickActionKeys = new Set([
+    'openChat',
+    'closeChat',
+    'openInNewWindow',
+    'openInNewTab'
+  ]);
+  const featuredQuickActions = quickActions.filter((action) => featuredQuickActionKeys.has(action.key));
+  const secondaryQuickActions = quickActions.filter((action) => !featuredQuickActionKeys.has(action.key));
+
   return (
     <Card>
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
@@ -165,8 +185,8 @@ const BasicDemoControlsCard = ({
           ))}
         </Space>
         <Space wrap>
-          {quickActions.map((action) => (
-            <Button key={action.key} type="primary" onClick={action.handler}>
+          {secondaryQuickActions.map((action) => (
+            <Button key={action.key} type={action.type || 'primary'} onClick={action.handler}>
               {action.label}
             </Button>
           ))}
@@ -239,6 +259,12 @@ const BasicDemoControlsCard = ({
           <Button type={loadHistoryEnabled ? 'primary' : 'default'} onClick={onLoadHistoryToggle}>
             {loadHistoryLabel}: {loadHistoryEnabled ? loadHistoryEnabledLabel : loadHistoryDisabledLabel}
           </Button>
+          <Button type={customTitleEnabled ? 'primary' : 'default'} onClick={onCustomTitleToggle}>
+            {localizedCopy.customTitleLabel}: {customTitleEnabled ? navbarHiddenLabel : navbarShownLabel}
+          </Button>
+          <Button type={carryBrowseInfoEnabled ? 'primary' : 'default'} onClick={onCarryBrowseInfoToggle}>
+            {localizedCopy.carryBrowseInfoLabel}: {carryBrowseInfoEnabled ? navbarHiddenLabel : navbarShownLabel}
+          </Button>
           <Button type={isMultiBubbleDemo ? 'primary' : 'default'} onClick={onMultiBubbleToggle}>
             {localizedCopy.multiBubbleLabel}
           </Button>
@@ -254,6 +280,13 @@ const BasicDemoControlsCard = ({
               onClick={() => onLocaleSwitch(item.value as DemoLanguage)}
             >
               {item.label}
+            </Button>
+          ))}
+        </Space>
+        <Space wrap>
+          {featuredQuickActions.map((action, index) => (
+            <Button key={action.key} type={index === 0 ? 'primary' : 'default'} onClick={action.handler}>
+              {action.label}
             </Button>
           ))}
         </Space>

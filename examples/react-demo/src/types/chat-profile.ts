@@ -5,6 +5,7 @@ export interface DemoChatConfig {
   org: string;
   t: '0' | '1' | '2';
   sid: string;
+  title?: string;
 }
 
 export interface DemoChatProfile {

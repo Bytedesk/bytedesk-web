@@ -127,6 +127,7 @@ export const buildFullConfigExample = ({
     org: '${selectedChatProfile.chatConfig.org}',
     t: '${selectedChatProfile.chatConfig.t}',
     sid: '${selectedChatProfile.chatConfig.sid}',
+    title: '${readChatConfigText('title') || '客服咨询'}',
     uid: '',
     visitorUid: '${readChatConfigText('visitorUid')}',
     nickname: '${readChatConfigText('nickname')}',
@@ -146,7 +147,7 @@ export const buildFullConfigExample = ({
   },
 
   browseConfig: {
-    referrer: document.referrer,
+    referer: document.referrer,
     url: window.location.href,
     title: document.title,
   },

@@ -331,6 +331,16 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     : 'https://cdn.weiyuai.cn';
   const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
+  const autoSendLabel = locale === 'en' ? 'Initial business card delivery' : '初始业务卡片发送方式';
+  const autoSendOptions = locale === 'en'
+    ? [
+        { value: '1', label: 'Send automatically' },
+        { value: '0', label: 'Preview and send manually' }
+      ]
+    : [
+        { value: '1', label: '自动发送' },
+        { value: '0', label: '弹窗确认后发送' }
+      ];
   const users = useMemo(
     () => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
       key,
@@ -345,6 +355,7 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     [selectedUser.visitorUid]
   );
   const shouldShowOrderList = !isAnonymousMode && orderList.length > 0;
+  const [autoSendBizInfo, setAutoSendBizInfo] = useState(true);
 
   const [selectedOrderUid, setSelectedOrderUid] = useState<string>(orderList[0]?.uid || DEMO_ORDERS[0].uid);
 
@@ -422,6 +433,7 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
             nickname: selectedUser.nickname,
             avatar: selectedUser.avatar
           }),
+      autoSendBizInfo: autoSendBizInfo ? '1' : '0',
       ...(orderInfoPayload
         ? {
             orderInfo: JSON.stringify(orderInfoPayload)
@@ -444,6 +456,7 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
       mode: themeMode
     }
   }), [
+    autoSendBizInfo,
     isAnonymousMode,
     htmlBaseUrl,
     locale,
@@ -480,6 +493,7 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     appendIfPresent('nickname', config.chatConfig?.nickname);
     appendIfPresent('avatar', config.chatConfig?.avatar);
     appendIfPresent('orderInfo', String(config.chatConfig?.orderInfo || ''));
+    appendIfPresent('autoSendBizInfo', String((config.chatConfig as any)?.autoSendBizInfo || ''));
     appendIfPresent('extra', String(config.chatConfig?.extra || ''));
     params.append('lang', locale);
     params.append('mode', String(themeMode || 'light'));
@@ -496,7 +510,10 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
   const rawUrlParams = useMemo(() => Array.from(new URL(chatPageUrl).searchParams.entries()), [chatPageUrl]);
   const requiredUrlParams = useMemo(() => new Set(['org', 't', 'sid']), []);
   const urlParamPurposeMap = useMemo<Record<string, string>>(() => ({
-    ...messages.pages.orderInfoDemo.urlParamPurposes
+    ...messages.pages.orderInfoDemo.urlParamPurposes,
+    autoSendBizInfo: locale === 'en'
+      ? 'Whether goods or order cards are sent automatically when chat initializes. Use 0 for manual confirmation.'
+      : '控制商品或订单卡片是否在会话初始化后自动发送；传 0 时改为弹窗确认发送。'
   } as Record<string, string>), [messages.pages.orderInfoDemo.urlParamPurposes]);
 
   const encodeHintText = locale === 'en'
@@ -559,6 +576,13 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
             {messages.pages.userInfoDemo.switchAnonymousUserLabel}
             {isAnonymousMode ? messages.pages.orderInfoDemo.currentIndicator : ''}
           </Button>
+          <Text strong>{autoSendLabel}</Text>
+          <Select
+            style={{ minWidth: 220 }}
+            value={autoSendBizInfo ? '1' : '0'}
+            options={autoSendOptions}
+            onChange={(value) => setAutoSendBizInfo(value === '1')}
+          />
         </Space>
 
         {shouldShowOrderList ? (
