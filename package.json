@@ -89,7 +89,7 @@
     "svelte": "^4.0.0",
     "sync-npm-mirror": "^1.0.0",
     "typescript": "^5.7.2",
-    "vite": "^5.0.0",
+    "vite": "^5.4.15",
     "vite-plugin-dts": "^4.4.0",
     "vue": "^3.0.0"
   },
