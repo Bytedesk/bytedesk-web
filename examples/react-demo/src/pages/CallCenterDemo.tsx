@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Alert, Button, Card, Input, List, Space, Tag, Typography, theme as antdTheme } from 'antd';
+import { Alert, Button, Card, Input, Space, Tag, Typography, theme as antdTheme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -219,14 +219,14 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
   return (
     <PageContainer>
       <Card>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Typography.Title level={2} style={{ marginBottom: 0 }}>
             {messages.pages.callCenterDemo.title}
           </Typography.Title>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
             {messages.pages.callCenterDemo.description}
           </Typography.Paragraph>
-          <Space direction="vertical" size={4}>
+          <Space orientation="vertical" size={4}>
             {docLinks.map((link) => (
               <Typography.Link key={link.href} href={link.href} target="_blank" rel="noopener noreferrer">
                 {link.label}
@@ -237,14 +237,14 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
       </Card>
 
       <Card>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Space align="center" wrap>
             <Typography.Text strong>{messages.pages.callCenterDemo.currentPathLabel}</Typography.Text>
             <Tag color="processing">/call</Tag>
             <Typography.Text type="secondary">{messages.pages.callCenterDemo.currentPathHint}</Typography.Text>
           </Space>
 
-          <Space direction="vertical" size={8} style={{ width: '100%' }}>
+          <Space orientation="vertical" size={8} style={{ width: '100%' }}>
             <CurrentUserProfile
               title={messages.pages.userInfoDemo.currentUserTitle}
               isAnonymousMode={isAnonymousMode}
@@ -305,17 +305,17 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
           </Space>
 
           <Card size="small" title="SIP/Freeswitch 呼叫演示按钮">
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
               <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
                 下面的按钮统一通过 /call 页面发起 SIP/Freeswitch 音频会话。已保留音频呼叫、音频 AI 机器人与 IVR 预置目标；如果 SDK 尚未初始化，则自动退回到新窗口打开 /call。
               </Typography.Paragraph>
               <Alert
                 type="info"
                 showIcon
-                message="参数说明：当前示例统一使用 audio=1&video=0 发起音频呼叫；showCall() 也使用同名参数。"
+                title="参数说明：当前示例统一使用 audio=1&video=0 发起音频呼叫；showCall() 也使用同名参数。"
                 style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
               />
-              <Space direction="vertical" size={8} style={{ width: '100%' }}>
+              <Space orientation="vertical" size={8} style={{ width: '100%' }}>
                 <Typography.Text strong>音频呼叫</Typography.Text>
                 <Space wrap>
                   {audioPresets.map((preset) => (
@@ -325,7 +325,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
                   ))}
                 </Space>
               </Space>
-              <Space direction="vertical" size={8} style={{ width: '100%' }}>
+              <Space orientation="vertical" size={8} style={{ width: '100%' }}>
                 <Typography.Text strong>音频AI 机器人</Typography.Text>
                 <Space wrap>
                   {audioAiPresets.map((preset) => (
@@ -335,7 +335,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
                   ))}
                 </Space>
               </Space>
-              <Space direction="vertical" size={8} style={{ width: '100%' }}>
+              <Space orientation="vertical" size={8} style={{ width: '100%' }}>
                 <Typography.Text strong>IVR 测试</Typography.Text>
                 <Space wrap>
                   {ivrPresets.map((preset) => (
@@ -368,13 +368,13 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
           <Alert
             type="info"
             showIcon
-            message={`${messages.common.apiHintPrefix} showCall() / hideChat()`}
+            title={`${messages.common.apiHintPrefix} showCall() / hideChat()`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
           <Alert
             type="info"
             showIcon
-            message={`咨询参数: ${chatConfigHint}；当前呼叫示例统一传入 audio=1&video=0`}
+            title={`咨询参数: ${chatConfigHint}；当前呼叫示例统一传入 audio=1&video=0`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
           <Space align="center" size={8}>
@@ -386,34 +386,31 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
             ) : null}
           </Space>
           {lastPopupUrl ? (
-            <Typography.Paragraph copyable={{ text: lastPopupUrl }} style={{ marginBottom: 0 }}>
-              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{lastPopupUrl}</pre>
-            </Typography.Paragraph>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{lastPopupUrl}</pre>
           ) : (
             <Typography.Text type="secondary">点击嵌入式呼叫、新窗口或新标签页按钮后，将在这里显示对应 URL</Typography.Text>
           )}
 
-          <List
-            header={messages.pages.callCenterDemo.usageTitle}
-            dataSource={messages.pages.callCenterDemo.usageNotes}
-            renderItem={(note) => <List.Item>{note}</List.Item>}
-          />
+          <div>
+            <Typography.Text strong>{messages.pages.callCenterDemo.usageTitle}</Typography.Text>
+            <ul style={{ margin: '8px 0 0', paddingLeft: 20, lineHeight: 1.8 }}>
+              {messages.pages.callCenterDemo.usageNotes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
+          </div>
         </Space>
       </Card>
 
       <Card title={messages.pages.callCenterDemo.urlGuideTitle}>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Typography.Text strong>{messages.pages.callCenterDemo.sampleUrlLabel}</Typography.Text>
-          <Typography.Paragraph copyable={{ text: sampleUrl }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
-          </Typography.Paragraph>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
             当前示例 URL 默认附带 audio=1、video=0，可直接按音频会话打开。
           </Typography.Paragraph>
           <Typography.Text strong>音频示例 URL</Typography.Text>
-          <Typography.Paragraph copyable={{ text: buildAudioCallUrl('1000') }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{buildAudioCallUrl('1000')}</pre>
-          </Typography.Paragraph>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{buildAudioCallUrl('1000')}</pre>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
             音频示例参数：audio=1、video=0，可选附加 target、callNumber、callDisplayName。
           </Typography.Paragraph>

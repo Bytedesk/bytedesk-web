@@ -13,23 +13,17 @@ import logger from '../utils/logger';
 let globalBytedeskInstance: BytedeskWeb | null = null;
 let activeComponentCount = 0;
 
-// 定义组件类型
-type BytedeskAngularType = {
-  config: BytedeskConfig;
-  ngOnInit(): void;
-  ngOnDestroy(): void;
-};
-
-// 导出组件
-export const BytedeskAngular: any = Component({
+@Component({
   selector: 'bytedesk-angular',
+  standalone: false,
   template: '',
   styles: [`
     :host {
       display: none;
     }
   `]
-})(class implements BytedeskAngularType {
+})
+export class BytedeskAngular {
   @Input() config!: BytedeskConfig;
 
   ngOnInit(): void {
@@ -67,4 +61,4 @@ export const BytedeskAngular: any = Component({
         }, 100);
     }
   }
-}); 
+}

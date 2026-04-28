@@ -59,7 +59,7 @@ export const thTh = {
     },
     userInfoDemo: {
       ...en.pages.userInfoDemo,
-      title: 'เดโมการเชื่อมต่อข้อมูลผู้ใช้'
+      title: 'เดโมการเชื่อมต่อผู้ใช้จากระบบธุรกิจบุคคลที่สาม'
     },
     goodsInfoDemo: {
       ...en.pages.goodsInfoDemo,

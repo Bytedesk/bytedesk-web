@@ -47,7 +47,7 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 import { useMemo } from 'react';
-import { Alert, Card, List, Space, Typography, theme } from 'antd';
+import { Alert, Card, Space, Typography, theme } from 'antd';
 import { getLocaleMessages, type DemoLanguage } from '../locales';
 
 interface InstallGuideProps {
@@ -79,7 +79,7 @@ const InstallGuide = ({ locale, showFeedback = true }: InstallGuideProps) => {
   return (
     <Card style={{ marginTop: 40 }}>
       <Typography.Title level={3}>{guide.title}</Typography.Title>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <Space orientation="vertical" size="large" style={{ width: '100%' }}>
         <Card type="inner" title={guide.sections.installDeps.title} variant="outlined">
           {renderCode(guide.sections.installDeps.code)}
         </Card>
@@ -89,7 +89,7 @@ const InstallGuide = ({ locale, showFeedback = true }: InstallGuideProps) => {
         </Card>
 
         <Card type="inner" title={guide.sections.config.title} variant="outlined">
-          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+          <Space orientation="vertical" size="small" style={{ width: '100%' }}>
             <Typography.Text strong>{guide.sections.config.minimalTitle}</Typography.Text>
             {renderCode(guide.sections.config.minimalCode, true)}
             <Typography.Paragraph type="secondary">{guide.sections.config.minimalNote}</Typography.Paragraph>
@@ -103,32 +103,29 @@ const InstallGuide = ({ locale, showFeedback = true }: InstallGuideProps) => {
         </Card>
 
         <Card type="inner" title={guide.sections.methods.title} variant="outlined">
-          <List
-            dataSource={[...guide.sections.methods.list]}
-            renderItem={(item: (typeof guide.sections.methods.list)[number]) => (
-              <List.Item style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {guide.sections.methods.list.map((item: (typeof guide.sections.methods.list)[number]) => (
+              <div key={item.code} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
                 <Typography.Text code>{item.code}</Typography.Text>
                 <Typography.Text type="secondary">{item.description}</Typography.Text>
-              </List.Item>
-            )}
-          />
+              </div>
+            ))}
+          </div>
         </Card>
 
         {showFeedback && (
           <Card type="inner" title={guide.sections.feedback.title} variant="outlined">
-            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            <Space orientation="vertical" size="small" style={{ width: '100%' }}>
               <Typography.Paragraph>{guide.sections.feedback.intro}</Typography.Paragraph>
-              <List
-                size="small"
-                dataSource={[...guide.sections.feedback.bullets]}
-                renderItem={(text: (typeof guide.sections.feedback.bullets)[number]) => (
-                  <List.Item style={{ paddingInline: 0 }}>{text}</List.Item>
-                )}
-              />
+              <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+                {guide.sections.feedback.bullets.map((text: (typeof guide.sections.feedback.bullets)[number]) => (
+                  <li key={text}>{text}</li>
+                ))}
+              </ul>
               <Alert
                 type="info"
                 showIcon
-                message={guide.sections.feedback.tip}
+                title={guide.sections.feedback.tip}
                 description={renderCode(guide.sections.feedback.tipCommand, true)}
               />
             </Space>

@@ -14,7 +14,7 @@ import InstallGuide from '../components/InstallGuide';
 import PageContainer from '../components/PageContainer';
 import { getLocaleMessages, type DemoLanguage } from '../locales';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
-import { FloatButton, theme } from 'antd';
+import { Card, FloatButton, Space, Table, Tag, Typography, theme } from 'antd';
 import BasicDemoConfigDocsCard from './basic-demo/BasicDemoConfigDocsCard';
 import BasicDemoControlsCard from './basic-demo/BasicDemoControlsCard';
 import { buildConfigDocSections } from './basic-demo/config-docs';
@@ -98,8 +98,6 @@ const BasicDemo = ({
   const webrtcHtmlBaseUrl = getDemoHtmlBaseUrl(9018);
   const callHtmlBaseUrl = getDemoHtmlBaseUrl(9022);
   const [lastActionApiHint, setLastActionApiHint] = useState<string>('');
-  const [isMultiBubbleDemo, setIsMultiBubbleDemo] = useState<boolean>(true);
-  const [bubbleSwitchMode, setBubbleSwitchMode] = useState<'fade' | 'slide-up' | 'ticker'>('fade');
   const [selectedEntryActions, setSelectedEntryActions] = useState<EntryAction[]>(['chat']);
   const [areEntryButtonsVisible, setAreEntryButtonsVisible] = useState<boolean>(true);
   const [qrCodeImageUrl, setQrCodeImageUrl] = useState<string>('https://www.weiyuai.cn/assets/images/qrcode/wechat.png');
@@ -108,27 +106,9 @@ const BasicDemo = ({
   const [isBrowseInfoEnabled, setIsBrowseInfoEnabled] = useState<boolean>(false);
 
   const localeValueHint = getLocaleValueHint(locale);
-  const localizedCopy = getLocalizedCopy(locale, isMultiBubbleDemo, bubbleSwitchMode);
-
-  const bubbleMessageList = useMemo(
-    () => [
-      {
-        icon: '👋',
-        title: messages.pages.basicDemo.bubbleTitle,
-        subtitle: messages.pages.basicDemo.bubbleSubtitle
-      },
-      {
-        icon: '🧠',
-        title: localizedCopy.bubbleAgentTitle,
-        subtitle: localizedCopy.bubbleAgentSubtitle
-      },
-      {
-        icon: '📹',
-        title: localizedCopy.bubbleWebrtcTitle,
-        subtitle: localizedCopy.bubbleWebrtcSubtitle
-      }
-    ],
-    [localizedCopy, messages]
+  const localizedCopy = useMemo(
+    () => getLocalizedCopy(locale, false, 'fade'),
+    [locale]
   );
 
   const entryActionOptions = useMemo(
@@ -220,11 +200,7 @@ const BasicDemo = ({
       show: true,
       icon: '👋',
       title: messages.pages.basicDemo.bubbleTitle,
-      subtitle: messages.pages.basicDemo.bubbleSubtitle,
-      messages: bubbleMessageList,
-      autoRotate: true,
-      rotateInterval: 3000,
-      switchMode: bubbleSwitchMode
+      subtitle: messages.pages.basicDemo.bubbleSubtitle
     },
     buttonConfig: {
       show: true,
@@ -263,11 +239,7 @@ const BasicDemo = ({
       bubbleConfig: {
         ...prevConfig.bubbleConfig,
         title: messages.pages.basicDemo.bubbleTitle,
-        subtitle: messages.pages.basicDemo.bubbleSubtitle,
-        messages: isMultiBubbleDemo ? bubbleMessageList : undefined,
-        autoRotate: isMultiBubbleDemo,
-        rotateInterval: 3000,
-        switchMode: bubbleSwitchMode
+        subtitle: messages.pages.basicDemo.bubbleSubtitle
       },
       chatConfig: {
         ...(prevConfig.chatConfig || {}),
@@ -276,7 +248,7 @@ const BasicDemo = ({
       },
       buttonsConfig: multiSessionButtons
     }));
-  }, [bubbleMessageList, bubbleSwitchMode, isMultiBubbleDemo, locale, multiSessionButtons, themeMode, messages, selectedChatProfile]);
+  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile]);
 
   const handleInit = () => {
     console.log('BytedeskReact initialized BasicDemo');
@@ -363,50 +335,7 @@ const BasicDemo = ({
     });
   };
 
-  const handleToggleMultiBubbleDemo = () => {
-    setIsMultiBubbleDemo((prev) => {
-      const next = !prev;
-      setConfig((prevConfig: BytedeskConfig) => ({
-        ...prevConfig,
-        bubbleConfig: {
-          ...(prevConfig.bubbleConfig || {}),
-          show: true,
-          icon: '👋',
-          title: messages.pages.basicDemo.bubbleTitle,
-          subtitle: messages.pages.basicDemo.bubbleSubtitle,
-          messages: next ? bubbleMessageList : undefined,
-          autoRotate: next,
-          rotateInterval: 3000,
-          switchMode: bubbleSwitchMode
-        }
-      }));
-      setLastActionApiHint(
-        next
-          ? `setConfig({ bubbleConfig: { messages, autoRotate: true, rotateInterval: 3000, switchMode: "${bubbleSwitchMode}" } })`
-          : `setConfig({ bubbleConfig: { messages: undefined, autoRotate: false, switchMode: "${bubbleSwitchMode}" } })`
-      );
-      return next;
-    });
-  };
-
   const configGuideCopy = getConfigGuideCopy(locale);
-
-  const handleToggleBubbleSwitchMode = () => {
-    const nextMode = bubbleSwitchMode === 'fade'
-      ? 'slide-up'
-      : bubbleSwitchMode === 'slide-up'
-        ? 'ticker'
-        : 'fade';
-    setBubbleSwitchMode(nextMode);
-    setConfig((prevConfig: BytedeskConfig) => ({
-      ...prevConfig,
-      bubbleConfig: {
-        ...(prevConfig.bubbleConfig || {}),
-        switchMode: nextMode
-      }
-    }));
-    setLastActionApiHint(`setConfig({ bubbleConfig: { switchMode: "${nextMode}" } })`);
-  };
 
   const handleLocaleSwitch = (nextLocale: DemoLanguage) => {
     onLocaleChange(nextLocale);
@@ -657,13 +586,13 @@ const BasicDemo = ({
   const recommendedConfigExample = useMemo(() => buildRecommendedConfigExample({
     config,
     exampleCopy,
-    bubbleSwitchMode,
+    bubbleSwitchMode: 'fade',
     locale,
     themeMode,
     selectedChatProfile,
     bubbleTitle: messages.pages.basicDemo.bubbleTitle,
     bubbleSubtitle: messages.pages.basicDemo.bubbleSubtitle,
-  }), [config, exampleCopy, bubbleSwitchMode, locale, themeMode, selectedChatProfile, messages.pages.basicDemo.bubbleTitle, messages.pages.basicDemo.bubbleSubtitle]);
+  }), [config, exampleCopy, locale, themeMode, selectedChatProfile, messages.pages.basicDemo.bubbleTitle, messages.pages.basicDemo.bubbleSubtitle]);
 
   const fieldDocCopy = useMemo(() => ({ fields: messages.pages.basicDemo.fieldDocs }), [messages.pages.basicDemo.fieldDocs]);
 
@@ -717,10 +646,30 @@ const BasicDemo = ({
 
   return (
     <PageContainer>
+      <Card>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <div>
+            <Typography.Title level={2} style={{ marginBottom: 0 }}>{messages.pages.basicDemo.title}</Typography.Title>
+            <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+              {messages.pages.basicDemo.intro}
+            </Typography.Paragraph>
+          </div>
+          <Space orientation="vertical" size={4}>
+            {docLinks.map((link) => (
+              <Typography.Link
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {link.label}
+              </Typography.Link>
+            ))}
+          </Space>
+        </Space>
+      </Card>
+
       <BasicDemoControlsCard
-        title={messages.pages.basicDemo.title}
-        intro={messages.pages.basicDemo.intro}
-        docLinks={docLinks}
         quickActions={quickActions}
         togglePlacementLabel={messages.common.buttons.togglePlacement}
         placementLabel={placementLabel}
@@ -736,7 +685,6 @@ const BasicDemo = ({
         entryMenuItems={entryMenuItems}
         selectedThemeModeKeys={[themePreference]}
         selectedEntryActions={selectedEntryActions}
-        isMultiBubbleDemo={isMultiBubbleDemo}
         locale={locale}
         localeValueHint={localeValueHint}
         lastActionApiHint={lastActionApiHint}
@@ -755,16 +703,9 @@ const BasicDemo = ({
         localizedCopy={localizedCopy}
         chatConfigHint={chatConfigHint}
         qrCodeImageUrl={qrCodeImageUrl}
-        chatPageUrl={chatPageUrl}
-        popupUrlParams={popupUrlParams}
-        requiredPopupParams={requiredPopupParams}
-        requiredLabel={requiredLabel}
-        optionalLabel={optionalLabel}
-        codeBlockStyle={codeBlockStyle}
         navButtonColor={config.theme?.backgroundColor || ''}
         navButtonTextColor={config.theme?.textColor || '#ffffff'}
         fallbackPrimaryColor={token.colorPrimary}
-        copyLabel={messages.common.buttons.copy}
         onPlacementToggle={handlePlacementToggle}
         onNavColorChange={handleNavColorSwitch}
         onNavTextColorChange={handleNavTextColorSwitch}
@@ -775,11 +716,66 @@ const BasicDemo = ({
         onLoadHistoryToggle={handleToggleLoadHistory}
         onCustomTitleToggle={handleToggleCustomTitle}
         onCarryBrowseInfoToggle={handleToggleBrowseInfo}
-        onMultiBubbleToggle={handleToggleMultiBubbleDemo}
-        onBubbleSwitchModeToggle={handleToggleBubbleSwitchMode}
         onLocaleSwitch={handleLocaleSwitch}
         onQrCodeImageUrlChange={handleQrCodeImageUrlChange}
       />
+
+      <Card title={localizedCopy.popupUrlTitle}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph
+            copyable={{ text: chatPageUrl }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {chatPageUrl}
+          </Typography.Paragraph>
+
+          <Typography.Text strong>{localizedCopy.popupUrlParamsTitle}</Typography.Text>
+          <Table
+            size="small"
+            bordered
+            pagination={false}
+            rowKey="key"
+            dataSource={popupUrlParams}
+            columns={[
+              {
+                title: localizedCopy.popupParamNameTitle,
+                dataIndex: 'key',
+                key: 'key',
+                render: (value: string) => (
+                  <Space size={6}>
+                    <Typography.Text copyable={{ text: value }}>{value}</Typography.Text>
+                    <Tag color={requiredPopupParams.has(value) ? 'error' : 'default'}>
+                      {requiredPopupParams.has(value) ? requiredLabel : optionalLabel}
+                    </Tag>
+                  </Space>
+                ),
+              },
+              {
+                title: localizedCopy.popupParamValueTitle,
+                dataIndex: 'value',
+                key: 'value',
+                render: (value: string) => {
+                  const hasCopyableValue = value.trim() !== '' && value !== '-';
+
+                  return (
+                    <Typography.Paragraph
+                      copyable={hasCopyableValue ? { text: value } : false}
+                      style={{ marginBottom: 0, wordBreak: 'break-all' }}
+                    >
+                      {value}
+                    </Typography.Paragraph>
+                  );
+                },
+              },
+              {
+                title: localizedCopy.popupParamPurposeTitle,
+                dataIndex: 'purpose',
+                key: 'purpose',
+              },
+            ]}
+          />
+        </Space>
+      </Card>
 
       <BasicDemoConfigDocsCard
         minimalConfigTitle={configGuideCopy.minimalConfigTitle}
@@ -794,7 +790,6 @@ const BasicDemo = ({
         recommendedConfigExample={recommendedConfigExample}
         fullConfigExample={fullConfigExample}
         configDocSections={configDocSections}
-        copyLabel={messages.pages.basicDemo.copyConfig}
         codeBlockStyle={codeBlockStyle}
       />
 

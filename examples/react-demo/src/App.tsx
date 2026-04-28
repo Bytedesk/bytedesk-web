@@ -13,10 +13,9 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
  */
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useLayoutEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { App as AntdApp, Avatar, Button, ConfigProvider, Dropdown, Layout, theme as antdTheme, type MenuProps } from 'antd';
+import { Suspense, lazy, useEffect, useLayoutEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { App as AntdApp, Avatar, Button, ConfigProvider, Dropdown, Layout, Spin, theme as antdTheme, type MenuProps } from 'antd';
 
-import DocFeedbackDemo from './pages/DocFeedbackDemo';
 // import FlightBookingDemo from './pages/FlightBookingDemo';
 // @ts-ignore
 import type { Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
@@ -31,17 +30,19 @@ import {
   type ChatProfileKey,
   type DemoChatProfile
 } from './types/chat-profile';
-import BasicDemo from './pages/BasicDemo';
-import GoodsInfoDemo from './pages/GoodsInfoDemo';
-import OrderInfoDemo from './pages/OrderInfoDemo';
-import ThreadHistoryDemo from './pages/ThreadHistoryDemo';
-import UnreadCountDemo from './pages/UnreadCountDemo';
-import UserInfoDemo from './pages/UserInfoDemo';
-import VipLevelDemo from './pages/VipLevelDemo';
-import CallCenterDemo from './pages/CallCenterDemo';
-import WebrtcDemo from './pages/WebrtcDemo';
-import ProactiveDemo from './pages/ProactiveDemo';
-import VoiceAgentDemo from './pages/VoiceAgentDemo';
+
+const BasicDemo = lazy(() => import('./pages/BasicDemo'));
+const GoodsInfoDemo = lazy(() => import('./pages/GoodsInfoDemo'));
+const OrderInfoDemo = lazy(() => import('./pages/OrderInfoDemo'));
+const ThreadHistoryDemo = lazy(() => import('./pages/ThreadHistoryDemo'));
+const UnreadCountDemo = lazy(() => import('./pages/UnreadCountDemo'));
+const UserInfoDemo = lazy(() => import('./pages/UserInfoDemo'));
+const VipLevelDemo = lazy(() => import('./pages/VipLevelDemo'));
+const CallCenterDemo = lazy(() => import('./pages/CallCenterDemo'));
+const WebrtcDemo = lazy(() => import('./pages/WebrtcDemo'));
+const ProactiveDemo = lazy(() => import('./pages/ProactiveDemo'));
+const VoiceAgentDemo = lazy(() => import('./pages/VoiceAgentDemo'));
+const DocFeedbackDemo = lazy(() => import('./pages/DocFeedbackDemo'));
 
 type DemoLocale = keyof LocaleMessages['common']['languageOptions'];
 type ThemeMode = keyof LocaleMessages['common']['themeOptions'];
@@ -172,6 +173,21 @@ function App() {
     <Router basename="/reactdemo">
       <ThemedRouterApp />
     </Router>
+  );
+}
+
+function RouteFallback() {
+  return (
+    <div
+      style={{
+        minHeight: 'calc(100vh - 132px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
+      <Spin size="large" />
+    </div>
   );
 }
 
@@ -848,71 +864,73 @@ function AppLayout({
         </div>
       </Layout.Header>
       <Layout.Content style={{ padding: 0, background: token.colorBgLayout }}>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <BasicDemo
-                locale={locale as Language}
-                themeMode={resolvedTheme as BytedeskTheme['mode']}
-                themePreference={themeMode}
-                selectedChatProfile={selectedChatProfile}
-                onLocaleChange={(nextLocale) => onLocaleChange(nextLocale as DemoLocale)}
-                onThemePreferenceChange={(nextTheme) => onThemeChange(nextTheme as ThemeMode)}
-              />
-            }
-          />
-          <Route
-            path="/userInfo"
-            element={<UserInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
-          />
-          <Route
-            path="/orderInfo"
-            element={<OrderInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
-          />
-          <Route
-            path="/goodsInfo"
-            element={<GoodsInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
-          />
-          <Route
-            path="/vipLevel"
-            element={<VipLevelDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
-          />
-          <Route
-            path="/unreadCount"
-            element={<UnreadCountDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
-          />
-          <Route
-            path="/threadHistory"
-            element={<ThreadHistoryDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
-          />
-          <Route
-            path="/webrtcDemo"
-            element={<WebrtcDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
-          />
-          <Route
-            path="/callCenter"
-            element={<CallCenterDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
-          />
-          {isDebugMode && (
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
             <Route
-              path="/proactive"
-              element={<ProactiveDemo />}
+              path="/"
+              element={
+                <BasicDemo
+                  locale={locale as Language}
+                  themeMode={resolvedTheme as BytedeskTheme['mode']}
+                  themePreference={themeMode}
+                  selectedChatProfile={selectedChatProfile}
+                  onLocaleChange={(nextLocale) => onLocaleChange(nextLocale as DemoLocale)}
+                  onThemePreferenceChange={(nextTheme) => onThemeChange(nextTheme as ThemeMode)}
+                />
+              }
             />
-          )}
-          <Route
-            path="/voiceagent"
-            element={<VoiceAgentDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
-          />
-          <Route
-            path="/documentFeedback"
-            element={<DocFeedbackDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}
-          />
-          {/* <Route
-            path="/flightBooking"
-            element={<FlightBookingDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}
-          /> */}
-        </Routes>
+            <Route
+              path="/userInfo"
+              element={<UserInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            <Route
+              path="/orderInfo"
+              element={<OrderInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            <Route
+              path="/goodsInfo"
+              element={<GoodsInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
+            />
+            <Route
+              path="/vipLevel"
+              element={<VipLevelDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            <Route
+              path="/unreadCount"
+              element={<UnreadCountDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
+            />
+            <Route
+              path="/threadHistory"
+              element={<ThreadHistoryDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            <Route
+              path="/webrtcDemo"
+              element={<WebrtcDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            <Route
+              path="/callCenter"
+              element={<CallCenterDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            {isDebugMode && (
+              <Route
+                path="/proactive"
+                element={<ProactiveDemo />}
+              />
+            )}
+            <Route
+              path="/voiceagent"
+              element={<VoiceAgentDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            <Route
+              path="/documentFeedback"
+              element={<DocFeedbackDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}
+            />
+            {/* <Route
+              path="/flightBooking"
+              element={<FlightBookingDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}
+            /> */}
+          </Routes>
+        </Suspense>
       </Layout.Content>
       <Layout.Footer
         style={{

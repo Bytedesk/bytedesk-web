@@ -5,23 +5,32 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
+    "noPropertyAccessFromIndexSignature": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
-    "importHelpers": true,
+    "moduleResolution": "bundler",
+    "importHelpers": false,
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
+    "types": ["node"],
+    "paths": {
+      "@/*": ["../../src/*"],
+      "bytedesk-web": ["../../src/main.ts"],
+      "bytedesk-web/angular": ["../../src/adapters/angular.ts"]
+    },
     "lib": [
       "ES2022",
       "dom"
     ]
   },
+  "include": [
+    "src/**/*.ts",
+    "../../src/types/**/*.d.ts"
+  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,

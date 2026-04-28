@@ -17,7 +17,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, FeedbackConfig, FeedbackData, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
-import { Alert, Button, Card, Col, List, Row, Space, Tag, Typography, theme } from 'antd';
+import { Alert, Button, Card, Col, Row, Space, Tag, Typography, theme } from 'antd';
 import InstallGuide from '../components/InstallGuide';
 import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
@@ -374,7 +374,7 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
   return (
     <PageContainer>
       <Card>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <div>
             <Typography.Title level={2} style={{ marginBottom: 0 }}>
               {messages.pages.documentFeedbackDemo.title}
@@ -383,7 +383,7 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
               {messages.pages.documentFeedbackDemo.subtitle}
             </Typography.Paragraph>
           </div>
-          <Space direction="vertical" size={4}>
+          <Space orientation="vertical" size={4}>
             {docLinks.map((link) => (
               <Typography.Link key={link.href} href={link.href} target="_blank" rel="noopener noreferrer">
                 {link.label}
@@ -394,28 +394,19 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
       </Card>
 
       <Card title={`📚 ${messages.pages.documentFeedbackDemo.setupStepsTitle}`}>
-        <List
-          bordered
-          dataSource={setupSteps}
-          
-          renderItem={(step, index) => (
-            <List.Item style={{ textAlign: 'center' }}>
-              <Typography.Text strong style={{ marginRight: 8 }}>{index + 1}.</Typography.Text>
-              <Typography.Text>{step}</Typography.Text>
-            </List.Item>
-          )}
-        />
+        <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.9 }}>
+          {setupSteps.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
       </Card>
 
       <Card title={`✨ ${messages.pages.documentFeedbackDemo.highlightsTitle}`} variant="outlined">
-        <List
-          dataSource={highlights}
-          renderItem={(item) => (
-            <List.Item>
-              <Typography.Text>{item}</Typography.Text>
-            </List.Item>
-          )}
-        />
+        <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+          {highlights.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
       </Card>
 
       <Card title={`🔧 ${messages.pages.documentFeedbackDemo.controlPanel.title}`} variant="outlined">
@@ -438,7 +429,7 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
           type="info"
           showIcon
           style={{ marginTop: 8, alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
-          message={`咨询参数: ${chatConfigHint}`}
+          title={`咨询参数: ${chatConfigHint}`}
         />
       </Card>
 
@@ -453,7 +444,7 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
             <Alert
               type="warning"
               showIcon
-              message={messages.pages.documentFeedbackDemo.exampleSection.tip}
+              title={messages.pages.documentFeedbackDemo.exampleSection.tip}
               style={{ marginTop: 16 }}
             />
           </Card>
@@ -465,11 +456,9 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
                 {messages.pages.documentFeedbackDemo.logs.empty}
               </Typography.Text>
             ) : (
-              <List
-                dataSource={feedbackLogs}
-                style={{ maxHeight: 500, overflowY: 'auto' }}
-                renderItem={(log) => (
-                  <List.Item style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 500, overflowY: 'auto' }}>
+                {feedbackLogs.map((log) => (
+                  <div key={log.timestamp} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', borderBottom: '1px solid rgba(0,0,0,0.06)', paddingBottom: 12 }}>
                     <Typography.Text type="secondary" style={{ fontSize: 12 }}>
                       {new Date(log.timestamp).toLocaleString(locale)}
                     </Typography.Text>
@@ -489,15 +478,15 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
                         </Space>
                       </div>
                     )}
-                    <Typography.Paragraph style={{ marginTop: 8 }}>
+                    <Typography.Paragraph style={{ marginTop: 8, marginBottom: 0 }}>
                       <strong>{messages.pages.documentFeedbackDemo.logs.feedback}:</strong>
                       <Typography.Text type="secondary" style={{ marginLeft: 8 }}>
                         {log.content.length > 120 ? `${log.content.slice(0, 120)}...` : log.content}
                       </Typography.Text>
                     </Typography.Paragraph>
-                  </List.Item>
-                )}
-              />
+                  </div>
+                ))}
+              </div>
             )}
           </Card>
         </Col>

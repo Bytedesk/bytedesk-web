@@ -23,7 +23,6 @@ interface BasicDemoConfigDocsCardProps {
   recommendedConfigExample: string;
   fullConfigExample: string;
   configDocSections: ConfigSection[];
-  copyLabel: string;
   codeBlockStyle: CSSProperties;
 }
 
@@ -40,12 +39,11 @@ const BasicDemoConfigDocsCard = ({
   recommendedConfigExample,
   fullConfigExample,
   configDocSections,
-  copyLabel,
   codeBlockStyle,
 }: BasicDemoConfigDocsCardProps) => {
   return (
     <Card style={{ marginTop: 16 }}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <Space orientation="vertical" size="large" style={{ width: '100%' }}>
         <div>
           <Typography.Title level={4} style={{ marginBottom: 8 }}>
             {minimalConfigTitle}
@@ -53,9 +51,7 @@ const BasicDemoConfigDocsCard = ({
           <Typography.Paragraph type="secondary" style={{ marginBottom: 8 }}>
             {minimalConfigDescription}
           </Typography.Paragraph>
-          <Typography.Paragraph copyable={{ text: minimalConfigExample, tooltips: [copyLabel, copyLabel] }} style={codeBlockStyle}>
-            {minimalConfigExample}
-          </Typography.Paragraph>
+          <pre style={codeBlockStyle}>{minimalConfigExample}</pre>
         </div>
 
         <div>
@@ -65,9 +61,7 @@ const BasicDemoConfigDocsCard = ({
           <Typography.Paragraph type="secondary" style={{ marginBottom: 8 }}>
             {recommendedConfigDescription}
           </Typography.Paragraph>
-          <Typography.Paragraph copyable={{ text: recommendedConfigExample, tooltips: [copyLabel, copyLabel] }} style={codeBlockStyle}>
-            {recommendedConfigExample}
-          </Typography.Paragraph>
+          <pre style={codeBlockStyle}>{recommendedConfigExample}</pre>
         </div>
 
         <div>
@@ -77,9 +71,7 @@ const BasicDemoConfigDocsCard = ({
           <Typography.Paragraph type="secondary" style={{ marginBottom: 8 }}>
             {configExampleDescription}
           </Typography.Paragraph>
-          <Typography.Paragraph copyable={{ text: fullConfigExample, tooltips: [copyLabel, copyLabel] }} style={codeBlockStyle}>
-            {fullConfigExample}
-          </Typography.Paragraph>
+          <pre style={codeBlockStyle}>{fullConfigExample}</pre>
         </div>
 
         <div>
@@ -89,7 +81,7 @@ const BasicDemoConfigDocsCard = ({
           <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
             {configGuideDescription}
           </Typography.Paragraph>
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
             {configDocSections.map((section) => (
               <Card key={section.title} size="small">
                 <Typography.Title level={5} style={{ marginBottom: 12 }}>

@@ -215,23 +215,23 @@ export const en = {
       fieldDocs: basicDemoFieldDocs
     },
     userInfoDemo: {
-      title: 'User Info Integration Demo',
+      title: 'Third-Party Business User Integration Demo',
       description:
-        'Pass visitorUid, nickname, avatar and more through the config object so agents instantly recognize the user. Use the buttons to switch between mock users.',
+        'Pass user data from your third-party business system, including visitorUid, nickname, avatar and more, into the config object so agents can immediately identify the current visitor and keep business context in sync. Use the buttons below to switch between mock business users.',
       switchUser: 'Switch user',
       switchToUserLabel: 'Switch to {{name}}',
       switchAnonymousUserLabel: 'Switch to anonymous user',
       anonymousUserLabel: 'Anonymous user',
       anonymousUserHint: 'Anonymous test mode: visitorUid, nickname, avatar and other user fields are omitted.',
-      currentUserTitle: 'Current User',
+      currentUserTitle: 'Current Business User',
       currentUserIdLabel: 'User ID',
       currentUserNicknameLabel: 'Nickname',
       contactSupport: 'Contact Support',
       inviteText: 'Hello, how can we help you?',
       docLinks: {
-        userInfoDoc: 'View user info integration docs',
-        reactExample: 'React user info sample',
-        vueExample: 'Vue user info sample'
+        userInfoDoc: 'View third-party business user integration docs',
+        reactExample: 'React third-party business user sample',
+        vueExample: 'Vue third-party business user sample'
       },
       controlPanel: {
         title: 'Bytedesk Control Panel',
@@ -240,7 +240,7 @@ export const en = {
         bubble: 'Bubble controls',
         invite: 'Invite dialog controls'
       },
-      urlGuideTitle: 'URL + Query usage',
+      urlGuideTitle: 'Current Standalone Window Full URL + Query usage',
       urlTemplateLabel: 'Generic URL template',
       urlParamsTitle: 'Parameter reference (for /chat)',
       urlParams: [

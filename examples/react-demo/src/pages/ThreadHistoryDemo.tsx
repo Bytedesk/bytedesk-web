@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Alert, Button, Card, List, Space, Tag, Typography, theme as antdTheme } from 'antd';
+import { Alert, Button, Card, Space, Tag, Typography, theme as antdTheme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -213,14 +213,14 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
   return (
     <PageContainer>
       <Card>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Typography.Title level={2} style={{ marginBottom: 0 }}>
             {messages.pages.threadHistoryDemo.title}
           </Typography.Title>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
             {messages.pages.threadHistoryDemo.description}
           </Typography.Paragraph>
-          <Space direction="vertical" size={4}>
+          <Space orientation="vertical" size={4}>
             {docLinks.map((link) => (
               <Typography.Link key={link.href} href={link.href} target="_blank" rel="noopener noreferrer">
                 {link.label}
@@ -231,14 +231,14 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
       </Card>
 
       <Card>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Space align="center" wrap>
             <Typography.Text strong>{messages.pages.threadHistoryDemo.currentPathLabel}</Typography.Text>
             <Tag color="processing">/chat/thread</Tag>
             <Typography.Text type="secondary">{messages.pages.threadHistoryDemo.currentPathHint}</Typography.Text>
           </Space>
 
-          <Space direction="vertical" size={8} style={{ width: '100%' }}>
+          <Space orientation="vertical" size={8} style={{ width: '100%' }}>
             <CurrentUserProfile
               title={messages.pages.userInfoDemo.currentUserTitle}
               isAnonymousMode={isAnonymousMode}
@@ -301,112 +301,101 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
           <Alert
             type="info"
             showIcon
-            message={`${messages.common.apiHintPrefix} showThread() / hideChat()`}
+            title={`${messages.common.apiHintPrefix} showThread() / hideChat()`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
 
-          <List
-            header={messages.pages.threadHistoryDemo.usageTitle}
-            dataSource={usageNotes}
-            renderItem={(note) => <List.Item>{note}</List.Item>}
-          />
+          <div>
+            <Typography.Text strong>{messages.pages.threadHistoryDemo.usageTitle}</Typography.Text>
+            <ul style={{ margin: '8px 0 0', paddingLeft: 20, lineHeight: 1.8 }}>
+              {usageNotes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
+          </div>
         </Space>
       </Card>
 
       <Card title={messages.pages.threadHistoryDemo.urlGuideTitle}>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Typography.Text strong>{messages.pages.threadHistoryDemo.urlTemplateLabel}</Typography.Text>
-          <Typography.Paragraph copyable={{ text: urlTemplate }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{urlTemplate}</pre>
-          </Typography.Paragraph>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{urlTemplate}</pre>
 
           <Typography.Text strong>{messages.pages.threadHistoryDemo.urlParamsTitle}</Typography.Text>
-          <List
-            size="small"
-            dataSource={urlParams}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
-          />
+          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+            {urlParams.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
 
           <Typography.Text strong>{messages.pages.threadHistoryDemo.sampleUrlLabel}</Typography.Text>
-          <Typography.Paragraph copyable={{ text: sampleUrl }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
-          </Typography.Paragraph>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
         </Space>
       </Card>
 
       <Card title="ThreadList 接口直调说明（不依赖组件）">
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           {isAnonymousMode && (
             <Alert
               type="warning"
               showIcon
-              message={threadApiGuide.anonymousHint}
+              title={threadApiGuide.anonymousHint}
             />
           )}
 
           <Typography.Text strong>接口 URL</Typography.Text>
-          <Typography.Paragraph copyable={{ text: threadApiGuide.endpoint }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{threadApiGuide.endpoint}</pre>
-          </Typography.Paragraph>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{threadApiGuide.endpoint}</pre>
 
           <Typography.Text strong>完整请求 URL（第 1 页）</Typography.Text>
-          <Typography.Paragraph copyable={{ text: threadApiGuide.fullUrlPage1 }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{threadApiGuide.fullUrlPage1}</pre>
-          </Typography.Paragraph>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{threadApiGuide.fullUrlPage1}</pre>
 
           <Typography.Text strong>完整请求 URL（第 2 页）</Typography.Text>
-          <Typography.Paragraph copyable={{ text: threadApiGuide.fullUrlPage2 }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{threadApiGuide.fullUrlPage2}</pre>
-          </Typography.Paragraph>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{threadApiGuide.fullUrlPage2}</pre>
 
           <Typography.Text strong>请求参数（Query）</Typography.Text>
-          <List
-            size="small"
-            dataSource={threadApiGuide.queryParams}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
-          />
+          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+            {threadApiGuide.queryParams.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
 
           <Typography.Text strong>分页与调用行为</Typography.Text>
-          <List
-            size="small"
-            dataSource={threadApiGuide.pagingMapping}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
-          />
+          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+            {threadApiGuide.pagingMapping.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
 
           <Typography.Text strong>curl 示例</Typography.Text>
-          <Typography.Paragraph copyable={{ text: threadApiGuide.curlExample }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{threadApiGuide.curlExample}</pre>
-          </Typography.Paragraph>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{threadApiGuide.curlExample}</pre>
 
           <Typography.Text strong>fetch 示例</Typography.Text>
-          <Typography.Paragraph copyable={{ text: threadApiGuide.fetchExample }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{threadApiGuide.fetchExample}</pre>
-          </Typography.Paragraph>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{threadApiGuide.fetchExample}</pre>
         </Space>
       </Card>
 
       <Card title="返回结果结构说明">
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Typography.Text strong>顶层结构</Typography.Text>
-          <List
-            size="small"
-            dataSource={responseTopLevelFields}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
-          />
+          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+            {responseTopLevelFields.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
 
           <Typography.Text strong>data 分页字段</Typography.Text>
-          <List
-            size="small"
-            dataSource={responseDataFields}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
-          />
+          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+            {responseDataFields.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
 
           <Typography.Text strong>data.content[] 单条会话（Thread）字段</Typography.Text>
-          <List
-            size="small"
-            dataSource={threadItemFields}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
-          />
+          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+            {threadItemFields.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
         </Space>
       </Card>
 

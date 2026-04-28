@@ -226,22 +226,22 @@ export const esEs = {
     },
     userInfoDemo: {
       ...en.pages.userInfoDemo,
-      title: 'Demo de integracion de informacion del usuario',
-      description: 'Pasa visitorUid, nickname, avatar y otros datos por config para que los agentes reconozcan al usuario al instante.',
+      title: 'Demo de integracion de usuarios del sistema de negocio de terceros',
+      description: 'Pasa los datos del usuario desde tu sistema de negocio de terceros, incluidos visitorUid, nickname, avatar y otros campos, para que los agentes identifiquen al visitante actual al instante y mantengan el contexto del negocio.',
       switchUser: 'Cambiar usuario',
       switchAnonymousUserLabel: 'Cambiar a usuario anonimo',
       anonymousUserLabel: 'Usuario anonimo',
       anonymousUserHint: 'Modo de prueba anonimo: se omiten visitorUid, nickname, avatar y otros datos del usuario.',
-      currentUserTitle: 'Usuario actual',
+      currentUserTitle: 'Usuario actual del sistema de negocio',
       currentUserIdLabel: 'ID de usuario',
       currentUserNicknameLabel: 'Apodo',
       contactSupport: 'Contactar soporte',
       inviteText: 'Hola, en que podemos ayudarte?',
       docLinks: {
         ...en.pages.userInfoDemo.docLinks,
-        userInfoDoc: 'Ver documentacion de integracion de usuario',
-        reactExample: 'Ejemplo React de informacion de usuario',
-        vueExample: 'Ejemplo Vue de informacion de usuario'
+        userInfoDoc: 'Ver documentacion de integracion de usuarios del sistema de negocio de terceros',
+        reactExample: 'Ejemplo React de usuarios del sistema de negocio de terceros',
+        vueExample: 'Ejemplo Vue de usuarios del sistema de negocio de terceros'
       },
       controlPanel: {
         title: 'Panel de control Bytedesk',
@@ -250,7 +250,7 @@ export const esEs = {
         bubble: 'Controles de la burbuja',
         invite: 'Controles de invitacion'
       },
-      urlGuideTitle: 'Uso de URL + parametros',
+      urlGuideTitle: 'URL completa actual de la ventana independiente + uso de parametros',
       urlTemplateLabel: 'Plantilla generica de URL',
       urlParamsTitle: 'Referencia de parametros (para /chat)',
       urlParams: [

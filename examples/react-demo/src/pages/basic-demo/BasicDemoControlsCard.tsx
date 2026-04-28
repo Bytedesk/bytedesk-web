@@ -1,5 +1,4 @@
-import type { CSSProperties } from 'react';
-import { Alert, Button, Card, ColorPicker, Dropdown, Input, Space, Table, Tag, Typography, type MenuProps } from 'antd';
+import { Alert, Button, Card, ColorPicker, Dropdown, Input, Space, Typography, type MenuProps } from 'antd';
 import type { DemoLanguage } from '../../locales';
 import { LANGUAGE_OPTIONS } from './constants';
 
@@ -9,14 +8,6 @@ type LocalizedCopy = {
   entrySelectorLabel: string;
   qrInputLabel: string;
   qrInputPlaceholder: string;
-  bubbleDemoLabel: string;
-  popupUrlTitle: string;
-  popupUrlParamsTitle: string;
-  popupParamNameTitle: string;
-  popupParamValueTitle: string;
-  popupParamPurposeTitle: string;
-  multiBubbleLabel: string;
-  switchModeLabel: string;
   customTitleLabel: string;
   carryBrowseInfoLabel: string;
 };
@@ -28,16 +19,7 @@ type QuickAction = {
   type?: 'primary' | 'default';
 };
 
-type PopupParam = {
-  key: string;
-  value: string;
-  purpose: string;
-};
-
 interface BasicDemoControlsCardProps {
-  title: string;
-  intro: string;
-  docLinks: Array<{ href: string; label: string }>;
   quickActions: QuickAction[];
   togglePlacementLabel: string;
   placementLabel: string;
@@ -53,7 +35,6 @@ interface BasicDemoControlsCardProps {
   entryMenuItems: MenuProps['items'];
   selectedThemeModeKeys: string[];
   selectedEntryActions: string[];
-  isMultiBubbleDemo: boolean;
   locale: DemoLanguage;
   localeValueHint: string;
   lastActionApiHint: string;
@@ -72,16 +53,9 @@ interface BasicDemoControlsCardProps {
   localizedCopy: LocalizedCopy;
   chatConfigHint: string;
   qrCodeImageUrl: string;
-  chatPageUrl: string;
-  popupUrlParams: PopupParam[];
-  requiredPopupParams: Set<string>;
-  requiredLabel: string;
-  optionalLabel: string;
-  codeBlockStyle: CSSProperties;
   navButtonColor: string;
   navButtonTextColor: string;
   fallbackPrimaryColor: string;
-  copyLabel: string;
   onPlacementToggle: () => void;
   onNavColorChange: (nextColor: string) => void;
   onNavTextColorChange: (nextColor: string) => void;
@@ -92,16 +66,11 @@ interface BasicDemoControlsCardProps {
   onLoadHistoryToggle: () => void;
   onCustomTitleToggle: () => void;
   onCarryBrowseInfoToggle: () => void;
-  onMultiBubbleToggle: () => void;
-  onBubbleSwitchModeToggle: () => void;
   onLocaleSwitch: (nextLocale: DemoLanguage) => void;
   onQrCodeImageUrlChange: (nextUrl: string) => void;
 }
 
 const BasicDemoControlsCard = ({
-  title,
-  intro,
-  docLinks,
   quickActions,
   togglePlacementLabel,
   placementLabel,
@@ -117,7 +86,6 @@ const BasicDemoControlsCard = ({
   entryMenuItems,
   selectedThemeModeKeys,
   selectedEntryActions,
-  isMultiBubbleDemo,
   locale,
   localeValueHint,
   lastActionApiHint,
@@ -136,16 +104,9 @@ const BasicDemoControlsCard = ({
   localizedCopy,
   chatConfigHint,
   qrCodeImageUrl,
-  chatPageUrl,
-  popupUrlParams,
-  requiredPopupParams,
-  requiredLabel,
-  optionalLabel,
-  codeBlockStyle,
   navButtonColor,
   navButtonTextColor,
   fallbackPrimaryColor,
-  copyLabel,
   onPlacementToggle,
   onNavColorChange,
   onNavTextColorChange,
@@ -156,8 +117,6 @@ const BasicDemoControlsCard = ({
   onLoadHistoryToggle,
   onCustomTitleToggle,
   onCarryBrowseInfoToggle,
-  onMultiBubbleToggle,
-  onBubbleSwitchModeToggle,
   onLocaleSwitch,
   onQrCodeImageUrlChange,
 }: BasicDemoControlsCardProps) => {
@@ -172,18 +131,7 @@ const BasicDemoControlsCard = ({
 
   return (
     <Card>
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        <Typography.Title level={2} style={{ marginBottom: 0 }}>{title}</Typography.Title>
-        <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          {intro}
-        </Typography.Paragraph>
-        <Space direction="vertical" size={4}>
-          {docLinks.map((link) => (
-            <Typography.Link key={link.href} href={link.href} target="_blank" rel="noopener noreferrer">
-              {link.label}
-            </Typography.Link>
-          ))}
-        </Space>
+      <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
         <Space wrap>
           {secondaryQuickActions.map((action) => (
             <Button key={action.key} type={action.type || 'primary'} onClick={action.handler}>
@@ -265,12 +213,6 @@ const BasicDemoControlsCard = ({
           <Button type={carryBrowseInfoEnabled ? 'primary' : 'default'} onClick={onCarryBrowseInfoToggle}>
             {localizedCopy.carryBrowseInfoLabel}: {carryBrowseInfoEnabled ? navbarHiddenLabel : navbarShownLabel}
           </Button>
-          <Button type={isMultiBubbleDemo ? 'primary' : 'default'} onClick={onMultiBubbleToggle}>
-            {localizedCopy.multiBubbleLabel}
-          </Button>
-          <Button type="primary" onClick={onBubbleSwitchModeToggle}>
-            {localizedCopy.switchModeLabel}
-          </Button>
         </Space>
         <Space wrap>
           {LANGUAGE_OPTIONS.map((item) => (
@@ -295,7 +237,7 @@ const BasicDemoControlsCard = ({
           <Alert
             type="info"
             showIcon
-            message={`${localizedCopy.apiMessageLabel} ${lastActionApiHint}`}
+            title={`${localizedCopy.apiMessageLabel} ${lastActionApiHint}`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
         )}
@@ -303,9 +245,14 @@ const BasicDemoControlsCard = ({
           {apiHintPrefix} {loadHistoryApiHintPrefix}
           {loadHistoryEnabled ? 'true' : 'false'}
         </Typography.Text>
-        <Typography.Text type="secondary">{localizedCopy.consultParamsLabel} {chatConfigHint}</Typography.Text>
+        <Alert
+          type="info"
+          showIcon
+          title={`${localizedCopy.consultParamsLabel} ${chatConfigHint}`}
+          style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
+        />
         {selectedEntryActions.includes('qrcode') && (
-          <Space direction="vertical" size={6} style={{ width: '100%' }}>
+          <Space orientation="vertical" size={6} style={{ width: '100%' }}>
             <Typography.Text type="secondary">{localizedCopy.qrInputLabel}</Typography.Text>
             <Input
               value={qrCodeImageUrl}
@@ -314,49 +261,6 @@ const BasicDemoControlsCard = ({
             />
           </Space>
         )}
-        <Space direction="vertical" size={8} style={{ width: '100%' }}>
-          <Typography.Text type="secondary">{localizedCopy.popupUrlTitle}</Typography.Text>
-          <Typography.Paragraph copyable={{ text: chatPageUrl, tooltips: [copyLabel, copyLabel] }} style={codeBlockStyle}>
-            {chatPageUrl}
-          </Typography.Paragraph>
-          <Typography.Text type="secondary">{localizedCopy.popupUrlParamsTitle}</Typography.Text>
-          <Table
-            size="small"
-            bordered
-            pagination={false}
-            rowKey="key"
-            dataSource={popupUrlParams}
-            columns={[
-              {
-                title: localizedCopy.popupParamNameTitle,
-                dataIndex: 'key',
-                key: 'key',
-                render: (value: string) => (
-                  <Space size={6}>
-                    <Typography.Text copyable={{ tooltips: false }}>{value}</Typography.Text>
-                    <Tag color={requiredPopupParams.has(value) ? 'error' : 'default'}>
-                      {requiredPopupParams.has(value) ? requiredLabel : optionalLabel}
-                    </Tag>
-                  </Space>
-                ),
-              },
-              {
-                title: localizedCopy.popupParamValueTitle,
-                dataIndex: 'value',
-                key: 'value',
-                render: (value: string) => (
-                  <Typography.Text copyable={value !== '-' ? { tooltips: false } : false}>{value}</Typography.Text>
-                ),
-              },
-              {
-                title: localizedCopy.popupParamPurposeTitle,
-                dataIndex: 'purpose',
-                key: 'purpose',
-              },
-            ]}
-          />
-        </Space>
-        <Typography.Text type="secondary">{localizedCopy.bubbleDemoLabel}</Typography.Text>
       </Space>
     </Card>
   );

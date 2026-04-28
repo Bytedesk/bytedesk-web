@@ -226,22 +226,22 @@ export const frFr = {
     },
     userInfoDemo: {
       ...en.pages.userInfoDemo,
-      title: 'Demo d integration des informations utilisateur',
-      description: 'Transmettez visitorUid, nickname, avatar et d autres champs via la config afin que les agents reconnaissent immediatement l utilisateur.',
+      title: 'Demo d integration des utilisateurs d un systeme metier tiers',
+      description: 'Transmettez les donnees utilisateur depuis votre systeme metier tiers, notamment visitorUid, nickname, avatar et d autres champs, afin que les agents identifient immediatement le visiteur courant et conservent le contexte metier.',
       switchUser: 'Changer d utilisateur',
       switchAnonymousUserLabel: 'Passer a l utilisateur anonyme',
       anonymousUserLabel: 'Utilisateur anonyme',
       anonymousUserHint: 'Mode de test anonyme : visitorUid, nickname, avatar et les autres champs utilisateur sont omis.',
-      currentUserTitle: 'Utilisateur actuel',
+      currentUserTitle: 'Utilisateur actuel du systeme metier',
       currentUserIdLabel: 'ID utilisateur',
       currentUserNicknameLabel: 'Pseudo',
       contactSupport: 'Contacter le support',
       inviteText: 'Bonjour, comment pouvons-nous vous aider ?',
       docLinks: {
         ...en.pages.userInfoDemo.docLinks,
-        userInfoDoc: 'Voir la documentation des informations utilisateur',
-        reactExample: 'Exemple React des informations utilisateur',
-        vueExample: 'Exemple Vue des informations utilisateur'
+        userInfoDoc: 'Voir la documentation d integration des utilisateurs d un systeme metier tiers',
+        reactExample: 'Exemple React des utilisateurs d un systeme metier tiers',
+        vueExample: 'Exemple Vue des utilisateurs d un systeme metier tiers'
       },
       controlPanel: {
         title: 'Panneau de controle Bytedesk',
@@ -250,7 +250,7 @@ export const frFr = {
         bubble: 'Controles de la bulle',
         invite: 'Controles de l invitation'
       },
-      urlGuideTitle: 'Usage URL + parametres',
+      urlGuideTitle: 'URL complete actuelle de la fenetre independante + usage des parametres',
       urlTemplateLabel: 'Modele URL generique',
       urlParamsTitle: 'Reference des parametres (pour /chat)',
       urlParams: [

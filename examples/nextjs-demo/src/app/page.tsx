@@ -46,7 +46,6 @@ export default function Home() {
       backgroundColor: '#ff4d4f',
       textColor: '#ffffff'
     },
-    showSupport: true,
     chatConfig: {
       org: 'df_org_uid',
       t: "2",

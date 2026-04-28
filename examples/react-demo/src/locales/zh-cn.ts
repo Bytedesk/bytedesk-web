@@ -215,23 +215,23 @@ export const zhCn = {
       fieldDocs: basicDemoFieldDocs
     },
     userInfoDemo: {
-      title: '用户信息对接演示',
+      title: '第三方业务系统用户信息对接演示',
       description:
-        '本示例演示如何通过配置参数传入用户信息（visitorUid、nickname、avatar）到客服组件中，点击下方按钮可以切换不同的用户。',
+        '本示例演示如何将第三方业务系统中的用户信息（visitorUid、nickname、avatar 等）通过配置参数传入客服组件，方便客服快速识别当前访客并关联业务上下文。点击下方按钮可以切换不同的业务系统测试用户。',
       switchUser: '切换用户',
       switchToUserLabel: '切换到 {{name}}',
       switchAnonymousUserLabel: '切换到匿名用户',
       anonymousUserLabel: '匿名用户',
       anonymousUserHint: '当前为匿名测试：不传 visitorUid、nickname、avatar 等用户信息',
-      currentUserTitle: '当前用户信息',
+      currentUserTitle: '当前业务系统用户信息',
       currentUserIdLabel: '用户ID',
       currentUserNicknameLabel: '昵称',
       contactSupport: '咨询客服',
       inviteText: '您好，请问有什么可以帮您？',
       docLinks: {
-        userInfoDoc: '查看用户信息对接文档',
-        reactExample: 'React 用户信息对接代码示例',
-        vueExample: 'Vue 用户信息对接代码示例'
+        userInfoDoc: '查看第三方业务系统用户信息对接文档',
+        reactExample: 'React 第三方业务系统用户信息对接代码示例',
+        vueExample: 'Vue 第三方业务系统用户信息对接代码示例'
       },
       controlPanel: {
         title: '微语接口控制面板',
@@ -240,7 +240,7 @@ export const zhCn = {
         bubble: '气泡消息控制',
         invite: '邀请对话框控制'
       },
-      urlGuideTitle: 'URL + 参数调用说明',
+      urlGuideTitle: '当前独立窗口完整 URL + 参数调用说明',
       urlTemplateLabel: '通用 URL 模板',
       urlParamsTitle: '参数说明（用于 /chat）',
       urlParams: [

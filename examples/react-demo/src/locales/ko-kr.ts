@@ -228,22 +228,22 @@ export const koKr = {
     },
     userInfoDemo: {
       ...en.pages.userInfoDemo,
-      title: '사용자 정보 연동 데모',
-      description: 'visitorUid, nickname, avatar 등 사용자 정보를 설정에 전달하여 상담사가 방문자를 즉시 식별할 수 있습니다. 아래 버튼으로 샘플 사용자를 전환해 보세요.',
+      title: '서드파티 업무 시스템 사용자 정보 연동 데모',
+      description: '서드파티 업무 시스템의 사용자 정보(visitorUid, nickname, avatar 등)를 설정으로 전달해 상담사가 현재 방문자를 즉시 식별하고 업무 문맥을 함께 확인할 수 있도록 합니다. 아래 버튼으로 샘플 업무 사용자를 전환해 보세요.',
       switchUser: '사용자 전환',
       switchToUserLabel: '{{name}}(으)로 전환',
       switchAnonymousUserLabel: '익명 사용자로 전환',
       anonymousUserLabel: '익명 사용자',
       anonymousUserHint: '익명 테스트 모드: visitorUid, nickname, avatar 등 사용자 필드를 전달하지 않습니다.',
-      currentUserTitle: '현재 사용자',
+      currentUserTitle: '현재 업무 시스템 사용자',
       currentUserIdLabel: '사용자 ID',
       currentUserNicknameLabel: '닉네임',
       contactSupport: '상담 시작',
       docLinks: {
         ...en.pages.userInfoDemo.docLinks,
-        userInfoDoc: '사용자 정보 연동 문서 보기',
-        reactExample: 'React 사용자 정보 예제',
-        vueExample: 'Vue 사용자 정보 예제'
+        userInfoDoc: '서드파티 업무 시스템 사용자 정보 연동 문서 보기',
+        reactExample: 'React 서드파티 업무 시스템 사용자 정보 예제',
+        vueExample: 'Vue 서드파티 업무 시스템 사용자 정보 예제'
       },
       controlPanel: {
         title: 'Bytedesk 제어 패널',
@@ -252,7 +252,7 @@ export const koKr = {
         bubble: '버블 제어',
         invite: '초대창 제어'
       },
-      urlGuideTitle: 'URL + 쿼리 사용법',
+      urlGuideTitle: '현재 독립 창 전체 URL + 쿼리 사용법',
       urlTemplateLabel: '공통 URL 템플릿',
       urlParamsTitle: '파라미터 안내 (/chat)',
       sampleUrlLabel: '현재 설정 기반 샘플 URL',

@@ -227,23 +227,23 @@ export const jaJp = {
     },
     userInfoDemo: {
       ...en.pages.userInfoDemo,
-      title: 'ユーザー情報連携デモ',
-      description: 'visitorUid、nickname、avatar などのユーザー情報を設定経由で渡し、オペレーターが利用者をすぐに識別できるようにします。下のボタンでサンプルユーザーを切り替えられます。',
+      title: 'サードパーティー業務システムユーザー情報連携デモ',
+      description: 'サードパーティー業務システム内のユーザー情報（visitorUid、nickname、avatar など）を設定経由で渡し、オペレーターが現在の訪問者をすぐに識別して業務コンテキストを同期できるようにします。下のボタンでサンプル業務ユーザーを切り替えられます。',
       switchUser: 'ユーザーを切り替え',
       switchToUserLabel: '{{name}} に切り替え',
       switchAnonymousUserLabel: '匿名ユーザーに切り替え',
       anonymousUserLabel: '匿名ユーザー',
       anonymousUserHint: '匿名テストモード: visitorUid、nickname、avatar などのユーザー情報は送信されません。',
-      currentUserTitle: '現在のユーザー情報',
+      currentUserTitle: '現在の業務システムユーザー情報',
       currentUserIdLabel: 'ユーザー ID',
       currentUserNicknameLabel: 'ニックネーム',
       contactSupport: 'サポートに相談',
       inviteText: 'こんにちは。どのようにお手伝いできますか？',
       docLinks: {
         ...en.pages.userInfoDemo.docLinks,
-        userInfoDoc: 'ユーザー情報連携ドキュメントを見る',
-        reactExample: 'React ユーザー情報サンプル',
-        vueExample: 'Vue ユーザー情報サンプル'
+        userInfoDoc: 'サードパーティー業務システムユーザー情報連携ドキュメントを見る',
+        reactExample: 'React サードパーティー業務システムユーザー情報サンプル',
+        vueExample: 'Vue サードパーティー業務システムユーザー情報サンプル'
       },
       controlPanel: {
         ...en.pages.userInfoDemo.controlPanel,
@@ -253,7 +253,7 @@ export const jaJp = {
         bubble: 'バブル操作',
         invite: '招待ダイアログ操作'
       },
-      urlGuideTitle: 'URL + クエリパラメータ利用方法',
+      urlGuideTitle: '現在の独立ウィンドウ完全 URL + クエリパラメータ利用方法',
       urlTemplateLabel: '共通 URL テンプレート',
       urlParamsTitle: 'パラメータ一覧（/chat 用）',
       sampleUrlLabel: '現在の設定から生成したサンプル URL',

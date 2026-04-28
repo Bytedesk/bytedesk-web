@@ -1,8 +1,43 @@
 {
   "../../../src/adapters/nextjs.tsx -> ../main": {
-    "id": "../../../src/adapters/nextjs.tsx -> ../main",
+    "id": 7399,
     "files": [
-      "static/chunks/_app-pages-browser_src_main_ts.js"
+      "static/chunks/399.2c79c7ea24c6fe2b.js"
+    ]
+  },
+  "../../../src/core/BytedeskWeb.ts -> ../apis/feedback": {
+    "id": 5543,
+    "files": [
+      "static/chunks/384.55520ca7beae7558.js",
+      "static/chunks/543.6406bfd72bc7cf0e.js"
+    ]
+  },
+  "../../../src/core/BytedeskWeb.ts -> ../apis/message": {
+    "id": 31,
+    "files": [
+      "static/chunks/384.55520ca7beae7558.js",
+      "static/chunks/31.de572d1ae7708554.js"
+    ]
+  },
+  "../../../src/core/BytedeskWeb.ts -> ../apis/request": {
+    "id": 6318,
+    "files": [
+      "static/chunks/384.55520ca7beae7558.js",
+      "static/chunks/318.86756c60fb34ce21.js"
+    ]
+  },
+  "../../../src/core/BytedeskWeb.ts -> ../apis/upload": {
+    "id": 6897,
+    "files": [
+      "static/chunks/384.55520ca7beae7558.js",
+      "static/chunks/897.63e41a718ad8efc6.js"
+    ]
+  },
+  "../../../src/core/BytedeskWeb.ts -> ../apis/visitor": {
+    "id": 6106,
+    "files": [
+      "static/chunks/384.55520ca7beae7558.js",
+      "static/chunks/106.584b105bf55b1a83.js"
     ]
   }
 }

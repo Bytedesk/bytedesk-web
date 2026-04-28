@@ -13,13 +13,14 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 import request from "./request";
+import type { FeedbackData } from "../types";
 
 /**
  * 提交文档反馈
  * @param params 反馈参数
  * @returns 提交结果
  */
-export function submitFeedback(params: FEEDBACK.FeedbackRequest) {
+export function submitFeedback(params: FeedbackData) {
   return request({
     url: `/visitor/api/feedback/submit`,
     method: "post",

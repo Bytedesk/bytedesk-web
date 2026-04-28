@@ -8,7 +8,7 @@ interface PageContainerProps {
 
 const PageContainer = ({ children, style, size = 'large' }: PropsWithChildren<PageContainerProps>) => (
   <Space
-    direction="vertical"
+    orientation="vertical"
     size={size}
     style={{
       width: '100%',

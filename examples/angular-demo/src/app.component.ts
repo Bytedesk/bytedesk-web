@@ -13,10 +13,11 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 import { Component } from '@angular/core';
-import type { BytedeskConfig } from '@bytedesk/web/types';
+import type { BytedeskConfig } from 'bytedesk-web';
 
 @Component({
   selector: 'app-root',
+  standalone: false,
   template: `
     <div style="padding: 20px">
       <h1>Bytedesk Angular Demo</h1>

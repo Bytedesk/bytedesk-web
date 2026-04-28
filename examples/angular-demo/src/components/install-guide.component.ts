@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-install-guide',
+  standalone: false,
   template: `
     <div style="margin-top: 40px; max-width: 800px">
       <h2>Installation Steps</h2>
@@ -17,8 +18,8 @@ yarn add bytedesk-web</pre>
       <div style="margin-bottom: 20px">
         <h3>2. Import Component</h3>
         <pre style="background: #f5f5f5; padding: 15px; border-radius: 4px">
-import &#123; BytedeskAngular &#125; from 'bytedesk-web/angular';
-import type &#123; BytedeskConfig &#125; from 'bytedesk-web/angular';</pre>
+      import &#123; BytedeskAngular &#125; from 'bytedesk-web/angular';
+      import type &#123; BytedeskConfig &#125; from 'bytedesk-web';</pre>
       </div>
 
       <div style="margin-bottom: 20px">

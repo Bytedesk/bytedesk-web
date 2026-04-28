@@ -215,22 +215,22 @@ export const msMy = {
       fieldDocs: basicDemoFieldDocs
     },
     userInfoDemo: {
-      title: 'Demo integrasi maklumat pengguna',
-      description: 'Hantar visitorUid, nickname, avatar dan medan lain melalui config supaya ejen boleh mengenali pengguna serta-merta. Gunakan butang di bawah untuk bertukar antara pengguna contoh.',
+      title: 'Demo integrasi pengguna sistem perniagaan pihak ketiga',
+      description: 'Hantar data pengguna daripada sistem perniagaan pihak ketiga anda, termasuk visitorUid, nickname, avatar dan medan lain, melalui config supaya ejen boleh mengenal pasti pelawat semasa dengan segera serta mengekalkan konteks perniagaan. Gunakan butang di bawah untuk bertukar antara pengguna contoh sistem perniagaan.',
       switchUser: 'Tukar pengguna',
       switchToUserLabel: 'Tukar ke {{name}}',
       switchAnonymousUserLabel: 'Tukar ke pengguna tanpa nama',
       anonymousUserLabel: 'Pengguna tanpa nama',
       anonymousUserHint: 'Mod ujian tanpa nama: visitorUid, nickname, avatar dan medan lain tidak dihantar.',
-      currentUserTitle: 'Pengguna semasa',
+      currentUserTitle: 'Pengguna semasa sistem perniagaan',
       currentUserIdLabel: 'ID pengguna',
       currentUserNicknameLabel: 'Nama paparan',
       contactSupport: 'Hubungi sokongan',
       inviteText: 'Hai, bagaimana kami boleh membantu anda?',
       docLinks: {
-        userInfoDoc: 'Lihat dokumentasi integrasi maklumat pengguna',
-        reactExample: 'Contoh React maklumat pengguna',
-        vueExample: 'Contoh Vue maklumat pengguna'
+        userInfoDoc: 'Lihat dokumentasi integrasi pengguna sistem perniagaan pihak ketiga',
+        reactExample: 'Contoh React pengguna sistem perniagaan pihak ketiga',
+        vueExample: 'Contoh Vue pengguna sistem perniagaan pihak ketiga'
       },
       controlPanel: {
         title: 'Panel kawalan Bytedesk',
@@ -239,7 +239,7 @@ export const msMy = {
         bubble: 'Kawalan gelembung',
         invite: 'Kawalan dialog jemputan'
       },
-      urlGuideTitle: 'Penggunaan URL + Query',
+      urlGuideTitle: 'Penggunaan URL penuh tetingkap berasingan semasa + Query',
       urlTemplateLabel: 'Templat URL umum',
       urlParamsTitle: 'Rujukan parameter (untuk /chat)',
       urlParams: [

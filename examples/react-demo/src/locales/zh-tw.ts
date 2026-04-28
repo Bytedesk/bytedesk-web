@@ -215,23 +215,23 @@ export const zhTw = {
       fieldDocs: basicDemoFieldDocs
     },
     userInfoDemo: {
-      title: '使用者資訊對接示範',
+      title: '第三方業務系統使用者資訊對接示範',
       description:
-        '此示例展示如何透過設定檔將 visitorUid、暱稱與頭像傳入客服元件，並透過按鈕切換不同的測試使用者。',
+        '此示例展示如何將第三方業務系統中的使用者資訊（visitorUid、暱稱、頭像等）透過設定參數傳入客服元件，協助客服快速辨識目前訪客並串聯業務上下文。可透過下方按鈕切換不同的業務系統測試使用者。',
       switchUser: '切換使用者',
       switchToUserLabel: '切換到 {{name}}',
       switchAnonymousUserLabel: '切換到匿名使用者',
       anonymousUserLabel: '匿名使用者',
       anonymousUserHint: '目前為匿名測試：不傳 visitorUid、nickname、avatar 等使用者資訊',
-      currentUserTitle: '目前使用者資訊',
+      currentUserTitle: '目前業務系統使用者資訊',
       currentUserIdLabel: '使用者 ID',
       currentUserNicknameLabel: '暱稱',
       contactSupport: '聯絡客服',
       inviteText: '您好，請問有什麼可以協助您？',
       docLinks: {
-        userInfoDoc: '查看使用者資訊對接文件',
-        reactExample: 'React 使用者資訊範例程式',
-        vueExample: 'Vue 使用者資訊範例程式'
+        userInfoDoc: '查看第三方業務系統使用者資訊對接文件',
+        reactExample: 'React 第三方業務系統使用者資訊範例程式',
+        vueExample: 'Vue 第三方業務系統使用者資訊範例程式'
       },
       controlPanel: {
         title: '微語介面控制台',
@@ -240,7 +240,7 @@ export const zhTw = {
         bubble: '氣泡控制',
         invite: '邀請對話框控制'
       },
-      urlGuideTitle: 'URL + 參數使用說明',
+      urlGuideTitle: '目前獨立視窗完整 URL + 參數使用說明',
       urlTemplateLabel: '通用 URL 範本',
       urlParamsTitle: '參數說明（用於 /chat）',
       urlParams: [

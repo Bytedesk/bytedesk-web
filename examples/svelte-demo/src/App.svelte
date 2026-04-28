@@ -3,11 +3,18 @@
   // @ts-ignore
   import BytedeskWeb from '@bytedesk/web/main'
 
-  const appId = 'your-app-id'
   let bytedesk: BytedeskWeb
 
+  const config = {
+    chatConfig: {
+      org: 'df_org_uid',
+      t: '2',
+      sid: 'df_rt_uid'
+    }
+  }
+
   onMount(() => {
-    bytedesk = new BytedeskWeb({ appId })
+    bytedesk = new BytedeskWeb(config)
     bytedesk.init()
     console.log('Bytedesk initialized in Svelte')
   })

@@ -1,8 +1,13 @@
 {
   "name": "bytedesk-web",
   "private": false,
-  "version": "1.9.1",
+  "version": "2.0.0",
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": "^20.19.0 || ^22.12.0 || >=24.0.0",
+    "pnpm": ">=9"
+  },
   "authors": [
     "270580156@qq.com"
   ],
@@ -63,46 +68,46 @@
     "dev": "vite",
     "build:esm": "vite build --config vite.config.esm.ts",
     "build:umd": "vite build --config vite.config.umd.ts",
-    "build": "yarn build:esm && yarn build:umd",
+    "build": "pnpm build:esm && pnpm build:umd",
     "preview": "vite preview",
-    "demo:react": "cd examples/react-demo && yarn install && yarn dev",
-    "demo:vue": "cd examples/vue-demo && yarn install && yarn dev",
-    "demo:svelte": "cd examples/svelte-demo && yarn install && yarn dev",
-    "demo:vanilla": "cd examples/vanilla-demo && yarn install && yarn dev",
-    "demo:javascript": "cd examples/javascript-demo && yarn install && yarn start",
-    "demo:angular": "cd examples/angular-demo && yarn install && yarn dev",
-    "demo:nextjs": "cd examples/nextjs-demo && yarn install && yarn dev"
+    "demo:react": "cd examples/react-demo && pnpm install && pnpm dev",
+    "demo:vue": "cd examples/vue-demo && pnpm install && pnpm dev",
+    "demo:svelte": "cd examples/svelte-demo && pnpm install && pnpm dev",
+    "demo:vanilla": "cd examples/vanilla-demo && pnpm install && pnpm dev",
+    "demo:javascript": "cd examples/javascript-demo && pnpm install && pnpm start",
+    "demo:angular": "cd examples/angular-demo && pnpm install && pnpm dev",
+    "demo:nextjs": "cd examples/nextjs-demo && pnpm install && pnpm dev"
   },
   "devDependencies": {
-    "@angular/common": "^16.0.0",
-    "@angular/core": "^16.0.0",
-    "@angular/platform-browser": "^16.0.0",
-    "@angular/platform-browser-dynamic": "^16.0.0",
-    "@sveltejs/vite-plugin-svelte": "^5.0.3",
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "@vitejs/plugin-vue": "^4.0.0",
-    "@vue/compiler-sfc": "^3.0.0",
-    "next": "^14.0.0",
-    "svelte": "^4.0.0",
+    "@angular/common": "^21.2.9",
+    "@angular/core": "^21.2.9",
+    "@angular/platform-browser": "^21.2.9",
+    "@angular/platform-browser-dynamic": "^21.2.9",
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/compiler-sfc": "^3.5.32",
+    "next": "^16.2.4",
+    "svelte": "^5.55.4",
     "sync-npm-mirror": "^1.0.0",
-    "typescript": "^5.7.2",
-    "vite": "^5.0.0",
-    "vite-plugin-dts": "^4.4.0",
-    "vue": "^3.0.0"
+    "typescript": "^6.0.3",
+    "vite": "^8.0.8",
+    "vite-plugin-dts": "^4.5.4",
+    "vue": "^3.5.32"
   },
   "peerDependencies": {
-    "@angular/common": "^16.0.0",
-    "@angular/core": "^16.0.0",
-    "@angular/platform-browser": "^16.0.0",
-    "@angular/platform-browser-dynamic": "^16.0.0",
-    "next": "^14.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "svelte": "^4.0.0",
-    "vue": "^3.0.0"
+    "@angular/common": "^21.2.9",
+    "@angular/core": "^21.2.9",
+    "@angular/platform-browser": "^21.2.9",
+    "@angular/platform-browser-dynamic": "^21.2.9",
+    "next": "^16.2.4",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "svelte": "^5.55.4",
+    "vue": "^3.5.32"
   },
   "license": "BUSL-1.1",
   "peerDependenciesMeta": {
@@ -148,10 +153,10 @@
     }
   },
   "dependencies": {
-    "axios": "^1.10.0",
+    "axios": "^1.15.0",
     "mitt": "^3.0.1",
-    "react-intl": "^6.6.8",
+    "react-intl": "^10.1.2",
     "svelte-i18n": "^4.0.1",
-    "vue-i18n": "^11.0.1"
+    "vue-i18n": "^11.3.2"
   }
 }

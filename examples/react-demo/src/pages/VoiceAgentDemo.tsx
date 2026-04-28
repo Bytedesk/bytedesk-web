@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Alert, Button, Card, List, Space, Tag, Typography, theme as antdTheme } from 'antd';
+import { Alert, Button, Card, Space, Tag, Typography, theme as antdTheme } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -122,26 +122,26 @@ const VoiceAgentDemo = ({
   return (
     <PageContainer>
       <Card>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Typography.Title level={2} style={{ marginBottom: 0 }}>
             {m.title}
           </Typography.Title>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
             {m.description}
           </Typography.Paragraph>
-          <Space direction="vertical" size={4}>
+          <Space orientation="vertical" size={4}>
             {docLinks.map((link) => (
               <Typography.Link key={link.href} href={link.href} target="_blank" rel="noopener noreferrer">
                 {link.label}
               </Typography.Link>
             ))}
           </Space>
-          <Alert type="info" showIcon message={m.pathAlert} />
+          <Alert type="info" showIcon title={m.pathAlert} />
         </Space>
       </Card>
 
       <Card>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Space align="center" wrap>
             <Typography.Text strong>{m.currentPathLabel}</Typography.Text>
             <Tag color="processing">/chat/voice</Tag>
@@ -151,10 +151,10 @@ const VoiceAgentDemo = ({
           <Alert
             type={selectedChatProfile.key === 'robot' ? 'success' : 'warning'}
             showIcon
-            message={m.recommendedProfileNotice}
+            title={m.recommendedProfileNotice}
           />
 
-          <Space direction="vertical" size={8} style={{ width: '100%' }}>
+          <Space orientation="vertical" size={8} style={{ width: '100%' }}>
             <CurrentUserProfile
               title={messages.pages.userInfoDemo.currentUserTitle}
               isAnonymousMode={isAnonymousMode}
@@ -220,45 +220,49 @@ const VoiceAgentDemo = ({
           <Alert
             type="info"
             showIcon
-            message={`${messages.common.apiHintPrefix} showChat() / hideChat() / chatPath=/chat/voice`}
+            title={`${messages.common.apiHintPrefix} showChat() / hideChat() / chatPath=/chat/voice`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
           <Alert
             type="info"
             showIcon
-            message={`咨询参数: ${chatConfigHint}`}
+            title={`咨询参数: ${chatConfigHint}`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
 
-          <List
-            header={m.capabilityTitle}
-            dataSource={m.capabilityItems}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
-          />
+          <div>
+            <Typography.Text strong>{m.capabilityTitle}</Typography.Text>
+            <ul style={{ margin: '8px 0 0', paddingLeft: 20, lineHeight: 1.8 }}>
+              {m.capabilityItems.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
 
-          <List
-            header={m.usageTitle}
-            dataSource={m.usageNotes}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
-          />
+          <div>
+            <Typography.Text strong>{m.usageTitle}</Typography.Text>
+            <ul style={{ margin: '8px 0 0', paddingLeft: 20, lineHeight: 1.8 }}>
+              {m.usageNotes.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
         </Space>
       </Card>
 
       <Card title={m.urlGuideTitle}>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
           <Typography.Text strong>{m.sampleUrlLabel}</Typography.Text>
-          <Typography.Paragraph copyable={{ text: sampleUrl }} style={{ marginBottom: 0 }}>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-              {sampleUrl}
-            </pre>
-          </Typography.Paragraph>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
 
-          <List
-            size="small"
-            header={<Typography.Text strong>{m.urlParamsTitle}</Typography.Text>}
-            dataSource={m.urlParams}
-            renderItem={(param) => <List.Item>{param}</List.Item>}
-          />
+          <div>
+            <Typography.Text strong>{m.urlParamsTitle}</Typography.Text>
+            <ul style={{ margin: '8px 0 0', paddingLeft: 20, lineHeight: 1.8 }}>
+              {m.urlParams.map((param) => (
+                <li key={param}>{param}</li>
+              ))}
+            </ul>
+          </div>
         </Space>
       </Card>
 

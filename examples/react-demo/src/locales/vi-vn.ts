@@ -215,22 +215,22 @@ export const viVn = {
       fieldDocs: basicDemoFieldDocs
     },
     userInfoDemo: {
-      title: 'Demo tich hop thong tin nguoi dung',
-      description: 'Truyen visitorUid, nickname, avatar va cac truong khac qua config de nhan vien ho tro nhan dien nguoi dung ngay lap tuc. Su dung cac nut ben duoi de chuyen giua cac tai khoan mau.',
+      title: 'Demo tich hop nguoi dung he thong nghiep vu ben thu ba',
+      description: 'Truyen du lieu nguoi dung tu he thong nghiep vu ben thu ba, bao gom visitorUid, nickname, avatar va cac truong khac, qua config de nhan vien ho tro nhan dien ngay nguoi truy cap hien tai va dong bo ngu canh nghiep vu. Su dung cac nut ben duoi de chuyen giua cac nguoi dung mau cua he thong nghiep vu.',
       switchUser: 'Chuyen nguoi dung',
       switchToUserLabel: 'Chuyen sang {{name}}',
       switchAnonymousUserLabel: 'Chuyen sang nguoi dung an danh',
       anonymousUserLabel: 'Nguoi dung an danh',
       anonymousUserHint: 'Che do kiem thu an danh: bo qua visitorUid, nickname, avatar va cac truong nguoi dung khac.',
-      currentUserTitle: 'Nguoi dung hien tai',
+      currentUserTitle: 'Nguoi dung hien tai cua he thong nghiep vu',
       currentUserIdLabel: 'ID nguoi dung',
       currentUserNicknameLabel: 'Biet danh',
       contactSupport: 'Lien he ho tro',
       inviteText: 'Xin chao, chung toi co the giup gi cho ban?',
       docLinks: {
-        userInfoDoc: 'Xem tai lieu tich hop thong tin nguoi dung',
-        reactExample: 'Vi du React thong tin nguoi dung',
-        vueExample: 'Vi du Vue thong tin nguoi dung'
+        userInfoDoc: 'Xem tai lieu tich hop nguoi dung he thong nghiep vu ben thu ba',
+        reactExample: 'Vi du React nguoi dung he thong nghiep vu ben thu ba',
+        vueExample: 'Vi du Vue nguoi dung he thong nghiep vu ben thu ba'
       },
       controlPanel: {
         title: 'Bang dieu khien Bytedesk',
@@ -239,7 +239,7 @@ export const viVn = {
         bubble: 'Dieu khien bong thong bao',
         invite: 'Dieu khien hop loi moi'
       },
-      urlGuideTitle: 'Cach dung URL + Query',
+      urlGuideTitle: 'Cach dung day du URL cua cua so rieng hien tai + Query',
       urlTemplateLabel: 'Mau URL chung',
       urlParamsTitle: 'Tham chieu tham so (cho /chat)',
       urlParams: [

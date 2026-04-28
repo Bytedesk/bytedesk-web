@@ -1,0 +1,20 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2020",
+    "verbatimModuleSyntax": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": ["node", "svelte", "vite/client"],
+    "paths": {
+      "@/*": ["../../src/*"],
+      "@bytedesk/web/*": ["../../src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.svelte", "../../src/types/**/*.d.ts"]
+}
