@@ -1,11 +1,17 @@
-import { Alert, Button, Card, ColorPicker, Dropdown, Input, Space, Typography, type MenuProps } from 'antd';
+import { useState } from 'react';
+import { Alert, Button, Card, ColorPicker, Divider, Dropdown, Input, Modal, Space, Switch, Typography, type MenuProps } from 'antd';
 import type { DemoLanguage } from '../../locales';
+import type { BubbleSwitchMode } from './copy';
 import { LANGUAGE_OPTIONS } from './constants';
 
 type LocalizedCopy = {
   apiMessageLabel: string;
   consultParamsLabel: string;
   entrySelectorLabel: string;
+  entryIconLabel: string;
+  entryTextToggleLabel: string;
+  entryTextInputLabel: string;
+  entryTextInputPlaceholder: string;
   qrInputLabel: string;
   qrInputPlaceholder: string;
   customTitleLabel: string;
@@ -23,6 +29,8 @@ interface BasicDemoControlsCardProps {
   quickActions: QuickAction[];
   togglePlacementLabel: string;
   placementLabel: string;
+  bubbleSwitchModeLabel: string;
+  selectedBubbleSwitchMode: BubbleSwitchMode | 'default';
   themeButtonLabel: string;
   themeColorLabel: string;
   themeTextButtonLabel: string;
@@ -33,8 +41,13 @@ interface BasicDemoControlsCardProps {
   navTextColorPresets: Array<{ label: string; colors: string[] }>;
   themeModeMenuItems: MenuProps['items'];
   entryMenuItems: MenuProps['items'];
+  entryIconMenuItems: MenuProps['items'];
   selectedThemeModeKeys: string[];
   selectedEntryActions: string[];
+  selectedEntryButtonIconKeys: string[];
+  selectedEntryButtonIconLabel: string;
+  isEntryButtonTextEnabled: boolean;
+  entryButtonTextValue: string;
   locale: DemoLanguage;
   localeValueHint: string;
   lastActionApiHint: string;
@@ -44,6 +57,12 @@ interface BasicDemoControlsCardProps {
   navbarLabel: string;
   navbarHiddenLabel: string;
   navbarShownLabel: string;
+  qrCodeParamEnabled: boolean;
+  qrCodeParamLabel: string;
+  threadDetailParamEnabled: boolean;
+  threadDetailParamLabel: string;
+  visitorProfileParamEnabled: boolean;
+  visitorProfileParamLabel: string;
   loadHistoryEnabled: boolean;
   loadHistoryLabel: string;
   loadHistoryEnabledLabel: string;
@@ -57,12 +76,19 @@ interface BasicDemoControlsCardProps {
   navButtonTextColor: string;
   fallbackPrimaryColor: string;
   onPlacementToggle: () => void;
+  onBubbleSwitchModeChange: (nextMode: BubbleSwitchMode) => void;
   onNavColorChange: (nextColor: string) => void;
   onNavTextColorChange: (nextColor: string) => void;
   onThemeModeClick: NonNullable<MenuProps['onClick']>;
   onEntrySelect: NonNullable<MenuProps['onSelect']>;
   onEntryDeselect: NonNullable<MenuProps['onDeselect']>;
+  onEntryButtonIconClick: NonNullable<MenuProps['onClick']>;
+  onEntryButtonTextToggle: () => void;
+  onEntryButtonTextChange: (nextText: string) => void;
   onNavbarToggle: () => void;
+  onQrCodeParamToggle: () => void;
+  onThreadDetailParamToggle: () => void;
+  onVisitorProfileParamToggle: () => void;
   onLoadHistoryToggle: () => void;
   onCustomTitleToggle: () => void;
   onCarryBrowseInfoToggle: () => void;
@@ -74,6 +100,8 @@ const BasicDemoControlsCard = ({
   quickActions,
   togglePlacementLabel,
   placementLabel,
+  bubbleSwitchModeLabel,
+  selectedBubbleSwitchMode,
   themeButtonLabel,
   themeColorLabel,
   themeTextButtonLabel,
@@ -84,8 +112,13 @@ const BasicDemoControlsCard = ({
   navTextColorPresets,
   themeModeMenuItems,
   entryMenuItems,
+  entryIconMenuItems,
   selectedThemeModeKeys,
   selectedEntryActions,
+  selectedEntryButtonIconKeys,
+  selectedEntryButtonIconLabel,
+  isEntryButtonTextEnabled,
+  entryButtonTextValue,
   locale,
   localeValueHint,
   lastActionApiHint,
@@ -95,6 +128,12 @@ const BasicDemoControlsCard = ({
   navbarLabel,
   navbarHiddenLabel,
   navbarShownLabel,
+  qrCodeParamEnabled,
+  qrCodeParamLabel,
+  threadDetailParamEnabled,
+  threadDetailParamLabel,
+  visitorProfileParamEnabled,
+  visitorProfileParamLabel,
   loadHistoryEnabled,
   loadHistoryLabel,
   loadHistoryEnabledLabel,
@@ -108,18 +147,32 @@ const BasicDemoControlsCard = ({
   navButtonTextColor,
   fallbackPrimaryColor,
   onPlacementToggle,
+  onBubbleSwitchModeChange,
   onNavColorChange,
   onNavTextColorChange,
   onThemeModeClick,
   onEntrySelect,
   onEntryDeselect,
+  onEntryButtonIconClick,
+  onEntryButtonTextToggle,
+  onEntryButtonTextChange,
   onNavbarToggle,
+  onQrCodeParamToggle,
+  onThreadDetailParamToggle,
+  onVisitorProfileParamToggle,
   onLoadHistoryToggle,
   onCustomTitleToggle,
   onCarryBrowseInfoToggle,
   onLocaleSwitch,
   onQrCodeImageUrlChange,
 }: BasicDemoControlsCardProps) => {
+  const [isEntryTextModalOpen, setIsEntryTextModalOpen] = useState(false);
+  const bubbleSwitchModeMenuItems: MenuProps['items'] = [
+    { key: 'default', label: 'default' },
+    { key: 'fade', label: 'fade' },
+    { key: 'slide-up', label: 'slide-up' },
+    { key: 'ticker', label: 'ticker' },
+  ];
   const featuredQuickActionKeys = new Set([
     'openChat',
     'closeChat',
@@ -134,13 +187,33 @@ const BasicDemoControlsCard = ({
       <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
         <Space wrap>
           {secondaryQuickActions.map((action) => (
-            <Button key={action.key} type={action.type || 'primary'} onClick={action.handler}>
-              {action.label}
-            </Button>
+            <Space key={action.key} size={8}>
+              <Button type={action.type || 'primary'} onClick={action.handler}>
+                {action.label}
+              </Button>
+              {action.key === 'toggleButtonVisibility' && (
+                <Button type={isEntryButtonTextEnabled ? 'primary' : 'default'} onClick={() => setIsEntryTextModalOpen(true)}>
+                  {localizedCopy.entryTextToggleLabel}: {isEntryButtonTextEnabled ? loadHistoryEnabledLabel : loadHistoryDisabledLabel}
+                </Button>
+              )}
+            </Space>
           ))}
           <Button type="primary" onClick={onPlacementToggle}>
             {togglePlacementLabel} ({placementLabel})
           </Button>
+          <Dropdown
+            trigger={['click']}
+            menu={{
+              items: bubbleSwitchModeMenuItems,
+              selectable: true,
+              selectedKeys: [selectedBubbleSwitchMode],
+              onClick: ({ key }) => onBubbleSwitchModeChange(key as BubbleSwitchMode),
+            }}
+          >
+            <Button type="primary">
+              {bubbleSwitchModeLabel}
+            </Button>
+          </Dropdown>
           <ColorPicker
             value={navButtonColor || fallbackPrimaryColor}
             presets={navColorPresets}
@@ -201,8 +274,30 @@ const BasicDemoControlsCard = ({
               {localizedCopy.entrySelectorLabel} ({selectedEntryActions.length})
             </Button>
           </Dropdown>
+          <Dropdown
+            trigger={['click']}
+            menu={{
+              items: entryIconMenuItems,
+              selectable: true,
+              selectedKeys: selectedEntryButtonIconKeys,
+              onClick: onEntryButtonIconClick,
+            }}
+          >
+            <Button type="primary">
+              {localizedCopy.entryIconLabel} ({selectedEntryButtonIconLabel})
+            </Button>
+          </Dropdown>
           <Button type={navbarHidden ? 'primary' : 'default'} onClick={onNavbarToggle}>
             {navbarLabel}: {navbarHidden ? navbarHiddenLabel : navbarShownLabel}
+          </Button>
+          <Button type={qrCodeParamEnabled ? 'primary' : 'default'} onClick={onQrCodeParamToggle}>
+            {qrCodeParamLabel}: {qrCodeParamEnabled ? loadHistoryEnabledLabel : loadHistoryDisabledLabel}
+          </Button>
+          <Button type={threadDetailParamEnabled ? 'primary' : 'default'} onClick={onThreadDetailParamToggle}>
+            {threadDetailParamLabel}: {threadDetailParamEnabled ? loadHistoryEnabledLabel : loadHistoryDisabledLabel}
+          </Button>
+          <Button type={visitorProfileParamEnabled ? 'primary' : 'default'} onClick={onVisitorProfileParamToggle}>
+            {visitorProfileParamLabel}: {visitorProfileParamEnabled ? loadHistoryEnabledLabel : loadHistoryDisabledLabel}
           </Button>
           <Button type={loadHistoryEnabled ? 'primary' : 'default'} onClick={onLoadHistoryToggle}>
             {loadHistoryLabel}: {loadHistoryEnabled ? loadHistoryEnabledLabel : loadHistoryDisabledLabel}
@@ -225,6 +320,7 @@ const BasicDemoControlsCard = ({
             </Button>
           ))}
         </Space>
+        <Divider />
         <Space wrap>
           {featuredQuickActions.map((action, index) => (
             <Button key={action.key} type={index === 0 ? 'primary' : 'default'} onClick={action.handler}>
@@ -262,6 +358,32 @@ const BasicDemoControlsCard = ({
           </Space>
         )}
       </Space>
+      <Modal
+        title={localizedCopy.entryTextToggleLabel}
+        open={isEntryTextModalOpen}
+        onCancel={() => setIsEntryTextModalOpen(false)}
+        footer={[
+          <Button key="close" type="primary" onClick={() => setIsEntryTextModalOpen(false)}>
+            OK
+          </Button>,
+        ]}
+      >
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Space align="center" style={{ justifyContent: 'space-between', width: '100%' }}>
+            <Typography.Text>{localizedCopy.entryTextToggleLabel}</Typography.Text>
+            <Switch checked={isEntryButtonTextEnabled} onChange={onEntryButtonTextToggle} />
+          </Space>
+          <Space orientation="vertical" size={6} style={{ width: '100%' }}>
+            <Typography.Text type="secondary">{localizedCopy.entryTextInputLabel}</Typography.Text>
+            <Input
+              value={entryButtonTextValue}
+              placeholder={localizedCopy.entryTextInputPlaceholder}
+              onChange={(event) => onEntryButtonTextChange(event.target.value)}
+              disabled={!isEntryButtonTextEnabled}
+            />
+          </Space>
+        </Space>
+      </Modal>
     </Card>
   );
 };

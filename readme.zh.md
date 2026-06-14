@@ -116,11 +116,23 @@ npm install html2canvas
 # Angular 21 / Vite 8 需要的 Node.js 版本
 nvm use 22.12.0
 
-# 本仓库使用 pnpm，不建议使用 yarn install
+# 本仓库使用 pnpm，请勿改用其他包管理器
 pnpm install
 ```
 
-### Install Dependencies
+## React 快速对接
+
+React 接入建议按下面 5 步完成：
+
+1. 安装 `bytedesk-web`
+2. 导入 `BytedeskReact` 和 `BytedeskConfig`
+3. 先用最小配置跑通 `org`、`t`、`sid`
+4. 再补充主题、入口按钮、访客信息、浏览上下文等可选项
+5. 通过 `(window as any).bytedesk` 调用运行时方法，实现动态打开、切换会话和隐藏窗口
+
+如果你只是想先接起来，直接使用下方“最小接入示例”即可；如果要和实际业务系统对接，继续看“推荐接入示例”和“运行时方法”。
+
+### 1. 安装依赖
 
 ```bash
 npm install bytedesk-web
@@ -128,109 +140,224 @@ npm install bytedesk-web
 yarn add bytedesk-web
 ```
 
-### 导入组件
+### 2. 导入组件
 
-```bash
+```ts
 import { BytedeskReact } from 'bytedesk-web/react';
 import type { BytedeskConfig } from 'bytedesk-web/react';
 ```
 
-### 配置参数
+### 3. 最小接入示例
 
-```bash
+这是最小可运行配置。`org`、`t`、`sid` 为必填项，先保证这 3 个值能正确打开会话。
+
+```ts
 const config: BytedeskConfig = {
-  chatPath: '/chat', // 默认 /chat，历史会话页使用 /chat/thread
+  chatConfig: {
+    org: 'df_org_uid',
+    t: '2',
+    sid: 'df_rt_uid',
+  },
+};
+```
+
+说明：
+
+- `org`：企业 UID
+- `t`：会话类型，常见值为 `0` 一对一、`1` 工作组、`2` 机器人、`16` 历史会话
+- `sid`：会话 ID，对应客服 UID、工作组 UID、机器人 UID 等
+
+### 4. 推荐接入示例
+
+正式环境一般至少会补齐以下几类配置：
+
+- 基础地址：`apiUrl`、`htmlUrl`
+- UI：`placement`、`bubbleConfig`、`buttonConfig`、`theme`
+- 会话：`chatConfig` 中的访客信息、业务扩展字段
+- 上下文：`browseConfig`
+- 行为：`inviteConfig`、`autoPopup`、`draggable`
+
+```ts
+const config: BytedeskConfig = {
+  isDebug: false,
+  forceRefresh: false,
+  apiUrl: 'https://api.weiyuai.cn',
+  htmlUrl: 'https://www.weiyuai.cn/chat',
+  locale: 'zh-cn',
+
+  chatPath: '/chat',
+  threadPath: '/chat/thread',
+  webrtcPath: '/webrtc',
+  callPath: '/call',
+
   placement: 'bottom-right',
   marginBottom: 20,
   marginSide: 20,
+  autoPopup: false,
+  autoPopupDelay: 3000,
+  draggable: true,
+
+  chatConfig: {
+    org: 'df_org_uid',
+    t: '2',
+    sid: 'df_rt_uid',
+    title: '在线咨询',
+    visitorUid: 'user_10001',
+    nickname: '张三',
+    avatar: 'https://example.com/avatar.jpg',
+    mobile: '13800138000',
+    email: 'zhangsan@example.com',
+    note: '来自 React 官网接入',
+    channel: 'WEB_VISITOR',
+    vipLevel: '2',
+    goodsInfo: '',
+    orderInfo: '',
+    extra: JSON.stringify({
+      source: 'react-web',
+      plan: 'pro',
+    }),
+    loadHistory: true,
+  },
+
+  browseConfig: {
+    referrer: document.referrer,
+    url: window.location.href,
+    title: document.title,
+  },
+
+  inviteConfig: {
+    show: false,
+    text: '需要帮助吗？',
+    icon: '👋',
+    delay: 1000,
+    loop: true,
+    loopDelay: 10000,
+    loopCount: 3,
+    acceptText: '开始对话',
+    rejectText: '稍后再说',
+  },
+
   bubbleConfig: {
     show: true,
-    icon: '👋',
-    title: 'Need help?',
-    subtitle: 'Click to chat'
+    icon: '💬',
+    title: '需要帮助吗？',
+    subtitle: '点击开始对话',
   },
+
   buttonConfig: {
     show: true,
     width: 60,
     height: 60,
-    // icon: '👋',
-    // text: '需要帮助吗？',
+    action: 'chat',
   },
-  chatConfig: {
-    org: 'df_org_uid',  // 替换为您的组织ID
-    t: "2",
-    sid: 'df_rt_uid'      // 替换为您的SID
-  }
+
+  theme: {
+    mode: 'light',
+    textColor: '#ffffff',
+    backgroundColor: '#0066FF',
+  },
+
+  onVisitorInfo: (uid, visitorUid) => {
+    console.log('visitor info', uid, visitorUid);
+  },
 };
 ```
 
-### 历史会话页面（`/chat/thread`）
+### 5. 在组件中使用
 
-将 `chatPath` 设置为 `/chat/thread` 后，点击 icon 和调用 `showChat()` 都会打开访客历史会话页面。
+```tsx
+import { BytedeskReact } from 'bytedesk-web/react';
+import type { BytedeskConfig } from 'bytedesk-web/react';
 
-```bash
 const config: BytedeskConfig = {
-  htmlUrl: 'https://cdn.weiyuai.cn/chat',
-  chatPath: '/chat/thread',
   chatConfig: {
     org: 'df_org_uid',
-    t: '1',
-    sid: 'df_wg_uid',
-    visitorUid: 'visitor_001',
-    nickname: '访客小明',
-    avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg'
-  }
+    t: '2',
+    sid: 'df_rt_uid',
+  },
 };
-```
 
-也可直接使用 URL + 参数方式接入（参数与 `/chat` 一致）：
-
-```bash
-https://cdn.weiyuai.cn/chat/thread?org=df_org_uid&t=1&sid=df_wg_uid&visitorUid=visitor_001&nickname=%E8%AE%BF%E5%AE%A2%E5%B0%8F%E6%98%8E&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&lang=zh-cn&mode=light
-```
-
-### 使用组件
-
-```bash
-const App = () => {
-  const handleInit = () => {
-    console.log('BytedeskReact initialized');
-  };
-
+export default function App() {
   return (
     <div>
-      <BytedeskReact {...config} onInit={handleInit} />
+      <BytedeskReact
+        {...config}
+        onInit={() => {
+          console.log('BytedeskReact initialized');
+        }}
+      />
+
       <button onClick={() => (window as any).bytedesk?.showChat()}>
         打开聊天
       </button>
     </div>
   );
-};
+}
 ```
 
-### 可用方法
+## 常见对接方式
+
+### 直接嵌入 React 页面
+
+这是最常见方式。页面挂载 `BytedeskReact` 后，SDK 会自动创建气泡、按钮和聊天窗口。
+
+适用场景：
+
+- 官网右下角客服入口
+- 帮助中心文档页
+- 营销落地页
+- SaaS 控制台内嵌客服
+
+### 打开独立聊天页
+
+如果你不想直接在 React 页内嵌，也可以使用独立 URL 打开聊天页。
 
 ```bash
-# 显示/隐藏按钮
-(window as any).bytedesk?.showButton();
-(window as any).bytedesk?.hideButton();
+https://www.weiyuai.cn/chat?org=df_org_uid&t=1&sid=df_wg_uid&lang=zh-cn&mode=light&backgroundColor=%230066FF&textColor=%23ffffff&visitorUid=user_10001&nickname=%E5%BC%A0%E4%B8%89&avatar=https%3A%2F%2Fexample.com%2Favatar.jpg&loadHistory=1
+```
 
-# 显示/隐藏气泡消息
-(window as any).bytedesk?.showBubble();
-(window as any).bytedesk?.hideBubble();
+更多 URL 参数说明请参考 [访客端开发文档](./docs/i18n/zh-CN/docusaurus-plugin-content-docs/current/development/chat.md)。
 
-# 显示/隐藏聊天窗口
+## 运行时方法
+
+挂载完成后，可以通过全局对象动态控制客服入口和窗口行为。
+
+```ts
+// 显示 / 隐藏聊天窗口
 (window as any).bytedesk?.showChat();
 (window as any).bytedesk?.hideChat();
 
-# 显示/隐藏邀请对话框
+// 动态切换会话并打开聊天窗口
+(window as any).bytedesk?.showChat({
+  chatConfig: {
+    org: 'df_org_uid',
+    t: '1',
+    sid: 'df_wg_uid',
+    visitorUid: 'user_10001',
+    nickname: '张三',
+  },
+});
+
+// 直接打开其他内置入口
+(window as any).bytedesk?.showThread();
+(window as any).bytedesk?.showWebrtc();
+(window as any).bytedesk?.showCall();
+
+// 显示 / 隐藏按钮
+(window as any).bytedesk?.showButton();
+(window as any).bytedesk?.hideButton();
+
+// 显示 / 隐藏气泡
+(window as any).bytedesk?.showBubble();
+(window as any).bytedesk?.hideBubble();
+
+// 显示 / 隐藏邀请对话框
 (window as any).bytedesk?.showInviteDialog();
 (window as any).bytedesk?.hideInviteDialog();
- 
-# 获取未读消息数
-(window as any).bytedesk?.getUnreadMessageCount()
-# 清空所有未读消息
-(window as any).bytedesk?.clearUnreadMessages()
+
+// 获取 / 清空未读消息
+const unreadCount = (window as any).bytedesk?.getUnreadMessageCount();
+(window as any).bytedesk?.clearUnreadMessages();
 ```
 
 ## 运行示例

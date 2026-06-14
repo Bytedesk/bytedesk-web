@@ -151,13 +151,13 @@ In the React demo, the “Reset Anonymous User” button is shown only when the 
 ## Run Examples
 
 ```bash
-yarn install
-yarn demo:react    # Run React demo
-yarn demo:vue      # Run Vue demo
-yarn demo:svelte   # Run Svelte demo
-yarn demo:vanilla  # Run Vanilla JS demo
+pnpm install
+pnpm demo:react    # Run React demo
+pnpm demo:vue      # Run Vue demo
+pnpm demo:svelte   # Run Svelte demo
+pnpm demo:vanilla  # Run Vanilla JS demo
 
 # JavaScript demo requires build first
-yarn build
-yarn demo:javascript
+pnpm build
+pnpm demo:javascript
 ```

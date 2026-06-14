@@ -64,12 +64,12 @@
           <h3>商品信息</h3>
           <div class="product-grid">
             <div class="product-image">
-              <img :src="currentOrder.goods.image" :alt="currentOrder.goods.title" class="img-responsive" />
+              <img :src="currentOrder.orderImage" :alt="currentOrder.orderTitle" class="img-responsive" />
             </div>
             <div>
-              <h4>{{ currentOrder.goods.title }}</h4>
-              <p>单价：¥{{ currentOrder.goods.price.toLocaleString() }}</p>
-              <p>数量：{{ currentOrder.goods.quantity }}</p>
+              <h4>{{ currentOrder.orderTitle }}</h4>
+              <p>单价：¥{{ currentOrder.orderPrice.toLocaleString() }}</p>
+              <p>数量：{{ currentOrder.orderQuantity }}</p>
             </div>
           </div>
         </div>
@@ -133,26 +133,27 @@ import { BytedeskVue } from '@bytedesk/web/adapters/vue';
 import type { BytedeskConfig } from '@bytedesk/web/types';
 
 // 定义商品信息接口
-interface GoodsInfo {
-  uid: string;
-  title: string;
-  image: string;
-  description: string;
-  price: number;
-  url: string;
-  tagList: string[];
-  extra: string;
-  quantity: number
-}
-
-// 定义订单信息接口
 interface OrderInfo {
-  uid: string;
+  orderUid: string;
+  type: string;
+  title: string;
+  description: string;
+  state: string;
+  navigateToPath: string;
   time: string;
   status: 'pending' | 'paid' | 'shipped' | 'delivered';
   statusText: string;
-  goods: GoodsInfo
+  orderTitle: string;
+  orderImage: string;
+  orderDescription: string;
+  orderPrice: number;
+  orderUrl: string;
+  orderTagList: string[];
+  orderExtra: string;
+  orderQuantity: number;
   totalAmount: number;
+  shopUid: string;
+  visitorUid: string;
   shippingAddress: {
     name: string;
     phone: string;
@@ -170,25 +171,29 @@ export default defineComponent({
   setup() {
     // 定义测试订单
     const currentOrder = reactive<OrderInfo>({
-      uid: 'ORD202505270001',
+      orderUid: 'ORD202505270001',
+      type: 'order',
+      title: '比亚迪 仰望U7 豪华纯电动轿车订单',
+      description: '订单商品快照',
+      state: 'paid',
+      navigateToPath: '/pages/order/detail/index?type=order&orderUid=ORD202505270001&shopUid=shop_001',
       time: '2025-05-27 14:30:00',
       status: 'paid',
       statusText: '已支付',
-      goods: {
-        uid: 'goods_001',
-        title: '比亚迪 仰望U7 豪华纯电动轿车',
-        image: 'https://www.weiyuai.cn/assets/images/car/yu7.jpg',
-        description: '比亚迪仰望U7是一款豪华纯电动轿车，采用最新一代刀片电池技术，续航里程可达1000公里。配备智能驾驶辅助系统，支持L3级别自动驾驶。内饰采用高级真皮材质，配备全景天窗、智能座舱等豪华配置。',
-        price: 299900,
-        url: 'https://www.weiyuai.cn/car/yu7',
-        tagList: ['新能源', '豪华轿车', '智能驾驶', '长续航'],
-        extra: JSON.stringify({
-          extraText: 'goodsExtraText',
-          extraName: 'goodsExtraName'
-        }),
-        quantity: 1  // 添加数量字段
-      },
+      orderTitle: '比亚迪 仰望U7 豪华纯电动轿车',
+      orderImage: 'https://www.weiyuai.cn/assets/images/car/yu7.jpg',
+      orderDescription: '比亚迪仰望U7是一款豪华纯电动轿车，采用最新一代刀片电池技术，续航里程可达1000公里。配备智能驾驶辅助系统，支持L3级别自动驾驶。内饰采用高级真皮材质，配备全景天窗、智能座舱等豪华配置。',
+      orderPrice: 299900,
+      orderUrl: 'https://www.weiyuai.cn/car/yu7',
+      orderTagList: ['新能源', '豪华轿车', '智能驾驶', '长续航'],
+      orderExtra: JSON.stringify({
+        extraText: 'goodsExtraText',
+        extraName: 'goodsExtraName'
+      }),
+      orderQuantity: 1,
       totalAmount: 299900,
+      shopUid: 'shop_001',
+      visitorUid: 'visitor_001',
       shippingAddress: {
         name: '张三',
         phone: '13800138000',
@@ -232,12 +237,26 @@ export default defineComponent({
         avatar: 'https://weiyuai.cn/assets/images/avatar/02.jpg',
         // 订单信息通过自定义消息发送
         orderInfo: JSON.stringify({
-          uid: currentOrder.uid,
+          orderUid: currentOrder.orderUid,
+          type: currentOrder.type,
+          title: currentOrder.title,
+          description: currentOrder.description,
+          state: currentOrder.state,
+          navigateToPath: currentOrder.navigateToPath,
           time: currentOrder.time,
           status: currentOrder.status,
           statusText: currentOrder.statusText,
-          goods: currentOrder.goods,
+          orderTitle: currentOrder.orderTitle,
+          orderImage: currentOrder.orderImage,
+          orderDescription: currentOrder.orderDescription,
+          orderPrice: currentOrder.orderPrice,
+          orderUrl: currentOrder.orderUrl,
+          orderTagList: currentOrder.orderTagList,
+          orderExtra: currentOrder.orderExtra,
+          orderQuantity: currentOrder.orderQuantity,
           totalAmount: currentOrder.totalAmount,
+          shopUid: currentOrder.shopUid,
+          visitorUid: currentOrder.visitorUid,
           shippingAddress: currentOrder.shippingAddress,
           paymentMethod: currentOrder.paymentMethod,
           extra: currentOrder.extra

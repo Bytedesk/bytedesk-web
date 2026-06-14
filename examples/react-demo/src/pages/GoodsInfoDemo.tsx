@@ -13,36 +13,29 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Avatar, Button, Card, Select, Space, Table, Tag, Typography } from 'antd';
+import { Alert, Avatar, Button, Card, Descriptions, FloatButton, Modal, Select, Space, Table, Tag, Typography } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
-import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
+import type { BytedeskConfig, Language, MessageBubbleClickEvent, Theme as BytedeskTheme } from '@bytedesk/web/types';
 import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
 import type { DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
+import type { DemoGoodsInfo, DemoOrderInfo, DemoOrderInfoInput, LegacyOrderInfoPayload } from '../utils/biz-card';
+import { normalizeDemoGoods, normalizeDemoOrder, parseJsonString } from '../utils/biz-card';
+import { parseBizPayloadFromNavigateToPath } from '../utils/biz-message-callback';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
+import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
 
 const { Title, Paragraph, Text } = Typography;
-
-interface DemoGoodsInfo {
-  uid: string;
-  title: string;
-  image: string;
-  description: string;
-  price: number;
-  url: string;
-  tagList: string[];
-  extra: string;
-  quantity: number;
-  shopUid: string;
-}
+const callbackModalTitle = '商品回调Demo演示';
+const orderCallbackModalTitle = '订单回调Demo演示';
+const callbackModalZIndex = 1000000;
 
 interface DemoShop {
   shopUid: string;
   name: string;
-  goods: DemoGoodsInfo[];
 }
 
 interface JsonResult<T> {
@@ -58,7 +51,10 @@ interface PageResult<T> {
 interface GoodsApiItem {
   goodsUid?: string;
   shopUid?: string;
+  type?: string;
+  status?: string;
   title?: string;
+  navigateToPath?: string;
   image?: string;
   description?: string;
   price?: number;
@@ -66,6 +62,11 @@ interface GoodsApiItem {
   tagList?: string[];
   extra?: string;
   quantity?: number;
+}
+
+interface ShopApiItem {
+  shopUid?: string;
+  name?: string;
 }
 
 interface DemoPageProps {
@@ -78,14 +79,39 @@ interface DemoPageProps {
 
 const getApiBaseUrl = () => demoApiUrl || window.location.origin;
 
+const buildGoodsNavigateToPath = (shopUid: string, goodsUid: string) => (
+  `/pages/goods/detail/index?type=goods&goodsUid=${encodeURIComponent(goodsUid)}&shopUid=${encodeURIComponent(shopUid)}`
+);
+
+const resolveGoodsDetailFromBubbleClick = (event: MessageBubbleClickEvent) => {
+  const payload = parseBizPayloadFromNavigateToPath<DemoGoodsInfo>(event.navigateToPath);
+  if (payload) {
+    return normalizeDemoGoods(payload);
+  }
+
+  return normalizeDemoGoods(parseJsonString<DemoGoodsInfo>(event.content));
+};
+
+const resolveOrderDetailFromBubbleClick = (event: MessageBubbleClickEvent) => {
+  const payload = parseBizPayloadFromNavigateToPath<DemoOrderInfoInput & LegacyOrderInfoPayload>(event.navigateToPath);
+  if (payload) {
+    return normalizeDemoOrder(payload);
+  }
+
+  return normalizeDemoOrder(parseJsonString<DemoOrderInfoInput & LegacyOrderInfoPayload>(event.content));
+};
+
 const toDemoGoods = (item: GoodsApiItem): DemoGoodsInfo | null => {
   if (!item.goodsUid || !item.shopUid) {
     return null;
   }
 
   return {
-    uid: item.goodsUid,
+    goodsUid: item.goodsUid,
+    type: item.type || 'goods',
+    status: item.status || 'ON_SHELF',
     title: item.title || item.goodsUid,
+    navigateToPath: item.navigateToPath || buildGoodsNavigateToPath(item.shopUid, item.goodsUid),
     image: item.image || '',
     description: item.description || '',
     price: typeof item.price === 'number' ? item.price : 0,
@@ -97,46 +123,127 @@ const toDemoGoods = (item: GoodsApiItem): DemoGoodsInfo | null => {
   };
 };
 
-const groupGoodsByShop = (goodsList: DemoGoodsInfo[]): DemoShop[] => {
-  const shopMap = new Map<string, DemoShop>();
+const toDemoShop = (item: ShopApiItem): DemoShop | null => {
+  if (!item.shopUid) {
+    return null;
+  }
 
-  goodsList.forEach((goods) => {
-    const existingShop = shopMap.get(goods.shopUid);
-    if (existingShop) {
-      existingShop.goods.push(goods);
-      return;
-    }
-
-    shopMap.set(goods.shopUid, {
-      shopUid: goods.shopUid,
-      name: goods.shopUid,
-      goods: [goods]
-    });
-  });
-
-  return Array.from(shopMap.values());
+  return {
+    shopUid: item.shopUid,
+    name: item.name || item.shopUid,
+  };
 };
 
 const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
   const docLinks = [
-    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/goods_info', label: locale === 'en' ? 'View goods info integration docs' : '查看商品信息对接文档' },
+    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/goods_info', label: locale === 'en' ? 'View goods info integration docs' : '查看商品信息对接文档' },
     { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/GoodsInfoDemo.tsx', label: locale === 'en' ? 'React goods info sample' : 'React 商品信息对接代码示例' },
     { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/GoodsInfoDemo.vue', label: locale === 'en' ? 'Vue goods info sample' : 'Vue 商品信息对接代码示例' }
   ];
   const orgUid = selectedChatProfile.chatConfig?.org || '';
-  const [goodsShops, setGoodsShops] = useState<DemoShop[]>([]);
+  const [shops, setShops] = useState<DemoShop[]>([]);
+  const [shopsLoading, setShopsLoading] = useState(false);
+  const [goodsList, setGoodsList] = useState<DemoGoodsInfo[]>([]);
   const [goodsLoading, setGoodsLoading] = useState(false);
   const [goodsError, setGoodsError] = useState<string>();
   const [selectedShopUid, setSelectedShopUid] = useState<string>('');
   const [selectedGoodsUid, setSelectedGoodsUid] = useState<string>('');
   const [autoSendBizInfo, setAutoSendBizInfo] = useState(true);
+  const [lastBubbleClickEvent, setLastBubbleClickEvent] = useState<MessageBubbleClickEvent>();
+  const [clickedGoodsDetail, setClickedGoodsDetail] = useState<DemoGoodsInfo>();
+  const [isGoodsDetailModalOpen, setIsGoodsDetailModalOpen] = useState(false);
+  const [clickedOrderDetail, setClickedOrderDetail] = useState<DemoOrderInfo>();
+  const [isOrderDetailModalOpen, setIsOrderDetailModalOpen] = useState(false);
 
   useEffect(() => {
     if (!orgUid) {
-      setGoodsShops([]);
-      setGoodsError(locale === 'en' ? 'Missing orgUid, unable to load goods data.' : '缺少 orgUid，无法加载商品数据');
+      setShops([]);
+      setGoodsList([]);
+      setGoodsError(locale === 'en' ? 'Missing orgUid, unable to load store data.' : '缺少 orgUid，无法加载店铺数据');
+      setShopsLoading(false);
+      setGoodsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadShops = async () => {
+      setShopsLoading(true);
+      setGoodsError(undefined);
+
+      try {
+        const url = new URL('/visitor/api/v1/shop/query/org', getApiBaseUrl());
+        url.searchParams.set('orgUid', orgUid);
+        url.searchParams.set('pageNumber', '0');
+        url.searchParams.set('pageSize', '20');
+
+        const response = await fetch(url.toString());
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const payload = await response.json() as JsonResult<PageResult<ShopApiItem>>;
+        if (payload.code !== 200) {
+          throw new Error(payload.message || 'Failed to load shops');
+        }
+
+        const nextShops =
+          (payload.data?.content || [])
+            .map(toDemoShop)
+            .filter((item): item is DemoShop => Boolean(item));
+
+        if (!cancelled) {
+          setShops(nextShops);
+          setSelectedShopUid((currentValue) => (
+            nextShops.some((shop) => shop.shopUid === currentValue)
+              ? currentValue
+              : (nextShops[0]?.shopUid || '')
+          ));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setShops([]);
+          setGoodsList([]);
+          setSelectedShopUid('');
+          setGoodsError(error instanceof Error ? error.message : (locale === 'en' ? 'Failed to load store data.' : '店铺数据加载失败'));
+        }
+      } finally {
+        if (!cancelled) {
+          setShopsLoading(false);
+        }
+      }
+    };
+
+    void loadShops();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [locale, orgUid]);
+
+  const selectedShop = useMemo(
+    () => shops.find((shop) => shop.shopUid === selectedShopUid) || shops[0],
+    [shops, selectedShopUid]
+  );
+
+  useEffect(() => {
+    if (!shops.length) {
+      if (selectedShopUid) {
+        setSelectedShopUid('');
+      }
+      return;
+    }
+
+    if (!shops.some((shop) => shop.shopUid === selectedShopUid)) {
+      setSelectedShopUid(shops[0].shopUid);
+    }
+  }, [selectedShopUid, shops]);
+
+  useEffect(() => {
+    if (!orgUid || !selectedShopUid) {
+      setGoodsList([]);
       setGoodsLoading(false);
       return;
     }
@@ -150,6 +257,9 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
       try {
         const url = new URL('/visitor/api/v1/goods/query/org', getApiBaseUrl());
         url.searchParams.set('orgUid', orgUid);
+        url.searchParams.set('shopUid', selectedShopUid);
+        url.searchParams.set('pageNumber', '0');
+        url.searchParams.set('pageSize', '20');
 
         const response = await fetch(url.toString());
         if (!response.ok) {
@@ -161,18 +271,16 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
           throw new Error(payload.message || 'Failed to load goods');
         }
 
-        const shops = groupGoodsByShop(
-          (payload.data?.content || [])
-            .map(toDemoGoods)
-            .filter((item): item is DemoGoodsInfo => Boolean(item))
-        );
+        const nextGoods = (payload.data?.content || [])
+          .map(toDemoGoods)
+          .filter((item): item is DemoGoodsInfo => Boolean(item));
 
         if (!cancelled) {
-          setGoodsShops(shops);
+          setGoodsList(nextGoods);
         }
       } catch (error) {
         if (!cancelled) {
-          setGoodsShops([]);
+          setGoodsList([]);
           setGoodsError(error instanceof Error ? error.message : (locale === 'en' ? 'Failed to load goods data.' : '商品数据加载失败'));
         }
       } finally {
@@ -187,47 +295,29 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     return () => {
       cancelled = true;
     };
-  }, [locale, orgUid]);
-
-  const selectedShop = useMemo(
-    () => goodsShops.find((shop) => shop.shopUid === selectedShopUid) || goodsShops[0],
-    [goodsShops, selectedShopUid]
-  );
+  }, [locale, orgUid, selectedShopUid]);
 
   useEffect(() => {
-    if (!goodsShops.length) {
-      if (selectedShopUid) {
-        setSelectedShopUid('');
-      }
-      return;
-    }
-
-    if (!goodsShops.some((shop) => shop.shopUid === selectedShopUid)) {
-      setSelectedShopUid(goodsShops[0].shopUid);
-    }
-  }, [goodsShops, selectedShopUid]);
-
-  useEffect(() => {
-    if (!selectedShop?.goods.length) {
+    if (!goodsList.length) {
       if (selectedGoodsUid) {
         setSelectedGoodsUid('');
       }
       return;
     }
 
-    if (!selectedShop.goods.some((goods) => goods.uid === selectedGoodsUid)) {
-      setSelectedGoodsUid(selectedShop.goods[0].uid);
+    if (!goodsList.some((goods) => goods.goodsUid === selectedGoodsUid)) {
+      setSelectedGoodsUid(goodsList[0].goodsUid);
     }
-  }, [selectedGoodsUid, selectedShop]);
+  }, [goodsList, selectedGoodsUid]);
 
   const selectedGoods = useMemo(() => {
-    if (!selectedShop) {
+    if (!goodsList.length) {
       return undefined;
     }
 
-    const hit = selectedShop.goods.find((goods) => goods.uid === selectedGoodsUid);
-    return hit || selectedShop.goods[0];
-  }, [selectedGoodsUid, selectedShop]);
+    const hit = goodsList.find((goods) => goods.goodsUid === selectedGoodsUid);
+    return hit || goodsList[0];
+  }, [goodsList, selectedGoodsUid]);
 
   const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
@@ -245,8 +335,11 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
   const goodsInfoPayload = useMemo(
     () => selectedGoods && selectedShop
       ? {
-          uid: selectedGoods.uid,
+          goodsUid: selectedGoods.goodsUid,
+          type: selectedGoods.type,
+          status: selectedGoods.status,
           title: selectedGoods.title,
+          navigateToPath: selectedGoods.navigateToPath,
           image: selectedGoods.image,
           description: selectedGoods.description,
           price: selectedGoods.price,
@@ -311,6 +404,27 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
           }
         : {})
     },
+    onMessageBubbleClick: (event: MessageBubbleClickEvent) => {
+      console.log('goods demo bubble click', event);
+      setLastBubbleClickEvent(event);
+
+      if (event.type === 'GOODS') {
+        const goodsDetail = resolveGoodsDetailFromBubbleClick(event);
+        if (goodsDetail) {
+          setClickedGoodsDetail(goodsDetail);
+          setIsGoodsDetailModalOpen(true);
+        }
+        return;
+      }
+
+      if (event.type === 'ORDER') {
+        const orderDetail = resolveOrderDetailFromBubbleClick(event);
+        if (orderDetail) {
+          setClickedOrderDetail(orderDetail);
+          setIsOrderDetailModalOpen(true);
+        }
+      }
+    },
     locale,
     theme: {
       mode: themeMode
@@ -373,6 +487,37 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     () => rawUrlParams.map(([key, value]) => ({ key, value, purpose: withEncodeHint(key, urlParamPurposeMap[key] || '—') })),
     [rawUrlParams, urlParamPurposeMap, encodeHintText]
   );
+  const embedCodeCopy = useMemo(() => getCurrentEmbedCodeCopy(locale), [locale]);
+  const codeBlockStyle = useMemo(() => ({
+    margin: 0,
+    padding: '12px 14px',
+    borderRadius: 8,
+    background: 'rgba(0,0,0,0.04)',
+    fontSize: 12,
+    lineHeight: 1.7,
+    fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace',
+    whiteSpace: 'pre-wrap' as const,
+    wordBreak: 'break-all' as const
+  }), []);
+  const currentEmbedCodeExample = useMemo(
+    () => buildCurrentEmbedCodeExample({
+      config,
+      callbackSources: {
+        onMessageBubbleClick: `(event) => {
+  console.log('goods demo bubble click', event);
+  const targetUrl = event.navigateToPath;
+  if (!targetUrl) {
+    return;
+  }
+  const parsed = new URL(targetUrl, window.location.origin);
+  const payload = parsed.searchParams.get('payload');
+  console.log('resolved target url', targetUrl);
+  console.log('resolved biz payload', payload ? JSON.parse(payload) : null);
+}`
+      }
+    }),
+    [config]
+  );
 
   return (
     <PageContainer>
@@ -404,12 +549,11 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
             <Select
               style={{ minWidth: 280 }}
               value={selectedShop?.shopUid}
-              loading={goodsLoading}
-              options={goodsShops.map((shop) => ({ value: shop.shopUid, label: `${shop.name} (${shop.shopUid})` }))}
+              loading={shopsLoading}
+              options={shops.map((shop) => ({ value: shop.shopUid, label: `${shop.name} (${shop.shopUid})` }))}
               onChange={(value) => {
                 setSelectedShopUid(value);
-                const nextShop = goodsShops.find((shop) => shop.shopUid === value);
-                setSelectedGoodsUid(nextShop?.goods[0]?.uid || '');
+                setSelectedGoodsUid('');
               }}
             />
             {selectedShop ? <Tag color="blue">shopUid: {selectedShop.shopUid}</Tag> : null}
@@ -423,15 +567,17 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
           </Space>
 
           {goodsError ? <Alert type="error" showIcon title={goodsError} /> : null}
-          {!goodsError && goodsLoading ? <Alert type="info" showIcon title={locale === 'en' ? 'Loading goods data...' : '正在加载商品数据...'} /> : null}
-          {!goodsError && !goodsLoading && !selectedShop ? <Alert type="warning" showIcon title={locale === 'en' ? 'No goods data returned by API.' : '接口未返回商品数据'} /> : null}
+          {!goodsError && shopsLoading ? <Alert type="info" showIcon title={locale === 'en' ? 'Loading store data...' : '正在加载店铺数据...'} /> : null}
+          {!goodsError && !shopsLoading && goodsLoading ? <Alert type="info" showIcon title={locale === 'en' ? 'Loading goods data...' : '正在加载商品数据...'} /> : null}
+          {!goodsError && !shopsLoading && !selectedShop ? <Alert type="warning" showIcon title={locale === 'en' ? 'No store data returned by API.' : '接口未返回店铺数据'} /> : null}
+          {!goodsError && !goodsLoading && !!selectedShop && !goodsList.length ? <Alert type="warning" showIcon title={locale === 'en' ? 'No goods data returned by API.' : '接口未返回商品数据'} /> : null}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {(selectedShop?.goods || []).map((item) => {
-              const active = item.uid === selectedGoods?.uid;
+            {goodsList.map((item) => {
+              const active = item.goodsUid === selectedGoods?.goodsUid;
               return (
                 <div
-                  key={item.uid}
+                  key={item.goodsUid}
                   style={{
                     display: 'flex',
                     gap: 12,
@@ -442,7 +588,7 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
                     cursor: 'pointer',
                     border: '1px solid rgba(0,0,0,0.06)'
                   }}
-                  onClick={() => setSelectedGoodsUid(item.uid)}
+                  onClick={() => setSelectedGoodsUid(item.goodsUid)}
                 >
                   <Avatar shape="square" size={40} src={item.image} />
                   <div style={{ flex: 1 }}>
@@ -453,15 +599,15 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
                         size="small"
                         onClick={(event) => {
                           event.stopPropagation();
-                          handleConsultGoods(item.uid);
+                          handleConsultGoods(item.goodsUid);
                         }}
                       >
                         {messages.pages.goodsInfoDemo.consultGoodsBtn}
                       </Button>
-                      <Text type="secondary">{item.uid}</Text>
+                      <Text type="secondary">{item.goodsUid}</Text>
                       <Text strong>¥{item.price.toLocaleString()}</Text>
                       {item.tagList.slice(0, 2).map((tag) => (
-                        <Tag key={`${item.uid}-${tag}`}>{tag}</Tag>
+                        <Tag key={`${item.goodsUid}-${tag}`}>{tag}</Tag>
                       ))}
                     </Space>
                   </div>
@@ -540,7 +686,158 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
         </Space>
       </Card>
 
+      <Card title={embedCodeCopy.title}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {embedCodeCopy.description}
+          </Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{ text: currentEmbedCodeExample }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {currentEmbedCodeExample}
+          </Typography.Paragraph>
+        </Space>
+      </Card>
+
+      <Card title={locale === 'en' ? 'Bubble click listener demo' : '消息气泡点击监听演示'}>
+        <Space orientation="vertical" style={{ width: '100%' }}>
+          <Alert
+            type="info"
+            showIcon
+            title={locale === 'en'
+              ? 'Click any message bubble in the embedded chat window. The SDK listener receives messageType, content, and a navigateToPath already suffixed with the original payload.'
+              : '点击嵌入聊天窗口中的任意消息气泡，SDK 监听器会接收到 iframe postMessage 传出的 messageType、content，以及已自动拼接原始 payload 的 navigateToPath。'}
+          />
+          <Alert
+            type="success"
+            showIcon
+            title={locale === 'en'
+              ? 'Scenario: the host can read event.navigateToPath, parse its payload query parameter, and route to the corresponding product detail page without rebuilding the business payload.'
+              : '应用场景：宿主系统可直接读取 event.navigateToPath，解析其中的 payload 参数，并完成详情页跳转，无需自行重组业务数据。'}
+          />
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace', fontSize: 12, background: 'rgba(0,0,0,0.04)', padding: '10px 12px', borderRadius: 6 }}>{JSON.stringify(lastBubbleClickEvent || {}, null, 2)}</pre>
+        </Space>
+      </Card>
+
+      <Modal
+        open={isGoodsDetailModalOpen}
+        title={callbackModalTitle}
+        footer={null}
+        onCancel={() => setIsGoodsDetailModalOpen(false)}
+        width={720}
+        zIndex={callbackModalZIndex}
+        getContainer={document.body}
+      >
+        {clickedGoodsDetail ? (
+          <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+            <Space align="start" size="middle" style={{ width: '100%' }}>
+              <Avatar shape="square" size={88} src={clickedGoodsDetail.image} />
+              <Space orientation="vertical" size={4} style={{ flex: 1 }}>
+                <Typography.Title level={4} style={{ margin: 0 }}>{clickedGoodsDetail.title}</Typography.Title>
+                <Typography.Text type="secondary">{clickedGoodsDetail.description || '-'}</Typography.Text>
+                <Space wrap>
+                  <Tag color="blue">goodsUid: {clickedGoodsDetail.goodsUid}</Tag>
+                  <Tag color="gold">shopUid: {clickedGoodsDetail.shopUid}</Tag>
+                  <Tag color="green">¥{clickedGoodsDetail.price.toLocaleString()}</Tag>
+                  <Tag>{locale === 'en' ? `Quantity: ${clickedGoodsDetail.quantity}` : `数量: ${clickedGoodsDetail.quantity}`}</Tag>
+                </Space>
+              </Space>
+            </Space>
+
+            <Descriptions bordered size="small" column={1}>
+              <Descriptions.Item label="type">{clickedGoodsDetail.type || '-'}</Descriptions.Item>
+              <Descriptions.Item label="status">{clickedGoodsDetail.status || '-'}</Descriptions.Item>
+              <Descriptions.Item label="navigateToPath">{clickedGoodsDetail.navigateToPath || '-'}</Descriptions.Item>
+              <Descriptions.Item label="URL">{clickedGoodsDetail.url || '-'}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Tags' : '标签'}>
+                {clickedGoodsDetail.tagList.length ? clickedGoodsDetail.tagList.join(' / ') : '-'}
+              </Descriptions.Item>
+              <Descriptions.Item label="extra">
+                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  {JSON.stringify(parseJsonString<Record<string, unknown>>(clickedGoodsDetail.extra) || clickedGoodsDetail.extra || {}, null, 2)}
+                </pre>
+              </Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Raw payload' : '原始回调内容'}>
+                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  {JSON.stringify(clickedGoodsDetail, null, 2)}
+                </pre>
+              </Descriptions.Item>
+            </Descriptions>
+          </Space>
+        ) : null}
+      </Modal>
+
+      <Modal
+        open={isOrderDetailModalOpen}
+        title={orderCallbackModalTitle}
+        footer={null}
+        onCancel={() => setIsOrderDetailModalOpen(false)}
+        width={760}
+        zIndex={callbackModalZIndex}
+        getContainer={document.body}
+      >
+        {clickedOrderDetail ? (
+          <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+            <Space align="start" size="middle" style={{ width: '100%' }}>
+              <Avatar shape="square" size={88} src={clickedOrderDetail.orderImage} />
+              <Space orientation="vertical" size={4} style={{ flex: 1 }}>
+                <Typography.Title level={4} style={{ margin: 0 }}>{clickedOrderDetail.orderTitle}</Typography.Title>
+                <Typography.Text type="secondary">{clickedOrderDetail.orderDescription || '-'}</Typography.Text>
+                <Space wrap>
+                  <Tag color="blue">uid: {clickedOrderDetail.orderUid}</Tag>
+                  <Tag color="gold">shopUid: {clickedOrderDetail.shopUid}</Tag>
+                  <Tag color="green">¥{clickedOrderDetail.totalAmount.toLocaleString()}</Tag>
+                  <Tag color="processing">{clickedOrderDetail.statusText}</Tag>
+                </Space>
+              </Space>
+            </Space>
+
+            <Descriptions bordered size="small" column={1}>
+              <Descriptions.Item label="type">{clickedOrderDetail.type || '-'}</Descriptions.Item>
+              <Descriptions.Item label="title">{clickedOrderDetail.title || '-'}</Descriptions.Item>
+              <Descriptions.Item label="description">{clickedOrderDetail.description || '-'}</Descriptions.Item>
+              <Descriptions.Item label="state">{clickedOrderDetail.state || '-'}</Descriptions.Item>
+              <Descriptions.Item label="status">{clickedOrderDetail.status || '-'}</Descriptions.Item>
+              <Descriptions.Item label="navigateToPath">{clickedOrderDetail.navigateToPath || '-'}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Order time' : '下单时间'}>{clickedOrderDetail.time || '-'}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Payment method' : '支付方式'}>{clickedOrderDetail.paymentMethod || '-'}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Visitor uid' : '访客uid'}>{clickedOrderDetail.visitorUid || '-'}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Order URL' : '订单链接'}>{clickedOrderDetail.orderUrl || '-'}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Goods title' : '商品标题'}>{clickedOrderDetail.orderTitle || '-'}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Goods description' : '商品描述'}>{clickedOrderDetail.orderDescription || '-'}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Goods price' : '商品价格'}>{clickedOrderDetail.orderPrice}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Goods quantity' : '商品数量'}>{clickedOrderDetail.orderQuantity}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Receiver' : '收货人'}>
+                {clickedOrderDetail.shippingAddress.name || '-'} / {clickedOrderDetail.shippingAddress.phone || '-'}
+              </Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Shipping address' : '收货地址'}>{clickedOrderDetail.shippingAddress.address || '-'}</Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Goods tags' : '商品标签'}>
+                {clickedOrderDetail.orderTagList.length ? clickedOrderDetail.orderTagList.join(' / ') : '-'}
+              </Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Order extra' : '订单扩展信息'}>
+                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  {JSON.stringify(parseJsonString<Record<string, unknown>>(clickedOrderDetail.extra) || clickedOrderDetail.extra || {}, null, 2)}
+                </pre>
+              </Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Goods extra' : '商品扩展信息'}>
+                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  {JSON.stringify(parseJsonString<Record<string, unknown>>(clickedOrderDetail.orderExtra) || clickedOrderDetail.orderExtra || {}, null, 2)}
+                </pre>
+              </Descriptions.Item>
+              <Descriptions.Item label={locale === 'en' ? 'Raw payload' : '原始回调内容'}>
+                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  {JSON.stringify(clickedOrderDetail, null, 2)}
+                </pre>
+              </Descriptions.Item>
+            </Descriptions>
+          </Space>
+        ) : null}
+      </Modal>
+
       <BytedeskReact {...config} />
+
+      <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
     </PageContainer>
   );
 };

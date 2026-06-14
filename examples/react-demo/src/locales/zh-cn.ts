@@ -14,7 +14,7 @@ const basicDemoFieldDocs = {
   autoPopup: '初始化完成后是否自动弹出聊天窗口。',
   autoPopupDelay: '自动弹出的延迟时间，单位毫秒。',
   draggable: '是否允许拖动入口模块。开启后用户可拖动按钮位置。',
-  tabsConfig: '控制聊天页内置 tab 的显隐，包括 home、messages、help、news。',
+  tabsConfig: '控制聊天页内置 tab 的显隐，包括 help、thread、messages。',
   bubbleConfig: '控制入口上方提示气泡，包括标题、副标题、多条轮播、切换方式等。',
   buttonConfig: '单入口按钮配置。只有一个入口时通常使用这个对象。',
   buttonsConfig: '多入口按钮数组。配置后优先级高于 buttonConfig，用于同时展示 chat、thread、webrtc、call、二维码等入口。',
@@ -80,6 +80,8 @@ const basicDemoFieldDocs = {
   'chat.draft': '灰度标识，会透传为 URL draft=1。',
   'chat.settingsUid': '设置唯一 ID，主要用于调试配置。',
   'chat.loadHistory': '是否加载历史消息。loadHistory=1 时打开对话页面默认加载历史聊天记录。',
+  'chat.threadDetail': '是否显示会话详情按钮。threadDetail=1 时显示，默认不显示。',
+  'chat.visitorProfile': '是否显示访客资料按钮。visitorProfile=1 时显示，默认不显示。',
   'chat.custom': '支持继续追加其他自定义业务字段，都会被拼入聊天 URL 参数。',
   'browse.referrer': '来源页面地址。',
   'browse.url': '当前页面 URL。',
@@ -107,10 +109,9 @@ const basicDemoFieldDocs = {
   'animation.type': '缓动类型，可选 ease、linear、ease-in、ease-out、ease-in-out。',
   'window.width': '桌面端聊天窗口宽度。',
   'window.height': '桌面端聊天窗口高度。',
-  'tabs.home': '是否显示首页 tab。',
   'tabs.messages': '是否显示消息 tab。',
+  'tabs.thread': '是否显示历史会话 tab。',
   'tabs.help': '是否显示帮助 tab。',
-  'tabs.news': '是否显示新闻 tab。',
 } as const;
 
 export const zhCn = {
@@ -179,6 +180,7 @@ export const zhCn = {
     vipLevelDemo: '👑 千人千面对接',
     unreadCountDemo: '🔔 未读消息数对接',
     threadHistoryDemo: '🧵 历史会话演示',
+    helpcenterDemo: '❔ 帮助中心演示',
     videoSupportDemo: '🎥 视频客服演示',
     webrtcDemo: '📹 音视频客服演示',
     callCenterDemo: '📞 电话客服演示',
@@ -204,6 +206,9 @@ export const zhCn = {
       navbarHidden: '是',
       navbarShown: '否',
       navbarParamPurpose: '是否隐藏顶部导航栏。navbar=0 时隐藏导航。',
+      qrCodeParamLabel: '显示二维码按钮',
+      threadDetailParamLabel: '显示会话详情按钮',
+      visitorProfileParamLabel: '显示访客资料按钮',
       loadHistoryLabel: '加载历史消息',
       loadHistoryEnabled: '是',
       loadHistoryDisabled: '否',
@@ -212,6 +217,25 @@ export const zhCn = {
       defaultTextColorLabel: '默认',
       currentConfigTitle: '当前配置',
       copyConfig: '复制配置 JSON',
+      urlParamsTitle: '参数说明',
+      urlParams: [
+        'org：组织 ID（必填）',
+        't：会话类型（0：一对一，1：工作组，2：机器人）',
+        'sid：会话目标 ID（客服 / 工作组 / 机器人）',
+        'visitorUid：传给独立页的自定义访客 ID（可选）',
+        'nickname / avatar：聊天页展示的访客信息（可选）',
+        'lang：独立页使用的语言参数',
+        'mode：主题模式（light / dark）',
+        'backgroundColor / textColor：悬浮入口主题颜色',
+        'navbar：是否隐藏顶部导航栏',
+        'qrcode：是否显示当前对话二维码按钮（1：显示，0：隐藏）',
+        'threadDetail：是否显示会话详情按钮（1：显示，默认不显示）',
+        'visitorProfile：是否显示访客资料按钮（1：显示，默认不显示）',
+        'loadHistory：是否加载历史会话消息',
+        'title：启用后传入自定义聊天标题',
+        'browse：传给页面的浏览上下文 JSON'
+      ],
+      manualEncodeHint: '手动拼接 URL 时，建议对 nickname、avatar、title 和 browse JSON 使用 encodeURIComponent 编码。',
       fieldDocs: basicDemoFieldDocs
     },
     userInfoDemo: {
@@ -254,11 +278,24 @@ export const zhCn = {
         'lang/mode：语言与主题参数（可选）'
       ],
       sampleUrlLabel: '当前配置生成的示例 URL',
+      parameterLabel: '参数',
+      currentValueLabel: '当前值',
+      purposeLabel: '说明',
+      requiredLabel: '必填',
+      optionalLabel: '可选',
+      manualEncodeHint: '手动拼接 URL 时，建议对 nickname、avatar、email、note、extra 使用 encodeURIComponent 编码。',
+      switchApiTitle: '切换用户后的接口调用（仅嵌入式集成）',
+      switchApiDescription: '以下说明仅适用于以嵌入式方式集成 bytedesk-web SDK 的场景。在你自己的应用中更新 chatConfig 时，当前传给 SDK 的访客参数会变化，但 SDK 仍会把访客身份缓存到 localStorage。切换用户后，建议再调用一次访客初始化接口，让 SDK 按最新 visitorUid 重新校验并刷新缓存身份。',
+      switchApiNotes: [
+        '实名用户切换：更新 visitorUid、nickname、avatar 后，调用 initVisitor()，让 SDK 用最新用户信息重新走一遍访客初始化接口。',
+        '匿名用户切换：先调用 resetAnonymousVisitor() 清掉已缓存的访客 UID，再调用 initVisitor() 重新初始化匿名访客。',
+        '如果你是通过 showChat(...)、新标签页或新窗口打开会话，建议在切换用户并完成上述调用后再打开，这样生成的 URL 和当前用户信息保持一致。'
+      ],
       apiHintPrefix: '调用代码：',
       users: {
-        user1: '访客小明',
-        user2: '访客小红',
-        user3: '访客小李'
+        user1: '用户小明',
+        user2: '用户小红',
+        user3: '用户小美'
       }
     },
     goodsInfoDemo: {
@@ -546,6 +583,107 @@ export const zhCn = {
         openHistoryPage: '打开历史会话页面',
         switchAnonymousUser: '切换到匿名用户'
       },
+      apiGuide: {
+        title: 'ThreadList 接口直调说明（不依赖组件）',
+        endpointLabel: '接口 URL',
+        fullUrlPage1Label: '完整请求 URL（第 1 页）',
+        fullUrlPage2Label: '完整请求 URL（第 2 页）',
+        queryParamsTitle: '请求参数（Query）',
+        pagingMappingTitle: '分页与调用行为',
+        curlExampleTitle: 'curl 示例',
+        fetchExampleTitle: 'fetch 示例',
+        anonymousHint: '匿名模式下如果已经持有稳定 visitorUid，直接只传 visitorUid 就可以查询全部历史会话；如果连 visitorUid 都没有，仍需先完成 initVisitor 拿到 uid/visitorUid。',
+        queryParams: [
+          'visitorUid: string（推荐传，访客业务 uid；单独传即可拉取该访客全部历史会话）',
+          'orgUid: string（可选，仅当你想限制在某个组织内查询时再传）',
+          'pageNumber: number（必填，后端从 0 开始；前端第 1 页传 0）',
+          'pageSize: number（必填，示例默认 10）',
+          'searchText: string（可选，按关键词筛选会话）'
+        ],
+        pagingMapping: [
+          'UI current=1 -> pageNumber=0',
+          'UI current=2 -> pageNumber=1',
+          '默认 requestKey 可理解为 visitorUid|pageNumber|pageSize|searchText；如果显式传了 orgUid，也会一起参与区分',
+          '只要 visitorUid 稳定可复用，ThreadList 可只传 visitorUid；如果同时持有 uid，也可以一并传入兼容历史数据',
+          '命中 403 时前端会对相同请求做 30s 冷却（FORBIDDEN_COOLDOWN_MS）'
+        ]
+      },
+      responseGuide: {
+        title: '返回结果结构说明',
+        topLevelTitle: '顶层结构',
+        dataFieldsTitle: 'data 分页字段',
+        threadItemFieldsTitle: 'data.content[] 单条会话（Thread）字段',
+        topLevelFields: [
+          'message: string — 响应描述，如 "查询成功"',
+          'code: number — HTTP 状态码，200 表示成功',
+          'data: object — 分页数据对象（见下方字段说明）'
+        ],
+        dataFields: [
+          'content: Thread[] — 会话列表，见下方单条会话字段说明',
+          'total / totalElements: number — 总记录数',
+          'totalPages: number — 总页数',
+          'first: boolean — 是否第一页',
+          'last: boolean — 是否最后一页',
+          'numberOfElements: number — 当前页实际条数',
+          'size: number — 每页大小（对应请求参数 pageSize）',
+          'number: number — 当前页号（从 0 开始，对应请求参数 pageNumber）',
+          'empty: boolean — 当前页是否为空'
+        ],
+        threadItemFields: [
+          'uid: string — 会话唯一 ID',
+          'userUid: string — 接待客服（坐席）的 uid',
+          'orgUid: string — 组织 uid',
+          'level: string — 层级，ORGANIZATION 表示组织级',
+          'platform: string — 平台标识，固定为 BYTEDESK',
+          'createdAt: string — 会话创建时间，格式 yyyy-MM-dd HH:mm:ss',
+          'updatedAt: string — 会话最后更新时间',
+          'topic: string — 会话 topic，格式：org/agent/{agentUid}/{visitorEntityUid}',
+          'content: string — 最后一条消息的原始内容（i18n key 或文本）',
+          'contentObject.msgType: string — 消息类型枚举，如 TEXT / AGENT_CLOSED / AUTO_CLOSED / INVITE_AUDIO_CANCEL 等',
+          'contentObject.preview: string — 用于列表展示的预览文本',
+          'contentObject.payload: string — 消息实际内容（文本或 JSON 字符串）',
+          'contentObject.displayText: string — 最终展示文本',
+          'type: string — 会话类型：AGENT=人工客服，ROBOT=机器人，WORKGROUP=工作组',
+          'status: string — 会话状态：OPEN=进行中，CLOSED=已关闭',
+          'transferStatus: string — 转接状态：NONE=未转接',
+          'closeType: string — 关闭方式：AGENT=客服手动关闭，AUTO=超时自动关闭，VISITOR=访客关闭',
+          'channel: string — 渠道来源，WEB_VISITOR=Web 访客',
+          'top: boolean — 是否置顶',
+          'unread: boolean — 客服侧是否有未读消息',
+          'unreadCount: number — 客服侧未读消息数',
+          'visitorUnreadCount: number — 访客侧未读消息数',
+          'mute: boolean — 是否静音',
+          'hide: boolean — 是否隐藏',
+          'star: number — 星标等级（0=未标记）',
+          'fold: boolean — 是否折叠',
+          'offline: boolean — 是否离线消息',
+          'tagList: string[] — 标签列表',
+          'note: string | null — 会话备注',
+          'extra: string — JSON 字符串，包含会话扩展配置（autoCloseMin / toolbar / requireLogin 等）',
+          'valid: boolean — 是否有效会话：访客有实际回复时为 true，仅系统消息时为 false',
+          'allMessageCount: number — 会话总消息数（访客 + 客服 + 系统 + 机器人）',
+          'visitorMessageCount: number — 访客发送消息数',
+          'agentMessageCount: number — 客服发送消息数',
+          'systemMessageCount: number — 系统消息数',
+          'robotMessageCount: number — 机器人消息数',
+          'robotToAgent: boolean — 是否从机器人转人工',
+          'queueMeta: object | null — 排队元信息，未排队时为 null',
+          'user: object — 访客信息（uid / nickname / avatar / type / extra）',
+          'owner: object — 会话拥有者信息（通常为管理员）',
+          'agent: string — 客服信息 JSON 字符串（uid / nickname / avatar / type）',
+          'robot: string — 机器人信息 JSON 字符串，无机器人时为 "{}"',
+          'workgroup: string — 工作组信息 JSON 字符串，无工作组时为 "{}"',
+          'agentProtobuf: object — 客服结构化信息对象',
+          'workgroupProtobuf: object — 工作组结构化信息对象',
+          'robotProtobuf: object — 机器人结构化信息对象',
+          'transfer: object | null — 转接信息，未发生转接时为 null',
+          'invites: object[] — 邀请相关用户列表',
+          'monitors: object[] — 监控相关用户列表',
+          'assistants: object[] — 协助相关用户列表',
+          'ticketors: object[] — 工单相关用户列表',
+          'processInstanceId / processEntityUid: string | null — 工单流程相关 ID，不涉及工单时为 null'
+        ]
+      },
       urlGuideTitle: 'URL + 参数调用说明',
       urlTemplateLabel: '通用 URL 模板',
       urlParamsTitle: '参数说明（与 /chat 一致）',
@@ -555,7 +693,8 @@ export const zhCn = {
         'sid：会话目标 ID（工作组/机器人/客服）',
         'visitorUid：自定义访客 ID（推荐）',
         'nickname/avatar：访客展示信息（可选）',
-        'lang/mode：语言与主题参数（可选）'
+        'lang/mode：语言与主题参数（可选）',
+        'threadDetail：打开历史会话后是否显示会话详情按钮（1：显示，默认隐藏）'
       ],
       sampleUrlLabel: '当前配置生成的示例 URL',
       docLinks: {
@@ -589,6 +728,27 @@ export const zhCn = {
         reactDoc: '查看 React 集成文档',
         vueDoc: '查看 Vue 集成文档',
         reactExample: 'React 视频客服演示源码'
+      }
+    },
+    helpcenterDemo: {
+      title: '帮助中心 Tab 演示',
+      description: '通过 tabsConfig 控制嵌入式客服窗口底部多个 tab 的显示与隐藏，用于在同一个小窗中切换对话窗口、历史会话窗口和帮助文档窗口。',
+      controlsTitle: 'Tab 开关',
+      previewTitle: '嵌入式窗口效果',
+      codeTitle: '配置示例',
+      currentChatProfile: '当前咨询参数',
+      openChatButton: '打开多 Tab 客服窗口',
+      openHelpcenterButton: '单独打开帮助中心',
+      helpHiddenText: 'help tab 已关闭',
+      windowHint: '点击按钮后查看右下角嵌入式窗口，底部会显示已开启的 tab。help 打开帮助文档窗口，thread 打开历史会话窗口，messages 打开对话窗口。',
+      embeddedWindowDescription: '本页不直接渲染 visitor 的 Helpcenter 页面，只演示 BytedeskConfig.tabsConfig 如何影响嵌入式窗口底部 tab。',
+      enabledTabsTitle: '当前将显示的底部 tab',
+      bubbleTitle: '查看多 Tab 窗口',
+      bubbleSubtitle: '打开客服窗口体验 help、thread、messages tab',
+      tabs: {
+        messages: '消息 tab',
+        thread: '历史会话 tab',
+        help: '帮助 tab',
       }
     },
     callCenterDemo: {
@@ -652,6 +812,39 @@ export const zhCn = {
           completeSession: '服务完成，本次会话已结束。'
         }
       }
+    },
+    proactiveDemo: {
+      title: '主动获客演示',
+      description: '这个页面接入默认工作流，点击按钮后会直接进入学历筛查、诉求确认与联系方式采集流程。',
+      tags: {
+        mobileValidation: '手机号校验',
+        multiTurnQa: '多轮问答'
+      },
+      alertTitle: '验证路径',
+      alertDescription: '进入对话后会依次收集学历、诉求，再要求填写城市、咨询场景、手机号。手机号不符合 11 位大陆手机号格式时，表单不会提交。每次打开都会强制新建工作流会话。',
+      workflowCardTitle: '默认主动获客工作流',
+      workflowCardTag: '学历筛查 + 诉求确认 + 联系方式采集',
+      bubbleTitle: '主动获客',
+      bubbleSubtitle: '默认工作流留资演示',
+      buttons: {
+        openWorkflowChat: '打开默认工作流对话',
+        closeChat: '关闭会话窗口'
+      },
+      urlParamsTitle: '工作流参数说明',
+      urlDescription: '当前独立窗口完整 URL 会跟随 locale、主题模式和访客身份参数变化；forceNewThread 用于 SDK 打开会话时强制新建 workflow 线程，因此保留在下方嵌入代码中展示。',
+      urlParams: [
+        'org: 组织唯一标识，指定工作流所属组织',
+        't: 会话类型，17 表示 workflow 工作流会话',
+        'sid: 工作流唯一标识，决定进入哪条默认工作流',
+        'lang: 会话语言，跟随当前示例页 locale',
+        'mode: 主题模式，跟随当前浅色或深色配置',
+        'navbar: 顶部导航显示开关，1 表示显示',
+        'visitorUid: 访客唯一标识，实名模式下用于绑定历史访客',
+        'nickname: 访客昵称，实名模式下透传到会话页',
+        'avatar: 访客头像地址，实名模式下用于展示头像'
+      ],
+      embedCodeTitle: '当前嵌入代码',
+      embedCodeDescription: '当前嵌入代码与本页实际接入配置一致，复制后可直接作为固定 workflow 留资入口使用。'
     },
     webrtcDemo: {
       title: '音视频客服演示',
@@ -1088,10 +1281,9 @@ export const zhCn = {
     onClick: () => console.log('按钮被点击'),
   },
   tabsConfig: {
-    home: true,
-    messages: true,
     help: true,
-    news: false,
+    thread: true,
+    messages: true,
   },
   theme: {
     mode: 'light',

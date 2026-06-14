@@ -8,30 +8,26 @@ import { useEffect, useMemo, useState } from 'react';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
-import type { ButtonConfig, BytedeskConfig, Theme } from '@bytedesk/web/types';
+import type { BytedeskConfig, Theme } from '@bytedesk/web/types';
 import type { MenuProps } from 'antd';
-import InstallGuide from '../components/InstallGuide';
 import PageContainer from '../components/PageContainer';
 import { getLocaleMessages, type DemoLanguage } from '../locales';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
+import type { DemoUserProfile } from '../types/demo-user';
 import { Card, FloatButton, Space, Table, Tag, Typography, theme } from 'antd';
-import BasicDemoConfigDocsCard from './basic-demo/BasicDemoConfigDocsCard';
 import BasicDemoControlsCard from './basic-demo/BasicDemoControlsCard';
-import { buildConfigDocSections } from './basic-demo/config-docs';
 import {
-  getConfigGuideCopy,
-  getExampleCopy,
+  type BubbleSwitchMode,
+  // getExampleCopy,
   getLocaleValueHint,
   getLocalizedCopy,
 } from './basic-demo/copy';
 import {
-  buildFullConfigExample,
-  buildMinimalConfigExample,
-  buildRecommendedConfigExample,
+  buildRuntimeEmbedCodeExample,
 } from './basic-demo/examples';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
+import { buildUrlParamRowsWithEncodeHint } from '../utils/url-param-guide';
 import {
-  LANG_EN,
   TEXT_COLORS,
   THEME_COLORS,
   type EntryAction,
@@ -42,6 +38,8 @@ interface BasicDemoProps {
   themeMode: Theme['mode'];
   themePreference: 'light' | 'dark' | 'system';
   selectedChatProfile: DemoChatProfile;
+  selectedUser: DemoUserProfile;
+  isAnonymousMode: boolean;
   onLocaleChange: (nextLocale: DemoLanguage) => void;
   onThemePreferenceChange: (nextTheme: 'light' | 'dark' | 'system') => void;
 }
@@ -62,8 +60,32 @@ type BytedeskRuntimeApi = {
   hideInviteDialog?: () => void;
 };
 
+type EntryButtonIconKey = 'default' | 'message' | 'robot' | 'headset' | 'sparkles' | 'bell';
+
+const ENTRY_BUTTON_ICON_MAP: Record<EntryButtonIconKey, string> = {
+  default: '',
+  message: '💬',
+  robot: '🤖',
+  headset: '🎧',
+  sparkles: '✨',
+  bell: '🛎️'
+};
+
+const ENTRY_BUTTON_ICON_OPTIONS: Array<{ key: EntryButtonIconKey; icon: string }> = [
+  { key: 'default', icon: '' },
+  { key: 'message', icon: ENTRY_BUTTON_ICON_MAP.message },
+  { key: 'robot', icon: ENTRY_BUTTON_ICON_MAP.robot },
+  { key: 'headset', icon: ENTRY_BUTTON_ICON_MAP.headset },
+  { key: 'sparkles', icon: ENTRY_BUTTON_ICON_MAP.sparkles },
+  { key: 'bell', icon: ENTRY_BUTTON_ICON_MAP.bell }
+];
+
 const getBytedeskRuntime = (): BytedeskRuntimeApi | null => {
   return ((window as any).bytedesk || null) as BytedeskRuntimeApi | null;
+};
+
+const buildEntryButtonIconConfig = (icon: string | null) => {
+  return icon ? { icon } : {};
 };
 
 const getReadableTextColor = (backgroundColor: string): string => {
@@ -84,11 +106,19 @@ const getReadableTextColor = (backgroundColor: string): string => {
   return brightness >= 186 ? '#111111' : '#ffffff';
 };
 
+type BubbleSwitchModeSelection = BubbleSwitchMode | 'default';
+
+const DEFAULT_BUBBLE_SWITCH_MODE: BubbleSwitchModeSelection = 'default';
+const DEFAULT_BUBBLE_ROTATE_INTERVAL = 3000;
+const DEFAULT_ENTRY_BUTTON_TEXT = '在线客服';
+
 const BasicDemo = ({
   locale,
   themeMode,
   themePreference,
   selectedChatProfile,
+  selectedUser,
+  isAnonymousMode,
   onLocaleChange,
   onThemePreferenceChange
 }: BasicDemoProps) => {
@@ -99,17 +129,42 @@ const BasicDemo = ({
   const callHtmlBaseUrl = getDemoHtmlBaseUrl(9022);
   const [lastActionApiHint, setLastActionApiHint] = useState<string>('');
   const [selectedEntryActions, setSelectedEntryActions] = useState<EntryAction[]>(['chat']);
+  const [selectedEntryButtonIconKey, setSelectedEntryButtonIconKey] = useState<EntryButtonIconKey>('default');
+  const [isEntryButtonTextEnabled, setIsEntryButtonTextEnabled] = useState<boolean>(true);
+  const [entryButtonTextOverride, setEntryButtonTextOverride] = useState<string>(DEFAULT_ENTRY_BUTTON_TEXT);
   const [areEntryButtonsVisible, setAreEntryButtonsVisible] = useState<boolean>(true);
   const [qrCodeImageUrl, setQrCodeImageUrl] = useState<string>('https://www.weiyuai.cn/assets/images/qrcode/wechat.png');
   const [isInviteDialogVisible, setIsInviteDialogVisible] = useState<boolean>(false);
   const [isCustomTitleEnabled, setIsCustomTitleEnabled] = useState<boolean>(false);
   const [isBrowseInfoEnabled, setIsBrowseInfoEnabled] = useState<boolean>(false);
+  const [isQrCodeParamEnabled, setIsQrCodeParamEnabled] = useState<boolean>(true);
+  const [isThreadDetailParamEnabled, setIsThreadDetailParamEnabled] = useState<boolean>(false);
+  const [isVisitorProfileParamEnabled, setIsVisitorProfileParamEnabled] = useState<boolean>(false);
+  const [selectedBubbleSwitchMode, setSelectedBubbleSwitchMode] = useState<BubbleSwitchModeSelection>(DEFAULT_BUBBLE_SWITCH_MODE);
 
   const localeValueHint = getLocaleValueHint(locale);
   const localizedCopy = useMemo(
-    () => getLocalizedCopy(locale, false, 'fade'),
-    [locale]
+    () => getLocalizedCopy(locale, true, selectedBubbleSwitchMode === 'default' ? 'fade' : selectedBubbleSwitchMode),
+    [locale, selectedBubbleSwitchMode]
   );
+  const bubbleMessages = useMemo(() => ([
+    {
+      icon: '🤖',
+      title: localizedCopy.bubbleAgentTitle,
+      subtitle: localizedCopy.bubbleAgentSubtitle,
+    },
+    {
+      icon: '📹',
+      title: localizedCopy.bubbleWebrtcTitle,
+      subtitle: localizedCopy.bubbleWebrtcSubtitle,
+    },
+  ]), [localizedCopy]);
+  const selectedEntryButtonIcon = selectedEntryButtonIconKey === 'default'
+    ? null
+    : ENTRY_BUTTON_ICON_MAP[selectedEntryButtonIconKey];
+  const selectedEntryButtonIconLabel = selectedEntryButtonIconKey === 'default'
+    ? localizedCopy.entryDefaultIconLabel
+    : ENTRY_BUTTON_ICON_MAP[selectedEntryButtonIconKey];
 
   const entryActionOptions = useMemo(
     () => ([
@@ -122,13 +177,31 @@ const BasicDemo = ({
     [localizedCopy]
   );
 
+  const entryIconMenuItems: MenuProps['items'] = useMemo(
+    () => ENTRY_BUTTON_ICON_OPTIONS.map((item) => ({
+      key: item.key,
+      label: item.key === 'default' ? localizedCopy.entryDefaultIconLabel : item.icon,
+    })),
+    [localizedCopy.entryDefaultIconLabel]
+  );
+
+  const effectiveEntryButtonText = entryButtonTextOverride.trim() || DEFAULT_ENTRY_BUTTON_TEXT;
+
+  const getEntryButtonLabel = (_action: EntryAction): string | undefined => {
+    // console.log('getEntryButtonLabel', { action, isEntryButtonTextEnabled, effectiveEntryButtonText });
+    if (!isEntryButtonTextEnabled) {
+      return undefined;
+    }
+
+    return effectiveEntryButtonText;
+  };
+
   const multiSessionButtons = useMemo<NonNullable<BytedeskConfig['buttonsConfig']>>(() => {
-    const shouldShowEntryText = selectedEntryActions.length > 1;
     const allButtons: Record<EntryAction, NonNullable<BytedeskConfig['buttonsConfig']>[number]> = {
       chat: {
         show: areEntryButtonsVisible,
-        icon: '💬',
-        text: shouldShowEntryText ? localizedCopy.entryChatLabel : undefined,
+        ...buildEntryButtonIconConfig(selectedEntryButtonIcon),
+        text: getEntryButtonLabel('chat'),
         action: 'chat',
         width: 54,
         height: 54,
@@ -136,8 +209,8 @@ const BasicDemo = ({
       },
       thread: {
         show: areEntryButtonsVisible,
-        icon: '🧵',
-        text: shouldShowEntryText ? localizedCopy.entryThreadLabel : undefined,
+        ...buildEntryButtonIconConfig(selectedEntryButtonIcon),
+        text: getEntryButtonLabel('thread'),
         action: 'thread',
         width: 54,
         height: 54,
@@ -145,8 +218,8 @@ const BasicDemo = ({
       },
       webrtc: {
         show: areEntryButtonsVisible,
-        icon: '📹',
-        text: shouldShowEntryText ? localizedCopy.entryWebrtcLabel : undefined,
+        ...buildEntryButtonIconConfig(selectedEntryButtonIcon),
+        text: getEntryButtonLabel('webrtc'),
         action: 'webrtc',
         width: 54,
         height: 54,
@@ -154,8 +227,8 @@ const BasicDemo = ({
       },
       call: {
         show: areEntryButtonsVisible,
-        icon: '📞',
-        text: shouldShowEntryText ? localizedCopy.entryCallLabel : undefined,
+        ...buildEntryButtonIconConfig(selectedEntryButtonIcon),
+        text: getEntryButtonLabel('call'),
         action: 'call',
         width: 54,
         height: 54,
@@ -163,8 +236,8 @@ const BasicDemo = ({
       },
       qrcode: {
         show: areEntryButtonsVisible,
-        icon: '🧾',
-        text: shouldShowEntryText ? localizedCopy.entryQrLabel : undefined,
+        ...buildEntryButtonIconConfig(selectedEntryButtonIcon),
+        text: getEntryButtonLabel('qrcode'),
         width: 54,
         height: 54,
         previewImageUrl: qrCodeImageUrl,
@@ -174,7 +247,7 @@ const BasicDemo = ({
     };
 
     return selectedEntryActions.map((action) => allButtons[action]);
-  }, [areEntryButtonsVisible, callHtmlBaseUrl, chatHtmlBaseUrl, localizedCopy, qrCodeImageUrl, selectedEntryActions, webrtcHtmlBaseUrl]);
+  }, [areEntryButtonsVisible, callHtmlBaseUrl, chatHtmlBaseUrl, effectiveEntryButtonText, isEntryButtonTextEnabled, localizedCopy.entryQrLabel, qrCodeImageUrl, selectedEntryActions, selectedEntryButtonIcon, webrtcHtmlBaseUrl]);
 
   const [config, setConfig] = useState<BytedeskConfig>(() => ({
     isDebug: false,
@@ -200,7 +273,9 @@ const BasicDemo = ({
       show: true,
       icon: '👋',
       title: messages.pages.basicDemo.bubbleTitle,
-      subtitle: messages.pages.basicDemo.bubbleSubtitle
+      subtitle: messages.pages.basicDemo.bubbleSubtitle,
+      messages: bubbleMessages,
+      autoRotate: false,
     },
     buttonConfig: {
       show: true,
@@ -209,13 +284,13 @@ const BasicDemo = ({
     },
     buttonsConfig: multiSessionButtons,
     chatConfig: {
-      title: messages.pages.basicDemo.title,
+      qrcode: '1',
       ...selectedChatProfile.chatConfig
     },
     browseConfig: {
-      referer: document.referrer,
-      url: window.location.href,
-      title: document.title,
+      referer: '',
+      url: '',
+      title: '',
     },
     theme: {
       mode: themeMode || 'light',
@@ -238,17 +313,39 @@ const BasicDemo = ({
       },
       bubbleConfig: {
         ...prevConfig.bubbleConfig,
+        messages: bubbleMessages,
+        autoRotate: selectedBubbleSwitchMode === 'default' ? false : true,
+        rotateInterval: selectedBubbleSwitchMode === 'default'
+          ? prevConfig.bubbleConfig?.rotateInterval
+          : (prevConfig.bubbleConfig?.rotateInterval ?? DEFAULT_BUBBLE_ROTATE_INTERVAL),
+        switchMode: selectedBubbleSwitchMode === 'default'
+          ? undefined
+          : (prevConfig.bubbleConfig?.switchMode || selectedBubbleSwitchMode),
         title: messages.pages.basicDemo.bubbleTitle,
         subtitle: messages.pages.basicDemo.bubbleSubtitle
       },
       chatConfig: {
         ...(prevConfig.chatConfig || {}),
-        title: messages.pages.basicDemo.title,
-        ...selectedChatProfile.chatConfig
+        ...selectedChatProfile.chatConfig,
+        ...(isCustomTitleEnabled ? { title: messages.pages.basicDemo.title } : { title: undefined }),
+        qrcode: isQrCodeParamEnabled ? '1' : '0',
+        threadDetail: isThreadDetailParamEnabled ? '1' : '0',
+        visitorProfile: isVisitorProfileParamEnabled ? '1' : '0'
       },
+      browseConfig: isBrowseInfoEnabled
+        ? {
+          referer: document.referrer,
+          url: window.location.href,
+          title: document.title,
+        }
+        : {
+          referer: '',
+          url: '',
+          title: '',
+        },
       buttonsConfig: multiSessionButtons
     }));
-  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile]);
+  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile, isQrCodeParamEnabled, isThreadDetailParamEnabled, isVisitorProfileParamEnabled, isCustomTitleEnabled, isBrowseInfoEnabled, bubbleMessages, selectedBubbleSwitchMode]);
 
   const handleInit = () => {
     console.log('BytedeskReact initialized BasicDemo');
@@ -319,9 +416,61 @@ const BasicDemo = ({
     setLastActionApiHint('setConfig({ chatConfig: { navbar: "0" | undefined } })');  
   };
 
+  const handleToggleQrCodeParam = () => {
+    setIsQrCodeParamEnabled((prevEnabled) => {
+      const nextEnabled = !prevEnabled;
+      setConfig((prevConfig: BytedeskConfig) => ({
+        ...prevConfig,
+        chatConfig: {
+          ...(prevConfig.chatConfig || selectedChatProfile.chatConfig),
+          qrcode: nextEnabled ? '1' : '0'
+        }
+      }));
+      setLastActionApiHint(`setConfig({ chatConfig: { qrcode: "${nextEnabled ? '1' : '0'}" } })`);
+      return nextEnabled;
+    });
+  };
+
+  const handleToggleThreadDetailParam = () => {
+    setIsThreadDetailParamEnabled((prevEnabled) => {
+      const nextEnabled = !prevEnabled;
+      setConfig((prevConfig: BytedeskConfig) => ({
+        ...prevConfig,
+        chatConfig: {
+          ...(prevConfig.chatConfig || selectedChatProfile.chatConfig),
+          threadDetail: nextEnabled ? '1' : '0'
+        }
+      }));
+      setLastActionApiHint(`setConfig({ chatConfig: { threadDetail: "${nextEnabled ? '1' : '0'}" } })`);
+      return nextEnabled;
+    });
+  };
+
+  const handleToggleVisitorProfileParam = () => {
+    setIsVisitorProfileParamEnabled((prevEnabled) => {
+      const nextEnabled = !prevEnabled;
+      setConfig((prevConfig: BytedeskConfig) => ({
+        ...prevConfig,
+        chatConfig: {
+          ...(prevConfig.chatConfig || selectedChatProfile.chatConfig),
+          visitorProfile: nextEnabled ? '1' : '0'
+        }
+      }));
+      setLastActionApiHint(`setConfig({ chatConfig: { visitorProfile: "${nextEnabled ? '1' : '0'}" } })`);
+      return nextEnabled;
+    });
+  };
+
   const handleToggleCustomTitle = () => {
     setIsCustomTitleEnabled((prev) => {
       const next = !prev;
+      setConfig((prevConfig: BytedeskConfig) => ({
+        ...prevConfig,
+        chatConfig: {
+          ...(prevConfig.chatConfig || selectedChatProfile.chatConfig),
+          title: next ? messages.pages.basicDemo.title : undefined,
+        },
+      }));
       setLastActionApiHint(`chatUrl${next ? ' + title' : ' - title'}`);
       return next;
     });
@@ -330,12 +479,24 @@ const BasicDemo = ({
   const handleToggleBrowseInfo = () => {
     setIsBrowseInfoEnabled((prev) => {
       const next = !prev;
+      setConfig((prevConfig: BytedeskConfig) => ({
+        ...prevConfig,
+        browseConfig: next
+          ? {
+            referer: document.referrer,
+            url: window.location.href,
+            title: document.title,
+          }
+          : {
+            referer: '',
+            url: '',
+            title: '',
+          },
+      }));
       setLastActionApiHint(`chatUrl${next ? ' + browse' : ' - browse'}`);
       return next;
     });
   };
-
-  const configGuideCopy = getConfigGuideCopy(locale);
 
   const handleLocaleSwitch = (nextLocale: DemoLanguage) => {
     onLocaleChange(nextLocale);
@@ -353,11 +514,67 @@ const BasicDemo = ({
     setLastActionApiHint(`bytedesk.setTheme({ mode: "${runtimeMode}" })`);
   };
 
+  const handleBubbleSwitchModeChange = (nextMode: BubbleSwitchModeSelection) => {
+    setSelectedBubbleSwitchMode(nextMode);
+    getBytedeskRuntime()?.setConfig?.({
+      bubbleConfig: {
+        messages: bubbleMessages,
+        autoRotate: nextMode === 'default' ? false : true,
+        rotateInterval: nextMode === 'default' ? undefined : DEFAULT_BUBBLE_ROTATE_INTERVAL,
+        switchMode: nextMode === 'default' ? undefined : nextMode,
+      },
+    });
+    setConfig((prevConfig: BytedeskConfig) => ({
+      ...prevConfig,
+      bubbleConfig: {
+        ...(prevConfig.bubbleConfig || {}),
+        messages: bubbleMessages,
+        autoRotate: nextMode === 'default' ? false : true,
+        rotateInterval: nextMode === 'default' ? undefined : DEFAULT_BUBBLE_ROTATE_INTERVAL,
+        switchMode: nextMode === 'default' ? undefined : nextMode,
+      },
+    }));
+    setLastActionApiHint(
+      nextMode === 'default'
+        ? 'setConfig({ bubbleConfig: { autoRotate: false } })'
+        : `setConfig({ bubbleConfig: { switchMode: "${nextMode}" } })`
+    );
+  };
+
   const handleEntryActionsChange = (nextSelectedKeys: string[]) => {
     const nextActions = nextSelectedKeys as EntryAction[];
     const safeActions: EntryAction[] = nextActions.length > 0 ? nextActions : ['chat'];
     setSelectedEntryActions(safeActions);
     setLastActionApiHint(`setConfig({ buttonsConfig: [${safeActions.map((action) => `"${action}"`).join(', ')}] })`);
+  };
+
+  const handleEntryButtonIconSwitch = ({ key }: { key: string }) => {
+    const nextIconKey = String(key) as EntryButtonIconKey;
+    const nextIcon = ENTRY_BUTTON_ICON_MAP[nextIconKey];
+    setSelectedEntryButtonIconKey(nextIconKey);
+    setLastActionApiHint(
+      nextIconKey === 'default'
+        ? 'setConfig({ buttonsConfig: [{ /* omit icon to use BytedeskWeb default icon */ }] })'
+        : `setConfig({ buttonsConfig: [{ icon: "${nextIcon}" }] })`
+    );
+  };
+
+  const handleToggleEntryButtonText = () => {
+    setIsEntryButtonTextEnabled((prevEnabled) => {
+      const nextEnabled = !prevEnabled;
+      setLastActionApiHint(
+        nextEnabled
+          ? `setConfig({ buttonsConfig: [{ text: "${effectiveEntryButtonText}" }] })`
+          : 'setConfig({ buttonsConfig: [{ text: undefined }] })'
+      );
+      return nextEnabled;
+    });
+  };
+
+  const handleEntryButtonTextChange = (nextText: string) => {
+    setEntryButtonTextOverride(nextText);
+    const nextDisplayText = nextText.trim() || DEFAULT_ENTRY_BUTTON_TEXT;
+    setLastActionApiHint(`setConfig({ buttonsConfig: [{ text: "${nextDisplayText}" }] })`);
   };
 
   const handleQrCodeImageUrlChange = (nextUrl: string) => {
@@ -438,11 +655,23 @@ const BasicDemo = ({
     params.append('mode', String(config.theme?.mode || themeMode || 'light'));
     params.append('backgroundColor', String(config.theme?.backgroundColor || THEME_COLORS[0]));
     params.append('textColor', String(config.theme?.textColor || getReadableTextColor(config.theme?.backgroundColor || THEME_COLORS[0])));
+    if (!isAnonymousMode) {
+      params.append('visitorUid', selectedUser.visitorUid);
+      params.append('nickname', selectedUser.nickname);
+      params.append('avatar', selectedUser.avatar);
+    }
     if (currentNavbar === '0') {
       params.append('navbar', '0');
     }
+    params.append('qrcode', isQrCodeParamEnabled ? '1' : '0');
     if (currentLoadHistory) {
-      params.append('loadHistory', '1');
+      params.append('history', '1');
+    }
+    if (isThreadDetailParamEnabled) {
+      params.append('threadDetail', '1');
+    }
+    if (isVisitorProfileParamEnabled) {
+      params.append('visitorProfile', '1');
     }
     if (isCustomTitleEnabled && currentChatConfig.title) {
       params.append('title', String(currentChatConfig.title));
@@ -542,10 +771,8 @@ const BasicDemo = ({
   const navbarHidden = config.chatConfig?.navbar === '0';
   const loadHistoryEnabled = Boolean(config.chatConfig?.loadHistory);
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
-  const rawPopupUrlParams = useMemo(() => Array.from(new URL(chatPageUrl).searchParams.entries()), [chatPageUrl]);
-  const requiredPopupParams = useMemo(() => new Set(['org', 't', 'sid']), []);
-  const requiredLabel = locale === LANG_EN ? 'Required' : '必填';
-  const optionalLabel = locale === LANG_EN ? 'Optional' : '可选';
+  const basicDemoMessages = messages.pages.basicDemo;
+  const requiredUrlParams = useMemo(() => new Set(['org', 't', 'sid']), []);
   const codeBlockStyle = useMemo(() => ({
     margin: 0,
     padding: '12px 14px',
@@ -558,91 +785,28 @@ const BasicDemo = ({
     whiteSpace: 'pre-wrap' as const,
     wordBreak: 'break-all' as const
   }), [token.colorBorder, token.colorBorderSecondary, token.colorFillQuaternary]);
-
-  const selectedChatConfigRecord = useMemo(
-    () => selectedChatProfile.chatConfig as unknown as Record<string, string | number | boolean | undefined>,
-    [selectedChatProfile.chatConfig]
+  const currentUrlParams = useMemo(
+    () => new URL(chatPageUrl).searchParams,
+    [chatPageUrl]
+  );
+  const urlParamRows = useMemo(
+    () => buildUrlParamRowsWithEncodeHint(
+      basicDemoMessages.urlParams,
+      currentUrlParams,
+      locale,
+      ['nickname', 'avatar', 'title', 'browse']
+    ),
+    [basicDemoMessages.urlParams, currentUrlParams, locale]
   );
 
-  const exampleCopy = getExampleCopy(locale);
+  // const exampleCopy = getExampleCopy(locale);
 
-  const fullConfigExample = useMemo(() => buildFullConfigExample({
+  const runtimeEmbedCodeExample = useMemo(() => buildRuntimeEmbedCodeExample({
     config,
-    exampleCopy,
-    locale,
-    qrCodeImageUrl,
-    selectedChatConfigRecord,
-    selectedChatProfile,
-    selectedEntryActions,
+    isAnonymousMode,
+    selectedUser,
     themeMode,
-  }), [config, exampleCopy, locale, qrCodeImageUrl, selectedChatConfigRecord, selectedChatProfile, selectedEntryActions, themeMode]);
-
-  const minimalConfigExample = useMemo(() => buildMinimalConfigExample({
-    htmlUrl: config.htmlUrl,
-    chatHtmlBaseUrl,
-    selectedChatProfile,
-  }), [config.htmlUrl, chatHtmlBaseUrl, selectedChatProfile]);
-
-  const recommendedConfigExample = useMemo(() => buildRecommendedConfigExample({
-    config,
-    exampleCopy,
-    bubbleSwitchMode: 'fade',
-    locale,
-    themeMode,
-    selectedChatProfile,
-    bubbleTitle: messages.pages.basicDemo.bubbleTitle,
-    bubbleSubtitle: messages.pages.basicDemo.bubbleSubtitle,
-  }), [config, exampleCopy, locale, themeMode, selectedChatProfile, messages.pages.basicDemo.bubbleTitle, messages.pages.basicDemo.bubbleSubtitle]);
-
-  const fieldDocCopy = useMemo(() => ({ fields: messages.pages.basicDemo.fieldDocs }), [messages.pages.basicDemo.fieldDocs]);
-
-  const popupParamPurposeMap = useMemo(() => ({
-    org: fieldDocCopy.fields['chat.org'],
-    t: fieldDocCopy.fields['chat.t'],
-    sid: fieldDocCopy.fields['chat.sid'],
-    title: '自定义当前聊天页面浏览器 tab 标题',
-    browse: `${fieldDocCopy.fields['browse.url'] || '来源页面 URL'} / ${fieldDocCopy.fields['browse.title'] || '来源页面标题'}`,
-    lang: fieldDocCopy.fields.locale,
-    mode: fieldDocCopy.fields['theme.mode'],
-    backgroundColor: fieldDocCopy.fields['theme.backgroundColor'],
-    textColor: fieldDocCopy.fields['theme.textColor'],
-    navbar: messages.pages.basicDemo.navbarParamPurpose,
-    loadHistory: fieldDocCopy.fields['chat.loadHistory'],
-  }), [fieldDocCopy, messages.pages.basicDemo.navbarParamPurpose]);
-
-  const popupParamEncodingHint = locale === LANG_EN
-    ? 'If you manually build URL strings, encode parameter values with encodeURIComponent.'
-    : '若手动拼接 URL，请对参数值使用 encodeURIComponent 编码。';
-
-  const popupParamNeedsEncoding = (key: string) => key === 'backgroundColor' || key === 'textColor' || key === 'browse' || key === 'title';
-
-  const withEncodingHint = (key: string, purpose: string) => (
-    popupParamNeedsEncoding(key) ? `${purpose} ${popupParamEncodingHint}` : purpose
-  );
-
-  const popupUrlParams = useMemo(() => {
-    const urlParamMap = new Map(rawPopupUrlParams);
-    const rows = rawPopupUrlParams.map(([key, value]) => ({
-      key,
-      value,
-      purpose: withEncodingHint(
-        key,
-        popupParamPurposeMap[key as keyof typeof popupParamPurposeMap] || localizedCopy.popupParamUnknownPurpose
-      ),
-    }));
-    // navbar 和 loadHistory 始终显示在参数说明表格中
-    for (const k of ['title', 'browse', 'navbar', 'loadHistory'] as const) {
-      if (!urlParamMap.has(k)) {
-        rows.push({ key: k, value: '-', purpose: withEncodingHint(k, popupParamPurposeMap[k]) });
-      }
-    }
-    return rows;
-  }, [localizedCopy.popupParamUnknownPurpose, popupParamEncodingHint, popupParamPurposeMap, rawPopupUrlParams]);
-
-  const configDocSections = useMemo(
-    () => buildConfigDocSections(configGuideCopy, fieldDocCopy),
-    [configGuideCopy, fieldDocCopy]
-  );
+  }), [config, isAnonymousMode, selectedUser, themeMode]);
 
   return (
     <PageContainer>
@@ -673,6 +837,8 @@ const BasicDemo = ({
         quickActions={quickActions}
         togglePlacementLabel={messages.common.buttons.togglePlacement}
         placementLabel={placementLabel}
+        bubbleSwitchModeLabel={localizedCopy.switchModeLabel}
+        selectedBubbleSwitchMode={selectedBubbleSwitchMode}
         themeButtonLabel={messages.pages.basicDemo.themeButtonLabel}
         themeColorLabel={themeColorLabel}
         themeTextButtonLabel={messages.pages.basicDemo.themeTextButtonLabel}
@@ -683,8 +849,13 @@ const BasicDemo = ({
         navTextColorPresets={navTextColorPresets}
         themeModeMenuItems={themeModeMenuItems}
         entryMenuItems={entryMenuItems}
+        entryIconMenuItems={entryIconMenuItems}
         selectedThemeModeKeys={[themePreference]}
         selectedEntryActions={selectedEntryActions}
+        selectedEntryButtonIconKeys={[selectedEntryButtonIconKey]}
+        selectedEntryButtonIconLabel={selectedEntryButtonIconLabel}
+        isEntryButtonTextEnabled={isEntryButtonTextEnabled}
+        entryButtonTextValue={entryButtonTextOverride}
         locale={locale}
         localeValueHint={localeValueHint}
         lastActionApiHint={lastActionApiHint}
@@ -694,6 +865,12 @@ const BasicDemo = ({
         navbarLabel={messages.pages.basicDemo.navbarLabel}
         navbarHiddenLabel={messages.pages.basicDemo.navbarHidden}
         navbarShownLabel={messages.pages.basicDemo.navbarShown}
+        qrCodeParamEnabled={isQrCodeParamEnabled}
+        qrCodeParamLabel={messages.pages.basicDemo.qrCodeParamLabel}
+        threadDetailParamEnabled={isThreadDetailParamEnabled}
+        threadDetailParamLabel={messages.pages.basicDemo.threadDetailParamLabel}
+        visitorProfileParamEnabled={isVisitorProfileParamEnabled}
+        visitorProfileParamLabel={messages.pages.basicDemo.visitorProfileParamLabel}
         loadHistoryEnabled={loadHistoryEnabled}
         loadHistoryLabel={messages.pages.basicDemo.loadHistoryLabel}
         loadHistoryEnabledLabel={messages.pages.basicDemo.loadHistoryEnabled}
@@ -707,12 +884,19 @@ const BasicDemo = ({
         navButtonTextColor={config.theme?.textColor || '#ffffff'}
         fallbackPrimaryColor={token.colorPrimary}
         onPlacementToggle={handlePlacementToggle}
+        onBubbleSwitchModeChange={handleBubbleSwitchModeChange}
         onNavColorChange={handleNavColorSwitch}
         onNavTextColorChange={handleNavTextColorSwitch}
         onThemeModeClick={({ key }) => handleThemeModeSwitch(String(key) as 'light' | 'dark' | 'system')}
         onEntrySelect={({ selectedKeys }) => handleEntryActionsChange(selectedKeys as string[])}
         onEntryDeselect={({ selectedKeys }) => handleEntryActionsChange(selectedKeys as string[])}
+        onEntryButtonIconClick={handleEntryButtonIconSwitch}
+        onEntryButtonTextToggle={handleToggleEntryButtonText}
+        onEntryButtonTextChange={handleEntryButtonTextChange}
         onNavbarToggle={handleToggleNavbar}
+        onQrCodeParamToggle={handleToggleQrCodeParam}
+        onThreadDetailParamToggle={handleToggleThreadDetailParam}
+        onVisitorProfileParamToggle={handleToggleVisitorProfileParam}
         onLoadHistoryToggle={handleToggleLoadHistory}
         onCustomTitleToggle={handleToggleCustomTitle}
         onCarryBrowseInfoToggle={handleToggleBrowseInfo}
@@ -722,36 +906,40 @@ const BasicDemo = ({
 
       <Card title={localizedCopy.popupUrlTitle}>
         <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {localizedCopy.popupUrlDescription}
+          </Typography.Paragraph>
           <Typography.Paragraph
             copyable={{ text: chatPageUrl }}
             style={{ ...codeBlockStyle, marginBottom: 0 }}
           >
             {chatPageUrl}
           </Typography.Paragraph>
-
-          <Typography.Text strong>{localizedCopy.popupUrlParamsTitle}</Typography.Text>
+          <Typography.Text strong>{basicDemoMessages.urlParamsTitle}</Typography.Text>
           <Table
             size="small"
             bordered
             pagination={false}
             rowKey="key"
-            dataSource={popupUrlParams}
+            dataSource={urlParamRows}
             columns={[
               {
-                title: localizedCopy.popupParamNameTitle,
+                title: messages.pages.userInfoDemo.parameterLabel,
                 dataIndex: 'key',
                 key: 'key',
                 render: (value: string) => (
                   <Space size={6}>
                     <Typography.Text copyable={{ text: value }}>{value}</Typography.Text>
-                    <Tag color={requiredPopupParams.has(value) ? 'error' : 'default'}>
-                      {requiredPopupParams.has(value) ? requiredLabel : optionalLabel}
+                    <Tag color={requiredUrlParams.has(value) ? 'error' : 'default'}>
+                      {requiredUrlParams.has(value)
+                        ? messages.pages.userInfoDemo.requiredLabel
+                        : messages.pages.userInfoDemo.optionalLabel}
                     </Tag>
                   </Space>
                 ),
               },
               {
-                title: localizedCopy.popupParamValueTitle,
+                title: messages.pages.userInfoDemo.currentValueLabel,
                 dataIndex: 'value',
                 key: 'value',
                 render: (value: string) => {
@@ -768,37 +956,35 @@ const BasicDemo = ({
                 },
               },
               {
-                title: localizedCopy.popupParamPurposeTitle,
+                title: messages.pages.userInfoDemo.purposeLabel,
                 dataIndex: 'purpose',
                 key: 'purpose',
               },
             ]}
           />
+          <Typography.Text type="secondary">{basicDemoMessages.manualEncodeHint}</Typography.Text>
         </Space>
       </Card>
 
-      <BasicDemoConfigDocsCard
-        minimalConfigTitle={configGuideCopy.minimalConfigTitle}
-        minimalConfigDescription={configGuideCopy.minimalConfigDescription}
-        recommendedConfigTitle={configGuideCopy.recommendedConfigTitle}
-        recommendedConfigDescription={configGuideCopy.recommendedConfigDescription}
-        configExampleTitle={configGuideCopy.configExampleTitle}
-        configExampleDescription={configGuideCopy.configExampleDescription}
-        configGuideTitle={configGuideCopy.configGuideTitle}
-        configGuideDescription={configGuideCopy.configGuideDescription}
-        minimalConfigExample={minimalConfigExample}
-        recommendedConfigExample={recommendedConfigExample}
-        fullConfigExample={fullConfigExample}
-        configDocSections={configDocSections}
-        codeBlockStyle={codeBlockStyle}
-      />
+      <Card title={localizedCopy.embedCodeTitle} style={{ marginTop: 16 }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {localizedCopy.embedCodeDescription}
+          </Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{ text: runtimeEmbedCodeExample }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {runtimeEmbedCodeExample}
+          </Typography.Paragraph>
+        </Space>
+      </Card>
 
       <BytedeskReact
         {...config}
         onInit={handleInit}
       />
 
-      <InstallGuide locale={locale} showFeedback={false} />
       <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
     </PageContainer>
   );

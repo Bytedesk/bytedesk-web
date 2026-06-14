@@ -14,7 +14,7 @@ const basicDemoFieldDocs = {
   autoPopup: 'Auto-open chat window after SDK initialization.',
   autoPopupDelay: 'Delay before auto-popup in milliseconds.',
   draggable: 'Allow dragging the entry button; when enabled, users can reposition it.',
-  tabsConfig: 'Control visibility of built-in tabs: home, messages, help, news.',
+  tabsConfig: 'Control visibility of built-in tabs: help, thread, messages.',
   bubbleConfig: 'Configure entry bubble with title, subtitle, carousel messages, and switch modes.',
   buttonConfig: 'Single entry button configuration; use this for one entry point.',
   buttonsConfig: 'Multiple entry button array; higher priority than buttonConfig for showing chat, thread, webrtc, call, and QR entries.',
@@ -80,6 +80,8 @@ const basicDemoFieldDocs = {
   'chat.draft': 'Gray-release flag passed as draft=1 in the URL.',
   'chat.settingsUid': 'Unique settings identifier mainly for config debugging.',
   'chat.loadHistory': 'Whether to load historical messages. loadHistory=1 loads chat history by default when opening the chat page.',
+  'chat.threadDetail': 'Whether to show the thread detail button. threadDetail=1 shows it; hidden by default.',
+  'chat.visitorProfile': 'Whether to show the visitor profile button. visitorProfile=1 shows it; hidden by default.',
   'chat.custom': 'Additional custom business fields appended into chat URL parameters.',
   'browse.referrer': 'Referring page URL.',
   'browse.url': 'Current page URL.',
@@ -107,10 +109,9 @@ const basicDemoFieldDocs = {
   'animation.type': 'Easing type: ease, linear, ease-in, ease-out, or ease-in-out.',
   'window.width': 'Desktop chat window width.',
   'window.height': 'Desktop chat window height.',
-  'tabs.home': 'Show or hide the home tab.',
   'tabs.messages': 'Show or hide the messages tab.',
+  'tabs.thread': 'Show or hide the thread history tab.',
   'tabs.help': 'Show or hide the help tab.',
-  'tabs.news': 'Show or hide the news tab.',
 } as const;
 
 export const en = {
@@ -179,6 +180,7 @@ export const en = {
     vipLevelDemo: '👑 Personalization',
     unreadCountDemo: '🔔 Unread Counter',
     threadHistoryDemo: '🧵 Thread History',
+    helpcenterDemo: '❔ Help Center',
     videoSupportDemo: '🎥 Video Support',
     webrtcDemo: '📹 WebRTC Demo',
     callCenterDemo: '📞 Call Center',
@@ -204,6 +206,9 @@ export const en = {
       navbarHidden: 'ON',
       navbarShown: 'OFF',
       navbarParamPurpose: 'Whether to hide the top navigation bar. navbar=0 hides the navbar.',
+      qrCodeParamLabel: 'Show QR button',
+      threadDetailParamLabel: 'Show thread detail button',
+      visitorProfileParamLabel: 'Show visitor profile button',
       loadHistoryLabel: 'Load history',
       loadHistoryEnabled: 'Yes',
       loadHistoryDisabled: 'No',
@@ -212,6 +217,25 @@ export const en = {
       defaultTextColorLabel: 'Default',
       currentConfigTitle: 'Current Config',
       copyConfig: 'Copy Config JSON',
+      urlParamsTitle: 'Parameter reference',
+      urlParams: [
+        'org: organization ID (required)',
+        't: session type (0: one-to-one, 1: workgroup, 2: bot)',
+        'sid: target session ID (agent / workgroup / bot)',
+        'visitorUid: custom visitor ID passed to the standalone page (optional)',
+        'nickname / avatar: visitor profile shown in the chat page (optional)',
+        'lang: locale value used by the standalone page',
+        'mode: theme mode (light / dark)',
+        'backgroundColor / textColor: floating entry theme colors',
+        'navbar: whether to hide the top navbar',
+        'qrcode: whether to show the current chat QR code button (1: show, 0: hide)',
+        'threadDetail: whether to show the thread detail button (1: show, hidden by default)',
+        'visitorProfile: whether to show the visitor profile button (1: show, hidden by default)',
+        'loadHistory: whether to load previous thread messages',
+        'title: custom chat title when enabled',
+        'browse: serialized browse context passed to the page'
+      ],
+      manualEncodeHint: 'When manually building the URL, use encodeURIComponent for nickname, avatar, title, and browse JSON values.',
       fieldDocs: basicDemoFieldDocs
     },
     userInfoDemo: {
@@ -254,11 +278,24 @@ export const en = {
         'lang/mode: locale and theme mode (optional)'
       ],
       sampleUrlLabel: 'Generated sample URL from current config',
+      parameterLabel: 'Parameter',
+      currentValueLabel: 'Current Value',
+      purposeLabel: 'Purpose',
+      requiredLabel: 'Required',
+      optionalLabel: 'Optional',
+      manualEncodeHint: 'When manually building URL strings, use encodeURIComponent for nickname, avatar, email, note, and extra.',
+      switchApiTitle: 'API to call after switching user (embedded only)',
+      switchApiDescription: 'The following guidance only applies when bytedesk-web SDK is integrated in embedded mode. Updating chatConfig in your own application changes the current visitor payload, but visitor identity is also cached in localStorage. After switching users, call the visitor init API again so the SDK can compare visitorUid and refresh the cached identity.',
+      switchApiNotes: [
+        'Named user switch: after updating visitorUid, nickname, and avatar, call initVisitor() to refresh the cached visitor identity.',
+        'Anonymous switch: call resetAnonymousVisitor() first to clear the cached visitor UID, then call initVisitor() to initialize the anonymous visitor again.',
+        'If you open chat with showChat(...) or a new tab/new window, do it after the user switch is applied so the generated URL matches the latest user info.'
+      ],
       apiHintPrefix: 'API calls:',
       users: {
-        user1: 'Visitor Xiao Ming',
-        user2: 'Visitor Xiao Hong',
-        user3: 'Visitor Xiao Li'
+        user1: 'User Xiao Ming',
+        user2: 'User Xiao Hong',
+        user3: 'User Xiao Mei'
       }
     },
     goodsInfoDemo: {
@@ -545,6 +582,107 @@ export const en = {
         openHistoryPage: 'Open thread history page',
         switchAnonymousUser: 'Switch to anonymous user'
       },
+      apiGuide: {
+        title: 'ThreadList API usage without widget',
+        endpointLabel: 'Endpoint URL',
+        fullUrlPage1Label: 'Full request URL (page 1)',
+        fullUrlPage2Label: 'Full request URL (page 2)',
+        queryParamsTitle: 'Query parameters',
+        pagingMappingTitle: 'Paging and request behavior',
+        curlExampleTitle: 'curl example',
+        fetchExampleTitle: 'fetch example',
+        anonymousHint: 'If anonymous mode already has a stable visitorUid, passing visitorUid alone is enough to query all history threads. If visitorUid is not available yet, initialize the visitor first to obtain uid/visitorUid.',
+        queryParams: [
+          'visitorUid: string (recommended; business visitor uid, sufficient by itself to fetch all history threads)',
+          'orgUid: string (optional; only pass it when you need to limit the query to one organization)',
+          'pageNumber: number (required; backend starts from 0, so UI page 1 should pass 0)',
+          'pageSize: number (required; demo default is 10)',
+          'searchText: string (optional; filter threads by keyword)'
+        ],
+        pagingMapping: [
+          'UI current=1 -> pageNumber=0',
+          'UI current=2 -> pageNumber=1',
+          'The default requestKey can be understood as visitorUid|pageNumber|pageSize|searchText; orgUid is also included when explicitly provided.',
+          'As long as visitorUid is stable, ThreadList can query with visitorUid only; if uid is also available, you can pass both for historical compatibility.',
+          'A 403 response triggers a 30s cooldown for the same request on the frontend (FORBIDDEN_COOLDOWN_MS).'
+        ]
+      },
+      responseGuide: {
+        title: 'Response structure reference',
+        topLevelTitle: 'Top-level fields',
+        dataFieldsTitle: 'data paging fields',
+        threadItemFieldsTitle: 'data.content[] thread fields',
+        topLevelFields: [
+          'message: string - response description, for example "Query succeeded"',
+          'code: number - HTTP status code, 200 means success',
+          'data: object - paged payload object (see field details below)'
+        ],
+        dataFields: [
+          'content: Thread[] - thread list; see the single-thread fields below',
+          'total / totalElements: number - total records',
+          'totalPages: number - total pages',
+          'first: boolean - whether this is the first page',
+          'last: boolean - whether this is the last page',
+          'numberOfElements: number - actual item count in the current page',
+          'size: number - page size (maps to request parameter pageSize)',
+          'number: number - current page number starting from 0 (maps to request parameter pageNumber)',
+          'empty: boolean - whether the current page is empty'
+        ],
+        threadItemFields: [
+          'uid: string - thread unique ID',
+          'userUid: string - assigned agent uid',
+          'orgUid: string - organization uid',
+          'level: string - hierarchy level, ORGANIZATION means organization-level',
+          'platform: string - platform identifier, fixed as BYTEDESK',
+          'createdAt: string - thread creation time in yyyy-MM-dd HH:mm:ss format',
+          'updatedAt: string - last updated time',
+          'topic: string - thread topic, format: org/agent/{agentUid}/{visitorEntityUid}',
+          'content: string - raw content of the latest message (i18n key or plain text)',
+          'contentObject.msgType: string - message type enum such as TEXT / AGENT_CLOSED / AUTO_CLOSED / INVITE_AUDIO_CANCEL',
+          'contentObject.preview: string - preview text for list rendering',
+          'contentObject.payload: string - actual message content (text or JSON string)',
+          'contentObject.displayText: string - final text shown to users',
+          'type: string - thread type: AGENT, ROBOT, or WORKGROUP',
+          'status: string - thread status: OPEN or CLOSED',
+          'transferStatus: string - transfer status, NONE means no transfer',
+          'closeType: string - close source: AGENT, AUTO, or VISITOR',
+          'channel: string - source channel, WEB_VISITOR for web visitors',
+          'top: boolean - whether pinned',
+          'unread: boolean - whether the agent side has unread messages',
+          'unreadCount: number - unread count on the agent side',
+          'visitorUnreadCount: number - unread count on the visitor side',
+          'mute: boolean - whether muted',
+          'hide: boolean - whether hidden',
+          'star: number - star level, 0 means none',
+          'fold: boolean - whether folded',
+          'offline: boolean - whether offline message',
+          'tagList: string[] - tag list',
+          'note: string | null - thread note',
+          'extra: string - JSON string for extended config such as autoCloseMin / toolbar / requireLogin',
+          'valid: boolean - whether the thread is valid; true after real visitor replies, false when it only contains system messages',
+          'allMessageCount: number - total message count across visitor, agent, system, and robot',
+          'visitorMessageCount: number - visitor message count',
+          'agentMessageCount: number - agent message count',
+          'systemMessageCount: number - system message count',
+          'robotMessageCount: number - robot message count',
+          'robotToAgent: boolean - whether this thread escalated from robot to agent',
+          'queueMeta: object | null - queue metadata, null when not queued',
+          'user: object - visitor profile object (uid / nickname / avatar / type / extra)',
+          'owner: object - thread owner object, usually an administrator',
+          'agent: string - agent profile JSON string (uid / nickname / avatar / type)',
+          'robot: string - robot profile JSON string, "{}" when absent',
+          'workgroup: string - workgroup profile JSON string, "{}" when absent',
+          'agentProtobuf: object - structured agent info object',
+          'workgroupProtobuf: object - structured workgroup info object',
+          'robotProtobuf: object - structured robot info object',
+          'transfer: object | null - transfer info, null when no transfer happened',
+          'invites: object[] - invited users list',
+          'monitors: object[] - monitoring users list',
+          'assistants: object[] - assisting users list',
+          'ticketors: object[] - ticket-related users list',
+          'processInstanceId / processEntityUid: string | null - workflow IDs for ticket flows, null when not applicable'
+        ]
+      },
       urlGuideTitle: 'URL + Query usage',
       urlTemplateLabel: 'Generic URL template',
       urlParamsTitle: 'Parameter reference (same as /chat)',
@@ -554,7 +692,8 @@ export const en = {
         'sid: target thread ID (workgroup/bot/agent)',
         'visitorUid: custom visitor ID (recommended)',
         'nickname/avatar: visitor profile (optional)',
-        'lang/mode: locale and theme mode (optional)'
+        'lang/mode: locale and theme mode (optional)',
+        'threadDetail: whether to show the thread detail button after opening a history session (1: show, hidden by default)'
       ],
       sampleUrlLabel: 'Generated sample URL from current config',
       docLinks: {
@@ -588,6 +727,27 @@ export const en = {
         reactDoc: 'View React integration docs',
         vueDoc: 'View Vue integration docs',
         reactExample: 'React video support demo source'
+      }
+    },
+    helpcenterDemo: {
+      title: 'Help Center Tab Demo',
+      description: 'Use tabsConfig to control multiple bottom tabs inside the embedded support window, switching between the chat window, thread history window, and help documentation window.',
+      controlsTitle: 'Tab switches',
+      previewTitle: 'Embedded window behavior',
+      codeTitle: 'Config sample',
+      currentChatProfile: 'Current chat params',
+      openChatButton: 'Open chat with multiple tabs',
+      openHelpcenterButton: 'Open Help Center alone',
+      helpHiddenText: 'The help tab is disabled',
+      windowHint: 'Click the button and check the embedded window in the bottom-right corner. messages opens chat, thread opens thread history, and help opens the help documentation tab.',
+      embeddedWindowDescription: 'This page does not render the visitor Helpcenter directly. It demonstrates how BytedeskConfig.tabsConfig changes the embedded window bottom tabs.',
+      enabledTabsTitle: 'Bottom tabs enabled now',
+      bubbleTitle: 'Open multi-tab window',
+      bubbleSubtitle: 'Open chat to try messages, thread, and help tabs',
+      tabs: {
+        messages: 'Messages tab',
+        thread: 'Thread History tab',
+        help: 'Help tab',
       }
     },
     callCenterDemo: {
@@ -651,6 +811,39 @@ export const en = {
           completeSession: 'Service completed and session closed.'
         }
       }
+    },
+    proactiveDemo: {
+      title: 'Proactive Acquisition Demo',
+      description: 'This page connects to the default workflow and jumps directly into education screening, demand confirmation, and contact collection after opening the chat.',
+      tags: {
+        mobileValidation: 'Mobile validation',
+        multiTurnQa: 'Multi-turn Q&A'
+      },
+      alertTitle: 'Validation path',
+      alertDescription: 'After entering the conversation, the workflow asks for education level and intent first, then collects city, consultation scenario, and mobile number. The form will not submit if the phone number is not a valid 11-digit mainland China mobile number. Every open forces a new workflow thread.',
+      workflowCardTitle: 'Default proactive workflow',
+      workflowCardTag: 'Education screening + demand confirmation + contact collection',
+      bubbleTitle: 'Proactive Acquisition',
+      bubbleSubtitle: 'Default workflow lead capture demo',
+      buttons: {
+        openWorkflowChat: 'Open default workflow chat',
+        closeChat: 'Close chat window'
+      },
+      urlParamsTitle: 'Workflow URL parameters',
+      urlDescription: 'The full standalone URL changes with locale, theme mode, and visitor identity parameters. forceNewThread is kept in the SDK embed example below because it is only used when opening the workflow through the SDK to guarantee a new workflow thread.',
+      urlParams: [
+        'org: organization unique identifier that owns the workflow',
+        't: session type; 17 means a workflow session',
+        'sid: workflow unique identifier that decides which default workflow to open',
+        'lang: conversation language following the current demo locale',
+        'mode: theme mode following the current light or dark setting',
+        'navbar: top navigation visibility flag; 1 means visible',
+        'visitorUid: visitor unique identifier used to bind visitor history in identified mode',
+        'nickname: visitor nickname passed through to the chat page in identified mode',
+        'avatar: visitor avatar URL used for display in identified mode'
+      ],
+      embedCodeTitle: 'Current embed code',
+      embedCodeDescription: 'The embed code below matches the live configuration on this page and can be copied directly as a fixed workflow lead-capture entry.'
     },
     webrtcDemo: {
       title: 'Audio / Video Agent Demo',
@@ -1087,10 +1280,9 @@ export const en = {
     onClick: () => console.log('Launcher clicked'),
   },
   tabsConfig: {
-    home: true,
-    messages: true,
     help: true,
-    news: false,
+    thread: true,
+    messages: true,
   },
   theme: {
     mode: 'light',

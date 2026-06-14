@@ -1,3 +1,5 @@
+import { en } from './en';
+
 const basicDemoFieldDocs = {
   isDebug: 'Sama ada untuk menghidupkan log nyahpepijat semasa pembangunan.',
   forceRefresh: 'Paksa segar semula halaman chat atau iframe untuk menyemak isu cache.',
@@ -14,7 +16,7 @@ const basicDemoFieldDocs = {
   autoPopup: 'Sama ada membuka tetingkap chat secara automatik selepas inisialisasi.',
   autoPopupDelay: 'Masa tunda sebelum auto popup.',
   draggable: 'Benarkan butang masuk diseret.',
-  tabsConfig: 'Kawal paparan tab home, messages, help dan news.',
+  tabsConfig: 'Kawal paparan tab messages, thread dan help.',
   bubbleConfig: 'Konfigurasi gelembung petunjuk di atas pintu masuk.',
   buttonConfig: 'Konfigurasi untuk satu butang masuk.',
   buttonsConfig: 'Senarai beberapa butang masuk, dengan keutamaan lebih tinggi daripada buttonConfig.',
@@ -80,6 +82,8 @@ const basicDemoFieldDocs = {
   'chat.draft': 'Penanda draft untuk pelepasan berperingkat.',
   'chat.settingsUid': 'ID unik untuk nyahpepijat konfigurasi.',
   'chat.loadHistory': 'Sama ada memuatkan sejarah mesej. loadHistory=1 akan memuatkan sejarah sembang secara lalai apabila membuka halaman sembang.',
+  'chat.threadDetail': 'Sama ada memaparkan butang butiran perbualan. threadDetail=1 akan memaparkannya; lalai disembunyikan.',
+  'chat.visitorProfile': 'Sama ada memaparkan butang profil pelawat. visitorProfile=1 akan memaparkannya; lalai disembunyikan.',
   'chat.custom': 'Medan perniagaan tambahan boleh terus ditambah ke parameter URL chat.',
   'browse.referrer': 'Alamat halaman rujukan.',
   'browse.url': 'Alamat halaman semasa.',
@@ -107,10 +111,9 @@ const basicDemoFieldDocs = {
   'animation.type': 'Jenis easing.',
   'window.width': 'Lebar tetingkap chat desktop.',
   'window.height': 'Tinggi tetingkap chat desktop.',
-  'tabs.home': 'Sama ada memaparkan tab home.',
   'tabs.messages': 'Sama ada memaparkan tab messages.',
+  'tabs.thread': 'Sama ada memaparkan tab sejarah perbualan.',
   'tabs.help': 'Sama ada memaparkan tab help.',
-  'tabs.news': 'Sama ada memaparkan tab news.',
 } as const;
 
 export const msMy = {
@@ -179,6 +182,7 @@ export const msMy = {
     vipLevelDemo: '👑 Pemperibadian',
     unreadCountDemo: '🔔 Belum dibaca',
     threadHistoryDemo: '🧵 Sejarah perbualan',
+    helpcenterDemo: '❔ Pusat bantuan',
     videoSupportDemo: '🎥 Sokongan video',
     webrtcDemo: '📹 Demo WebRTC',
     callCenterDemo: '📞 Pusat panggilan',
@@ -204,6 +208,9 @@ export const msMy = {
       navbarHidden: 'HIDUP',
       navbarShown: 'MATI',
       navbarParamPurpose: 'Sama ada menyembunyikan bar navigasi atas. navbar=0 akan menyembunyikan navigasi.',
+      qrCodeParamLabel: 'Tunjuk butang QR',
+      threadDetailParamLabel: 'Tunjuk butang butiran',
+      visitorProfileParamLabel: 'Tunjuk butang profil pelawat',
       loadHistoryLabel: 'Muat sejarah',
       loadHistoryEnabled: 'HIDUP',
       loadHistoryDisabled: 'MATI',
@@ -212,6 +219,25 @@ export const msMy = {
       defaultTextColorLabel: 'Lalai',
       currentConfigTitle: 'Konfigurasi semasa',
       copyConfig: 'Salin JSON konfigurasi',
+      urlParamsTitle: 'Rujukan parameter',
+      urlParams: [
+        'org: ID organisasi (wajib)',
+        't: jenis sesi (0: satu-ke-satu, 1: kumpulan, 2: bot)',
+        'sid: ID sasaran sesi (ejen / kumpulan / bot)',
+        'visitorUid: ID pelawat tersuai yang dihantar ke halaman berasingan (pilihan)',
+        'nickname / avatar: maklumat profil pelawat yang dipaparkan pada halaman chat (pilihan)',
+        'lang: nilai bahasa untuk halaman berasingan',
+        'mode: mod tema (light / dark)',
+        'backgroundColor / textColor: warna tema untuk pintu masuk terapung',
+        'navbar: sama ada menyembunyikan bar navigasi atas',
+        'qrcode: sama ada menunjukkan butang kod QR chat semasa (1: tunjuk, 0: sembunyi)',
+        'threadDetail: sama ada menunjukkan butang butiran perbualan (1: tunjuk, lalai sembunyi)',
+        'visitorProfile: sama ada menunjukkan butang profil pelawat (1: tunjuk, lalai sembunyi)',
+        'loadHistory: sama ada memuat mesej sesi terdahulu',
+        'title: tajuk chat tersuai apabila diaktifkan',
+        'browse: JSON konteks browse yang dihantar ke halaman'
+      ],
+      manualEncodeHint: 'Apabila membina URL secara manual, gunakan encodeURIComponent untuk nickname, avatar, title dan nilai JSON browse.',
       fieldDocs: basicDemoFieldDocs
     },
     userInfoDemo: {
@@ -253,11 +279,24 @@ export const msMy = {
         'lang/mode: bahasa dan mod tema (pilihan)'
       ],
       sampleUrlLabel: 'Contoh URL dijana daripada konfigurasi semasa',
+      parameterLabel: 'Parameter',
+      currentValueLabel: 'Nilai semasa',
+      purposeLabel: 'Tujuan',
+      requiredLabel: 'Wajib',
+      optionalLabel: 'Pilihan',
+      manualEncodeHint: 'Apabila membina rentetan URL secara manual, gunakan encodeURIComponent untuk nickname, avatar, email, note dan extra.',
+      switchApiTitle: 'API untuk dipanggil selepas menukar pengguna (embedded sahaja)',
+      switchApiDescription: 'Panduan berikut hanya terpakai apabila bytedesk-web SDK diintegrasikan dalam mod embedded. Apabila mengemas kini chatConfig dalam aplikasi anda sendiri, payload pelawat semasa yang dihantar kepada SDK akan berubah, tetapi identiti pelawat masih dicache dalam localStorage. Selepas menukar pengguna, panggil semula API init pelawat supaya SDK boleh membandingkan visitorUid dan menyegarkan identiti yang dicache.',
+      switchApiNotes: [
+        'Pertukaran pengguna bernama: selepas mengemas kini visitorUid, nickname dan avatar, panggil initVisitor() untuk menyegarkan identiti pelawat yang dicache.',
+        'Pertukaran ke pengguna tanpa nama: panggil resetAnonymousVisitor() dahulu untuk mengosongkan visitor UID yang dicache, kemudian panggil initVisitor() untuk memulakan semula pelawat tanpa nama.',
+        'Jika anda membuka chat melalui showChat(...), tab baharu atau tetingkap baharu, lakukan selepas pertukaran pengguna diterapkan supaya URL yang dijana sepadan dengan maklumat pengguna terkini.'
+      ],
       apiHintPrefix: 'Panggilan API:',
       users: {
-        user1: 'Pelawat Xiao Ming',
-        user2: 'Pelawat Xiao Hong',
-        user3: 'Pelawat Xiao Li'
+        user1: 'Pengguna Xiao Ming',
+        user2: 'Pengguna Xiao Hong',
+        user3: 'Pengguna Xiao Mei'
       }
     },
     goodsInfoDemo: {
@@ -542,6 +581,8 @@ export const msMy = {
         openHistoryPage: 'Buka halaman sejarah thread',
         switchAnonymousUser: 'Tukar ke pengguna tanpa nama'
       },
+      apiGuide: en.pages.threadHistoryDemo.apiGuide,
+      responseGuide: en.pages.threadHistoryDemo.responseGuide,
       urlGuideTitle: 'Penggunaan URL + Query',
       urlTemplateLabel: 'Templat URL umum',
       urlParamsTitle: 'Rujukan parameter (sama seperti /chat)',
@@ -585,6 +626,27 @@ export const msMy = {
         reactDoc: 'Lihat dokumentasi integrasi React',
         vueDoc: 'Lihat dokumentasi integrasi Vue',
         reactExample: 'Kod sumber demo sokongan video React'
+      }
+    },
+    helpcenterDemo: {
+      title: 'Demo tab pusat bantuan',
+      description: 'Gunakan tabsConfig untuk mengawal beberapa tab bawah dalam tetingkap sokongan tertanam, bertukar antara tetingkap chat, tetingkap sejarah perbualan dan tetingkap dokumen bantuan.',
+      controlsTitle: 'Suis tab',
+      previewTitle: 'Kelakuan tetingkap tertanam',
+      codeTitle: 'Contoh konfigurasi',
+      currentChatProfile: 'Parameter chat semasa',
+      openChatButton: 'Buka tetingkap chat berbilang tab',
+      openHelpcenterButton: 'Buka pusat bantuan sahaja',
+      helpHiddenText: 'Tab help dimatikan',
+      windowHint: 'Klik butang dan lihat tetingkap tertanam di penjuru kanan bawah. messages membuka chat, thread membuka sejarah perbualan, manakala help membuka dokumen bantuan.',
+      embeddedWindowDescription: 'Halaman ini tidak merender Helpcenter visitor secara terus. Ia menunjukkan bagaimana BytedeskConfig.tabsConfig mengubah tab bawah tetingkap tertanam.',
+      enabledTabsTitle: 'Tab bawah yang sedang aktif',
+      bubbleTitle: 'Buka tetingkap berbilang tab',
+      bubbleSubtitle: 'Buka chat untuk cuba tab messages, thread dan help',
+      tabs: {
+        messages: 'Tab Messages',
+        thread: 'Tab Thread',
+        help: 'Tab Help',
       }
     },
     callCenterDemo: {
@@ -722,6 +784,39 @@ export const msMy = {
         vueDoc: 'Lihat dokumentasi integrasi Vue',
         reactExample: 'Kod sumber demo persidangan video React'
       }
+    },
+    proactiveDemo: {
+      title: 'Demo pemerolehan pelanggan proaktif',
+      description: 'Halaman ini disambungkan kepada workflow lalai dan terus masuk ke proses saringan pendidikan, pengesahan keperluan dan pengumpulan maklumat hubungan apabila chat dibuka.',
+      tags: {
+        mobileValidation: 'Pengesahan nombor telefon',
+        multiTurnQa: 'Soal jawab berbilang pusingan'
+      },
+      alertTitle: 'Aliran pengesahan',
+      alertDescription: 'Selepas masuk ke perbualan, workflow akan mengumpul tahap pendidikan dan niat terlebih dahulu, kemudian meminta bandar, senario perundingan dan nombor telefon. Borang tidak akan dihantar jika nombor telefon tidak sepadan dengan format mudah alih China daratan 11 digit. Setiap kali dibuka akan memaksa thread workflow baharu.',
+      workflowCardTitle: 'Workflow proaktif lalai',
+      workflowCardTag: 'Saringan pendidikan + pengesahan keperluan + pengumpulan hubungan',
+      bubbleTitle: 'Pemerolehan pelanggan proaktif',
+      bubbleSubtitle: 'Demo pengumpulan lead workflow lalai',
+      buttons: {
+        openWorkflowChat: 'Buka chat workflow lalai',
+        closeChat: 'Tutup tetingkap chat'
+      },
+      urlParamsTitle: 'Parameter URL workflow',
+      urlDescription: 'URL penuh tetingkap berasingan berubah mengikut locale, mod tema dan parameter identiti pelawat. forceNewThread dikekalkan dalam contoh SDK di bawah kerana ia hanya digunakan apabila membuka workflow melalui SDK untuk menjamin thread workflow yang baharu.',
+      urlParams: [
+        'org: pengecam unik organisasi pemilik workflow',
+        't: jenis sesi; 17 bermaksud sesi workflow',
+        'sid: pengecam unik workflow yang menentukan workflow lalai yang dibuka',
+        'lang: bahasa perbualan mengikut locale demo semasa',
+        'mode: mod tema mengikut tetapan cerah atau gelap semasa',
+        'navbar: kawalan paparan navigasi atas; 1 bermaksud dipaparkan',
+        'visitorUid: pengecam unik pelawat untuk mengikat sejarah pelawat dalam mod dikenal pasti',
+        'nickname: nama panggilan pelawat yang dihantar ke halaman chat dalam mod dikenal pasti',
+        'avatar: URL avatar pelawat untuk paparan dalam mod dikenal pasti'
+      ],
+      embedCodeTitle: 'Kod benam semasa',
+      embedCodeDescription: 'Kod benam di bawah sepadan dengan konfigurasi sebenar halaman ini dan boleh disalin terus sebagai pintu masuk tetap untuk pengumpulan lead workflow.'
     },
     voiceAgentDemo: {
       title: 'Demo pembantu suara',
@@ -1084,10 +1179,9 @@ export const msMy = {
     onClick: () => console.log('Launcher clicked'),
   },
   tabsConfig: {
-    home: true,
-    messages: true,
     help: true,
-    news: false,
+    thread: true,
+    messages: true,
   },
   theme: {
     mode: 'light',

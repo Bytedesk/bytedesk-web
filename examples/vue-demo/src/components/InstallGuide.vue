@@ -132,10 +132,9 @@ import type { BytedeskConfig } from 'bytedesk-web/vue';</code></pre>
   
   // 标签配置
   tabsConfig: {
-    home: true, // 首页
     messages: true, // 消息
+    thread: true, // 历史会话
     help: true, // 帮助
-    news: false, // 新闻
   },
   
   // 主题配置

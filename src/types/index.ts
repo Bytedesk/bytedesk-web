@@ -38,10 +38,9 @@ export interface BubbleMessageItem {
 export type BubbleSwitchMode = 'fade' | 'slide-up' | 'ticker';
 
 export interface TabsConfig {
-  home?: boolean; // 首页
   messages?: boolean; // 消息
+  thread?: boolean; // 历史会话
   help?: boolean; // 帮助
-  news?: boolean; // 新闻
 }
 
 export interface WindowConfig {
@@ -79,6 +78,8 @@ export interface ChatConfig {
   draft?: boolean; // 灰度测试标识（将透传到URL参数中：draft=1）
   settingsUid?: string; // 设置唯一ID, 主要用于调试模式
   loadHistory?: boolean; // 是否加载历史消息
+  threadDetail?: string | boolean; // 是否显示会话详情按钮
+  visitorProfile?: string | boolean; // 是否显示访客资料按钮
   // 其他自定义字段
   [key: string]: string | number | boolean | undefined;
 } 
@@ -152,6 +153,16 @@ export interface FeedbackData {
   orgUid?: string; // 组织ID（可选）
 }
 
+export interface MessageBubbleClickEvent {
+  uid?: string; // 被点击消息的唯一 ID
+  type?: string; // 被点击消息的消息类型，而不是 postMessage 事件名
+  content?: unknown; // 被点击消息的消息内容
+  navigateToPath?: string | null; // 已拼接 payload 参数的跳转地址，宿主可直接解析并执行跳转
+  extra?: unknown; // 被点击消息的扩展字段
+  position?: string; // 被点击消息在对话中的位置
+  status?: string; // 被点击消息的发送/处理状态
+}
+
 export interface BytedeskConfig {
   isDebug?: boolean; // 是否开启调试模式
   forceRefresh?: boolean; // 是否强制刷新页面
@@ -183,6 +194,7 @@ export interface BytedeskConfig {
   onShowChat?: () => void; // 显示聊天回调
   onHideChat?: () => void; // 隐藏聊天回调
   onMessage?: (message: string, type: string) => void; // 消息回调
+  onMessageBubbleClick?: (event: MessageBubbleClickEvent) => void; // 消息气泡点击回调，event.type 为消息类型
   onConfigChange?: (config: BytedeskConfig) => void; // 配置变更回调
   onVisitorInfo?: (uid: string, visitorUid: string) => void; // localStorage 数据回调
 }

@@ -16,7 +16,7 @@ const basicDemoFieldDocs = {
   autoPopup: 'Abre automáticamente la ventana de chat después de inicializar.',
   autoPopupDelay: 'Retraso antes de la apertura automática.',
   draggable: 'Permite arrastrar el botón de entrada.',
-  tabsConfig: 'Controla la visibilidad de las pestañas home, messages, help y news.',
+  tabsConfig: 'Controla la visibilidad de las pestañas messages, thread y help.',
   bubbleConfig: 'Configura la burbuja de aviso sobre la entrada.',
   buttonConfig: 'Configuración para un único botón de entrada.',
   buttonsConfig: 'Lista de múltiples botones de entrada con prioridad sobre buttonConfig.',
@@ -82,6 +82,8 @@ const basicDemoFieldDocs = {
   'chat.draft': 'Bandera de despliegue gradual transmitida como draft=1 en la URL.',
   'chat.settingsUid': 'ID único usado para depurar configuración.',
   'chat.loadHistory': 'Indica si se carga el historial de mensajes. loadHistory=1 carga el historial de chat de forma predeterminada al abrir la pagina.',
+  'chat.threadDetail': 'Indica si se muestra el boton de detalle de la conversacion. threadDetail=1 lo muestra; por defecto esta oculto.',
+  'chat.visitorProfile': 'Indica si se muestra el boton de perfil del visitante. visitorProfile=1 lo muestra; por defecto esta oculto.',
   'chat.custom': 'Se pueden seguir añadiendo campos de negocio al URL de chat.',
   'browse.referrer': 'Dirección de la página de origen.',
   'browse.url': 'Dirección de la página actual.',
@@ -109,10 +111,9 @@ const basicDemoFieldDocs = {
   'animation.type': 'Tipo de easing.',
   'window.width': 'Ancho de la ventana de chat en escritorio.',
   'window.height': 'Alto de la ventana de chat en escritorio.',
-  'tabs.home': 'Indica si se muestra la pestaña home.',
   'tabs.messages': 'Indica si se muestra la pestaña messages.',
+  'tabs.thread': 'Indica si se muestra la pestaña de historial thread.',
   'tabs.help': 'Indica si se muestra la pestaña help.',
-  'tabs.news': 'Indica si se muestra la pestaña news.',
 } as const;
 
 export const esEs = {
@@ -195,6 +196,40 @@ export const esEs = {
   },
   pages: {
     ...en.pages,
+    proactiveDemo: {
+      ...en.pages.proactiveDemo,
+      title: 'Demo de captacion proactiva',
+      description: 'Esta pagina conecta el flujo de trabajo predeterminado y, al abrir el chat, entra directamente en el filtrado educativo, la confirmacion de necesidad y la recopilacion de contacto.',
+      tags: {
+        mobileValidation: 'Validacion de movil',
+        multiTurnQa: 'Dialogo multinivel'
+      },
+      alertTitle: 'Ruta de validacion',
+      alertDescription: 'Al entrar en la conversacion, el flujo recopila primero nivel educativo e intencion y despues solicita ciudad, escenario de consulta y movil. El formulario no se enviara si el numero no coincide con un movil continental chino de 11 digitos. Cada apertura fuerza un nuevo hilo de workflow.',
+      workflowCardTitle: 'Flujo proactivo predeterminado',
+      workflowCardTag: 'Filtro educativo + confirmacion de necesidad + recopilacion de contacto',
+      bubbleTitle: 'Captacion proactiva',
+      bubbleSubtitle: 'Demo de captacion del workflow predeterminado',
+      buttons: {
+        openWorkflowChat: 'Abrir chat del workflow',
+        closeChat: 'Cerrar ventana de chat'
+      },
+      urlParamsTitle: 'Parametros URL del workflow',
+      urlDescription: 'La URL completa de la ventana independiente cambia segun locale, modo de tema e identidad del visitante. forceNewThread se conserva en el ejemplo del SDK porque solo se usa al abrir el workflow desde el SDK para garantizar un hilo nuevo.',
+      urlParams: [
+        'org: identificador unico de la organizacion propietaria del workflow',
+        't: tipo de sesion; 17 indica una sesion de workflow',
+        'sid: identificador unico del workflow que decide cual abrir por defecto',
+        'lang: idioma de la conversacion segun el locale actual de la demo',
+        'mode: modo de tema segun la configuracion clara u oscura actual',
+        'navbar: control de visibilidad de la barra superior; 1 significa visible',
+        'visitorUid: identificador unico del visitante para vincular historial en modo identificado',
+        'nickname: apodo del visitante enviado a la pagina de chat en modo identificado',
+        'avatar: URL del avatar usada para mostrarlo en modo identificado'
+      ],
+      embedCodeTitle: 'Codigo de integracion actual',
+      embedCodeDescription: 'El codigo de integracion siguiente coincide con la configuracion real de esta pagina y puede copiarse directamente como entrada fija de captacion.'
+    },
     voiceAgentDemo: {
       ...en.pages.voiceAgentDemo,
       title: 'Demo del asistente de voz'
@@ -215,6 +250,9 @@ export const esEs = {
       navbarHidden: 'ACTIVADO',
       navbarShown: 'DESACTIVADO',
       navbarParamPurpose: 'Indica si se oculta la barra de navegacion superior. navbar=0 oculta la navegacion.',
+      qrCodeParamLabel: 'Mostrar boton QR',
+      threadDetailParamLabel: 'Mostrar boton de detalle',
+      visitorProfileParamLabel: 'Mostrar boton de perfil',
       loadHistoryLabel: 'Cargar historial',
       loadHistoryEnabled: 'ACTIVADO',
       loadHistoryDisabled: 'DESACTIVADO',
@@ -266,9 +304,9 @@ export const esEs = {
       sampleUrlLabel: 'URL de ejemplo generada desde la configuracion actual',
       apiHintPrefix: 'Llamadas API:',
       users: {
-        user1: 'Visitante Xiao Ming',
-        user2: 'Visitante Xiao Hong',
-        user3: 'Visitante Xiao Li'
+        user1: 'Usuario Xiao Ming',
+        user2: 'Usuario Xiao Hong',
+        user3: 'Usuario Xiao Mei'
       }
     },
     goodsInfoDemo: {

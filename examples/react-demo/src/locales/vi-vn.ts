@@ -1,3 +1,5 @@
+import { en } from './en';
+
 const basicDemoFieldDocs = {
   isDebug: 'Bật nhật ký gỡ lỗi khi phát triển.',
   forceRefresh: 'Làm mới cưỡng bức trang chat hoặc tài nguyên iframe để kiểm tra cache.',
@@ -14,7 +16,7 @@ const basicDemoFieldDocs = {
   autoPopup: 'Tự động mở cửa sổ chat sau khi khởi tạo.',
   autoPopupDelay: 'Độ trễ trước khi tự động mở.',
   draggable: 'Cho phép kéo nút vào vị trí khác.',
-  tabsConfig: 'Điều khiển hiển thị các tab home, messages, help, news.',
+  tabsConfig: 'Điều khiển hiển thị các tab messages, thread va help.',
   bubbleConfig: 'Cấu hình bong bóng nhắc phía trên nút vào.',
   buttonConfig: 'Cấu hình cho một nút vào duy nhất.',
   buttonsConfig: 'Mảng cấu hình cho nhiều nút vào, ưu tiên hơn buttonConfig.',
@@ -80,6 +82,8 @@ const basicDemoFieldDocs = {
   'chat.draft': 'Cờ phát hành xám, truyền dưới dạng draft=1 trong URL.',
   'chat.settingsUid': 'ID duy nhất dùng cho gỡ lỗi cấu hình.',
   'chat.loadHistory': 'Có tải lịch sử tin nhắn hay không. loadHistory=1 se mac dinh tai lich su khi mo trang chat.',
+  'chat.threadDetail': 'Co hien nut chi tiet hoi thoai hay khong. threadDetail=1 se hien thi, mac dinh an.',
+  'chat.visitorProfile': 'Co hien nut ho so khach truy cap hay khong. visitorProfile=1 se hien thi, mac dinh an.',
   'chat.custom': 'Có thể tiếp tục thêm trường nghiệp vụ tùy chỉnh vào URL chat.',
   'browse.referrer': 'Địa chỉ trang nguồn.',
   'browse.url': 'Địa chỉ trang hiện tại.',
@@ -107,10 +111,9 @@ const basicDemoFieldDocs = {
   'animation.type': 'Kiểu easing.',
   'window.width': 'Chiều rộng cửa sổ chat desktop.',
   'window.height': 'Chiều cao cửa sổ chat desktop.',
-  'tabs.home': 'Có hiển thị tab home hay không.',
   'tabs.messages': 'Có hiển thị tab messages hay không.',
+  'tabs.thread': 'Có hiển thị tab lich su hoi thoai hay không.',
   'tabs.help': 'Có hiển thị tab help hay không.',
-  'tabs.news': 'Có hiển thị tab news hay không.',
 } as const;
 
 export const viVn = {
@@ -179,6 +182,7 @@ export const viVn = {
     vipLevelDemo: '👑 Ca nhan hoa',
     unreadCountDemo: '🔔 Tin chua doc',
     threadHistoryDemo: '🧵 Lich su hoi thoai',
+    helpcenterDemo: '❔ Trung tam tro giup',
     videoSupportDemo: '🎥 Ho tro video',
     webrtcDemo: '📹 Demo WebRTC',
     callCenterDemo: '📞 Tong dai',
@@ -204,6 +208,9 @@ export const viVn = {
       navbarHidden: 'BAT',
       navbarShown: 'TAT',
       navbarParamPurpose: 'Co an thanh dieu huong phia tren hay khong. navbar=0 se an thanh dieu huong.',
+      qrCodeParamLabel: 'Hien nut ma QR',
+      threadDetailParamLabel: 'Hien nut chi tiet hoi thoai',
+      visitorProfileParamLabel: 'Hien nut ho so khach truy cap',
       loadHistoryLabel: 'Tai lich su',
       loadHistoryEnabled: 'BAT',
       loadHistoryDisabled: 'TAT',
@@ -212,6 +219,25 @@ export const viVn = {
       defaultTextColorLabel: 'Mac dinh',
       currentConfigTitle: 'Cau hinh hien tai',
       copyConfig: 'Sao chep JSON cau hinh',
+      urlParamsTitle: 'Tham chieu tham so',
+      urlParams: [
+        'org: ID to chuc (bat buoc)',
+        't: loai hoi thoai (0: 1-1, 1: nhom ho tro, 2: bot)',
+        'sid: ID muc tieu hoi thoai (agent / nhom / bot)',
+        'visitorUid: ID khach truy cap tuy chinh truyen vao trang doc lap (tuy chon)',
+        'nickname / avatar: thong tin hien thi cua khach truy cap tren trang chat (tuy chon)',
+        'lang: gia tri ngon ngu cua trang doc lap',
+        'mode: che do giao dien (light / dark)',
+        'backgroundColor / textColor: mau chu de cua nut noi',
+        'navbar: co an thanh dieu huong tren cung hay khong',
+        'qrcode: co hien nut ma QR cua cuoc hoi thoai hien tai hay khong (1: hien, 0: an)',
+        'threadDetail: co hien nut chi tiet hoi thoai hay khong (1: hien, mac dinh an)',
+        'visitorProfile: co hien nut ho so khach truy cap hay khong (1: hien, mac dinh an)',
+        'loadHistory: co tai lich su hoi thoai truoc do hay khong',
+        'title: tieu de chat tuy chinh khi bat',
+        'browse: JSON ngu canh browse truyen vao trang'
+      ],
+      manualEncodeHint: 'Khi tu ghep URL, hay dung encodeURIComponent cho nickname, avatar, title va gia tri JSON cua browse.',
       fieldDocs: basicDemoFieldDocs
     },
     userInfoDemo: {
@@ -253,11 +279,24 @@ export const viVn = {
         'lang/mode: ngon ngu va che do giao dien (tuy chon)'
       ],
       sampleUrlLabel: 'URL mau tao tu cau hinh hien tai',
+      parameterLabel: 'Tham so',
+      currentValueLabel: 'Gia tri hien tai',
+      purposeLabel: 'Muc dich',
+      requiredLabel: 'Bat buoc',
+      optionalLabel: 'Tuy chon',
+      manualEncodeHint: 'Khi tu tao chuoi URL, hay dung encodeURIComponent cho nickname, avatar, email, note va extra.',
+      switchApiTitle: 'API can goi sau khi chuyen nguoi dung (chi cho embedded)',
+      switchApiDescription: 'Huong dan duoi day chi ap dung khi bytedesk-web SDK duoc tich hop o che do embedded. Khi cap nhat chatConfig trong ung dung cua ban, payload khach hien tai gui vao SDK se thay doi, nhung danh tinh khach van duoc cache trong localStorage. Sau khi chuyen nguoi dung, hay goi lai API khoi tao khach de SDK so sanh visitorUid va lam moi danh tinh da cache.',
+      switchApiNotes: [
+        'Chuyen nguoi dung xac dinh: sau khi cap nhat visitorUid, nickname va avatar, hay goi initVisitor() de lam moi danh tinh khach da cache.',
+        'Chuyen sang an danh: hay goi resetAnonymousVisitor() truoc de xoa visitor UID da cache, sau do goi initVisitor() de khoi tao lai khach an danh.',
+        'Neu ban mo chat bang showChat(...), tab moi hoac cua so moi, hay thuc hien sau khi chuyen nguoi dung de URL tao ra khop voi thong tin nguoi dung moi nhat.'
+      ],
       apiHintPrefix: 'Loi goi API:',
       users: {
-        user1: 'Khach Tieu Minh',
-        user2: 'Khach Tieu Hong',
-        user3: 'Khach Tieu Ly'
+        user1: 'Nguoi dung Tieu Minh',
+        user2: 'Nguoi dung Tieu Hong',
+        user3: 'Nguoi dung Tieu Mei'
       }
     },
     goodsInfoDemo: {
@@ -542,6 +581,8 @@ export const viVn = {
         openHistoryPage: 'Mo trang lich su hoi thoai',
         switchAnonymousUser: 'Chuyen sang nguoi dung an danh'
       },
+      apiGuide: en.pages.threadHistoryDemo.apiGuide,
+      responseGuide: en.pages.threadHistoryDemo.responseGuide,
       urlGuideTitle: 'Cach dung URL + Query',
       urlTemplateLabel: 'Mau URL chung',
       urlParamsTitle: 'Tham chieu tham so (giong /chat)',
@@ -585,6 +626,27 @@ export const viVn = {
         reactDoc: 'Xem tai lieu tich hop React',
         vueDoc: 'Xem tai lieu tich hop Vue',
         reactExample: 'Nguon demo ho tro video React'
+      }
+    },
+    helpcenterDemo: {
+      title: 'Demo tab trung tam tro giup',
+      description: 'Dung tabsConfig de dieu khien cac tab o duoi cua cua so ho tro nhung, chuyen giua cua so chat, cua so lich su hoi thoai va cua so tai lieu tro giup.',
+      controlsTitle: 'Cong tac tab',
+      previewTitle: 'Hanh vi cua so nhung',
+      codeTitle: 'Mau cau hinh',
+      currentChatProfile: 'Tham so chat hien tai',
+      openChatButton: 'Mo cua so chat da tab',
+      openHelpcenterButton: 'Mo rieng trung tam tro giup',
+      helpHiddenText: 'Tab help da tat',
+      windowHint: 'Nhan nut va xem cua so nhung o goc phai duoi. messages mo chat, thread mo lich su hoi thoai, help mo tai lieu tro giup.',
+      embeddedWindowDescription: 'Trang nay khong render truc tiep Helpcenter cua visitor. No chi demo BytedeskConfig.tabsConfig anh huong den tab duoi cua cua so nhung.',
+      enabledTabsTitle: 'Cac tab duoi dang bat',
+      bubbleTitle: 'Mo cua so da tab',
+      bubbleSubtitle: 'Mo chat de thu messages, thread va help',
+      tabs: {
+        messages: 'Tab Messages',
+        thread: 'Tab Thread',
+        help: 'Tab Help',
       }
     },
     callCenterDemo: {
@@ -722,6 +784,39 @@ export const viVn = {
         vueDoc: 'Xem tai lieu tich hop Vue',
         reactExample: 'Nguon demo hoi nghi video React'
       }
+    },
+    proactiveDemo: {
+      title: 'Demo thu hut khach hang chu dong',
+      description: 'Trang nay ket noi workflow mac dinh va sau khi mo chat se vao truc tiep quy trinh sang loc hoc van, xac nhan nhu cau va thu thap thong tin lien he.',
+      tags: {
+        mobileValidation: 'Kiem tra so dien thoai',
+        multiTurnQa: 'Hoi dap nhieu luot'
+      },
+      alertTitle: 'Luong kiem tra',
+      alertDescription: 'Sau khi vao cuoc tro chuyen, workflow se thu thap hoc van va muc dich truoc, sau do yeu cau thanh pho, tinh huong tu van va so dien thoai. Bieu mau se khong gui neu so dien thoai khong dung dinh dang di dong Trung Quoc dai luc 11 so. Moi lan mo deu bat buoc tao mot workflow thread moi.',
+      workflowCardTitle: 'Workflow thu hut chu dong mac dinh',
+      workflowCardTag: 'Sang loc hoc van + xac nhan nhu cau + thu thap lien he',
+      bubbleTitle: 'Thu hut khach hang chu dong',
+      bubbleSubtitle: 'Demo thu lead workflow mac dinh',
+      buttons: {
+        openWorkflowChat: 'Mo chat workflow mac dinh',
+        closeChat: 'Dong cua so chat'
+      },
+      urlParamsTitle: 'Tham so URL workflow',
+      urlDescription: 'URL day du cua cua so doc lap thay doi theo locale, che do giao dien va tham so nhan dang khach truy cap. forceNewThread duoc giu lai trong vi du SDK ben duoi vi chi duoc dung khi mo workflow qua SDK de dam bao mot workflow thread moi.',
+      urlParams: [
+        'org: dinh danh duy nhat cua to chuc so huu workflow',
+        't: loai phien; 17 nghia la phien workflow',
+        'sid: dinh danh workflow quyet dinh workflow mac dinh nao se duoc mo',
+        'lang: ngon ngu hoi thoai theo locale hien tai cua demo',
+        'mode: che do giao dien theo cau hinh sang hoac toi hien tai',
+        'navbar: cong tac hien thanh dieu huong tren; 1 nghia la hien',
+        'visitorUid: dinh danh duy nhat cua khach de lien ket lich su trong che do xac dinh danh tinh',
+        'nickname: biet danh cua khach duoc truyen toi trang chat trong che do xac dinh danh tinh',
+        'avatar: URL anh dai dien dung de hien thi trong che do xac dinh danh tinh'
+      ],
+      embedCodeTitle: 'Ma nhung hien tai',
+      embedCodeDescription: 'Ma nhung ben duoi trung voi cau hinh thuc te cua trang nay va co the sao chep truc tiep de dung lam diem vao co dinh cho workflow thu lead.'
     },
     voiceAgentDemo: {
       title: 'Demo tro ly giong noi',
@@ -1084,10 +1179,9 @@ export const viVn = {
     onClick: () => console.log('Launcher clicked'),
   },
   tabsConfig: {
-    home: true,
-    messages: true,
     help: true,
-    news: false,
+    thread: true,
+    messages: true,
   },
   theme: {
     mode: 'light',

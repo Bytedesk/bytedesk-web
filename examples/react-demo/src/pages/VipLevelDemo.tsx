@@ -15,7 +15,7 @@
  */
 
 import { useMemo } from 'react';
-import { Alert, Button, Card, Typography, Space, Tag, theme as antdTheme } from 'antd';
+import { Alert, Button, Card, Table, Typography, Space, Tag, theme as antdTheme, FloatButton } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -26,6 +26,8 @@ import PageContainer from '../components/PageContainer';
 import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
+import { buildUrlParamRowsWithEncodeHint } from '../utils/url-param-guide';
+import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
 
 const { Title, Paragraph } = Typography;
 
@@ -62,7 +64,7 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     const currentUser = users.find((user) => user.key === selectedUser.key) || users[0];
     const docLinks = useMemo(
         () => [
-            { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/viplevel', label: messages.pages.vipLevelDemo.docLinks.vipDoc },
+            { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/viplevel', label: messages.pages.vipLevelDemo.docLinks.vipDoc },
             { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/VipLevelDemo.tsx', label: messages.pages.vipLevelDemo.docLinks.reactExample },
             { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/vipLevelDemo.vue', label: messages.pages.vipLevelDemo.docLinks.vueExample }
         ],
@@ -153,11 +155,6 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     const formatSwitchLabel = (name: string) =>
         messages.pages.vipLevelDemo.switchButtonLabel.replace('{{name}}', name);
 
-    const urlTemplate = useMemo(() => {
-        const { org, t, sid } = selectedChatProfile.chatConfig;
-        return `{{BASE_URL}}/chat?org=${org}&t=${t}&sid=${sid}&visitorUid=visitor_001&nickname=普通体验账号&avatar=https%3A%2F%2Fweiyuai.cn%2Fassets%2Fimages%2Favatar%2F02.jpg&vipLevel=0&extra=%7B...%7D&lang=zh-cn&mode=light`;
-    }, [selectedChatProfile]);
-
     const sampleUrl = useMemo(() => {
         const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/chat(?:\/thread)?\/?$/, '');
         const params = new URLSearchParams();
@@ -180,7 +177,18 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         return `${baseHtmlUrl}/chat?${params.toString()}`;
     }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
 
-    const urlParams = messages.pages.vipLevelDemo.urlParams;
+    const requiredUrlParams = useMemo(() => new Set(['org', 't', 'sid']), []);
+    const currentUrlParamMap = useMemo(() => new URL(sampleUrl).searchParams, [sampleUrl]);
+    const embedCodeCopy = useMemo(() => getCurrentEmbedCodeCopy(locale), [locale]);
+    const urlParamRows = useMemo(
+        () => buildUrlParamRowsWithEncodeHint(
+            messages.pages.vipLevelDemo.urlParams,
+            currentUrlParamMap,
+            locale,
+            ['nickname', 'avatar', 'extra']
+        ),
+        [currentUrlParamMap, locale, messages.pages.vipLevelDemo.urlParams]
+    );
 
     const vipPayload = useMemo(() => ({
         vipLevel: String(currentUser.vipLevel),
@@ -194,6 +202,22 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     const vipPayloadEncoded = useMemo(() => encodeURIComponent(vipPayloadJson), [vipPayloadJson]);
     const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
     const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
+    const codeBlockStyle = useMemo(() => ({
+        margin: 0,
+        padding: '12px 14px',
+        borderRadius: 8,
+        border: `1px solid ${token.colorBorderSecondary || token.colorBorder}`,
+        background: token.colorFillQuaternary,
+        fontSize: 12,
+        lineHeight: 1.7,
+        fontFamily: 'SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace',
+        whiteSpace: 'pre-wrap' as const,
+        wordBreak: 'break-all' as const
+    }), [token.colorBorder, token.colorBorderSecondary, token.colorFillQuaternary]);
+    const currentEmbedCodeExample = useMemo(
+        () => buildCurrentEmbedCodeExample({ config }),
+        [config]
+    );
 
     return (
         <PageContainer>
@@ -298,18 +322,59 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
 
             <Card title={messages.pages.vipLevelDemo.urlGuideTitle}>
                 <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
-                    <Typography.Text strong>{messages.pages.vipLevelDemo.urlTemplateLabel}</Typography.Text>
-                    <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{urlTemplate}</pre>
-
-                    <Typography.Text strong>{messages.pages.vipLevelDemo.urlParamsTitle}</Typography.Text>
-                    <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
-                        {urlParams.map((item) => (
-                            <li key={item}>{item}</li>
-                        ))}
-                    </ul>
+                    {/* <Typography.Text strong>{messages.pages.vipLevelDemo.urlTemplateLabel}</Typography.Text> */}
+                    {/* <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{urlTemplate}</pre> */}
 
                     <Typography.Text strong>{messages.pages.vipLevelDemo.sampleUrlLabel}</Typography.Text>
                     <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
+
+                    <Typography.Text strong>{messages.pages.vipLevelDemo.urlParamsTitle}</Typography.Text>
+                    <Table
+                        size="small"
+                        bordered
+                        pagination={false}
+                        rowKey="key"
+                        dataSource={urlParamRows}
+                        columns={[
+                            {
+                                title: messages.pages.userInfoDemo.parameterLabel,
+                                dataIndex: 'key',
+                                key: 'key',
+                                render: (value: string) => (
+                                    <Space size={6}>
+                                        <Typography.Text copyable={{ text: value }}>{value}</Typography.Text>
+                                        <Tag color={requiredUrlParams.has(value) ? 'error' : 'default'}>
+                                            {requiredUrlParams.has(value)
+                                                ? messages.pages.userInfoDemo.requiredLabel
+                                                : messages.pages.userInfoDemo.optionalLabel}
+                                        </Tag>
+                                    </Space>
+                                ),
+                            },
+                            {
+                                title: messages.pages.userInfoDemo.currentValueLabel,
+                                dataIndex: 'value',
+                                key: 'value',
+                                render: (value: string) => {
+                                    const hasCopyableValue = value.trim() !== '' && value !== '-';
+
+                                    return (
+                                        <Typography.Paragraph
+                                            copyable={hasCopyableValue ? { text: value } : false}
+                                            style={{ marginBottom: 0, wordBreak: 'break-all' }}
+                                        >
+                                            {value}
+                                        </Typography.Paragraph>
+                                    );
+                                },
+                            },
+                            {
+                                title: messages.pages.userInfoDemo.purposeLabel,
+                                dataIndex: 'purpose',
+                                key: 'purpose',
+                            },
+                        ]}
+                    />
                 </Space>
             </Card>
 
@@ -335,7 +400,23 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                 </Space>
             </Card>
 
+            <Card title={embedCodeCopy.title}>
+                <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+                    <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                        {embedCodeCopy.description}
+                    </Typography.Paragraph>
+                    <Typography.Paragraph
+                        copyable={{ text: currentEmbedCodeExample }}
+                        style={{ ...codeBlockStyle, marginBottom: 0 }}
+                    >
+                        {currentEmbedCodeExample}
+                    </Typography.Paragraph>
+                </Space>
+            </Card>
+
             <BytedeskReact {...config} />
+
+            <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
         </PageContainer>
     );
 };

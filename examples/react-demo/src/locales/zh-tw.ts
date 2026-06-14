@@ -1,3 +1,5 @@
+import { en } from './en';
+
 const basicDemoFieldDocs = {
   isDebug: '是否啟用偵錯日誌。開發聯調時建議啟用，生產環境通常關閉。',
   forceRefresh: '是否強制重新整理聊天頁或 iframe 資源，適合偵測快取問題。',
@@ -14,7 +16,7 @@ const basicDemoFieldDocs = {
   autoPopup: '初始化完成後是否自動彈出聊天視窗。',
   autoPopupDelay: '自動彈出的延遲時間，單位毫秒。',
   draggable: '是否允許拖動入口模組。啟用後用戶可拖動按鈕位置。',
-  tabsConfig: '控制聊天頁內置 tab 的顯隱，包括 home、messages、help、news。',
+  tabsConfig: '控制聊天頁內置 tab 的顯隱，包括 help、thread、messages。',
   bubbleConfig: '控制入口上方提示氣泡，包括標題、副標題、多條輪播、切換方式等。',
   buttonConfig: '單入口按鈕設定。只有一個入口時通常使用這個物件。',
   buttonsConfig: '多入口按鈕陣列。設定後優先級高於 buttonConfig，用於同時展示 chat、thread、webrtc、call、二維碼等入口。',
@@ -80,6 +82,8 @@ const basicDemoFieldDocs = {
   'chat.draft': '灰度標識，會透傳為 URL draft=1。',
   'chat.settingsUid': '設定唯一 ID，主要用於偵錯設定。',
   'chat.loadHistory': '是否載入歷史訊息。loadHistory=1 時開啟對話頁面預設載入歷史聊天記錄。',
+  'chat.threadDetail': '是否顯示會話詳情按鈕。threadDetail=1 時顯示，預設不顯示。',
+  'chat.visitorProfile': '是否顯示訪客資料按鈕。visitorProfile=1 時顯示，預設不顯示。',
   'chat.custom': '支援繼續追加其他自訂業務欄位，都會被拼入聊天 URL 參數。',
   'browse.referrer': '來源頁面位址。',
   'browse.url': '目前頁面 URL。',
@@ -107,10 +111,9 @@ const basicDemoFieldDocs = {
   'animation.type': '緩動類型，可選 ease、linear、ease-in、ease-out、ease-in-out。',
   'window.width': '桌面端聊天視窗寬度。',
   'window.height': '桌面端聊天視窗高度。',
-  'tabs.home': '是否顯示首頁 tab。',
   'tabs.messages': '是否顯示訊息 tab。',
+  'tabs.thread': '是否顯示歷史會話 tab。',
   'tabs.help': '是否顯示說明 tab。',
-  'tabs.news': '是否顯示新聞 tab。',
 } as const;
 
 export const zhTw = {
@@ -179,6 +182,7 @@ export const zhTw = {
     vipLevelDemo: '👑 千人千面',
     unreadCountDemo: '🔔 未讀訊息對接',
     threadHistoryDemo: '🧵 歷史會話示範',
+    helpcenterDemo: '❔ 幫助中心示範',
     videoSupportDemo: '🎥 影片客服示範',
     webrtcDemo: '📹 音視訊客服示範',
     callCenterDemo: '📞 电话客服示範',
@@ -204,6 +208,9 @@ export const zhTw = {
       navbarHidden: '是',
       navbarShown: '否',
       navbarParamPurpose: '是否隱藏頂部導覽列。navbar=0 時隱藏導覽。',
+      qrCodeParamLabel: '顯示 QR Code 按鈕',
+      threadDetailParamLabel: '顯示會話詳情按鈕',
+      visitorProfileParamLabel: '顯示訪客資料按鈕',
       loadHistoryLabel: '載入歷史訊息',
       loadHistoryEnabled: '開啟',
       loadHistoryDisabled: '關閉',
@@ -212,6 +219,25 @@ export const zhTw = {
       defaultTextColorLabel: '預設',
       currentConfigTitle: '目前設定',
       copyConfig: '複製配置 JSON',
+      urlParamsTitle: '參數說明',
+      urlParams: [
+        'org：組織 ID（必填）',
+        't：會話類型（0：一對一，1：工作組，2：機器人）',
+        'sid：會話目標 ID（客服 / 工作組 / 機器人）',
+        'visitorUid：傳給獨立頁的自訂訪客 ID（可選）',
+        'nickname / avatar：聊天頁展示的訪客資訊（可選）',
+        'lang：獨立頁使用的語言參數',
+        'mode：主題模式（light / dark）',
+        'backgroundColor / textColor：浮動入口主題顏色',
+        'navbar：是否隱藏頂部導覽列',
+        'qrcode：是否顯示當前對話 QR Code 按鈕（1：顯示，0：隱藏）',
+        'threadDetail：是否顯示會話詳情按鈕（1：顯示，預設不顯示）',
+        'visitorProfile：是否顯示訪客資料按鈕（1：顯示，預設不顯示）',
+        'loadHistory：是否載入歷史會話訊息',
+        'title：啟用後傳入自訂聊天標題',
+        'browse：傳給頁面的瀏覽上下文 JSON'
+      ],
+      manualEncodeHint: '手動拼接 URL 時，建議對 nickname、avatar、title 與 browse JSON 使用 encodeURIComponent 編碼。',
       fieldDocs: basicDemoFieldDocs
     },
     userInfoDemo: {
@@ -254,11 +280,24 @@ export const zhTw = {
         'lang/mode：語言與主題參數（選填）'
       ],
       sampleUrlLabel: '依目前設定產生的示例 URL',
+      parameterLabel: '參數',
+      currentValueLabel: '目前值',
+      purposeLabel: '說明',
+      requiredLabel: '必填',
+      optionalLabel: '選填',
+      manualEncodeHint: '手動組裝 URL 時，建議對 nickname、avatar、email、note、extra 使用 encodeURIComponent 編碼。',
+      switchApiTitle: '切換使用者後的 API 呼叫（僅嵌入式整合）',
+      switchApiDescription: '以下說明僅適用於以嵌入式方式整合 bytedesk-web SDK 的情境。在你自己的應用程式中更新 chatConfig 時，目前傳給 SDK 的訪客參數會改變，但 SDK 仍會把訪客身份快取到 localStorage。切換使用者後，建議再次呼叫訪客初始化介面，讓 SDK 依最新 visitorUid 重新比對並刷新快取身份。',
+      switchApiNotes: [
+        '實名使用者切換：更新 visitorUid、nickname、avatar 後，呼叫 initVisitor()，讓 SDK 用最新使用者資訊重新執行一次訪客初始化。',
+        '匿名使用者切換：先呼叫 resetAnonymousVisitor() 清除已快取的訪客 UID，再呼叫 initVisitor() 重新初始化匿名訪客。',
+        '如果你是透過 showChat(...)、新分頁或新視窗開啟會話，建議在切換使用者並完成上述呼叫後再開啟，確保產生的 URL 與目前使用者資訊一致。'
+      ],
       apiHintPrefix: '呼叫程式：',
       users: {
-        user1: '訪客小明',
-        user2: '訪客小紅',
-        user3: '訪客小李'
+        user1: '用戶小明',
+        user2: '用戶小紅',
+        user3: '用戶小美'
       }
     },
     goodsInfoDemo: {
@@ -545,6 +584,8 @@ export const zhTw = {
         openHistoryPage: '開啟歷史會話頁',
         switchAnonymousUser: '切換到匿名使用者'
       },
+      apiGuide: en.pages.threadHistoryDemo.apiGuide,
+      responseGuide: en.pages.threadHistoryDemo.responseGuide,
       urlGuideTitle: 'URL + 參數使用說明',
       urlTemplateLabel: '通用 URL 範本',
       urlParamsTitle: '參數說明（與 /chat 一致）',
@@ -588,6 +629,27 @@ export const zhTw = {
         reactDoc: '查看 React 集成文件',
         vueDoc: '查看 Vue 集成文件',
         reactExample: 'React 影片客服示範原始碼'
+      }
+    },
+    helpcenterDemo: {
+      title: '幫助中心 Tab 示範',
+      description: '透過 tabsConfig 控制嵌入式客服視窗底部多個 tab 的顯示與隱藏，用於在同一個小窗中切換對話視窗、歷史會話視窗和幫助文件視窗。',
+      controlsTitle: 'Tab 開關',
+      previewTitle: '嵌入式視窗效果',
+      codeTitle: '設定範例',
+      currentChatProfile: '目前諮詢參數',
+      openChatButton: '開啟多 Tab 客服視窗',
+      openHelpcenterButton: '單獨開啟幫助中心',
+      helpHiddenText: 'help tab 已關閉',
+      windowHint: '點擊按鈕後查看右下角嵌入式視窗，底部會顯示已啟用的 tab。messages 開啟對話視窗，thread 開啟歷史會話視窗，help 開啟幫助文件視窗。',
+      embeddedWindowDescription: '本頁不直接渲染 visitor 的 Helpcenter 頁面，只示範 BytedeskConfig.tabsConfig 如何影響嵌入式視窗底部 tab。',
+      enabledTabsTitle: '目前將顯示的底部 tab',
+      bubbleTitle: '查看多 Tab 視窗',
+      bubbleSubtitle: '開啟客服視窗體驗 help、thread、messages tab',
+      tabs: {
+        messages: '訊息 tab',
+        thread: '歷史會話 tab',
+        help: '幫助 tab',
       }
     },
     callCenterDemo: {
@@ -725,6 +787,39 @@ export const zhTw = {
         vueDoc: '查看 Vue 集成文件',
         reactExample: 'React 視訊會議示範原始碼'
       }
+    },
+    proactiveDemo: {
+      title: '主動獲客示範',
+      description: '這個頁面接入預設工作流，點擊按鈕後會直接進入學歷篩查、訴求確認與聯絡方式採集流程。',
+      tags: {
+        mobileValidation: '手機號校驗',
+        multiTurnQa: '多輪問答'
+      },
+      alertTitle: '驗證路徑',
+      alertDescription: '進入對話後會依序收集學歷、訴求，再要求填寫城市、諮詢場景與手機號。當手機號不符合 11 位中國大陸手機格式時，表單不會提交。每次打開都會強制新建工作流會話。',
+      workflowCardTitle: '預設主動獲客工作流',
+      workflowCardTag: '學歷篩查 + 訴求確認 + 聯絡方式採集',
+      bubbleTitle: '主動獲客',
+      bubbleSubtitle: '預設工作流留資示範',
+      buttons: {
+        openWorkflowChat: '打開預設工作流對話',
+        closeChat: '關閉會話視窗'
+      },
+      urlParamsTitle: '工作流參數說明',
+      urlDescription: '目前獨立視窗完整 URL 會跟隨 locale、主題模式與訪客身份參數變化；forceNewThread 用於 SDK 打開會話時強制新建 workflow 執行緒，因此保留在下方嵌入程式碼中展示。',
+      urlParams: [
+        'org: 組織唯一標識，指定工作流所屬組織',
+        't: 會話類型，17 表示 workflow 工作流會話',
+        'sid: 工作流唯一標識，決定進入哪條預設工作流',
+        'lang: 會話語言，跟隨當前示例頁 locale',
+        'mode: 主題模式，跟隨當前淺色或深色配置',
+        'navbar: 頂部導航顯示開關，1 表示顯示',
+        'visitorUid: 訪客唯一標識，實名模式下用於綁定歷史訪客',
+        'nickname: 訪客暱稱，實名模式下透傳到會話頁',
+        'avatar: 訪客頭像位址，實名模式下用於展示頭像'
+      ],
+      embedCodeTitle: '目前嵌入程式碼',
+      embedCodeDescription: '目前嵌入程式碼與本頁實際接入設定一致，複製後可直接作為固定 workflow 留資入口使用。'
     },
     voiceAgentDemo: {
       title: '語音助手示範',
@@ -1087,10 +1182,9 @@ export const zhTw = {
     onClick: () => console.log('按鈕被點擊'),
   },
   tabsConfig: {
-    home: true,
-    messages: true,
     help: true,
-    news: false,
+    thread: true,
+    messages: true,
   },
   theme: {
     mode: 'light',

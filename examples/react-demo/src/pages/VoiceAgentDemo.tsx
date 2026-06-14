@@ -1,15 +1,16 @@
 import { useMemo } from 'react';
-import { Alert, Button, Card, Space, Tag, Typography, theme as antdTheme } from 'antd';
+import { Alert, Button, Card, FloatButton, Space, Table, Tag, Typography } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
-import CurrentUserProfile from '../components/CurrentUserProfile';
 import PageContainer from '../components/PageContainer';
 import { getLocaleMessages } from '../locales';
-import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
+import type { DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, type DemoChatProfile } from '../types/chat-profile';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
+import { buildUrlParamRowsWithEncodeHint } from '../utils/url-param-guide';
+import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
 
 interface VoiceAgentDemoProps {
   locale: Language;
@@ -17,8 +18,6 @@ interface VoiceAgentDemoProps {
   selectedChatProfile: DemoChatProfile;
   selectedUser: DemoUserProfile;
   isAnonymousMode: boolean;
-  onSelectUser: (nextUser: DemoUserKey) => void;
-  onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
 const VoiceAgentDemo = ({
@@ -27,24 +26,23 @@ const VoiceAgentDemo = ({
   selectedChatProfile,
   selectedUser,
   isAnonymousMode,
-  onSelectUser,
-  onAnonymousModeChange,
 }: VoiceAgentDemoProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const m = messages.pages.voiceAgentDemo;
-  const { token } = antdTheme.useToken();
   const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
-
-  const users = useMemo(
-    () =>
-      (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
-        key,
-        visitorUid: DEMO_USER_PRESETS[key].visitorUid,
-        avatar: DEMO_USER_PRESETS[key].avatar,
-        nickname: messages.pages.userInfoDemo.users[key],
-      })),
-    [messages]
-  );
+  const requiredUrlParams = useMemo(() => new Set(['org', 't', 'sid']), []);
+  const embedCodeCopy = useMemo(() => getCurrentEmbedCodeCopy(locale), [locale]);
+  const codeBlockStyle = useMemo(() => ({
+    margin: 0,
+    padding: '12px 14px',
+    borderRadius: 8,
+    background: 'rgba(0,0,0,0.04)',
+    fontSize: 12,
+    lineHeight: 1.7,
+    fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace',
+    whiteSpace: 'pre-wrap' as const,
+    wordBreak: 'break-all' as const
+  }), []);
 
   const docLinks = useMemo(
     () => [
@@ -115,9 +113,15 @@ const VoiceAgentDemo = ({
   }, [htmlBaseUrl, isAnonymousMode, locale, selectedChatProfile, selectedUser, themeMode]);
 
   const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
-
-  const formatSwitchLabel = (name: string) =>
-    messages.pages.userInfoDemo.switchToUserLabel.replace('{{name}}', name);
+  const currentUrlParamMap = useMemo(() => new URL(sampleUrl).searchParams, [sampleUrl]);
+  const urlParamRows = useMemo(
+    () => buildUrlParamRowsWithEncodeHint(m.urlParams, currentUrlParamMap, locale, ['visitorUid', 'nickname', 'avatar']),
+    [currentUrlParamMap, locale, m.urlParams]
+  );
+  const currentEmbedCodeExample = useMemo(
+    () => buildCurrentEmbedCodeExample({ config }),
+    [config]
+  );
 
   return (
     <PageContainer>
@@ -154,52 +158,6 @@ const VoiceAgentDemo = ({
             title={m.recommendedProfileNotice}
           />
 
-          <Space orientation="vertical" size={8} style={{ width: '100%' }}>
-            <CurrentUserProfile
-              title={messages.pages.userInfoDemo.currentUserTitle}
-              isAnonymousMode={isAnonymousMode}
-              avatar={selectedUser.avatar}
-              anonymousIdText={m.anonymousUserHint}
-              anonymousNicknameText={messages.pages.userInfoDemo.anonymousUserLabel}
-              userIdLabel={messages.pages.userInfoDemo.currentUserIdLabel}
-              userId={selectedUser.visitorUid}
-              userNicknameLabel={messages.pages.userInfoDemo.currentUserNicknameLabel}
-              userNickname={selectedUser.nickname}
-              compact
-            />
-            <Space wrap>
-              {users.map((user) => (
-                <Button
-                  key={user.visitorUid}
-                  type="primary"
-                  onClick={() => {
-                    if (!isAnonymousMode && selectedUser.key === user.key) return;
-                    onAnonymousModeChange(false);
-                    onSelectUser(user.key);
-                  }}
-                  style={
-                    !isAnonymousMode && selectedUser.key === user.key
-                      ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess }
-                      : undefined
-                  }
-                >
-                  {formatSwitchLabel(user.nickname)}
-                  {!isAnonymousMode && selectedUser.key === user.key ? '【当前】' : ''}
-                </Button>
-              ))}
-              <Button
-                type={isAnonymousMode ? 'primary' : 'default'}
-                onClick={() => {
-                  if (!isAnonymousMode) onAnonymousModeChange(true);
-                }}
-                style={isAnonymousMode ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
-              >
-                {m.buttons.switchAnonymousUser}
-                {isAnonymousMode ? '【当前】' : ''}
-              </Button>
-            </Space>
-          </Space>
-
           <Space wrap>
             <Button type="primary" onClick={() => (window as any).bytedesk?.showChat()}>
               {m.buttons.openVoiceAgent}
@@ -230,23 +188,23 @@ const VoiceAgentDemo = ({
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
 
-          <div>
+          {/* <div>
             <Typography.Text strong>{m.capabilityTitle}</Typography.Text>
             <ul style={{ margin: '8px 0 0', paddingLeft: 20, lineHeight: 1.8 }}>
               {m.capabilityItems.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
-          </div>
+          </div> */}
 
-          <div>
+          {/* <div>
             <Typography.Text strong>{m.usageTitle}</Typography.Text>
             <ul style={{ margin: '8px 0 0', paddingLeft: 20, lineHeight: 1.8 }}>
               {m.usageNotes.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
-          </div>
+          </div> */}
         </Space>
       </Card>
 
@@ -255,18 +213,69 @@ const VoiceAgentDemo = ({
           <Typography.Text strong>{m.sampleUrlLabel}</Typography.Text>
           <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{sampleUrl}</pre>
 
-          <div>
-            <Typography.Text strong>{m.urlParamsTitle}</Typography.Text>
-            <ul style={{ margin: '8px 0 0', paddingLeft: 20, lineHeight: 1.8 }}>
-              {m.urlParams.map((param) => (
-                <li key={param}>{param}</li>
-              ))}
-            </ul>
-          </div>
+          <Typography.Text strong>{m.urlParamsTitle}</Typography.Text>
+          <Table
+            size="small"
+            bordered
+            pagination={false}
+            rowKey="key"
+            dataSource={urlParamRows}
+            columns={[
+              {
+                title: messages.pages.userInfoDemo.parameterLabel,
+                dataIndex: 'key',
+                key: 'key',
+                render: (value: string) => (
+                  <Space size={6}>
+                    <Typography.Text copyable={{ text: value }}>{value}</Typography.Text>
+                    <Tag color={requiredUrlParams.has(value) ? 'error' : 'default'}>
+                      {requiredUrlParams.has(value)
+                        ? messages.pages.userInfoDemo.requiredLabel
+                        : messages.pages.userInfoDemo.optionalLabel}
+                    </Tag>
+                  </Space>
+                ),
+              },
+              {
+                title: messages.pages.userInfoDemo.currentValueLabel,
+                dataIndex: 'value',
+                key: 'value',
+                render: (value: string) => (
+                  <Typography.Paragraph
+                    copyable={value.trim() !== '' && value !== '-' ? { text: value } : false}
+                    style={{ marginBottom: 0, wordBreak: 'break-all' }}
+                  >
+                    {value}
+                  </Typography.Paragraph>
+                ),
+              },
+              {
+                title: messages.pages.userInfoDemo.purposeLabel,
+                dataIndex: 'purpose',
+                key: 'purpose',
+              },
+            ]}
+          />
+        </Space>
+      </Card>
+
+      <Card title={embedCodeCopy.title}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {embedCodeCopy.description}
+          </Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{ text: currentEmbedCodeExample }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {currentEmbedCodeExample}
+          </Typography.Paragraph>
         </Space>
       </Card>
 
       <BytedeskReact {...config} />
+
+      <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
     </PageContainer>
   );
 };

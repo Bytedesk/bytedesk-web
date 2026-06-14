@@ -14,5 +14,5 @@ rm -rf ./$DIST
 # 打包完，复制
 echo "Building project..."
 # 打包完，上传到服务器
-yarn build && \
+pnpm build && \
 scp -r ./$DIST/* root@$SERVER_HOST:$TARGET_DIST

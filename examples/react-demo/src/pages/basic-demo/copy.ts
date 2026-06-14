@@ -24,6 +24,11 @@ export interface BasicDemoLocalizedCopy {
   apiMessageLabel: string;
   consultParamsLabel: string;
   entrySelectorLabel: string;
+  entryIconLabel: string;
+  entryTextToggleLabel: string;
+  entryTextInputLabel: string;
+  entryTextInputPlaceholder: string;
+  entryDefaultIconLabel: string;
   entryChatLabel: string;
   entryThreadLabel: string;
   entryWebrtcLabel: string;
@@ -33,11 +38,9 @@ export interface BasicDemoLocalizedCopy {
   qrInputPlaceholder: string;
   bubbleDemoLabel: string;
   popupUrlTitle: string;
-  popupUrlParamsTitle: string;
-  popupParamNameTitle: string;
-  popupParamValueTitle: string;
-  popupParamPurposeTitle: string;
-  popupParamUnknownPurpose: string;
+  popupUrlDescription: string;
+  embedCodeTitle: string;
+  embedCodeDescription: string;
 }
 
 export interface ConfigGuideCopy {
@@ -142,6 +145,11 @@ export const getLocalizedCopy = (
         apiMessageLabel: 'API hien tai:',
         consultParamsLabel: 'Tham so tu van:',
         entrySelectorLabel: 'Demo nhieu loi vao',
+        entryIconLabel: 'Icon loi vao',
+        entryTextToggleLabel: 'Van ban tren nut',
+        entryTextInputLabel: 'Noi dung van ban tren nut',
+        entryTextInputPlaceholder: 'De trong de dung nhan mac dinh cua tung nut',
+        entryDefaultIconLabel: 'Mac dinh',
         entryChatLabel: 'Van ban',
         entryThreadLabel: 'Lich su',
         entryWebrtcLabel: 'Video',
@@ -151,11 +159,9 @@ export const getLocalizedCopy = (
         qrInputPlaceholder: 'Nhap URL hinh QR',
         bubbleDemoLabel: `Demo bong: bubbleConfig.messages + autoRotate + rotateInterval + switchMode=${bubbleSwitchMode}`,
         popupUrlTitle: 'URL cua cua so rieng hien tai:',
-        popupUrlParamsTitle: 'Danh sach tham so URL hien tai:',
-        popupParamNameTitle: 'Tham so',
-        popupParamValueTitle: 'Gia tri',
-        popupParamPurposeTitle: 'Cong dung',
-        popupParamUnknownPurpose: 'Tham so URL mo rong tuy chinh.'
+        popupUrlDescription: 'URL nay se thay doi theo cau hinh hien tai va co the duoc sao chep de mo cua so doc lap ngay lap tuc.',
+        embedCodeTitle: 'Ma nhung hien tai:',
+        embedCodeDescription: 'Doan ma nay duoc tao theo cau hinh hien tai. Sao chep vao du an React de su dung truc tiep.'
       };
     case LANG_MS_MY:
       return {
@@ -170,6 +176,11 @@ export const getLocalizedCopy = (
         apiMessageLabel: 'API semasa:',
         consultParamsLabel: 'Parameter rundingan:',
         entrySelectorLabel: 'Demo pelbagai pintu masuk',
+        entryIconLabel: 'Ikon pintu masuk',
+        entryTextToggleLabel: 'Teks pada butang',
+        entryTextInputLabel: 'Kandungan teks butang',
+        entryTextInputPlaceholder: 'Biarkan kosong untuk guna label lalai setiap butang',
+        entryDefaultIconLabel: 'Lalai',
         entryChatLabel: 'Teks',
         entryThreadLabel: 'Sejarah',
         entryWebrtcLabel: 'Video',
@@ -179,11 +190,9 @@ export const getLocalizedCopy = (
         qrInputPlaceholder: 'Masukkan URL imej QR',
         bubbleDemoLabel: `Demo gelembung: bubbleConfig.messages + autoRotate + rotateInterval + switchMode=${bubbleSwitchMode}`,
         popupUrlTitle: 'URL tetingkap berasingan semasa:',
-        popupUrlParamsTitle: 'Senarai parameter URL semasa:',
-        popupParamNameTitle: 'Parameter',
-        popupParamValueTitle: 'Nilai',
-        popupParamPurposeTitle: 'Tujuan',
-        popupParamUnknownPurpose: 'Parameter URL tambahan tersuai.'
+        popupUrlDescription: 'URL ini akan berubah bersama konfigurasi semasa dan boleh terus disalin untuk membuka tetingkap berasingan.',
+        embedCodeTitle: 'Kod benam semasa:',
+        embedCodeDescription: 'Kod ini dijana daripada konfigurasi semasa. Salin ke projek React anda untuk digunakan terus.'
       };
     case LANG_ES_ES:
       return {
@@ -198,6 +207,11 @@ export const getLocalizedCopy = (
         apiMessageLabel: 'API actual:',
         consultParamsLabel: 'Parametros de consulta:',
         entrySelectorLabel: 'Demo de entradas multiples',
+        entryIconLabel: 'Icono de entrada',
+        entryTextToggleLabel: 'Texto del boton',
+        entryTextInputLabel: 'Contenido del texto del boton',
+        entryTextInputPlaceholder: 'Dejalo vacio para usar la etiqueta predeterminada de cada boton',
+        entryDefaultIconLabel: 'Predeterminado',
         entryChatLabel: 'Texto',
         entryThreadLabel: 'Historial',
         entryWebrtcLabel: 'Video',
@@ -207,11 +221,9 @@ export const getLocalizedCopy = (
         qrInputPlaceholder: 'Introduce la URL de la imagen QR',
         bubbleDemoLabel: `Demo de globo: bubbleConfig.messages + autoRotate + rotateInterval + switchMode=${bubbleSwitchMode}`,
         popupUrlTitle: 'URL completa actual de la ventana independiente:',
-        popupUrlParamsTitle: 'Lista actual de parametros URL:',
-        popupParamNameTitle: 'Parametro',
-        popupParamValueTitle: 'Valor',
-        popupParamPurposeTitle: 'Uso',
-        popupParamUnknownPurpose: 'Parametro URL personalizado adicional.'
+        popupUrlDescription: 'Esta URL cambia segun la configuracion actual y se puede copiar directamente para abrir la ventana independiente.',
+        embedCodeTitle: 'Codigo embebido actual:',
+        embedCodeDescription: 'Este codigo se genera segun la configuracion actual. Copialo en tu proyecto React para usarlo directamente.'
       };
     case LANG_FR_FR:
       return {
@@ -226,6 +238,11 @@ export const getLocalizedCopy = (
         apiMessageLabel: 'API actuelle :',
         consultParamsLabel: 'Parametres de consultation :',
         entrySelectorLabel: 'Demo multi-entrees',
+        entryIconLabel: 'Icone d entree',
+        entryTextToggleLabel: 'Texte du bouton',
+        entryTextInputLabel: 'Contenu du texte du bouton',
+        entryTextInputPlaceholder: 'Laissez vide pour utiliser le libelle par defaut de chaque bouton',
+        entryDefaultIconLabel: 'Defaut',
         entryChatLabel: 'Texte',
         entryThreadLabel: 'Historique',
         entryWebrtcLabel: 'Video',
@@ -235,11 +252,9 @@ export const getLocalizedCopy = (
         qrInputPlaceholder: 'Saisissez l URL de l image QR',
         bubbleDemoLabel: `Demo de bulle : bubbleConfig.messages + autoRotate + rotateInterval + switchMode=${bubbleSwitchMode}`,
         popupUrlTitle: 'URL complete actuelle de la fenetre independante :',
-        popupUrlParamsTitle: 'Liste actuelle des parametres URL :',
-        popupParamNameTitle: 'Parametre',
-        popupParamValueTitle: 'Valeur',
-        popupParamPurposeTitle: 'Usage',
-        popupParamUnknownPurpose: 'Parametre URL personnalise supplementaire.'
+        popupUrlDescription: 'Cette URL suit la configuration actuelle et peut etre copiee telle quelle pour ouvrir la fenetre autonome.',
+        embedCodeTitle: 'Code embarque actuel :',
+        embedCodeDescription: 'Ce code est genere a partir de la configuration courante. Copiez-le dans votre projet React pour l utiliser directement.'
       };
     case LANG_EN:
       return {
@@ -254,6 +269,11 @@ export const getLocalizedCopy = (
         apiMessageLabel: 'Current API:',
         consultParamsLabel: 'Consultation params:',
         entrySelectorLabel: 'Multi-entry demo',
+        entryIconLabel: 'Entry icon',
+        entryTextToggleLabel: 'Button text',
+        entryTextInputLabel: 'Button text content',
+        entryTextInputPlaceholder: 'Leave empty to use each button\'s default label',
+        entryDefaultIconLabel: 'Default',
         entryChatLabel: 'Text',
         entryThreadLabel: 'History',
         entryWebrtcLabel: 'Video',
@@ -263,11 +283,9 @@ export const getLocalizedCopy = (
         qrInputPlaceholder: 'Enter QR image URL',
         bubbleDemoLabel: `Bubble demo: bubbleConfig.messages + autoRotate + rotateInterval + switchMode=${bubbleSwitchMode}`,
         popupUrlTitle: 'Current standalone window full URL:',
-        popupUrlParamsTitle: 'Current URL parameter list:',
-        popupParamNameTitle: 'Parameter',
-        popupParamValueTitle: 'Value',
-        popupParamPurposeTitle: 'Purpose',
-        popupParamUnknownPurpose: 'Additional custom URL parameter.'
+        popupUrlDescription: 'This URL updates with the current configuration and can be copied as-is to open the standalone chat window.',
+        embedCodeTitle: 'Current embed code:',
+        embedCodeDescription: 'This snippet is generated from the current configuration. Copy it into your React project and use it directly.'
       };
     case LANG_JA_JP:
       return {
@@ -282,6 +300,11 @@ export const getLocalizedCopy = (
         apiMessageLabel: '現在の API:',
         consultParamsLabel: '相談パラメータ:',
         entrySelectorLabel: '複数入口デモ',
+        entryIconLabel: '入口アイコン',
+        entryTextToggleLabel: 'ボタン文言',
+        entryTextInputLabel: 'ボタン文言の内容',
+        entryTextInputPlaceholder: '空欄の場合は各ボタンの既定ラベルを使います',
+        entryDefaultIconLabel: 'デフォルト',
         entryChatLabel: 'テキスト',
         entryThreadLabel: '履歴',
         entryWebrtcLabel: '映像',
@@ -291,11 +314,9 @@ export const getLocalizedCopy = (
         qrInputPlaceholder: 'QR画像のURLを入力',
         bubbleDemoLabel: `バブルデモ: bubbleConfig.messages + autoRotate + rotateInterval + switchMode=${bubbleSwitchMode}`,
         popupUrlTitle: '現在の独立ウィンドウ完全 URL:',
-        popupUrlParamsTitle: '現在の URL パラメータ一覧:',
-        popupParamNameTitle: 'パラメータ',
-        popupParamValueTitle: '値',
-        popupParamPurposeTitle: '用途',
-        popupParamUnknownPurpose: '追加のカスタム URL パラメータです。'
+        popupUrlDescription: 'この URL は現在の設定に応じて変わり、そのままコピーして独立ウィンドウを開けます。',
+        embedCodeTitle: '現在の埋め込みコード:',
+        embedCodeDescription: 'このコードは現在の設定から生成されます。React プロジェクトへコピーすればそのまま利用できます。'
       };
     case LANG_KO_KR:
       return {
@@ -310,6 +331,11 @@ export const getLocalizedCopy = (
         apiMessageLabel: '현재 API:',
         consultParamsLabel: '상담 파라미터:',
         entrySelectorLabel: '다중 진입 데모',
+        entryIconLabel: '진입 아이콘',
+        entryTextToggleLabel: '버튼 텍스트',
+        entryTextInputLabel: '버튼 텍스트 내용',
+        entryTextInputPlaceholder: '비워 두면 각 버튼의 기본 라벨을 사용합니다',
+        entryDefaultIconLabel: '기본값',
         entryChatLabel: '텍스트',
         entryThreadLabel: '기록',
         entryWebrtcLabel: '영상',
@@ -319,11 +345,9 @@ export const getLocalizedCopy = (
         qrInputPlaceholder: 'QR 이미지 URL 입력',
         bubbleDemoLabel: `버블 데모: bubbleConfig.messages + autoRotate + rotateInterval + switchMode=${bubbleSwitchMode}`,
         popupUrlTitle: '현재 독립 창 전체 URL:',
-        popupUrlParamsTitle: '현재 URL 파라미터 목록:',
-        popupParamNameTitle: '파라미터',
-        popupParamValueTitle: '값',
-        popupParamPurposeTitle: '용도',
-        popupParamUnknownPurpose: '추가 사용자 정의 URL 파라미터입니다.'
+        popupUrlDescription: '이 URL 은 현재 설정에 맞춰 갱신되며, 그대로 복사해 독립 창을 열 수 있습니다.',
+        embedCodeTitle: '현재 임베드 코드:',
+        embedCodeDescription: '이 코드는 현재 설정을 기준으로 생성됩니다. React 프로젝트에 복사해서 바로 사용할 수 있습니다.'
       };
     case LANG_ZH_TW:
       return {
@@ -338,6 +362,11 @@ export const getLocalizedCopy = (
         apiMessageLabel: '目前呼叫介面:',
         consultParamsLabel: '諮詢參數:',
         entrySelectorLabel: '多入口示範',
+        entryIconLabel: '入口圖示',
+        entryTextToggleLabel: '按鈕文字',
+        entryTextInputLabel: '按鈕文字內容',
+        entryTextInputPlaceholder: '留空時使用各按鈕預設標籤',
+        entryDefaultIconLabel: '預設',
         entryChatLabel: '文字',
         entryThreadLabel: '歷史',
         entryWebrtcLabel: '視訊',
@@ -347,11 +376,9 @@ export const getLocalizedCopy = (
         qrInputPlaceholder: '請輸入 QR 圖片 URL',
         bubbleDemoLabel: `氣泡示範：bubbleConfig.messages + autoRotate + rotateInterval + switchMode=${bubbleSwitchMode}`,
         popupUrlTitle: '目前獨立視窗完整 URL：',
-        popupUrlParamsTitle: '目前 URL 參數列表：',
-        popupParamNameTitle: '參數',
-        popupParamValueTitle: '值',
-        popupParamPurposeTitle: '用途',
-        popupParamUnknownPurpose: '額外自訂 URL 參數。'
+        popupUrlDescription: '此 URL 會隨目前配置即時更新，可直接複製後開啟獨立聊天視窗。',
+        embedCodeTitle: '目前嵌入程式碼：',
+        embedCodeDescription: '這段程式碼會根據目前配置生成，複製到 React 專案即可直接使用。'
       };
     default:
       return {
@@ -366,6 +393,11 @@ export const getLocalizedCopy = (
         apiMessageLabel: '当前调用接口:',
         consultParamsLabel: '咨询参数:',
         entrySelectorLabel: '多入口演示',
+        entryIconLabel: '入口图标',
+        entryTextToggleLabel: '按钮文字',
+        entryTextInputLabel: '按钮文字内容',
+        entryTextInputPlaceholder: '留空时使用每个按钮的默认标签',
+        entryDefaultIconLabel: '默认',
         entryChatLabel: '文本对话',
         entryThreadLabel: '历史会话',
         entryWebrtcLabel: '音视频',
@@ -375,11 +407,9 @@ export const getLocalizedCopy = (
         qrInputPlaceholder: '请输入二维码图片 URL',
         bubbleDemoLabel: `气泡示例：bubbleConfig.messages + autoRotate + rotateInterval + switchMode=${bubbleSwitchMode}`,
         popupUrlTitle: '当前独立窗口完整 URL：',
-        popupUrlParamsTitle: '当前 URL 参数列表：',
-        popupParamNameTitle: '参数',
-        popupParamValueTitle: '值',
-        popupParamPurposeTitle: '用途',
-        popupParamUnknownPurpose: '额外自定义 URL 参数。'
+        popupUrlDescription: '这个 URL 会随着当前配置实时变化，可以直接复制后打开独立聊天窗口。',
+        embedCodeTitle: '当前嵌入代码：',
+        embedCodeDescription: '这段代码根据当前配置实时生成，复制到 React 项目里即可直接使用。'
       };
   }
 };

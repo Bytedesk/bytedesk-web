@@ -16,7 +16,7 @@ const basicDemoFieldDocs = {
   autoPopup: '초기화 후 채팅창을 자동으로 열지 여부입니다.',
   autoPopupDelay: '자동 팝업까지의 지연 시간입니다.',
   draggable: '진입 버튼을 드래그 가능하게 할지 여부입니다.',
-  tabsConfig: 'home, messages, help, news 탭 표시 여부를 제어합니다.',
+  tabsConfig: 'help, thread, messages 탭 표시 여부를 제어합니다.',
   bubbleConfig: '입구 위 안내 버블의 제목, 부제, 로테이션 문구 등을 설정합니다.',
   buttonConfig: '단일 진입 버튼 설정입니다.',
   buttonsConfig: '복수 진입 버튼 배열 설정입니다. buttonConfig 보다 우선합니다.',
@@ -82,6 +82,8 @@ const basicDemoFieldDocs = {
   'chat.draft': '점진 배포용 draft 플래그입니다.',
   'chat.settingsUid': '설정 디버깅에 쓰는 고유 ID 입니다.',
   'chat.loadHistory': '이전 메시지를 불러올지 여부입니다. loadHistory=1 이면 대화 페이지 열 때 기본으로 이전 채팅 기록을 불러옵니다.',
+  'chat.threadDetail': '스레드 상세 버튼 표시 여부입니다. threadDetail=1 이면 표시하고 기본값은 숨김입니다.',
+  'chat.visitorProfile': '방문자 프로필 버튼 표시 여부입니다. visitorProfile=1 이면 표시하고 기본값은 숨김입니다.',
   'chat.custom': '추가 비즈니스 필드를 URL 파라미터로 계속 확장할 수 있습니다.',
   'browse.referrer': '유입 페이지 주소입니다.',
   'browse.url': '현재 페이지 주소입니다.',
@@ -109,10 +111,9 @@ const basicDemoFieldDocs = {
   'animation.type': '이징 타입입니다.',
   'window.width': '데스크톱 채팅창 너비입니다.',
   'window.height': '데스크톱 채팅창 높이입니다.',
-  'tabs.home': 'home 탭 표시 여부입니다.',
   'tabs.messages': 'messages 탭 표시 여부입니다.',
+  'tabs.thread': 'thread 히스토리 탭 표시 여부입니다.',
   'tabs.help': 'help 탭 표시 여부입니다.',
-  'tabs.news': 'news 탭 표시 여부입니다.',
 } as const;
 
 export const koKr = {
@@ -197,6 +198,40 @@ export const koKr = {
   },
   pages: {
     ...en.pages,
+    proactiveDemo: {
+      ...en.pages.proactiveDemo,
+      title: '능동 고객 확보 데모',
+      description: '이 페이지는 기본 워크플로우에 연결되며 채팅을 열면 학력 확인, 요구 확인, 연락처 수집 흐름으로 바로 진입합니다.',
+      tags: {
+        mobileValidation: '휴대폰 검증',
+        multiTurnQa: '다회차 문답'
+      },
+      alertTitle: '검증 경로',
+      alertDescription: '대화에 들어가면 먼저 학력과 상담 의도를 수집한 뒤 도시, 상담 시나리오, 휴대폰 번호를 입력받습니다. 번호가 중국 본토 11자리 휴대폰 형식과 맞지 않으면 폼이 제출되지 않습니다. 매번 열 때마다 새 워크플로우 스레드를 강제로 생성합니다.',
+      workflowCardTitle: '기본 능동 고객 확보 워크플로우',
+      workflowCardTag: '학력 확인 + 요구 확인 + 연락처 수집',
+      bubbleTitle: '능동 고객 확보',
+      bubbleSubtitle: '기본 워크플로우 리드 수집 데모',
+      buttons: {
+        openWorkflowChat: '기본 워크플로우 열기',
+        closeChat: '채팅 창 닫기'
+      },
+      urlParamsTitle: '워크플로우 URL 파라미터',
+      urlDescription: '독립 창 전체 URL은 locale, 테마 모드, 방문자 식별 파라미터에 따라 달라집니다. forceNewThread는 SDK에서 워크플로우를 열 때 새 스레드를 보장하기 위해서만 쓰이므로 아래 임베드 코드에 유지했습니다.',
+      urlParams: [
+        'org: 워크플로우가 속한 조직의 고유 식별자',
+        't: 세션 타입이며 17은 워크플로우 세션을 의미합니다',
+        'sid: 어떤 기본 워크플로우를 열지 결정하는 워크플로우 고유 식별자',
+        'lang: 현재 데모 locale을 따르는 대화 언어',
+        'mode: 현재 라이트 또는 다크 설정을 따르는 테마 모드',
+        'navbar: 상단 내비게이션 표시 여부이며 1이면 표시',
+        'visitorUid: 실명 모드에서 방문자 이력을 연결하는 방문자 고유 식별자',
+        'nickname: 실명 모드에서 채팅 페이지로 전달되는 방문자 닉네임',
+        'avatar: 실명 모드에서 표시용으로 쓰는 방문자 아바타 URL'
+      ],
+      embedCodeTitle: '현재 임베드 코드',
+      embedCodeDescription: '아래 임베드 코드는 이 페이지의 실제 설정과 동일하며 고정 워크플로우 리드 수집 진입점으로 바로 복사해 사용할 수 있습니다.'
+    },
     voiceAgentDemo: {
       ...en.pages.voiceAgentDemo,
       title: '음성 도우미 데모'
@@ -217,6 +252,9 @@ export const koKr = {
       navbarHidden: 'ON',
       navbarShown: 'OFF',
       navbarParamPurpose: '상단 내비게이션 바를 숨길지 여부입니다. navbar=0 이면 숨깁니다.',
+      qrCodeParamLabel: 'QR 버튼 표시',
+      threadDetailParamLabel: '스레드 상세 버튼 표시',
+      visitorProfileParamLabel: '방문자 프로필 버튼 표시',
       loadHistoryLabel: '대화 이력 로드',
       loadHistoryEnabled: 'ON',
       loadHistoryDisabled: 'OFF',

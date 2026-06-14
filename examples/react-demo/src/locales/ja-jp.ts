@@ -15,7 +15,7 @@ const basicDemoFieldDocs = {
   autoPopup: '初期化後にチャットウィンドウを自動表示するかどうかです。',
   autoPopupDelay: '自動表示までの遅延時間です。単位はミリ秒です。',
   draggable: '入口ボタンをドラッグ可能にするかどうかです。',
-  tabsConfig: 'home、messages、help、news の表示制御です。',
+  tabsConfig: 'help、thread、messages の表示制御です。',
   bubbleConfig: '入口上の案内バブルのタイトル、サブタイトル、ローテーション表示などを設定します。',
   buttonConfig: '単一入口ボタンの設定です。入口が 1 つの場合に使います。',
   buttonsConfig: '複数入口ボタンの配列です。buttonConfig より優先されます。',
@@ -81,6 +81,8 @@ const basicDemoFieldDocs = {
   'chat.draft': '段階リリース用フラグで、URL に draft=1 として渡されます。',
   'chat.settingsUid': '設定デバッグに使う一意 ID です。',
   'chat.loadHistory': '履歴メッセージを読み込むかどうかです。loadHistory=1 でチャットページを開く際に履歴を自動読み込みします。',
+  'chat.threadDetail': 'スレッド詳細ボタンを表示するかどうかです。threadDetail=1 で表示し、既定では非表示です。',
+  'chat.visitorProfile': '訪問者プロフィールボタンを表示するかどうかです。visitorProfile=1 で表示し、既定では非表示です。',
   'chat.custom': '追加の業務フィールドを URL パラメータとして付与できます。',
   'browse.referrer': '遷移元ページ URL です。',
   'browse.url': '現在ページ URL です。',
@@ -108,10 +110,9 @@ const basicDemoFieldDocs = {
   'animation.type': 'イージング種別です。',
   'window.width': 'デスクトップチャットウィンドウ幅です。',
   'window.height': 'デスクトップチャットウィンドウ高さです。',
-  'tabs.home': 'home タブを表示するかどうかです。',
   'tabs.messages': 'messages タブを表示するかどうかです。',
+  'tabs.thread': 'thread 履歴タブを表示するかどうかです。',
   'tabs.help': 'help タブを表示するかどうかです。',
-  'tabs.news': 'news タブを表示するかどうかです。',
 } as const;
 
 export const jaJp = {
@@ -196,6 +197,40 @@ export const jaJp = {
   },
   pages: {
     ...en.pages,
+    proactiveDemo: {
+      ...en.pages.proactiveDemo,
+      title: 'プロアクティブ獲得デモ',
+      description: 'このページはデフォルトのワークフローに接続し、チャットを開くと学歴確認、要望確認、連絡先収集の流れに直接入ります。',
+      tags: {
+        mobileValidation: '携帯番号検証',
+        multiTurnQa: '複数ターンQ&A'
+      },
+      alertTitle: '検証フロー',
+      alertDescription: '会話に入ると、まず学歴と相談意図を確認し、その後に都市、相談シーン、携帯番号を収集します。携帯番号が中国本土の11桁形式に合わない場合、フォームは送信されません。毎回の起動で新しいワークフロースレッドを強制作成します。',
+      workflowCardTitle: 'デフォルトのプロアクティブワークフロー',
+      workflowCardTag: '学歴確認 + 要望確認 + 連絡先収集',
+      bubbleTitle: 'プロアクティブ獲得',
+      bubbleSubtitle: 'デフォルトワークフローのリード獲得デモ',
+      buttons: {
+        openWorkflowChat: 'デフォルトワークフローを開く',
+        closeChat: 'チャットウィンドウを閉じる'
+      },
+      urlParamsTitle: 'ワークフロー URL パラメータ',
+      urlDescription: '独立ウィンドウの完全 URL は locale、テーマモード、訪問者識別パラメータに応じて変化します。forceNewThread は SDK からワークフローを開く際に新しいスレッドを保証するためのものなので、下の埋め込みコードに残しています。',
+      urlParams: [
+        'org: ワークフロー所属組織の一意 ID',
+        't: セッション種別。17 はワークフローセッションを表します',
+        'sid: どのデフォルトワークフローを開くかを決めるワークフロー一意 ID',
+        'lang: 現在のデモ locale に従う会話言語',
+        'mode: 現在のライト / ダーク設定に従うテーマモード',
+        'navbar: 上部ナビゲーション表示フラグ。1 で表示',
+        'visitorUid: 実名モードで訪問者履歴を紐付けるための訪問者一意 ID',
+        'nickname: 実名モードでチャットページに渡す訪問者ニックネーム',
+        'avatar: 実名モードで表示に使う訪問者アバター URL'
+      ],
+      embedCodeTitle: '現在の埋め込みコード',
+      embedCodeDescription: '下の埋め込みコードはこのページの実際の設定と一致しており、そのまま固定ワークフローのリード導線として利用できます。'
+    },
     voiceAgentDemo: {
       ...en.pages.voiceAgentDemo,
       title: '音声アシスタントデモ'
@@ -216,6 +251,9 @@ export const jaJp = {
       navbarHidden: 'オン',
       navbarShown: 'オフ',
       navbarParamPurpose: '上部ナビゲーションバーを非表示にするかどうかです。navbar=0 で非表示になります。',
+      qrCodeParamLabel: 'QRボタンを表示',
+      threadDetailParamLabel: 'スレッド詳細ボタンを表示',
+      visitorProfileParamLabel: '訪問者プロフィールボタンを表示',
       loadHistoryLabel: '履歴メッセージを読み込む',
       loadHistoryEnabled: 'オン',
       loadHistoryDisabled: 'オフ',
@@ -259,9 +297,9 @@ export const jaJp = {
       sampleUrlLabel: '現在の設定から生成したサンプル URL',
       apiHintPrefix: 'API 呼び出し:',
       users: {
-        user1: '訪問者 Xiao Ming',
-        user2: '訪問者 Xiao Hong',
-        user3: '訪問者 Xiao Li'
+        user1: 'ユーザー Xiao Ming',
+        user2: 'ユーザー Xiao Hong',
+        user3: 'ユーザー Xiao Mei'
       }
     },
     goodsInfoDemo: {

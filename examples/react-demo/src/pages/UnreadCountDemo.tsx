@@ -9,11 +9,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
-import { Alert, Button, Card, InputNumber, Space, Statistic, Typography, theme } from 'antd';
+import { Alert, Button, Card, FloatButton, InputNumber, Space, Statistic, Table, Tag, Typography, theme } from 'antd';
 import { getLocaleMessages } from '../locales';
 import type { DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
+import { buildUrlParamRowsWithEncodeHint } from '../utils/url-param-guide';
+import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
 
 interface DemoPageProps {
     locale: Language;
@@ -268,6 +270,34 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
     }, [updateUnreadCount]);
 
     const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
+    const requiredUrlParams = useMemo(() => new Set(['uid', 'orgUid', 'client']), []);
+    const embedCodeCopy = useMemo(() => getCurrentEmbedCodeCopy(locale), [locale]);
+    const codeBlockStyle = useMemo(() => ({
+        margin: 0,
+        padding: '12px 14px',
+        borderRadius: 8,
+        border: `1px solid ${token.colorBorderSecondary || token.colorBorder}`,
+        background: token.colorFillQuaternary,
+        fontSize: 12,
+        lineHeight: 1.7,
+        fontFamily: 'SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace',
+        whiteSpace: 'pre-wrap' as const,
+        wordBreak: 'break-all' as const
+    }), [token.colorBorder, token.colorBorderSecondary, token.colorFillQuaternary]);
+    const currentEmbedCodeExample = useMemo(
+        () => buildCurrentEmbedCodeExample({
+            config,
+            callbackSources: {
+                onVisitorInfo: "(uid, visitorUid) => console.log('visitor info', { uid, visitorUid })"
+            }
+        }),
+        [config]
+    );
+    const currentUrlParamMap = useMemo(() => new URL(countApiSampleUrl).searchParams, [countApiSampleUrl]);
+    const urlParamRows = useMemo(
+        () => buildUrlParamRowsWithEncodeHint(messages.pages.unreadCountDemo.urlParams, currentUrlParamMap, locale, ['uid', 'visitorUid']),
+        [currentUrlParamMap, locale, messages.pages.unreadCountDemo.urlParams]
+    );
 
     return (
         <div style={{ padding: 24 }}>
@@ -365,11 +395,48 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
                         <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{clearBadgeApiTemplate}</pre>
 
                         <Typography.Text strong>{messages.pages.unreadCountDemo.urlParamsTitle}</Typography.Text>
-                        <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
-                            {messages.pages.unreadCountDemo.urlParams.map((item) => (
-                                <li key={item}>{item}</li>
-                            ))}
-                        </ul>
+                        <Table
+                            size="small"
+                            bordered
+                            pagination={false}
+                            rowKey="key"
+                            dataSource={urlParamRows}
+                            columns={[
+                                {
+                                    title: messages.pages.userInfoDemo.parameterLabel,
+                                    dataIndex: 'key',
+                                    key: 'key',
+                                    render: (value: string) => (
+                                        <Space size={6}>
+                                            <Typography.Text copyable={{ text: value }}>{value}</Typography.Text>
+                                            <Tag color={requiredUrlParams.has(value) ? 'error' : 'default'}>
+                                                {requiredUrlParams.has(value)
+                                                    ? messages.pages.userInfoDemo.requiredLabel
+                                                    : messages.pages.userInfoDemo.optionalLabel}
+                                            </Tag>
+                                        </Space>
+                                    ),
+                                },
+                                {
+                                    title: messages.pages.userInfoDemo.currentValueLabel,
+                                    dataIndex: 'value',
+                                    key: 'value',
+                                    render: (value: string) => (
+                                        <Typography.Paragraph
+                                            copyable={value.trim() !== '' && value !== '-' ? { text: value } : false}
+                                            style={{ marginBottom: 0, wordBreak: 'break-all' }}
+                                        >
+                                            {value}
+                                        </Typography.Paragraph>
+                                    ),
+                                },
+                                {
+                                    title: messages.pages.userInfoDemo.purposeLabel,
+                                    dataIndex: 'purpose',
+                                    key: 'purpose',
+                                },
+                            ]}
+                        />
 
                         <Typography.Text strong>{messages.pages.unreadCountDemo.sampleUrlLabel}</Typography.Text>
                         <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{countApiSampleUrl}</pre>
@@ -397,7 +464,23 @@ const UnreadCountDemo = ({ locale, themeMode, selectedChatProfile, selectedUser,
                         ))}
                     </ul>
                 </Card>
+
+                <Card title={embedCodeCopy.title}>
+                    <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+                        <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                            {embedCodeCopy.description}
+                        </Typography.Paragraph>
+                        <Typography.Paragraph
+                            copyable={{ text: currentEmbedCodeExample }}
+                            style={{ ...codeBlockStyle, marginBottom: 0 }}
+                        >
+                            {currentEmbedCodeExample}
+                        </Typography.Paragraph>
+                    </Space>
+                </Card>
             </Space>
+
+            <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
         </div>
     );
 };

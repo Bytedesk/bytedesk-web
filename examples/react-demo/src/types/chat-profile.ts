@@ -6,6 +6,9 @@ export interface DemoChatConfig {
   t: '0' | '1' | '2';
   sid: string;
   title?: string;
+  qrcode?: '0' | '1';
+  threadDetail?: '0' | '1';
+  visitorProfile?: '0' | '1';
 }
 
 export interface DemoChatProfile {

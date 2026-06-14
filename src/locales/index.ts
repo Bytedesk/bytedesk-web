@@ -20,10 +20,9 @@ type Messages = {
       subtitle: string;
     };
     tabs: {
-      home: string;
       messages: string;
+      thread: string;
       help: string;
-      news: string;
     };
     settings: {
       position: string;
@@ -48,10 +47,9 @@ export const messages: Messages = {
       subtitle: '点击开始对话'
     },
     tabs: {
-      home: '首页',
       messages: '消息',
+      thread: '历史会话',
       help: '帮助',
-      news: '新闻'
     },
     settings: {
       position: '位置',
@@ -73,10 +71,9 @@ export const messages: Messages = {
       subtitle: '點擊開始對話'
     },
     tabs: {
-      home: '首頁',
       messages: '消息',
+      thread: '歷史會話',
       help: '幫助',
-      news: '新聞'
     },
     settings: {
       position: '位置',
@@ -98,10 +95,9 @@ export const messages: Messages = {
       subtitle: 'Click to start chat'
     },
     tabs: {
-      home: 'Home',
       messages: 'Messages',
+      thread: 'History',
       help: 'Help',
-      news: 'News'
     },
     settings: {
       position: 'Position',
@@ -123,10 +119,9 @@ export const messages: Messages = {
       subtitle: 'クリックして会話を開始'
     },
     tabs: {
-      home: 'ホーム',
       messages: 'メッセージ',
+      thread: '履歴',
       help: 'ヘルプ',
-      news: 'ニュース'
     },
     settings: {
       position: '位置',
@@ -148,10 +143,9 @@ export const messages: Messages = {
       subtitle: 'クリックして会話を開始'
     },
     tabs: {
-      home: 'ホーム',
       messages: 'メッセージ',
+      thread: '履歴',
       help: 'ヘルプ',
-      news: 'ニュース'
     },
     settings: {
       position: '位置',

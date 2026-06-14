@@ -86,7 +86,7 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
     } else {
       bytedeskRef.current = globalBytedeskInstance;
       (window as any).bytedesk = globalBytedeskInstance;
-      globalBytedeskInstance.setConfig(config);
+      globalBytedeskInstance.setConfig(config, { replaceChatConfig: true, replaceTabsConfig: true });
 
       if (!didCallInitRef.current) {
         didCallInitRef.current = true;

@@ -1,4 +1,6 @@
 #!/bin/bash
+
+set -euo pipefail
 ###
  # @Author: jackning 270580156@qq.com
  # @Date: 2024-12-31 13:48:46
@@ -17,18 +19,18 @@
 # 本地路径
 DIST=dist
 # 本地路径
-TARGET_DIST=/Users/ningjinpeng/Desktop/git/private/github/bytedesk-2x/starter/src/main/resources/static/reactdemo
+TARGET_DIST=/Users/ningjinpeng/Desktop/Git/Github/private/bytedesk-2x/starter/src/main/resources/static/reactdemo
 
 # 清理 dist 目录
 echo "Cleaning dist directory..."
-rm -rf ./$DIST
+rm -rf "./$DIST"
 
 # 打包完，复制
 echo "Building project..."
-yarn build && \
+pnpm build
 # 将dist文件夹复制到bytedesk-2x/starter/src/main/resources/templates/文件夹中，并重命名为chat
 echo "Copying to target directory..."
-rm -fr $TARGET_DIST && \
-cp -r ./$DIST $TARGET_DIST
+rm -fr "$TARGET_DIST"
+cp -r "./$DIST" "$TARGET_DIST"
 
 echo "Build and copy completed!"

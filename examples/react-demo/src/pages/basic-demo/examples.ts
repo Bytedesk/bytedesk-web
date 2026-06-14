@@ -1,5 +1,6 @@
 import type { BytedeskConfig, Theme } from '@bytedesk/web/types';
 import type { DemoChatProfile } from '../../types/chat-profile';
+import type { DemoUserProfile } from '../../types/demo-user';
 import { THEME_COLORS } from './constants';
 import type { ExampleCopy } from './copy';
 
@@ -32,6 +33,75 @@ interface RecommendedConfigExampleParams {
   bubbleTitle: string;
   bubbleSubtitle: string;
 }
+
+interface RuntimeEmbedCodeExampleParams {
+  config: BytedeskConfig;
+  isAnonymousMode: boolean;
+  selectedUser: DemoUserProfile;
+  themeMode: Theme['mode'];
+}
+
+const escapeSingleQuotedString = (value: string): string => value
+  .replace(/\\/g, '\\\\')
+  .replace(/'/g, "\\'");
+
+const stringifyForCode = (value: unknown): string => {
+  return JSON.stringify(value, null, 2)
+    .replace(/"([^"]+)":/g, '$1:')
+    .replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (_match, group) => `'${escapeSingleQuotedString(group)}'`);
+};
+
+export const buildRuntimeEmbedCodeExample = ({
+  config,
+  isAnonymousMode,
+  selectedUser,
+  themeMode,
+}: RuntimeEmbedCodeExampleParams) => {
+  const currentChatConfig = {
+    ...(config.chatConfig || {}),
+    ...(isAnonymousMode
+      ? {}
+      : {
+          visitorUid: selectedUser.visitorUid,
+          nickname: selectedUser.nickname,
+          avatar: selectedUser.avatar,
+        }),
+  };
+
+  const runtimeConfig = {
+    ...(config.apiUrl ? { apiUrl: config.apiUrl } : {}),
+    htmlUrl: config.htmlUrl,
+    placement: config.placement,
+    marginBottom: config.marginBottom,
+    marginSide: config.marginSide,
+    autoPopup: config.autoPopup,
+    draggable: config.draggable,
+    locale: config.locale,
+    buttonConfig: config.buttonConfig,
+    buttonsConfig: config.buttonsConfig,
+    inviteConfig: config.inviteConfig,
+    bubbleConfig: config.bubbleConfig,
+    chatConfig: currentChatConfig,
+    browseConfig: config.browseConfig,
+    theme: {
+      ...(config.theme || {}),
+      mode: config.theme?.mode || themeMode || 'light',
+    },
+    onVisitorInfo: '(uid, visitorUid) => console.log(uid, visitorUid)',
+  };
+
+  const serializedConfig = stringifyForCode(runtimeConfig)
+    .replace(/'\(uid, visitorUid\) => console\.log\(uid, visitorUid\)'/g, '(uid, visitorUid) => console.log(uid, visitorUid)');
+
+  return `import { BytedeskReact } from '@bytedesk/web/adapters/react';
+import type { BytedeskConfig } from '@bytedesk/web/types';
+
+const bytedeskConfig: BytedeskConfig = ${serializedConfig};
+
+export default function VisitorWidget() {
+  return <BytedeskReact {...bytedeskConfig} />;
+}`;
+};
 
 export const buildFullConfigExample = ({
   config,
@@ -73,10 +143,9 @@ export const buildFullConfigExample = ({
   locale: '${currentLocale}',
 
   tabsConfig: {
-    home: ${String(Boolean(config.tabsConfig?.home))},
-    messages: ${String(config.tabsConfig?.messages !== false)},
     help: ${String(Boolean(config.tabsConfig?.help))},
-    news: ${String(Boolean(config.tabsConfig?.news))},
+    thread: ${String(Boolean(config.tabsConfig?.thread))},
+    messages: ${String(Boolean(config.tabsConfig?.messages))},
   },
 
   bubbleConfig: {
@@ -143,6 +212,9 @@ export const buildFullConfigExample = ({
     debug: ${String(Boolean(selectedChatConfigRecord.debug))},
     draft: ${String(Boolean(selectedChatConfigRecord.draft))},
     settingsUid: '${readChatConfigText('settingsUid')}',
+    qrcode: '${config.chatConfig?.qrcode === '0' ? '0' : '1'}',
+    threadDetail: '${config.chatConfig?.threadDetail === '1' ? '1' : '0'}',
+    visitorProfile: '${config.chatConfig?.visitorProfile === '1' ? '1' : '0'}',
     loadHistory: ${String(Boolean(config.chatConfig?.loadHistory))},
   },
 
@@ -235,6 +307,8 @@ export const buildRecommendedConfigExample = ({
     org: '${selectedChatProfile.chatConfig.org}',
     t: '${selectedChatProfile.chatConfig.t}',
     sid: '${selectedChatProfile.chatConfig.sid}',
+    threadDetail: '${config.chatConfig?.threadDetail === '1' ? '1' : '0'}',
+    visitorProfile: '${config.chatConfig?.visitorProfile === '1' ? '1' : '0'}',
     loadHistory: ${String(Boolean(config.chatConfig?.loadHistory))},
   },
 

@@ -17,7 +17,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, FeedbackConfig, FeedbackData, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
-import { Alert, Button, Card, Col, Row, Space, Tag, Typography, theme } from 'antd';
+import { Alert, Button, Card, Col, FloatButton, Row, Space, Tag, Typography, theme } from 'antd';
 import InstallGuide from '../components/InstallGuide';
 import { getLocaleMessages } from '../locales';
 import PageContainer from '../components/PageContainer';
@@ -101,10 +101,9 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
     marginSide: 20,
     inviteConfig: { show: false },
     tabsConfig: {
-      home: false,
-      messages: true,
       help: false,
-      news: false
+      thread: false,
+      messages: true,
     },
     bubbleConfig: { show: false },
     buttonConfig: {
@@ -500,6 +499,8 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
       <Card>
         <InstallGuide locale={locale} />
       </Card>
+
+      <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
     </PageContainer>
   );
 };

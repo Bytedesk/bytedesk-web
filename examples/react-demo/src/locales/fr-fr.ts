@@ -16,7 +16,7 @@ const basicDemoFieldDocs = {
   autoPopup: 'Ouvre automatiquement la fenêtre de chat après l initialisation.',
   autoPopupDelay: 'Délai avant l ouverture automatique.',
   draggable: 'Permet de faire glisser le bouton d entrée.',
-  tabsConfig: 'Contrôle l affichage des onglets home, messages, help et news.',
+  tabsConfig: 'Contrôle l affichage des onglets messages, thread et help.',
   bubbleConfig: 'Configure la bulle d information au-dessus de l entrée.',
   buttonConfig: 'Configuration pour un seul bouton d entrée.',
   buttonsConfig: 'Liste de plusieurs boutons d entrée, prioritaire sur buttonConfig.',
@@ -82,6 +82,8 @@ const basicDemoFieldDocs = {
   'chat.draft': 'Indicateur de diffusion progressive transmis comme draft=1 dans l URL.',
   'chat.settingsUid': 'Identifiant unique utilisé pour déboguer la configuration.',
   'chat.loadHistory': 'Indique si l historique des messages est charge. loadHistory=1 charge l historique par defaut a l ouverture de la page de chat.',
+  'chat.threadDetail': 'Indique si le bouton de detail de conversation est affiche. threadDetail=1 l affiche; masque par defaut.',
+  'chat.visitorProfile': 'Indique si le bouton de profil visiteur est affiche. visitorProfile=1 l affiche; masque par defaut.',
   'chat.custom': 'Des champs métier supplémentaires peuvent encore être ajoutés aux paramètres de l URL de chat.',
   'browse.referrer': 'Adresse de la page source.',
   'browse.url': 'Adresse de la page courante.',
@@ -109,10 +111,9 @@ const basicDemoFieldDocs = {
   'animation.type': 'Type d easing.',
   'window.width': 'Largeur de la fenêtre de chat desktop.',
   'window.height': 'Hauteur de la fenêtre de chat desktop.',
-  'tabs.home': 'Indique si l onglet home est affiché.',
   'tabs.messages': 'Indique si l onglet messages est affiché.',
+  'tabs.thread': 'Indique si l onglet historique thread est affiché.',
   'tabs.help': 'Indique si l onglet help est affiché.',
-  'tabs.news': 'Indique si l onglet news est affiché.',
 } as const;
 
 export const frFr = {
@@ -195,6 +196,40 @@ export const frFr = {
   },
   pages: {
     ...en.pages,
+    proactiveDemo: {
+      ...en.pages.proactiveDemo,
+      title: 'Demo d acquisition proactive',
+      description: 'Cette page connecte le workflow par defaut et, a l ouverture du chat, lance directement le filtrage du niveau d etudes, la confirmation du besoin et la collecte des coordonnees.',
+      tags: {
+        mobileValidation: 'Validation mobile',
+        multiTurnQa: 'Questions-reponses multi-tour'
+      },
+      alertTitle: 'Parcours de validation',
+      alertDescription: 'Une fois dans la conversation, le workflow collecte d abord le niveau d etudes et l intention, puis demande la ville, le scenario de consultation et le numero de mobile. Le formulaire ne sera pas envoye si le numero ne correspond pas a un mobile continental chinois a 11 chiffres. Chaque ouverture force un nouveau fil workflow.',
+      workflowCardTitle: 'Workflow proactif par defaut',
+      workflowCardTag: 'Filtrage des etudes + confirmation du besoin + collecte des coordonnees',
+      bubbleTitle: 'Acquisition proactive',
+      bubbleSubtitle: 'Demo de collecte de leads du workflow par defaut',
+      buttons: {
+        openWorkflowChat: 'Ouvrir le chat workflow',
+        closeChat: 'Fermer la fenetre de chat'
+      },
+      urlParamsTitle: 'Parametres URL du workflow',
+      urlDescription: 'L URL complete de la fenetre autonome change selon la locale, le mode de theme et l identite du visiteur. forceNewThread reste dans l exemple SDK ci-dessous car il n est utilise que lors de l ouverture du workflow via le SDK afin de garantir un nouveau fil workflow.',
+      urlParams: [
+        'org: identifiant unique de l organisation qui possede le workflow',
+        't: type de session ; 17 indique une session workflow',
+        'sid: identifiant unique du workflow qui determine quel workflow par defaut ouvrir',
+        'lang: langue de la conversation suivant la locale actuelle de la demo',
+        'mode: mode de theme suivant le reglage clair ou sombre actuel',
+        'navbar: visibilite de la barre superieure ; 1 signifie visible',
+        'visitorUid: identifiant unique du visiteur pour lier l historique en mode identifie',
+        'nickname: pseudo du visiteur transmis a la page de chat en mode identifie',
+        'avatar: URL de l avatar utilisee pour l affichage en mode identifie'
+      ],
+      embedCodeTitle: 'Code d integration actuel',
+      embedCodeDescription: 'Le code d integration ci-dessous correspond a la configuration active de cette page et peut etre copie directement comme entree fixe de collecte de leads.'
+    },
     voiceAgentDemo: {
       ...en.pages.voiceAgentDemo,
       title: 'Demo de l assistant vocal'
@@ -215,6 +250,9 @@ export const frFr = {
       navbarHidden: 'ACTIVE',
       navbarShown: 'DESACTIVE',
       navbarParamPurpose: 'Indique si la barre de navigation superieure est masquee. navbar=0 masque la navigation.',
+      qrCodeParamLabel: 'Afficher le bouton QR',
+      threadDetailParamLabel: 'Afficher le bouton detail',
+      visitorProfileParamLabel: 'Afficher le bouton profil visiteur',
       loadHistoryLabel: 'Charger l historique',
       loadHistoryEnabled: 'ACTIVE',
       loadHistoryDisabled: 'DESACTIVE',
@@ -266,9 +304,9 @@ export const frFr = {
       sampleUrlLabel: 'URL d exemple generee depuis la configuration actuelle',
       apiHintPrefix: 'Appels API :',
       users: {
-        user1: 'Visiteur Xiao Ming',
-        user2: 'Visiteur Xiao Hong',
-        user3: 'Visiteur Xiao Li'
+        user1: 'Utilisateur Xiao Ming',
+        user2: 'Utilisateur Xiao Hong',
+        user3: 'Utilisateur Xiao Mei'
       }
     },
     goodsInfoDemo: {

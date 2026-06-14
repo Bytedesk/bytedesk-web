@@ -15,6 +15,7 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Suspense, lazy, useEffect, useLayoutEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { App as AntdApp, Avatar, Button, ConfigProvider, Dropdown, Layout, Spin, theme as antdTheme, type MenuProps } from 'antd';
+import packageJson from '../package.json';
 
 // import FlightBookingDemo from './pages/FlightBookingDemo';
 // @ts-ignore
@@ -43,6 +44,7 @@ const WebrtcDemo = lazy(() => import('./pages/WebrtcDemo'));
 const ProactiveDemo = lazy(() => import('./pages/ProactiveDemo'));
 const VoiceAgentDemo = lazy(() => import('./pages/VoiceAgentDemo'));
 const DocFeedbackDemo = lazy(() => import('./pages/DocFeedbackDemo'));
+const HelpcenterDemo = lazy(() => import('./pages/HelpcenterDemo'));
 
 type DemoLocale = keyof LocaleMessages['common']['languageOptions'];
 type ThemeMode = keyof LocaleMessages['common']['themeOptions'];
@@ -56,6 +58,7 @@ const THEME_STORAGE_KEY = 'bytedesk-react-demo-theme';
 const USER_STORAGE_KEY = 'bytedesk-react-demo-user';
 const USER_ANONYMOUS_STORAGE_KEY = 'bytedesk-react-demo-user-anonymous';
 const isBrowser = typeof window !== 'undefined';
+const APP_VERSION = packageJson.version;
 
 const isDemoLocale = (value: string | null): value is DemoLocale => {
   return !!value && LANGUAGE_LIST.includes(value as DemoLocale);
@@ -198,6 +201,7 @@ function ThemedRouterApp() {
   const [activeUserKey, setActiveUserKey] = useState<DemoUserKey>(getStoredUserKey);
   const [isAnonymousMode, setIsAnonymousMode] = useState<boolean>(getStoredAnonymousMode);
   const [chatProfileKey, setChatProfileKey] = useState<ChatProfileKey>(getStoredChatProfileKey);
+  const didSyncVisitorIdentityRef = useRef(false);
   const systemTheme = useSystemTheme();
   const locale = useMemo<DemoLocale>(() => {
     if (!isBrowser) {
@@ -238,6 +242,40 @@ function ThemedRouterApp() {
       window.localStorage.setItem(USER_ANONYMOUS_STORAGE_KEY, String(isAnonymousMode));
     }
   }, [isAnonymousMode]);
+
+  useEffect(() => {
+    if (!isBrowser) {
+      return;
+    }
+
+    if (!didSyncVisitorIdentityRef.current) {
+      didSyncVisitorIdentityRef.current = true;
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      const bytedesk = (window as any).bytedesk as {
+        resetAnonymousVisitor?: () => void;
+        initVisitor?: () => Promise<unknown>;
+      } | undefined;
+
+      if (!bytedesk?.initVisitor) {
+        return;
+      }
+
+      if (isAnonymousMode) {
+        bytedesk.resetAnonymousVisitor?.();
+      }
+
+      bytedesk.initVisitor().catch((error: unknown) => {
+        console.warn('Bytedesk visitor identity sync failed:', error);
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [activeUserKey, isAnonymousMode]);
 
   useEffect(() => {
     if (isBrowser) {
@@ -363,17 +401,18 @@ function AppLayout({
   const navLinks = useMemo<NavLinkItem[]>(() => ([
     { path: '/', label: messages.nav.basicDemo },
     { path: '/userInfo', label: messages.nav.userInfoDemo },
+    { path: '/vipLevel', label: messages.nav.vipLevelDemo },
     { path: '/goodsInfo', label: messages.nav.goodsInfoDemo },
     { path: '/orderInfo', label: messages.nav.orderInfoDemo },
+    { path: '/proactive', label: messages.nav.proactiveDemo },
     { path: '/webrtcDemo', label: messages.nav.webrtcDemo },
-    { path: '/vipLevel', label: messages.nav.vipLevelDemo },
     { path: '/unreadCount', label: messages.nav.unreadCountDemo },
     { path: '/threadHistory', label: messages.nav.threadHistoryDemo },
     { path: '/voiceagent', label: messages.nav.voiceAgentDemo },
     { path: '/callCenter', label: messages.nav.callCenterDemo },
     ...(isDebugMode
       ? [
-        { path: '/proactive', label: messages.nav.proactiveDemo },
+        { path: '/helpcenter', label: messages.nav.helpcenterDemo },
       ]
       : []),
     { path: '/documentFeedback', label: messages.nav.documentFeedbackDemo },
@@ -874,6 +913,8 @@ function AppLayout({
                   themeMode={resolvedTheme as BytedeskTheme['mode']}
                   themePreference={themeMode}
                   selectedChatProfile={selectedChatProfile}
+                  selectedUser={activeUserProfile}
+                  isAnonymousMode={isAnonymousMode}
                   onLocaleChange={(nextLocale) => onLocaleChange(nextLocale as DemoLocale)}
                   onThemePreferenceChange={(nextTheme) => onThemeChange(nextTheme as ThemeMode)}
                 />
@@ -884,6 +925,10 @@ function AppLayout({
               element={<UserInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
             />
             <Route
+              path="/vipLevel"
+              element={<VipLevelDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            <Route
               path="/orderInfo"
               element={<OrderInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
             />
@@ -892,9 +937,17 @@ function AppLayout({
               element={<GoodsInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
             />
             <Route
-              path="/vipLevel"
-              element={<VipLevelDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+              path="/proactive"
+              element={<ProactiveDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
             />
+            {isDebugMode && (
+              <>
+                <Route
+                  path="/helpcenter"
+                  element={<HelpcenterDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
+                />
+              </>
+            )}
             <Route
               path="/unreadCount"
               element={<UnreadCountDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
@@ -904,31 +957,22 @@ function AppLayout({
               element={<ThreadHistoryDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
             />
             <Route
+              path="/voiceagent"
+              element={<VoiceAgentDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
+            />
+            <Route
               path="/webrtcDemo"
-              element={<WebrtcDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+              element={<WebrtcDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
             />
             <Route
               path="/callCenter"
-              element={<CallCenterDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+              element={<CallCenterDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
             />
-            {isDebugMode && (
-              <Route
-                path="/proactive"
-                element={<ProactiveDemo />}
-              />
-            )}
-            <Route
-              path="/voiceagent"
-              element={<VoiceAgentDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
-            />
+
             <Route
               path="/documentFeedback"
               element={<DocFeedbackDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}
             />
-            {/* <Route
-              path="/flightBooking"
-              element={<FlightBookingDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}
-            /> */}
           </Routes>
         </Suspense>
       </Layout.Content>
@@ -950,6 +994,7 @@ function AppLayout({
           >
             {messages.common.officialSiteLabel}
           </a>
+          <span style={{ marginLeft: 8 }}>v{APP_VERSION}</span>
         </div>
       </Layout.Footer>
     </Layout>

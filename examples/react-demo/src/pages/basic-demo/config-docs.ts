@@ -190,10 +190,9 @@ export const buildConfigDocSections = (
   {
     title: configGuideCopy.tabsSectionTitle,
     items: [
-      { key: 'tabs.home', label: 'home', children: fieldDocCopy.fields['tabs.home'] },
       { key: 'tabs.messages', label: 'messages', children: fieldDocCopy.fields['tabs.messages'] },
+      { key: 'tabs.thread', label: 'thread', children: fieldDocCopy.fields['tabs.thread'] },
       { key: 'tabs.help', label: 'help', children: fieldDocCopy.fields['tabs.help'] },
-      { key: 'tabs.news', label: 'news', children: fieldDocCopy.fields['tabs.news'] },
     ],
   },
 ]);

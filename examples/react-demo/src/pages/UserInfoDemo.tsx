@@ -13,9 +13,8 @@
  *  技术/商务联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-
 import { useMemo } from 'react';
-import { Alert, Button, Card, Typography, Space, Table, Tag, theme as antdTheme } from 'antd';
+import { Alert, Button, Card, Typography, Space, Table, Tag, theme as antdTheme, FloatButton } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -29,6 +28,8 @@ import CurrentUserProfile from '../components/CurrentUserProfile';
 import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
+import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
+import { buildUrlParamRowsWithEncodeHint } from '../utils/url-param-guide';
 
 const { Title, Paragraph } = Typography;
 
@@ -124,7 +125,7 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     };
 
     const docLinks = [
-        { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/user_info', label: messages.pages.userInfoDemo.docLinks.userInfoDoc },
+        { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/user_info', label: messages.pages.userInfoDemo.docLinks.userInfoDoc },
         { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/UserInfoDemo.tsx', label: messages.pages.userInfoDemo.docLinks.reactExample },
         { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/userInfoDemo.vue', label: messages.pages.userInfoDemo.docLinks.vueExample }
     ];
@@ -157,16 +158,22 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     }, [config.chatConfig, config.htmlUrl, locale, themeMode]);
 
     const requiredUrlParams = useMemo(() => new Set(['org', 't', 'sid']), []);
-    const requiredLabel = locale === 'en' ? 'Required' : '必填';
-    const optionalLabel = locale === 'en' ? 'Optional' : '可选';
-    const urlParamNameTitle = locale === 'en' ? 'Parameter' : '参数';
-    const urlParamValueTitle = locale === 'en' ? 'Current Value' : '当前值';
-    const urlParamPurposeTitle = locale === 'en' ? 'Purpose' : '说明';
+    const userInfoMessages = messages.pages.userInfoDemo;
+    const requiredLabel = userInfoMessages.requiredLabel;
+    const optionalLabel = userInfoMessages.optionalLabel;
+    const urlParamNameTitle = userInfoMessages.parameterLabel;
+    const urlParamValueTitle = userInfoMessages.currentValueLabel;
+    const urlParamPurposeTitle = userInfoMessages.purposeLabel;
     const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
     const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
-    const manualEncodeHint = locale === 'en'
-        ? 'When manually building URL strings, use encodeURIComponent for nickname, avatar, email, note, and extra.'
-        : '手动拼接 URL 时，建议对 nickname、avatar、email、note、extra 使用 encodeURIComponent 编码。';
+    const manualEncodeHint = userInfoMessages.manualEncodeHint;
+    const switchApiTitle = userInfoMessages.switchApiTitle;
+    const switchApiDescription = userInfoMessages.switchApiDescription;
+    const switchApiCode = isAnonymousMode
+        ? `(window as any).bytedesk?.resetAnonymousVisitor?.();\n(window as any).bytedesk?.initVisitor?.();`
+        : `(window as any).bytedesk?.initVisitor?.();`;
+    const switchApiNotes = userInfoMessages.switchApiNotes;
+    const embedCodeCopy = useMemo(() => getCurrentEmbedCodeCopy(locale), [locale]);
     const codeBlockStyle = useMemo(() => ({
         margin: 0,
         padding: '12px 14px',
@@ -179,26 +186,27 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         whiteSpace: 'pre-wrap' as const,
         wordBreak: 'break-all' as const
     }), [token.colorBorder, token.colorBorderSecondary, token.colorFillQuaternary]);
-    const currentUrlParamMap = useMemo(
-        () => new Map(new URL(sampleUrl).searchParams.entries()),
+    const currentUrlParams = useMemo(
+        () => new URL(sampleUrl).searchParams,
         [sampleUrl]
     );
     const urlParamRows = useMemo(
-        () => messages.pages.userInfoDemo.urlParams.flatMap((item) => {
-            const matched = item.match(/^([^:：]+)\s*[:：]\s*(.+)$/);
-            const paramKeys = (matched?.[1] || item)
-                .split('/')
-                .map((value) => value.trim())
-                .filter(Boolean);
-            const purpose = matched?.[2]?.trim() || item;
-
-            return paramKeys.map((paramKey) => ({
-                key: paramKey,
-                value: currentUrlParamMap.get(paramKey) || '-',
-                purpose,
-            }));
+        () => buildUrlParamRowsWithEncodeHint(
+            messages.pages.userInfoDemo.urlParams,
+            currentUrlParams,
+            locale,
+            ['nickname', 'avatar', 'email', 'note', 'extra']
+        ),
+        [currentUrlParams, locale, messages.pages.userInfoDemo.urlParams]
+    );
+    const currentEmbedCodeExample = useMemo(
+        () => buildCurrentEmbedCodeExample({
+            config,
+            callbackSources: {
+                onVisitorInfo: "(uid, visitorUid) => console.log('visitor info', { uid, visitorUid })"
+            }
         }),
-        [currentUrlParamMap, messages.pages.userInfoDemo.urlParams]
+        [config]
     );
 
     return (
@@ -286,6 +294,25 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                 </Space>
             </Card>
 
+            <Card title={switchApiTitle}>
+                <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+                    <Alert type="warning" showIcon title={switchApiDescription} />
+                    <Typography.Paragraph
+                        copyable={{ text: switchApiCode }}
+                        style={{ ...codeBlockStyle, marginBottom: 0 }}
+                    >
+                        {switchApiCode}
+                    </Typography.Paragraph>
+                    <Space orientation="vertical" size={4} style={{ width: '100%' }}>
+                        {switchApiNotes.map((note) => (
+                            <Typography.Text key={note} type="secondary">
+                                {note}
+                            </Typography.Text>
+                        ))}
+                    </Space>
+                </Space>
+            </Card>
+
             <Card title={messages.pages.userInfoDemo.urlGuideTitle}>
                 <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                     <Typography.Text strong>{messages.pages.userInfoDemo.sampleUrlLabel}</Typography.Text>
@@ -345,7 +372,23 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                 </Space>
             </Card>
 
+            <Card title={embedCodeCopy.title}>
+                <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+                    <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                        {embedCodeCopy.description}
+                    </Typography.Paragraph>
+                    <Typography.Paragraph
+                        copyable={{ text: currentEmbedCodeExample }}
+                        style={{ ...codeBlockStyle, marginBottom: 0 }}
+                    >
+                        {currentEmbedCodeExample}
+                    </Typography.Paragraph>
+                </Space>
+            </Card>
+
             <BytedeskReact {...config} />
+
+            <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
         </PageContainer>
     );
 };

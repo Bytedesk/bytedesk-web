@@ -1,15 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Alert, Button, Card, Input, Space, Tag, Typography, theme as antdTheme } from 'antd';
+import { Alert, Button, Card, FloatButton, Input, Space, Table, Tag, Typography } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
 import { getLocaleMessages } from '../locales';
-import CurrentUserProfile from '../components/CurrentUserProfile';
 import PageContainer from '../components/PageContainer';
-import { DEMO_USER_PRESETS, type DemoUserKey, type DemoUserProfile } from '../types/demo-user';
+import type { DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
+import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
+import { buildUrlParamRowsWithEncodeHint } from '../utils/url-param-guide';
 
 interface DemoPageProps {
   locale: Language;
@@ -17,8 +18,6 @@ interface DemoPageProps {
   selectedChatProfile: DemoChatProfile;
   selectedUser: DemoUserProfile;
   isAnonymousMode: boolean;
-  onSelectUser: (nextUser: DemoUserKey) => void;
-  onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
 type AudioPreset = {
@@ -27,15 +26,28 @@ type AudioPreset = {
   target: string;
 };
 
+const DIRECT_CALL_DEMO_PARAM = 'directCallDemo';
+
 type CallLaunchMode = 'embed' | 'window' | 'tab';
 
-const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
+const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
-  const { token } = antdTheme.useToken();
   const [customTarget, setCustomTarget] = useState('');
   const [lastPopupUrl, setLastPopupUrl] = useState('');
   const [lastLaunchMode, setLastLaunchMode] = useState<CallLaunchMode | null>(null);
   const htmlBaseUrl = getDemoHtmlBaseUrl(9022);
+  const embedCodeCopy = useMemo(() => getCurrentEmbedCodeCopy(locale), [locale]);
+  const codeBlockStyle = useMemo(() => ({
+    margin: 0,
+    padding: '12px 14px',
+    borderRadius: 8,
+    background: 'rgba(0,0,0,0.04)',
+    fontSize: 12,
+    lineHeight: 1.7,
+    fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace',
+    whiteSpace: 'pre-wrap' as const,
+    wordBreak: 'break-all' as const
+  }), []);
 
   const audioPresets = useMemo<AudioPreset[]>(() => [
     { key: 'echo', label: '回声 echo', target: 'echo' },
@@ -49,8 +61,8 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
 
   const audioAiPresets = useMemo<AudioPreset[]>(() => [
     // { key: '9200', label: '音频AI 9200', target: '9200' },
-    { key: '9201', label: '音频AI 9201', target: '9201' },
-    // { key: '9203', label: '音频AI 9203', target: '9203' },
+    { key: '9201', label: '音频AI 9201 多轮对话', target: '9201' },
+    { key: '9203', label: '音频AI 9203 不限轮对话', target: '9203' },
     // { key: '92030', label: '音频AI 92030', target: '92030' },
     // { key: '9295', label: '音频AI 9295', target: '9295' },
     // { key: '9296', label: '音频AI 9296', target: '9296' },
@@ -60,11 +72,23 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
   ], []);
 
   const ivrPresets = useMemo<AudioPreset[]>(() => [
-    { key: '5000', label: 'IVR 5000', target: '5000' }
+    { key: '5002', label: 'IVR 5002 默认菜单', target: '5002' },
+    { key: '5004', label: 'IVR 5004 满意度回访', target: '5004' },
+    { key: '5005', label: 'IVR 5005 密码验证', target: '5005' },
+    { key: '5006', label: 'IVR 5006 机器人对话', target: '5006' }
   ], []);
+
+  // const speechTestPresets = useMemo<AudioPreset[]>(() => [
+  //   { key: '9295', label: '语音测试 9295 ASR 回声', target: '9295' },
+  //   { key: '9296', label: '语音测试 9296 UniMRCP SSML', target: '9296' },
+  //   { key: '9297', label: '语音测试 9297 长音播放', target: '9297' },
+  //   { key: '9298', label: '语音测试 9298 本地播放', target: '9298' },
+  //   { key: '9299', label: '语音测试 9299 UniMRCP 最小化', target: '9299' }
+  // ], []);
 
   const audioAiTargetSet = useMemo(() => new Set(audioAiPresets.map((preset) => preset.target)), [audioAiPresets]);
   const ivrTargetSet = useMemo(() => new Set(ivrPresets.map((preset) => preset.target)), [ivrPresets]);
+  // const speechTestTargetSet = useMemo(() => new Set(speechTestPresets.map((preset) => preset.target)), [speechTestPresets]);
 
   const getAudioCallDisplayName = useCallback((target?: string) => {
     if (!target) {
@@ -73,18 +97,11 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
     if (ivrTargetSet.has(target)) {
       return `IVR ${target}`;
     }
+    // if (speechTestTargetSet.has(target)) {
+    //   return `语音测试 ${target}`;
+    // }
     return audioAiTargetSet.has(target) ? `音频AI ${target}` : `音频 ${target}`;
   }, [audioAiTargetSet, ivrTargetSet]);
-
-  const users = useMemo(
-    () => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
-      key,
-      visitorUid: DEMO_USER_PRESETS[key].visitorUid,
-      avatar: DEMO_USER_PRESETS[key].avatar,
-      nickname: messages.pages.userInfoDemo.users[key]
-    })),
-    [messages]
-  );
 
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
@@ -162,6 +179,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
       url.searchParams.set('target', target);
       url.searchParams.set('callNumber', target);
       url.searchParams.set('callDisplayName', getAudioCallDisplayName(target) || `Audio ${target}`);
+      url.searchParams.set(DIRECT_CALL_DEMO_PARAM, '1');
     }
     return url.toString();
   }, [getAudioCallDisplayName, sampleUrl]);
@@ -200,7 +218,8 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
           ? {
               target,
               callNumber: target,
-              callDisplayName: getAudioCallDisplayName(target) || `Audio ${target}`
+              callDisplayName: getAudioCallDisplayName(target) || `Audio ${target}`,
+              [DIRECT_CALL_DEMO_PARAM]: 1
             }
           : {})
       }
@@ -212,9 +231,33 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
     const defaultLabel = getConsultButtonLabel(selectedChatProfile, locale);
     return locale === 'zh-cn' ? defaultLabel.replace(/^咨询/, '呼叫') : defaultLabel;
   }, [locale, selectedChatProfile]);
-
-  const formatSwitchUserLabel = (name: string) =>
-    messages.pages.userInfoDemo.switchToUserLabel.replace('{{name}}', name);
+  const callExampleUrl = useMemo(() => buildAudioCallUrl(customTarget || '1000'), [buildAudioCallUrl, customTarget]);
+  const callUrlParamDocs = useMemo(
+    () => [
+      'org: 组织 ID（必填）',
+      't: 会话类型（0：一对一，1：工作组）',
+      'sid: 呼叫中心 / 工作组 ID（必填）',
+      'visitorUid: 自定义访客 ID（可选）',
+      'nickname / avatar: 访客展示信息（可选）',
+      'audio: 是否启用音频（1 启用，0 禁用）',
+      'video: 是否启用视频（当前示例固定 0）',
+      'target / callNumber: 分机号或呼叫目标（可选）',
+      'callDisplayName: 呼叫展示名称（可选）',
+      'directCallDemo: 固定号码直呼模式标记；开启后 /call 直接使用演示 SIP 账号外呼（可选）',
+      'lang / mode: 语言与主题参数（可选）'
+    ],
+    []
+  );
+  const requiredUrlParams = useMemo(() => new Set(['org', 't', 'sid', 'audio', 'video']), []);
+  const currentUrlParamMap = useMemo(() => new URL(callExampleUrl).searchParams, [callExampleUrl]);
+  const urlParamRows = useMemo(
+    () => buildUrlParamRowsWithEncodeHint(callUrlParamDocs, currentUrlParamMap, locale, ['visitorUid', 'nickname', 'avatar', 'callDisplayName']),
+    [callExampleUrl, callUrlParamDocs, currentUrlParamMap, locale]
+  );
+  const currentEmbedCodeExample = useMemo(
+    () => buildCurrentEmbedCodeExample({ config }),
+    [config]
+  );
 
   return (
     <PageContainer>
@@ -244,53 +287,6 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
             <Typography.Text type="secondary">{messages.pages.callCenterDemo.currentPathHint}</Typography.Text>
           </Space>
 
-          <Space orientation="vertical" size={8} style={{ width: '100%' }}>
-            <CurrentUserProfile
-              title={messages.pages.userInfoDemo.currentUserTitle}
-              isAnonymousMode={isAnonymousMode}
-              avatar={selectedUser.avatar}
-              anonymousIdText={messages.pages.callCenterDemo.anonymousUserHint}
-              anonymousNicknameText={messages.pages.userInfoDemo.anonymousUserLabel}
-              userIdLabel={messages.pages.userInfoDemo.currentUserIdLabel}
-              userId={selectedUser.visitorUid}
-              userNicknameLabel={messages.pages.userInfoDemo.currentUserNicknameLabel}
-              userNickname={selectedUser.nickname}
-              compact
-            />
-            <Space wrap>
-              {users.map((user) => (
-                <Button
-                  key={user.visitorUid}
-                  type="primary"
-                  onClick={() => {
-                    if (!isAnonymousMode && selectedUser.key === user.key) {
-                      return;
-                    }
-                    onAnonymousModeChange(false);
-                    onSelectUser(user.key);
-                  }}
-                  style={!isAnonymousMode && selectedUser.key === user.key ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
-                >
-                  {formatSwitchUserLabel(user.nickname)}
-                  {!isAnonymousMode && selectedUser.key === user.key ? '【当前】' : ''}
-                </Button>
-              ))}
-              <Button
-                type={isAnonymousMode ? 'primary' : 'default'}
-                onClick={() => {
-                  if (isAnonymousMode) {
-                    return;
-                  }
-                  onAnonymousModeChange(true);
-                }}
-                style={isAnonymousMode ? { backgroundColor: token.colorSuccess, borderColor: token.colorSuccess } : undefined}
-              >
-                {messages.pages.callCenterDemo.buttons.switchAnonymousUser}
-                {isAnonymousMode ? '【当前】' : ''}
-              </Button>
-            </Space>
-          </Space>
-
           <Space wrap>
             <Button type="primary" onClick={() => showAudioCallPopup()}>
               {consultButtonLabel}
@@ -307,7 +303,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
           <Card size="small" title="SIP/Freeswitch 呼叫演示按钮">
             <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
               <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                下面的按钮统一通过 /call 页面发起 SIP/Freeswitch 音频会话。已保留音频呼叫、音频 AI 机器人与 IVR 预置目标；如果 SDK 尚未初始化，则自动退回到新窗口打开 /call。
+                下面的按钮统一通过 /call 页面发起 SIP/Freeswitch 音频会话。固定号码会附带 directCallDemo=1，使 /call 直接使用演示 SIP 账号发起外呼；如果 SDK 尚未初始化，则自动退回到新窗口打开 /call。
               </Typography.Paragraph>
               <Alert
                 type="info"
@@ -345,6 +341,16 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
                   ))}
                 </Space>
               </Space>
+              {/* <Space orientation="vertical" size={8} style={{ width: '100%' }}>
+                <Typography.Text strong>语音能力测试</Typography.Text>
+                <Space wrap>
+                  {speechTestPresets.map((preset) => (
+                    <Button key={preset.key} onClick={() => showAudioCallPopup(preset.target)}>
+                      {preset.label}
+                    </Button>
+                  ))}
+                </Space>
+              </Space> */}
               <Space.Compact>
                 <Input
                   value={customTarget}
@@ -410,14 +416,73 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
             当前示例 URL 默认附带 audio=1、video=0，可直接按音频会话打开。
           </Typography.Paragraph>
           <Typography.Text strong>音频示例 URL</Typography.Text>
-          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{buildAudioCallUrl('1000')}</pre>
+          <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{callExampleUrl}</pre>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            音频示例参数：audio=1、video=0，可选附加 target、callNumber、callDisplayName。
+            音频示例参数：audio=1、video=0；固定号码直呼会额外附加 target、callNumber、callDisplayName、directCallDemo=1。
+          </Typography.Paragraph>
+          <Typography.Text strong>参数说明</Typography.Text>
+          <Table
+            size="small"
+            bordered
+            pagination={false}
+            rowKey="key"
+            dataSource={urlParamRows}
+            columns={[
+              {
+                title: messages.pages.userInfoDemo.parameterLabel,
+                dataIndex: 'key',
+                key: 'key',
+                render: (value: string) => (
+                  <Space size={6}>
+                    <Typography.Text copyable={{ text: value }}>{value}</Typography.Text>
+                    <Tag color={requiredUrlParams.has(value) ? 'error' : 'default'}>
+                      {requiredUrlParams.has(value)
+                        ? messages.pages.userInfoDemo.requiredLabel
+                        : messages.pages.userInfoDemo.optionalLabel}
+                    </Tag>
+                  </Space>
+                ),
+              },
+              {
+                title: messages.pages.userInfoDemo.currentValueLabel,
+                dataIndex: 'value',
+                key: 'value',
+                render: (value: string) => (
+                  <Typography.Paragraph
+                    copyable={value.trim() !== '' && value !== '-' ? { text: value } : false}
+                    style={{ marginBottom: 0, wordBreak: 'break-all' }}
+                  >
+                    {value}
+                  </Typography.Paragraph>
+                ),
+              },
+              {
+                title: messages.pages.userInfoDemo.purposeLabel,
+                dataIndex: 'purpose',
+                key: 'purpose',
+              },
+            ]}
+          />
+        </Space>
+      </Card>
+
+      <Card title={embedCodeCopy.title}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {embedCodeCopy.description}
+          </Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{ text: currentEmbedCodeExample }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {currentEmbedCodeExample}
           </Typography.Paragraph>
         </Space>
       </Card>
 
       <BytedeskReact {...config} />
+
+      <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
     </PageContainer>
   );
 };

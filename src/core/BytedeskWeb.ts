@@ -22,14 +22,23 @@ import {
   POST_MESSAGE_INVITE_VISITOR_ACCEPT,
   POST_MESSAGE_INVITE_VISITOR_REJECT,
   POST_MESSAGE_LOCALSTORAGE_RESPONSE,
+  POST_MESSAGE_MESSAGE_BUBBLE_CLICK,
   POST_MESSAGE_RESET_ANONYMOUS_VISITOR,
   POST_MESSAGE_MAXIMIZE_WINDOW,
   POST_MESSAGE_MINIMIZE_WINDOW,
   POST_MESSAGE_RECEIVE_MESSAGE,
 } from "../utils/constants";
 import type { ButtonConfig, BytedeskConfig } from "../types";
+import { logBizMessageCallbackDebug } from "../utils/bizMessageCallbackDebug";
 import logger, { setGlobalConfig } from "../utils/logger";
 import { serializeBrowseConfig } from "./browseUrl";
+
+interface SetConfigOptions {
+  replaceChatConfig?: boolean;
+  replaceTabsConfig?: boolean;
+}
+
+type EmbeddedTabKey = "messages" | "thread" | "help";
 
 export default class BytedeskWeb {
   private config: BytedeskConfig;
@@ -104,7 +113,12 @@ export default class BytedeskWeb {
     }
   }
 
-  private mergeConfig(nextConfig: Partial<BytedeskConfig>): BytedeskConfig {
+  private mergeConfig(nextConfig: Partial<BytedeskConfig>, options?: SetConfigOptions): BytedeskConfig {
+    const shouldReplaceChatConfig = Boolean(options?.replaceChatConfig && nextConfig.chatConfig);
+    const tabsConfigBase = options?.replaceTabsConfig
+      ? this.getDefaultTabsConfig()
+      : this.config.tabsConfig || {};
+
     return {
       ...this.config,
       ...nextConfig,
@@ -113,7 +127,7 @@ export default class BytedeskWeb {
         ...(nextConfig.inviteConfig || {}),
       },
       tabsConfig: {
-        ...(this.config.tabsConfig || {}),
+        ...tabsConfigBase,
         ...(nextConfig.tabsConfig || {}),
       },
       bubbleConfig: {
@@ -128,7 +142,9 @@ export default class BytedeskWeb {
         ...(this.config.feedbackConfig || {}),
         ...(nextConfig.feedbackConfig || {}),
       },
-      chatConfig: nextConfig.chatConfig
+      chatConfig: shouldReplaceChatConfig
+        ? nextConfig.chatConfig
+        : nextConfig.chatConfig
         ? {
             ...(this.config.chatConfig || ({} as NonNullable<BytedeskConfig["chatConfig"]>)),
             ...nextConfig.chatConfig,
@@ -250,10 +266,9 @@ export default class BytedeskWeb {
       return;
     }
     const iframe = this.window.querySelector("iframe") as HTMLIFrameElement | null;
-    if (!iframe) {
-      return;
+    if (iframe) {
+      iframe.src = this.generateChatUrl();
     }
-    iframe.src = this.generateChatUrl();
   }
 
   public setTheme(themeConfig: Partial<NonNullable<BytedeskConfig["theme"]>>) {
@@ -265,9 +280,9 @@ export default class BytedeskWeb {
     });
   }
 
-  public setConfig(nextConfig: Partial<BytedeskConfig>) {
+  public setConfig(nextConfig: Partial<BytedeskConfig>, options?: SetConfigOptions) {
     const previousConfig = this.config;
-    this.config = this.mergeConfig(nextConfig);
+    this.config = this.mergeConfig(nextConfig, options);
 
     const nextAction = this.getPrimaryActionFromConfig(nextConfig);
     const hasExplicitChatPath = Object.prototype.hasOwnProperty.call(nextConfig, "chatPath");
@@ -294,6 +309,19 @@ export default class BytedeskWeb {
       this.refreshFloatingUi();
     }
 
+    if (this.window && document.body.contains(this.window) && nextConfig.tabsConfig) {
+      const wasVisible = this.window.style.display !== "none";
+      document.body.removeChild(this.window);
+      this.window = null;
+      if (wasVisible) {
+        this.createChatWindow();
+        const recreatedWindow = this.window as HTMLElement | null;
+        if (recreatedWindow) {
+          recreatedWindow.style.display = "block";
+        }
+      }
+    }
+
     if (this.window && document.body.contains(this.window)) {
       this.updateChatWindowLayout();
 
@@ -305,7 +333,8 @@ export default class BytedeskWeb {
         nextConfig.chatPath ||
         nextConfig.threadPath ||
         nextConfig.webrtcPath ||
-        nextConfig.callPath
+        nextConfig.callPath ||
+        nextConfig.tabsConfig
       );
 
       if (shouldRefreshIframe) {
@@ -365,10 +394,7 @@ export default class BytedeskWeb {
         rejectText: "稍后再说",
       },
       tabsConfig: {
-        home: false,
-        messages: true,
-        help: false,
-        news: false,
+        ...this.getDefaultTabsConfig(),
       },
       bubbleConfig: {
         show: true,
@@ -429,6 +455,14 @@ export default class BytedeskWeb {
       draggable: false,
       locale: "zh-cn",
     } as BytedeskConfig;
+  }
+
+  private getDefaultTabsConfig(): NonNullable<BytedeskConfig["tabsConfig"]> {
+    return {
+      help: false,
+      thread: false,
+      messages: false,
+    };
   }
 
   private getEffectiveButtonConfigs(): ButtonConfig[] {
@@ -611,10 +645,14 @@ export default class BytedeskWeb {
     const isMultiLayout = options?.isMultiLayout === true;
     const baseButtonWidth = buttonConfig.width || 60;
     const baseButtonHeight = buttonConfig.height || 60;
+    const hasButtonText = Boolean(buttonConfig.text);
     const squareSize = Math.max(baseButtonWidth, baseButtonHeight);
     const buttonWidth = isMultiLayout ? squareSize : baseButtonWidth;
     const buttonHeight = isMultiLayout ? squareSize : baseButtonHeight;
-    const borderRadius = isMultiLayout ? 0 : Math.min(buttonWidth, buttonHeight) / 2;
+    const borderRadius = isMultiLayout ? 0 : buttonHeight / 2;
+    const horizontalPadding = !isMultiLayout && hasButtonText
+      ? Math.max(14, Math.round(buttonHeight * 0.3))
+      : 0;
     const isDarkMode = this.config.theme?.mode === "dark";
     const defaultBackgroundColor = isDarkMode ? "#3B82F6" : "#0066FF";
     const buttonBackgroundColor = this.config.theme?.backgroundColor || defaultBackgroundColor;
@@ -629,7 +667,8 @@ export default class BytedeskWeb {
 
     buttonElement.style.cssText = `
       background-color: ${isMultiLayout ? "transparent" : buttonBackgroundColor};
-      width: ${buttonWidth}px;
+      width: ${!isMultiLayout && hasButtonText ? "auto" : `${buttonWidth}px`};
+      min-width: ${!isMultiLayout && hasButtonText ? `${Math.max(buttonWidth, buttonHeight)}px` : `${buttonWidth}px`};
       height: ${buttonHeight}px;
       border-radius: ${borderRadius}px;
       border: none;
@@ -643,7 +682,8 @@ export default class BytedeskWeb {
       outline: none;
       position: relative;
       user-select: none;
-      padding: 0;
+      padding: 0 ${horizontalPadding}px;
+      white-space: nowrap;
     `;
 
     const buttonContent = document.createElement("div");
@@ -652,9 +692,10 @@ export default class BytedeskWeb {
       align-items: center;
       justify-content: center;
       flex-direction: ${isMultiLayout && buttonConfig.text ? "column" : "row"};
-      gap: ${isMultiLayout ? "4px" : "8px"};
-      width: 100%;
+      gap: ${isMultiLayout ? "4px" : hasButtonText ? "6px" : "8px"};
+      width: ${!isMultiLayout && hasButtonText ? "auto" : "100%"};
       height: 100%;
+      min-width: 0;
     `;
 
     if (buttonConfig.icon) {
@@ -701,7 +742,7 @@ export default class BytedeskWeb {
       }
     });
     buttonElement.addEventListener("mouseleave", () => {
-      buttonElement.style.transform = "scale(1)";
+      buttonElement.style.transform = isMultiLayout ? "translateY(0)" : "scale(1)";
       if (isMultiLayout) {
         buttonElement.style.backgroundColor = "transparent";
       }
@@ -2040,9 +2081,16 @@ export default class BytedeskWeb {
       `;
     }
 
-    // 创建聊天界面
+    const frameContainer = document.createElement("div");
+    frameContainer.style.cssText = `
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      background: ${this.config.theme?.mode === "dark" ? "#111827" : "#ffffff"};
+    `;
+
     const iframe = document.createElement("iframe");
-    // Allow speech input and related browser capabilities in embedded chat.
     iframe.setAttribute("allow", "microphone *; camera *; autoplay *; clipboard-write *");
     iframe.style.cssText = `
       width: 100%;
@@ -2053,13 +2101,30 @@ export default class BytedeskWeb {
     `;
     iframe.src = this.generateChatUrl();
     logger.debug("iframe.src: ", iframe.src);
-    this.window.appendChild(iframe);
+    frameContainer.appendChild(iframe);
+    this.window.appendChild(frameContainer);
+
     document.body.appendChild(this.window);
+  }
+
+  private getEnabledEmbeddedTabs(): EmbeddedTabKey[] {
+    const tabsConfig = {
+      help: false,
+      thread: false,
+      messages: false,
+      ...(this.config.tabsConfig || {}),
+    };
+
+    return (["help", "thread", "messages"] as EmbeddedTabKey[]).filter((tab) => Boolean(tabsConfig[tab]));
+  }
+
+  private getDefaultEmbeddedTab(enabledTabs: EmbeddedTabKey[]): EmbeddedTabKey {
+    return enabledTabs[0] || "messages";
   }
 
   private generateChatUrl(
     // preload: boolean = false,
-    tab: string = "messages"
+    tab: string = ""
   ): string {
     logger.debug("this.config: ", this.config, tab);
     const params = new URLSearchParams();
@@ -2138,7 +2203,16 @@ export default class BytedeskWeb {
     //   params.append("preload", "1");
     // }
 
-    const baseUrl = this.getChatPageBaseUrl();
+    const enabledTabs = this.getEnabledEmbeddedTabs();
+    const activeTab = tab && enabledTabs.includes(tab as EmbeddedTabKey)
+      ? tab
+      : this.getDefaultEmbeddedTab(enabledTabs);
+    params.append("tab", activeTab);
+    if (enabledTabs.length > 1) {
+      params.append("tabs", enabledTabs.join(","));
+    }
+
+    const baseUrl = this.getChatPageBaseUrl(enabledTabs.length > 1 ? "home" : activeTab);
     const url = `${baseUrl}?${params.toString()}`;
     logger.debug("chat url: ", url);
     return url;
@@ -2153,8 +2227,8 @@ export default class BytedeskWeb {
     return fallback;
   }
 
-  private getChatPageBaseUrl(): string {
-    const normalizedPath = this.normalizePath(this.config.chatPath, "/chat");
+  private getChatPageBaseUrl(tab: string = "messages"): string {
+    const normalizedPath = this.normalizePath(this.getChatPathByTab(tab), "/chat");
     const rawHtmlUrl = (this.config.htmlUrl || "").trim();
     const sanitizedHtmlUrl = rawHtmlUrl.replace(/\/$/, "");
 
@@ -2164,9 +2238,9 @@ export default class BytedeskWeb {
 
     // 如果 htmlUrl 已经指向某个具体页面路径，则优先复用该路径，避免再拼接默认 /chat 导致地址错误。
     // 对内置页面路径仍做归一化替换，兼容 /chat、/chat/thread、/webrtc、/call 之间的切换。
-    const matchedBuiltinPath = sanitizedHtmlUrl.match(/\/(chat(?:\/thread)?|webrtc|call)\/?$/);
+    const matchedBuiltinPath = sanitizedHtmlUrl.match(/\/(chat(?:\/(?:thread|helpcenter))?|webrtc|call)\/?$/);
     if (matchedBuiltinPath) {
-      return sanitizedHtmlUrl.replace(/\/(chat(?:\/thread)?|webrtc|call)\/?$/, normalizedPath);
+      return sanitizedHtmlUrl.replace(/\/(chat(?:\/(?:thread|helpcenter))?|webrtc|call)\/?$/, normalizedPath);
     }
 
     try {
@@ -2184,6 +2258,20 @@ export default class BytedeskWeb {
     return `${sanitizedHtmlUrl}${normalizedPath}`;
   }
 
+  private getChatPathByTab(tab: string): string {
+    switch (tab) {
+      case "home":
+        return "/chat/home";
+      case "thread":
+        return this.config.threadPath || "/chat/thread";
+      case "help":
+        return "/chat/helpcenter";
+      case "messages":
+      default:
+        return this.config.chatPath || "/chat";
+    }
+  }
+
   private setupMessageListener() {
     window.addEventListener("message", (event) => {
       switch (event.data.type) {
@@ -2198,6 +2286,22 @@ export default class BytedeskWeb {
           break;
         case POST_MESSAGE_RECEIVE_MESSAGE:
           logger.debug("RECEIVE_MESSAGE");
+          break;
+        case POST_MESSAGE_MESSAGE_BUBBLE_CLICK:
+          logBizMessageCallbackDebug('host-receive.web-sdk', {
+            messageType: event.data.clickedMessageType,
+            uid: event.data.uid,
+            navigateToPath: event.data.navigateToPath,
+          });
+          this.config.onMessageBubbleClick?.({
+            uid: event.data.uid,
+            type: event.data.clickedMessageType,
+            content: event.data.content,
+            navigateToPath: event.data.navigateToPath,
+            extra: event.data.extra,
+            position: event.data.position,
+            status: event.data.status,
+          });
           break;
         case POST_MESSAGE_INVITE_VISITOR:
           logger.debug("INVITE_VISITOR");
@@ -2258,10 +2362,7 @@ export default class BytedeskWeb {
   showChat(config?: Partial<BytedeskConfig>) {
     // 合并新配置（如果提供了）
     if (config) {
-      this.config = {
-        ...this.config,
-        ...config,
-      };
+      this.config = this.mergeConfig(config);
 
       // 如果修改了配置并且窗口已经创建，需要销毁重建
       if (this.window) {
