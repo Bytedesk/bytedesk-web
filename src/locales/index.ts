@@ -15,6 +15,9 @@
 type Messages = {
   [key in 'zh-cn' | 'zh-tw' | 'en' | 'ja' | 'ja-jp']: {
     title: string;
+    actions: {
+      continueChat: string;
+    };
     bubble: {
       title: string;
       subtitle: string;
@@ -42,6 +45,9 @@ type Messages = {
 export const messages: Messages = {
   'zh-cn': {
     title: '在线客服',
+    actions: {
+      continueChat: '继续对话'
+    },
     bubble: {
       title: '需要帮助吗？',
       subtitle: '点击开始对话'
@@ -66,6 +72,9 @@ export const messages: Messages = {
   },
   'zh-tw': {
     title: '線上客服',
+    actions: {
+      continueChat: '繼續對話'
+    },
     bubble: {
       title: '需要幫助嗎？',
       subtitle: '點擊開始對話'
@@ -90,6 +99,9 @@ export const messages: Messages = {
   },
   'en': {
     title: 'Online Support',
+    actions: {
+      continueChat: 'Continue chat'
+    },
     bubble: {
       title: 'Need help?',
       subtitle: 'Click to start chat'
@@ -114,6 +126,9 @@ export const messages: Messages = {
   },
   'ja': {
     title: 'オンラインサポート',
+    actions: {
+      continueChat: '会話を続ける'
+    },
     bubble: {
       title: 'お困りですか？',
       subtitle: 'クリックして会話を開始'
@@ -138,6 +153,9 @@ export const messages: Messages = {
   },
   'ja-jp': {
     title: 'オンラインサポート',
+    actions: {
+      continueChat: '会話を続ける'
+    },
     bubble: {
       title: 'お困りですか？',
       subtitle: 'クリックして会話を開始'
@@ -161,3 +179,11 @@ export const messages: Messages = {
     }
   }
 }; 
+
+export const getLocaleMessages = (locale?: string): Messages[keyof Messages] => {
+  const normalizedLocale = (locale || 'zh-cn').toLowerCase();
+
+  return messages[normalizedLocale as keyof Messages]
+    || messages[normalizedLocale.split('-')[0] as keyof Messages]
+    || messages['zh-cn'];
+};

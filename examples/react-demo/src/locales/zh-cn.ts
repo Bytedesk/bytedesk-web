@@ -184,6 +184,9 @@ export const zhCn = {
     videoSupportDemo: '🎥 视频客服演示',
     webrtcDemo: '📹 音视频客服演示',
     callCenterDemo: '📞 电话客服演示',
+    ticketDemo: '🎫 工单演示',
+    ratingDemo: '⭐ 满意度评价演示',
+    platformDemo: '🏬 平台客服演示',
     proactiveDemo: '🎯 主动获客演示',
     voiceAgentDemo: '🎙️ 语音助手演示',
     videoConferenceDemo: '🎬 视频会议演示',
@@ -249,6 +252,8 @@ export const zhCn = {
       anonymousUserHint: '当前为匿名测试：不传 visitorUid、nickname、avatar 等用户信息',
       currentUserTitle: '当前业务系统用户信息',
       currentUserIdLabel: '用户ID',
+      currentUidLabel: 'uid',
+      currentVisitorUidLabel: 'visitorUid',
       currentUserNicknameLabel: '昵称',
       contactSupport: '咨询客服',
       inviteText: '您好，请问有什么可以帮您？',
@@ -701,6 +706,197 @@ export const zhCn = {
         threadDoc: '查看历史会话对接文档',
         visitorRef: '参考 visitor ThreadList 实现',
         reactExample: 'React 历史会话演示源码'
+      }
+    },
+    ticketDemo: {
+      title: '访客工单演示',
+      description: '演示访客查看历史工单、工单提交、状态查看、详情查看和通知消息提醒',
+      bubbleTitle: '工单中心',
+      bubbleSubtitle: '打开访客工单路由',
+      currentPathLabel: '当前入口路径',
+      currentPathHint: '悬浮入口会在不同 /ticket 路由之间切换，并继续携带 org、sid、访客、语言和主题参数。',
+      selectedScenarioTitle: '工单场景按钮',
+      detailTicketIdLabel: '详情路由使用的工单 ID',
+      detailTicketIdPlaceholder: '输入真实工单 UID 后可自动拉起详情抽屉',
+      usageTitle: '演示说明',
+      usageNotes: [
+        '1. 通过 chatConfig.showNavBar=0 隐藏顶部导航，使其更适合嵌入到 BytedeskWeb 小窗中。',
+        '2. 工单提交路由会在页面加载后直接打开提交抽屉，适合 AI 未解决或无人在线时的转工单入口。',
+      ],
+      buttons: {
+        closeTicket: '关闭工单窗口'
+      },
+      routeTableTitle: '可用的 visitorTicket 路由',
+      routeTable: {
+        routeLabel: '路由',
+        purposeLabel: '用途',
+        exampleLabel: '路径示例'
+      },
+      routeRows: {
+        history: {
+          label: '历史工单',
+          purpose: '查看当前访客或登录用户已提交的工单列表。',
+          example: '/ticket/history'
+        },
+        create: {
+          label: '工单提交',
+          purpose: '页面加载后立即打开工单提交抽屉。',
+          example: '/ticket/create'
+        },
+        notifications: {
+          label: '通知消息提醒',
+          purpose: '作为工单回复和状态变更通知的落地页入口。',
+          example: '/ticket/notifications'
+        }
+      },
+      urlGuideTitle: 'URL + 参数调用说明',
+      sampleUrlLabel: '当前场景生成的示例 URL',
+      urlParamsTitle: '/ticket 路由共用参数',
+      urlParams: [
+        'org：组织 ID（必填）',
+        'sid：工单工作组 ID（必填）',
+        't：沿用当前咨询场景的会话类型',
+        'visitorUid / nickname / avatar：访客身份信息，用于匹配访客侧工单',
+        'showNavBar：iframe 模式建议传 0，隐藏顶部导航',
+        'showHeader：传 0 可隐藏 TicketHeader，传 1 显示 TicketHeader',
+        'lang / mode：语言与主题参数（可选）',
+        'backgroundColor / textColor：自定义嵌入页主色和文字颜色，保持与宿主主题一致',
+        'ticketId：详情路由可选参数，可放在 /ticket/detail/:ticketId 或 query 中'
+      ],
+      docLinks: {
+        visitorTicketRef: '查看 visitorTicket 路由实现',
+        reactExample: 'React 工单演示源码',
+        agentTicketDocs: '客服端/管理端工单文档',
+        visitorTicketDocs: '访客/客户端工单文档',
+        ticketDemoPreview: '工单演示预览链接'
+      },
+      notificationApiTitle: '通知未读数 API 说明',
+      notificationApiDescription: '查询当前访客的未读通知数量，用于在通知入口按钮上展示 Badge 徽标。',
+      notificationApiEndpointLabel: '接口地址',
+      notificationApiMethodLabel: '请求方式',
+      notificationApiParamsTitle: '请求参数',
+      notificationApiNoteTitle: '💡 说明',
+      notificationApiNoteContent: '推荐使用 visitorUid + orgUid 直接查询（后端通过 native query join visitor 表自动解析）。也支持传入系统 userUid 查询，两者任选其一即可。',
+      notificationApiRequestExample: '请求示例',
+      notificationApiResponseExample: '响应示例',
+      notificationApiParams: [
+        'visitorUid：前端自定义访客标识，如 visitor_001（推荐，与 orgUid 配合使用）',
+        'orgUid：组织 ID（与 visitorUid 配合使用时必填）',
+        'channel：渠道标识，固定值 HTTP（必填）',
+        'userUid：系统生成的访客 uid（可选，来自 visitor init 的 data.uid）'
+      ]
+    },
+    ratingDemo: {
+      title: '访客满意度评价演示',
+      description: '演示如何通过访客历史会话入口承接满意度评价相关流程。待评价历史会话和支持追评都复用 /chat/thread，因为当前评分动作发生在会话消息和历史抽屉内，而不是独立页面。',
+      bubbleTitle: '服务评价',
+      bubbleSubtitle: '打开评价相关历史会话',
+      currentPathLabel: '当前入口路径',
+      currentPathHint: '支持正常发起对话，也支持按待评价/已评价场景打开历史会话。',
+      selectedScenarioTitle: '评价场景按钮',
+      usageTitle: '演示说明',
+      usageNotes: [
+        '1. 当前 visitor 端没有独立的满意度评价路由；评分能力是在聊天消息和历史会话消息中渲染出来的。',
+        '2. 普通发起对话走 /chat；待评价列表与已评价列表走 /chat/thread。',
+        '3. ratingIntent=pending 用来加载待评价会话，ratingIntent=followup 用来加载已评价会话并进入追加评价模式。',
+        '4. 默认启用 threadDetail=1，方便在历史会话页中查看更多上下文后再进行评分或追加评价。',
+      ],
+      routeTableTitle: '评价入口场景',
+      routeTable: {
+        routeLabel: '场景',
+        purposeLabel: '用途',
+        exampleLabel: '路径示例'
+      },
+      routeRows: {
+        chat: {
+          label: '正常对话',
+          purpose: '用于演示对话中进行评价。',
+          example: '/chat'
+        },
+        pending: {
+          label: '待评价会话列表',
+          purpose: '用于演示会话后进行评价。',
+          example: '/chat/thread?ratingIntent=pending'
+        },
+        followup: {
+          label: '已评价会话列表',
+          purpose: '用于演示追评。',
+          example: '/chat/thread?ratingIntent=followup'
+        }
+      },
+      urlGuideTitle: 'URL + 参数调用说明',
+      sampleUrlLabel: '当前场景生成的示例 URL',
+      urlParamsTitle: '评价相关历史会话共用参数',
+      urlParams: [
+        'org：组织 ID（必填）',
+        'sid：工作组或客服目标 ID（必填）',
+        't：沿用当前咨询场景的会话类型',
+        'visitorUid / nickname / avatar：访客身份信息，用于定位正确的历史会话',
+        'lang / mode：语言与主题参数（可选）',
+        'threadDetail：建议传 1，用于在历史会话中查看更多上下文',
+        'ratingIntent：pending 或 followup，用来区分待评价列表与已评价列表'
+      ],
+      docLinks: {
+        rateBubbleRef: '满意度评价文档',
+        reactExample: 'React 满意度评价演示源码'
+      }
+    },
+    platformDemo: {
+      title: '平台客服路由演示',
+      description: '说明如何区分平台客服与店铺客服。默认组织 orgUid=df_org_uid 视为平台客服租户，其余 orgUid 都视为店铺客服租户；同一个组织还可以通过不同 sid 暴露多个咨询入口，例如售前、售后等。平台客服还可以查看整个平台的全部数据。',
+      bubbleTitle: '平台客服',
+      bubbleSubtitle: '切换平台或店铺咨询入口',
+      currentPathLabel: '当前入口路径',
+      currentPathHint: '所有场景都复用 /chat，实际路由由 org + sid + title 决定。',
+      mappingAlertTitle: '平台客服与店铺客服的区分规则',
+      mappingAlertDescription: '使用默认组织 orgUid=df_org_uid 作为平台统一客服入口，平台客服可以查看整个平台的全部数据。除 df_org_uid 以外的 orgUid，都应视为店铺客服租户；每个店铺租户还可以继续配置多个咨询入口，例如售前客服、售后客服、物流客服、会员专属客服等。',
+      selectedScenarioTitle: '咨询入口场景',
+      usageTitle: '演示说明',
+      usageNotes: [
+        '1. 默认组织 orgUid=df_org_uid 表示平台级客服入口。',
+        '2. 平台客服在 df_org_uid 下可以访问并查看整个平台级的数据。',
+        '3. 任何不等于 df_org_uid 的 orgUid，都可以理解为某个店铺或商家的客服组织。',
+        '4. 同一个组织可以配置多个咨询入口，只需给不同业务线分配不同 sid，例如售前、售后、物流、会员服务等。',
+        '5. 平台客服与店铺客服都仍然使用 /chat 页面，真正决定路由的是 org、t、sid 以及可选的 title。',
+        '6. 这里展示的店铺 orgUid 和 sid 仅用于说明，接入真实环境时请替换为你自己的组织 ID 和工作组/客服入口 ID。'
+      ],
+      routeTableTitle: '组织与咨询入口示例',
+      routeTable: {
+        routeLabel: '入口',
+        purposeLabel: '用途',
+        exampleLabel: '示例 org/sid'
+      },
+      routeRows: {
+        platform: {
+          label: '平台客服',
+          purpose: '使用默认 orgUid=df_org_uid 作为平台统一客服入口。',
+          example: 'org=df_org_uid&sid=df_wg_uid'
+        },
+        presales: {
+          label: '店铺售前客服',
+          purpose: '使用非默认 orgUid 与独立 sid，把访客路由到店铺售前入口。',
+          example: 'org=store_demo_org_uid&sid=store_presales_wg_uid'
+        },
+        aftersales: {
+          label: '店铺售后客服',
+          purpose: '复用同一个店铺 orgUid，再配置另一个 sid，用于独立的售后入口。',
+          example: 'org=store_demo_org_uid&sid=store_aftersales_wg_uid'
+        }
+      },
+      urlGuideTitle: 'URL + 参数调用说明',
+      sampleUrlLabel: '当前场景生成的示例 URL',
+      urlParamsTitle: '平台/店铺客服路由共用参数',
+      urlParams: [
+        'org：组织 ID。df_org_uid 表示平台客服，其余值表示店铺客服租户。',
+        't：会话类型。工作组咨询入口通常使用 t=1。',
+        'sid：咨询入口 ID。可通过不同 sid 区分售前、售后、物流等入口。',
+        'title：可选标题，用于标记当前咨询入口。',
+        'visitorUid / nickname / avatar：可选访客身份信息。',
+        'lang / mode：语言与主题参数（可选）'
+      ],
+      docLinks: {
+        chatProfileRef: '查看示例 chat-profile 配置',
+        reactExample: 'React 平台客服演示源码'
       }
     },
     videoSupportDemo: {

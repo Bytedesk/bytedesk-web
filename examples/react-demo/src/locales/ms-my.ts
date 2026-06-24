@@ -186,6 +186,9 @@ export const msMy = {
     videoSupportDemo: '🎥 Sokongan video',
     webrtcDemo: '📹 Demo WebRTC',
     callCenterDemo: '📞 Pusat panggilan',
+    ticketDemo: '🎫 Demo tiket',
+    ratingDemo: '⭐ Demo penilaian',
+    platformDemo: '🏬 Demo platform',
     proactiveDemo: '🎯 Pemerolehan pelanggan proaktif',
     voiceAgentDemo: '🎙️ Ejen suara',
     videoConferenceDemo: '🎬 Persidangan video',
@@ -250,6 +253,8 @@ export const msMy = {
       anonymousUserHint: 'Mod ujian tanpa nama: visitorUid, nickname, avatar dan medan lain tidak dihantar.',
       currentUserTitle: 'Pengguna semasa sistem perniagaan',
       currentUserIdLabel: 'ID pengguna',
+      currentUidLabel: 'uid',
+      currentVisitorUidLabel: 'visitorUid',
       currentUserNicknameLabel: 'Nama paparan',
       contactSupport: 'Hubungi sokongan',
       inviteText: 'Hai, bagaimana kami boleh membantu anda?',
@@ -600,6 +605,41 @@ export const msMy = {
         visitorRef: 'Rujukan Visitor ThreadList',
         reactExample: 'Kod sumber demo sejarah thread React'
       }
+    },
+    ticketDemo: {
+      ...en.pages.ticketDemo,
+      title: 'Demo tiket pelawat',
+      description: 'Menunjukkan cara menukar pintu masuk Bytedesk Web SDK ke route sejarah, cipta, status, butiran dan notifikasi dalam visitorTicket untuk kegunaan iframe terbenam.',
+      bubbleTitle: 'Pusat tiket',
+      bubbleSubtitle: 'Buka route tiket pelawat',
+      currentPathLabel: 'Laluan masuk semasa',
+      currentPathHint: 'Pintu masuk terapung bertukar antara route /ticket sambil mengekalkan parameter org, sid, pelawat, bahasa dan tema.',
+      selectedScenarioTitle: 'Senario tiket',
+      detailTicketIdLabel: 'ID tiket untuk route butiran',
+      detailTicketIdPlaceholder: 'Masukkan UID tiket sebenar untuk membuka laci butiran secara automatik',
+      usageTitle: 'Nota demo',
+      buttons: {
+        closeTicket: 'Tutup tetingkap tiket'
+      },
+      docLinks: {
+        ...en.pages.ticketDemo.docLinks,
+        visitorTicketRef: 'Lihat implementasi route visitorTicket',
+        reactExample: 'Sumber demo tiket React'
+      }
+    },
+    ratingDemo: {
+      ...en.pages.ratingDemo,
+      title: 'Demo penilaian kepuasan pelawat',
+      description: 'Menunjukkan cara masuk ke aliran penilaian melalui sejarah perbualan. Kedua-dua senario penilaian tertunda dan penilaian susulan kini menggunakan /chat/thread.',
+      bubbleTitle: 'Penilaian perkhidmatan',
+      bubbleSubtitle: 'Buka sejarah perbualan berkaitan penilaian'
+    },
+    platformDemo: {
+      ...en.pages.platformDemo,
+      title: 'Demo khidmat platform',
+      description: 'Menerangkan penggunaan orgUid=df_org_uid sebagai khidmat pelanggan platform, manakala orgUid lain dianggap sebagai khidmat pelanggan kedai. Setiap organisasi juga boleh mempunyai berbilang pintu masuk seperti pra-jualan dan selepas jualan.',
+      bubbleTitle: 'Khidmat platform',
+      bubbleSubtitle: 'Tukar antara pintu masuk platform dan kedai'
     },
     videoSupportDemo: {
       title: 'Demo sokongan video',

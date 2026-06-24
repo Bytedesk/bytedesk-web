@@ -184,6 +184,9 @@ export const en = {
     videoSupportDemo: '🎥 Video Support',
     webrtcDemo: '📹 WebRTC Demo',
     callCenterDemo: '📞 Call Center',
+    ticketDemo: '🎫 Ticket Demo',
+    ratingDemo: '⭐ Rating Demo',
+    platformDemo: '🏬 Platform Demo',
     proactiveDemo: '🎯 Proactive Acquisition',
     voiceAgentDemo: '🎙️ Voice Agent',
     videoConferenceDemo: '🎬 Video Conference',
@@ -249,6 +252,8 @@ export const en = {
       anonymousUserHint: 'Anonymous test mode: visitorUid, nickname, avatar and other user fields are omitted.',
       currentUserTitle: 'Current Business User',
       currentUserIdLabel: 'User ID',
+      currentUidLabel: 'uid',
+      currentVisitorUidLabel: 'visitorUid',
       currentUserNicknameLabel: 'Nickname',
       contactSupport: 'Contact Support',
       inviteText: 'Hello, how can we help you?',
@@ -700,6 +705,197 @@ export const en = {
         threadDoc: 'View thread history integration guide',
         visitorRef: 'Visitor ThreadList reference',
         reactExample: 'React thread history demo source'
+      }
+    },
+    ticketDemo: {
+      title: 'Visitor Ticket Demo',
+      description: 'Demonstrates how to route the Bytedesk Web SDK entry into the visitorTicket app for ticket history, ticket submission, status lookup, detail lookup, and notification follow-up in an iframe-friendly flow.',
+      bubbleTitle: 'Ticket Center',
+      bubbleSubtitle: 'Open visitor ticket routes',
+      currentPathLabel: 'Current entry path',
+      currentPathHint: 'The floating entry switches between dedicated /ticket routes while keeping org, sid, visitor, locale, and theme params in the query string.',
+      selectedScenarioTitle: 'Ticket scenarios',
+      detailTicketIdLabel: 'Ticket ID for detail route',
+      detailTicketIdPlaceholder: 'Enter a real ticket UID to auto-open the detail drawer',
+      usageTitle: 'Demo notes',
+      usageNotes: [
+        '1. Pass showNavBar=0 in chatConfig so the embedded route hides the top navigation and behaves like an in-widget page.',
+        '2. The create route opens the visitor submission drawer on mount, which is suitable for AI fallback or offline handoff flows.',
+      ],
+      buttons: {
+        closeTicket: 'Close ticket window'
+      },
+      routeTableTitle: 'Available visitorTicket routes',
+      routeTable: {
+        routeLabel: 'Route',
+        purposeLabel: 'Purpose',
+        exampleLabel: 'Path example'
+      },
+      routeRows: {
+        history: {
+          label: 'History tickets',
+          purpose: 'List the tickets submitted by the current visitor or logged-in user.',
+          example: '/ticket/history'
+        },
+        create: {
+          label: 'Create ticket',
+          purpose: 'Open the ticket submission drawer immediately after the route loads.',
+          example: '/ticket/create'
+        },
+        notifications: {
+          label: 'Message notifications',
+          purpose: 'Open the same visitor ticket shell as a notification landing route for replies and status changes.',
+          example: '/ticket/notifications'
+        }
+      },
+      urlGuideTitle: 'URL + Query usage',
+      sampleUrlLabel: 'Generated sample URL from the current scenario',
+      urlParamsTitle: 'Shared parameters for /ticket routes',
+      urlParams: [
+        'org: organization ID (required)',
+        'sid: ticket workgroup ID (required)',
+        't: session type inherited from the current chat profile',
+        'visitorUid / nickname / avatar: optional visitor identity used to match visitor-side tickets',
+        'showNavBar: pass 0 to hide the top navigation in iframe mode',
+        'showHeader: pass 0 to hide TicketHeader, or 1 to show TicketHeader',
+        'lang / mode: locale and theme mode (optional)',
+        'backgroundColor / textColor: customize the embedded page primary color and text color to match the host theme',
+        'ticketId: optional for detail route; can be passed in /ticket/detail/:ticketId or as a query parameter'
+      ],
+      docLinks: {
+        visitorTicketRef: 'VisitorTicket route implementation',
+        reactExample: 'React ticket demo source',
+        agentTicketDocs: 'Agent/admin ticket docs',
+        visitorTicketDocs: 'Visitor/client ticket docs',
+        ticketDemoPreview: 'Ticket demo preview link'
+      },
+      notificationApiTitle: 'Notification Unread Count API',
+      notificationApiDescription: 'Query the unread notification count for the current visitor, used to display a Badge on the notification entry button.',
+      notificationApiEndpointLabel: 'Endpoint',
+      notificationApiMethodLabel: 'Method',
+      notificationApiParamsTitle: 'Parameters',
+      notificationApiNoteTitle: '💡 Note',
+      notificationApiNoteContent: 'It is recommended to use visitorUid + orgUid for direct query (the backend resolves it via a native query join on the visitor table). Passing the system userUid is also supported — use either one.',
+      notificationApiRequestExample: 'Request Example',
+      notificationApiResponseExample: 'Response Example',
+      notificationApiParams: [
+        'visitorUid: Frontend custom visitor identifier, e.g. visitor_001 (recommended, use with orgUid)',
+        'orgUid: Organization ID (required when using visitorUid)',
+        'channel: Channel identifier, always "HTTP" (required)',
+        'userUid: System-generated visitor uid (optional, from visitor init data.uid)'
+      ]
+    },
+    ratingDemo: {
+      title: 'Visitor Rating Demo',
+      description: 'Shows how to enter visitor history threads for rating-related flows. Pending rating and follow-up rating both reuse the history thread surface because rating is completed inside thread messages and history drawers rather than on a standalone page.',
+      bubbleTitle: 'Service Rating',
+      bubbleSubtitle: 'Open rating-related history threads',
+      currentPathLabel: 'Current entry path',
+      currentPathHint: 'Supports a normal chat entry and two history-thread rating entry modes.',
+      selectedScenarioTitle: 'Rating scenarios',
+      usageTitle: 'Demo notes',
+      usageNotes: [
+        '1. There is no standalone visitor rating route today; rating is rendered inside chat and history-thread messages.',
+        '2. Normal chat starts from /chat, while pending-rated and already-rated thread lists open through /chat/thread.',
+        '3. ratingIntent=pending loads threads awaiting rating, and ratingIntent=followup loads already-rated threads in append-comment mode.',
+        '4. threadDetail=1 is enabled so the embedded history page can expose more conversation details before rating or follow-up comment submission.'
+      ],
+      routeTableTitle: 'Rating entry scenario',
+      routeTable: {
+        routeLabel: 'Scenario',
+        purposeLabel: 'Purpose',
+        exampleLabel: 'Path example'
+      },
+      routeRows: {
+        chat: {
+          label: 'Normal chat',
+          purpose: 'Used to demonstrate in-conversation rating during a normal chat session.',
+          example: '/chat'
+        },
+        pending: {
+          label: 'Pending rating threads',
+          purpose: 'Used to demonstrate post-conversation rating from the pending rating thread list.',
+          example: '/chat/thread?ratingIntent=pending'
+        },
+        followup: {
+          label: 'Rated threads',
+          purpose: 'Used to demonstrate follow-up rating from the rated thread list.',
+          example: '/chat/thread?ratingIntent=followup'
+        }
+      },
+      urlGuideTitle: 'URL + Query usage',
+      sampleUrlLabel: 'Generated sample URL from the current scenario',
+      urlParamsTitle: 'Shared parameters for rating-related history entry',
+      urlParams: [
+        'org: organization ID (required)',
+        'sid: workgroup or agent target ID (required)',
+        't: session type inherited from the current chat profile',
+        'visitorUid / nickname / avatar: visitor identity used to load the correct history threads',
+        'lang / mode: locale and theme mode (optional)',
+        'threadDetail: pass 1 to expose more thread details from the history view',
+        'ratingIntent: pending or followup, used to switch between pending and rated thread lists'
+      ],
+      docLinks: {
+        rateBubbleRef: 'Visitor RateBubble implementation',
+        reactExample: 'React rating demo source'
+      }
+    },
+    platformDemo: {
+      title: 'Platform Routing Demo',
+      description: 'Explains how to distinguish platform support from store support. Use the default organization orgUid=df_org_uid as the platform support tenant, treat every other orgUid as a store support tenant, and note that platform support can view all platform data.',
+      bubbleTitle: 'Platform Support',
+      bubbleSubtitle: 'Switch platform or store service entries',
+      currentPathLabel: 'Current entry path',
+      currentPathHint: 'All scenarios keep /chat; routing is determined by org + sid + title.',
+      mappingAlertTitle: 'Platform and store routing rule',
+      mappingAlertDescription: 'Use orgUid=df_org_uid for platform-wide customer service. Platform support can view all platform data. Any other orgUid should be considered a store tenant, and each store tenant can publish multiple consultation entries such as presales, aftersales, logistics, or VIP support.',
+      selectedScenarioTitle: 'Support entry scenarios',
+      usageTitle: 'Demo notes',
+      usageNotes: [
+        '1. The default organization orgUid=df_org_uid represents the platform customer-service entry.',
+        '2. Platform support under df_org_uid can access and view all platform-level data.',
+        '3. Any orgUid other than df_org_uid should be treated as a store service tenant.',
+        '4. One organization can configure multiple consultation entries by assigning different sid values, such as presales, aftersales, logistics, or membership care.',
+        '5. Platform and store entries still use /chat; the actual routing comes from org, t, sid, and an optional title field.',
+        '6. The store orgUid and sid values in this explanation are placeholders. Replace them with real store organization and workgroup IDs before production use.'
+      ],
+      routeTableTitle: 'Organization and entry examples',
+      routeTable: {
+        routeLabel: 'Entry',
+        purposeLabel: 'Purpose',
+        exampleLabel: 'Sample org/sid'
+      },
+      routeRows: {
+        platform: {
+          label: 'Platform customer service',
+          purpose: 'Use the default orgUid=df_org_uid as the platform-level support tenant.',
+          example: 'org=df_org_uid&sid=df_wg_uid'
+        },
+        presales: {
+          label: 'Store presales support',
+          purpose: 'Use a non-default orgUid plus a dedicated sid to route visitors to a store presales entry.',
+          example: 'org=store_demo_org_uid&sid=store_presales_wg_uid'
+        },
+        aftersales: {
+          label: 'Store aftersales support',
+          purpose: 'Reuse the same store orgUid with another sid to expose a separate aftersales support entry.',
+          example: 'org=store_demo_org_uid&sid=store_aftersales_wg_uid'
+        }
+      },
+      urlGuideTitle: 'URL + Query usage',
+      sampleUrlLabel: 'Generated sample URL from the current scenario',
+      urlParamsTitle: 'Shared parameters for platform/store routing',
+      urlParams: [
+        'org: organization ID. df_org_uid means platform support; any other value means a store tenant.',
+        't: session type. Workgroup routing usually uses t=1.',
+        'sid: consultation entry ID. Use different sid values for presales, aftersales, logistics, etc.',
+        'title: optional browser or page title for the current entry point.',
+        'visitorUid / nickname / avatar: optional visitor identity passed into the chat page.',
+        'lang / mode: locale and theme mode (optional)'
+      ],
+      docLinks: {
+        chatProfileRef: 'Demo chat-profile examples',
+        reactExample: 'React platform demo source'
       }
     },
     videoSupportDemo: {

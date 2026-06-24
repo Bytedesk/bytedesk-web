@@ -13,7 +13,7 @@
  *  技术/商务联系：270580156@qq.com
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, Button, Card, Typography, Space, Table, Tag, theme as antdTheme, FloatButton } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
@@ -43,10 +43,16 @@ interface DemoPageProps {
     onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
+interface VisitorIdentity {
+    uid: string;
+    visitorUid: string;
+}
+
 const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode, onSelectUser, onAnonymousModeChange }: DemoPageProps) => {
     const messages = useMemo(() => getLocaleMessages(locale), [locale]);
     const { token } = antdTheme.useToken();
     const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
+    const [visitorIdentity, setVisitorIdentity] = useState<VisitorIdentity>({ uid: '', visitorUid: '' });
     const bubbleNickname = isAnonymousMode ? messages.pages.userInfoDemo.anonymousUserLabel : selectedUser.nickname;
     const users = useMemo(() => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
         key,
@@ -55,6 +61,10 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         nickname: messages.pages.userInfoDemo.users[key]
     })), [messages]);
     const currentUser = selectedUser;
+
+    useEffect(() => {
+        setVisitorIdentity({ uid: '', visitorUid: '' });
+    }, [isAnonymousMode, selectedUser.visitorUid]);
 
     // 配置客服组件
     const config = useMemo<BytedeskConfig>(() => ({
@@ -109,6 +119,7 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         },
         // 添加 onVisitorInfo 回调
         onVisitorInfo: (uid: string, visitorUid: string) => {
+            setVisitorIdentity({ uid, visitorUid });
             console.log('收到访客信息:', { uid, visitorUid });
         },
     }), [htmlBaseUrl, locale, messages, isAnonymousMode, selectedChatProfile, selectedUser, themeMode]);
@@ -208,6 +219,8 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         }),
         [config]
     );
+    const displayVisitorUid = visitorIdentity.visitorUid || currentUser.visitorUid || '-';
+    const displayUid = visitorIdentity.uid || '-';
 
     return (
         <PageContainer>
@@ -242,10 +255,15 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                         avatar={currentUser.avatar}
                         anonymousIdText={messages.pages.userInfoDemo.anonymousUserHint}
                         anonymousNicknameText={messages.pages.userInfoDemo.anonymousUserLabel}
-                        userIdLabel={messages.pages.userInfoDemo.currentUserIdLabel}
-                        userId={currentUser.visitorUid}
+                        userIdLabel={messages.pages.userInfoDemo.currentVisitorUidLabel}
+                        userId={displayVisitorUid}
                         userNicknameLabel={messages.pages.userInfoDemo.currentUserNicknameLabel}
                         userNickname={currentUser.nickname}
+                        extraContent={(
+                            <Typography.Text type="secondary">
+                                {messages.pages.userInfoDemo.currentUidLabel}: {displayUid}
+                            </Typography.Text>
+                        )}
                     />
 
                     <Space wrap>

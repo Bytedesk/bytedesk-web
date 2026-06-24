@@ -111,6 +111,7 @@ type BubbleSwitchModeSelection = BubbleSwitchMode | 'default';
 const DEFAULT_BUBBLE_SWITCH_MODE: BubbleSwitchModeSelection = 'default';
 const DEFAULT_BUBBLE_ROTATE_INTERVAL = 3000;
 const DEFAULT_ENTRY_BUTTON_TEXT = '在线客服';
+const DEFAULT_MINIMIZED_BAR_TEXT = '';
 
 const BasicDemo = ({
   locale,
@@ -141,6 +142,7 @@ const BasicDemo = ({
   const [isThreadDetailParamEnabled, setIsThreadDetailParamEnabled] = useState<boolean>(false);
   const [isVisitorProfileParamEnabled, setIsVisitorProfileParamEnabled] = useState<boolean>(false);
   const [selectedBubbleSwitchMode, setSelectedBubbleSwitchMode] = useState<BubbleSwitchModeSelection>(DEFAULT_BUBBLE_SWITCH_MODE);
+  const [minimizedBarTextOverride, setMinimizedBarTextOverride] = useState<string>(DEFAULT_MINIMIZED_BAR_TEXT);
 
   const localeValueHint = getLocaleValueHint(locale);
   const localizedCopy = useMemo(
@@ -297,6 +299,9 @@ const BasicDemo = ({
       textColor: '#ffffff',
       backgroundColor: THEME_COLORS[0]
     },
+    minimizedBarConfig: {
+      text: undefined,
+    },
     locale,
     onVisitorInfo: (uid: string, visitorUid: string) => {
       console.log('BasicDemo 收到访客信息:', { uid, visitorUid });
@@ -343,9 +348,12 @@ const BasicDemo = ({
           url: '',
           title: '',
         },
+      minimizedBarConfig: {
+        text: minimizedBarTextOverride.trim() || undefined,
+      },
       buttonsConfig: multiSessionButtons
     }));
-  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile, isQrCodeParamEnabled, isThreadDetailParamEnabled, isVisitorProfileParamEnabled, isCustomTitleEnabled, isBrowseInfoEnabled, bubbleMessages, selectedBubbleSwitchMode]);
+  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile, isQrCodeParamEnabled, isThreadDetailParamEnabled, isVisitorProfileParamEnabled, isCustomTitleEnabled, isBrowseInfoEnabled, bubbleMessages, selectedBubbleSwitchMode, minimizedBarTextOverride]);
 
   const handleInit = () => {
     console.log('BytedeskReact initialized BasicDemo');
@@ -580,6 +588,23 @@ const BasicDemo = ({
   const handleQrCodeImageUrlChange = (nextUrl: string) => {
     setQrCodeImageUrl(nextUrl);
     setLastActionApiHint(`setConfig({ buttonsConfig: [{ previewImageUrl: "${nextUrl}" }] })`);
+  };
+
+  const handleMinimizedBarTextChange = (nextText: string) => {
+    setMinimizedBarTextOverride(nextText);
+    const normalizedText = nextText.trim();
+    setConfig((prevConfig: BytedeskConfig) => ({
+      ...prevConfig,
+      minimizedBarConfig: {
+        ...(prevConfig.minimizedBarConfig || {}),
+        text: normalizedText || undefined,
+      },
+    }));
+    setLastActionApiHint(
+      normalizedText
+        ? `setConfig({ minimizedBarConfig: { text: "${normalizedText}" } })`
+        : 'setConfig({ minimizedBarConfig: { text: undefined } })'
+    );
   };
 
   const handleToggleButtonVisibility = () => {
@@ -856,6 +881,7 @@ const BasicDemo = ({
         selectedEntryButtonIconLabel={selectedEntryButtonIconLabel}
         isEntryButtonTextEnabled={isEntryButtonTextEnabled}
         entryButtonTextValue={entryButtonTextOverride}
+        minimizedBarTextValue={minimizedBarTextOverride}
         locale={locale}
         localeValueHint={localeValueHint}
         lastActionApiHint={lastActionApiHint}
@@ -893,6 +919,7 @@ const BasicDemo = ({
         onEntryButtonIconClick={handleEntryButtonIconSwitch}
         onEntryButtonTextToggle={handleToggleEntryButtonText}
         onEntryButtonTextChange={handleEntryButtonTextChange}
+        onMinimizedBarTextChange={handleMinimizedBarTextChange}
         onNavbarToggle={handleToggleNavbar}
         onQrCodeParamToggle={handleToggleQrCodeParam}
         onThreadDetailParamToggle={handleToggleThreadDetailParam}

@@ -272,6 +272,8 @@ export const esEs = {
       anonymousUserHint: 'Modo de prueba anonimo: se omiten visitorUid, nickname, avatar y otros datos del usuario.',
       currentUserTitle: 'Usuario actual del sistema de negocio',
       currentUserIdLabel: 'ID de usuario',
+      currentUidLabel: 'uid',
+      currentVisitorUidLabel: 'visitorUid',
       currentUserNicknameLabel: 'Apodo',
       contactSupport: 'Contactar soporte',
       inviteText: 'Hola, en que podemos ayudarte?',
@@ -540,6 +542,41 @@ export const esEs = {
         visitorRef: 'Referencia Visitor ThreadList',
         reactExample: 'Codigo fuente React del historial'
       }
+    },
+    ticketDemo: {
+      ...en.pages.ticketDemo,
+      title: 'Demo de tickets del visitante',
+      description: 'Muestra como dirigir la entrada del SDK Web de Bytedesk a las rutas de historial, creacion, estado, detalle y notificaciones de visitorTicket para escenarios embebidos con iframe.',
+      bubbleTitle: 'Centro de tickets',
+      bubbleSubtitle: 'Abrir rutas de tickets del visitante',
+      currentPathLabel: 'Ruta de entrada actual',
+      currentPathHint: 'La entrada flotante cambia entre rutas /ticket y conserva org, sid, visitante, idioma y tema en la query.',
+      selectedScenarioTitle: 'Escenarios de ticket',
+      detailTicketIdLabel: 'ID del ticket para la ruta de detalle',
+      detailTicketIdPlaceholder: 'Introduce un UID real para abrir automaticamente el panel de detalle',
+      usageTitle: 'Notas del demo',
+      buttons: {
+        closeTicket: 'Cerrar ventana de tickets'
+      },
+      docLinks: {
+        ...en.pages.ticketDemo.docLinks,
+        visitorTicketRef: 'Ver implementacion de rutas de visitorTicket',
+        reactExample: 'Codigo fuente del demo React de tickets'
+      }
+    },
+    ratingDemo: {
+      ...en.pages.ratingDemo,
+      title: 'Demo de valoracion del visitante',
+      description: 'Muestra como entrar en el flujo de valoracion desde el historial de conversaciones. Tanto la valoracion pendiente como la valoracion de seguimiento reutilizan /chat/thread.',
+      bubbleTitle: 'Valoracion del servicio',
+      bubbleSubtitle: 'Abrir historiales relacionados con la valoracion'
+    },
+    platformDemo: {
+      ...en.pages.platformDemo,
+      title: 'Demo de soporte de plataforma',
+      description: 'Explica como usar orgUid=df_org_uid como atencion al cliente de plataforma y tratar los demas orgUid como tiendas. Cada organizacion puede tener varias entradas, como preventa y postventa.',
+      bubbleTitle: 'Soporte de plataforma',
+      bubbleSubtitle: 'Cambiar entre entradas de plataforma y tienda'
     },
     callCenterDemo: {
       ...en.pages.callCenterDemo,

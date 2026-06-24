@@ -275,6 +275,8 @@ export const koKr = {
       anonymousUserHint: '익명 테스트 모드: visitorUid, nickname, avatar 등 사용자 필드를 전달하지 않습니다.',
       currentUserTitle: '현재 업무 시스템 사용자',
       currentUserIdLabel: '사용자 ID',
+      currentUidLabel: 'uid',
+      currentVisitorUidLabel: 'visitorUid',
       currentUserNicknameLabel: '닉네임',
       contactSupport: '상담 시작',
       docLinks: {
@@ -484,6 +486,41 @@ export const koKr = {
         visitorRef: 'Visitor ThreadList 참고',
         reactExample: 'React 대화 이력 데모 소스'
       }
+    },
+    ticketDemo: {
+      ...en.pages.ticketDemo,
+      title: '방문자 티켓 데모',
+      description: 'Bytedesk Web SDK 진입점을 visitorTicket 앱의 이력, 생성, 상태 조회, 상세 조회, 알림 라우트로 전환하는 방법을 보여 줍니다. iframe 임베드 흐름에 맞춘 구성입니다.',
+      bubbleTitle: '티켓 센터',
+      bubbleSubtitle: '방문자 티켓 라우트 열기',
+      currentPathLabel: '현재 진입 경로',
+      currentPathHint: '/ticket 라우트를 전환하면서 org, sid, 방문자, 언어, 테마 파라미터를 유지합니다.',
+      selectedScenarioTitle: '티켓 시나리오',
+      detailTicketIdLabel: '상세 라우트용 티켓 ID',
+      detailTicketIdPlaceholder: '실제 티켓 UID를 입력하면 상세 드로어를 자동으로 엽니다',
+      usageTitle: '데모 메모',
+      buttons: {
+        closeTicket: '티켓 창 닫기'
+      },
+      docLinks: {
+        ...en.pages.ticketDemo.docLinks,
+        visitorTicketRef: 'visitorTicket 라우트 구현 보기',
+        reactExample: 'React 티켓 데모 소스'
+      }
+    },
+    ratingDemo: {
+      ...en.pages.ratingDemo,
+      title: '방문자 만족도 평가 데모',
+      description: '히스토리 대화 입구를 통해 만족도 평가 흐름으로 들어가는 방식을 보여줍니다. 대기 평가와 추가 평가는 현재 모두 /chat/thread 를 재사용합니다.',
+      bubbleTitle: '서비스 평가',
+      bubbleSubtitle: '평가 관련 히스토리 대화 열기'
+    },
+    platformDemo: {
+      ...en.pages.platformDemo,
+      title: '플랫폼 상담 데모',
+      description: '기본 조직 orgUid=df_org_uid 를 플랫폼 상담으로 보고, 그 외 orgUid 는 모두 상점 상담으로 구분하는 방식을 설명합니다. 각 조직은 사전판매, 사후지원 등 여러 상담 입구를 가질 수 있습니다.',
+      bubbleTitle: '플랫폼 상담',
+      bubbleSubtitle: '플랫폼 또는 상점 상담 입구 전환'
     },
     callCenterDemo: {
       ...en.pages.callCenterDemo,

@@ -35,6 +35,9 @@ import {
 const BasicDemo = lazy(() => import('./pages/BasicDemo'));
 const GoodsInfoDemo = lazy(() => import('./pages/GoodsInfoDemo'));
 const OrderInfoDemo = lazy(() => import('./pages/OrderInfoDemo'));
+const TicketDemo = lazy(() => import('./pages/TicketDemo'));
+const RatingDemo = lazy(() => import('./pages/RatingDemo'));
+const PlatformDemo = lazy(() => import('./pages/PlatformDemo'));
 const ThreadHistoryDemo = lazy(() => import('./pages/ThreadHistoryDemo'));
 const UnreadCountDemo = lazy(() => import('./pages/UnreadCountDemo'));
 const UserInfoDemo = lazy(() => import('./pages/UserInfoDemo'));
@@ -404,6 +407,9 @@ function AppLayout({
     { path: '/vipLevel', label: messages.nav.vipLevelDemo },
     { path: '/goodsInfo', label: messages.nav.goodsInfoDemo },
     { path: '/orderInfo', label: messages.nav.orderInfoDemo },
+    { path: '/ticket', label: messages.nav.ticketDemo },
+    { path: '/rating', label: messages.nav.ratingDemo },
+    { path: '/platform', label: messages.nav.platformDemo },
     { path: '/proactive', label: messages.nav.proactiveDemo },
     { path: '/webrtcDemo', label: messages.nav.webrtcDemo },
     { path: '/unreadCount', label: messages.nav.unreadCountDemo },
@@ -931,6 +937,18 @@ function AppLayout({
             <Route
               path="/orderInfo"
               element={<OrderInfoDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            <Route
+              path="/ticket"
+              element={<TicketDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            <Route
+              path="/rating"
+              element={<RatingDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
+            />
+            <Route
+              path="/platform"
+              element={<PlatformDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} onSelectUser={onActiveUserChange} onAnonymousModeChange={onAnonymousModeChange} />}
             />
             <Route
               path="/goodsInfo"

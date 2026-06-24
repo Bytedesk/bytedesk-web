@@ -81,6 +81,7 @@ export const buildRuntimeEmbedCodeExample = ({
     buttonsConfig: config.buttonsConfig,
     inviteConfig: config.inviteConfig,
     bubbleConfig: config.bubbleConfig,
+    minimizedBarConfig: config.minimizedBarConfig,
     chatConfig: currentChatConfig,
     browseConfig: config.browseConfig,
     theme: {

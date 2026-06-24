@@ -115,6 +115,41 @@ export const thTh = {
       ...en.pages.threadHistoryDemo,
       title: 'เดโมประวัติการสนทนา'
     },
+    ticketDemo: {
+      ...en.pages.ticketDemo,
+      title: 'เดโมทิกเก็ตผู้เยี่ยมชม',
+      description: 'สาธิตวิธีเปลี่ยนจุดเข้า Bytedesk Web SDK ไปยัง route ประวัติ สร้างใหม่ สถานะ รายละเอียด และการแจ้งเตือนของ visitorTicket สำหรับการฝังผ่าน iframe',
+      bubbleTitle: 'ศูนย์ทิกเก็ต',
+      bubbleSubtitle: 'เปิด route ทิกเก็ตของผู้เยี่ยมชม',
+      currentPathLabel: 'พาธทางเข้าปัจจุบัน',
+      currentPathHint: 'ปุ่มลอยจะสลับระหว่าง route /ticket พร้อมคงพารามิเตอร์ org, sid, ผู้เยี่ยมชม, ภาษา และธีมไว้ใน query',
+      selectedScenarioTitle: 'สถานการณ์ทิกเก็ต',
+      detailTicketIdLabel: 'Ticket ID สำหรับ route รายละเอียด',
+      detailTicketIdPlaceholder: 'ใส่ UID ทิกเก็ตจริงเพื่อเปิด drawer รายละเอียดอัตโนมัติ',
+      usageTitle: 'บันทึกเดโม',
+      buttons: {
+        closeTicket: 'ปิดหน้าต่างทิกเก็ต'
+      },
+      docLinks: {
+        ...en.pages.ticketDemo.docLinks,
+        visitorTicketRef: 'ดูการทำงานของ route visitorTicket',
+        reactExample: 'ซอร์สเดโมทิกเก็ต React'
+      }
+    },
+    ratingDemo: {
+      ...en.pages.ratingDemo,
+      title: 'เดโมการให้คะแนนความพึงพอใจของผู้เยี่ยมชม',
+      description: 'สาธิตการเข้าสู่ขั้นตอนการให้คะแนนผ่านประวัติการสนทนา ปัจจุบันทั้งกรณีรอให้คะแนนและกรณีติดตามผลใช้ /chat/thread ร่วมกัน',
+      bubbleTitle: 'ประเมินบริการ',
+      bubbleSubtitle: 'เปิดประวัติการสนทนาที่เกี่ยวข้องกับการประเมิน'
+    },
+    platformDemo: {
+      ...en.pages.platformDemo,
+      title: 'เดโมบริการลูกค้าแพลตฟอร์ม',
+      description: 'อธิบายการใช้ orgUid=df_org_uid เป็นบริการลูกค้าระดับแพลตฟอร์ม และถือว่า orgUid อื่นเป็นบริการลูกค้าของร้านค้า โดยแต่ละองค์กรสามารถมีหลายทางเข้า เช่น ก่อนขายและหลังการขาย',
+      bubbleTitle: 'บริการลูกค้าแพลตฟอร์ม',
+      bubbleSubtitle: 'สลับทางเข้าแพลตฟอร์มหรือร้านค้า'
+    },
     callCenterDemo: {
       ...en.pages.callCenterDemo,
       title: 'เดโมคอลเซ็นเตอร์'

@@ -48,6 +48,10 @@ export interface WindowConfig {
   height?: number; // 窗口高度
 }
 
+export interface MinimizedBarConfig {
+  text?: string; // 最小化恢复条文案，未配置时使用 locale 默认文案
+}
+
 export interface Animation {
   enabled?: boolean; // 是否启用动画
   duration?: number; // 动画持续时间, 单位: 毫秒
@@ -115,7 +119,7 @@ export interface ButtonConfig {
   // size?: number; // 按钮大小
   width?: number; // 按钮宽度
   height?: number; // 按钮高度
-  action?: 'chat' | 'thread' | 'webrtc' | 'call'; // 按钮点击后触发的内置会话类型
+  action?: 'chat' | 'thread' | 'webrtc' | 'call' | 'ticket'; // 按钮点击后触发的内置会话类型
   previewImageUrl?: string; // 鼠标悬浮时展示的图片地址，例如企业微信二维码
   previewImageAlt?: string; // 悬浮图片说明文案
   onClick?: () => void; // 点击回调
@@ -172,6 +176,7 @@ export interface BytedeskConfig {
   threadPath?: string; // 历史会话页面路径，默认 /chat/thread
   webrtcPath?: string; // 音视频通话页面路径，默认 /webrtc
   callPath?: string; // 呼叫中心页面路径，默认 /call
+  ticketPath?: string; // 工单页面路径，默认 /ticket/history
   placement?: 'bottom-left' | 'bottom-right'; // 弹出位置
   marginBottom?: number; // 底部边距
   marginSide?: number; // 侧边边距
@@ -189,6 +194,7 @@ export interface BytedeskConfig {
   browseConfig?: BrowseConfig; // 浏览配置
   animation?: Animation; // 动画配置
   window?: WindowConfig; // 窗口配置
+  minimizedBarConfig?: MinimizedBarConfig; // 最小化恢复条配置
   theme?: Theme; // 主题配置
   onInit?: () => void; // 初始化回调
   onShowChat?: () => void; // 显示聊天回调

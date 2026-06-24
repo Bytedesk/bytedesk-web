@@ -274,6 +274,8 @@ export const jaJp = {
       anonymousUserHint: '匿名テストモード: visitorUid、nickname、avatar などのユーザー情報は送信されません。',
       currentUserTitle: '現在の業務システムユーザー情報',
       currentUserIdLabel: 'ユーザー ID',
+      currentUidLabel: 'uid',
+      currentVisitorUidLabel: 'visitorUid',
       currentUserNicknameLabel: 'ニックネーム',
       contactSupport: 'サポートに相談',
       inviteText: 'こんにちは。どのようにお手伝いできますか？',
@@ -429,6 +431,66 @@ export const jaJp = {
         visitorRef: '訪問者 ThreadList リファレンス',
         reactExample: 'React 履歴スレッドデモソース'
       }
+    },
+    ticketDemo: {
+      ...en.pages.ticketDemo,
+      title: '訪問者チケットデモ',
+      description: 'Bytedesk Web SDK の入口を visitorTicket の履歴、作成、状態確認、詳細確認、通知ルートへ切り替える方法を示します。iframe 埋め込みを前提とした構成です。',
+      bubbleTitle: 'チケットセンター',
+      bubbleSubtitle: '訪問者チケットルートを開く',
+      currentPathLabel: '現在の入口パス',
+      currentPathHint: '/ticket ルートを切り替えながら、org、sid、訪問者、言語、テーマのパラメータを維持します。',
+      selectedScenarioTitle: 'チケットシナリオ',
+      detailTicketIdLabel: '詳細ルート用チケット ID',
+      detailTicketIdPlaceholder: '実在するチケット UID を入力すると詳細ドロワーを自動表示します',
+      usageTitle: 'デモメモ',
+      buttons: {
+        closeTicket: 'チケットウィンドウを閉じる'
+      },
+      docLinks: {
+        ...en.pages.ticketDemo.docLinks,
+        visitorTicketRef: 'visitorTicket ルート実装を見る',
+        reactExample: 'React チケットデモソース'
+      }
+    },
+    ratingDemo: {
+      ...en.pages.ratingDemo,
+      title: '訪問者満足度評価デモ',
+      description: '履歴会話入口を使って満足度評価フローへ入る方法を示します。未評価履歴と追評価対応は現在どちらも /chat/thread を利用します。',
+      bubbleTitle: 'サービス評価',
+      bubbleSubtitle: '評価関連の履歴会話を開く',
+      currentPathLabel: '現在の入口パス',
+      currentPathHint: '通常の対話開始と、未評価/既評価の履歴会話入口を切り替えられます。',
+      selectedScenarioTitle: '評価シナリオ',
+      usageTitle: 'デモメモ',
+      routeRows: {
+        chat: {
+          label: '通常の対話開始',
+          purpose: '通常のチャット画面を開き、評価気泡から送信した評価は前回内容を上書きします。',
+          example: '/chat'
+        },
+        pending: {
+          label: '未評価の会話一覧',
+          purpose: '未評価の履歴会話を開き、初回評価を行います。',
+          example: '/chat/thread?ratingIntent=pending'
+        },
+        followup: {
+          label: '既評価の会話一覧',
+          purpose: '既評価の履歴会話を開き、コメント追記のみを許可します。',
+          example: '/chat/thread?ratingIntent=followup'
+        }
+      },
+      docLinks: {
+        rateBubbleRef: 'visitor RateBubble 実装を見る',
+        reactExample: 'React 満足度評価デモソース'
+      }
+    },
+    platformDemo: {
+      ...en.pages.platformDemo,
+      title: 'プラットフォームサポートデモ',
+      description: 'orgUid=df_org_uid をプラットフォーム客服とみなし、それ以外の orgUid を店舗客服として扱う構成を説明します。各組織は售前・售後など複数の相談入口を持てます。',
+      bubbleTitle: 'プラットフォーム客服',
+      bubbleSubtitle: 'プラットフォームまたは店舗の入口を切り替える'
     },
     callCenterDemo: {
       ...en.pages.callCenterDemo,

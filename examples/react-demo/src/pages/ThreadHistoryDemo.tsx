@@ -22,11 +22,31 @@ interface DemoPageProps {
   onAnonymousModeChange: (nextMode: boolean) => void;
 }
 
+const getReadableTextColor = (backgroundColor: string): string => {
+  const normalized = backgroundColor.trim().replace('#', '');
+  const fullHex = normalized.length === 3
+    ? normalized.split('').map((char) => char + char).join('')
+    : normalized;
+
+  if (!/^[0-9a-fA-F]{6}$/.test(fullHex)) {
+    return '#ffffff';
+  }
+
+  const red = Number.parseInt(fullHex.slice(0, 2), 16);
+  const green = Number.parseInt(fullHex.slice(2, 4), 16);
+  const blue = Number.parseInt(fullHex.slice(4, 6), 16);
+  const brightness = (red * 299 + green * 587 + blue * 114) / 1000;
+
+  return brightness >= 186 ? '#111111' : '#ffffff';
+};
+
 const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const { token } = antdTheme.useToken();
   const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
   const [isThreadDetailParamEnabled, setIsThreadDetailParamEnabled] = useState<boolean>(false);
+  const currentThemeColor = useMemo(() => token.colorPrimary || '#1677ff', [token.colorPrimary]);
+  const currentThemeTextColor = useMemo(() => getReadableTextColor(currentThemeColor), [currentThemeColor]);
   const config = useMemo<BytedeskConfig>(() => ({
     isDebug: true,
     htmlUrl: htmlBaseUrl,
@@ -51,6 +71,8 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
     chatConfig: {
       ...selectedChatProfile.chatConfig,
       threadDetail: isThreadDetailParamEnabled ? '1' : '0',
+      backgroundColor: currentThemeColor,
+      textColor: currentThemeTextColor,
       ...(isAnonymousMode
         ? {}
         : {
@@ -60,10 +82,12 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
         })
     },
     theme: {
-      mode: themeMode
+      mode: themeMode,
+      backgroundColor: currentThemeColor,
+      textColor: currentThemeTextColor,
     },
     locale
-  }), [htmlBaseUrl, isAnonymousMode, isThreadDetailParamEnabled, locale, messages, selectedChatProfile, selectedUser, themeMode]);
+  }), [currentThemeColor, currentThemeTextColor, htmlBaseUrl, isAnonymousMode, isThreadDetailParamEnabled, locale, messages, selectedChatProfile, selectedUser, themeMode]);
 
   const docLinks = useMemo(
     () => [
@@ -87,11 +111,13 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
     params.append('visitorUid', demoVisitorUid);
     params.append('lang', locale);
     params.append('mode', String(themeMode || 'light'));
+    params.append('backgroundColor', currentThemeColor);
+    params.append('textColor', currentThemeTextColor);
     if (isThreadDetailParamEnabled) {
       params.append('threadDetail', '1');
     }
     return `${htmlBaseUrl}/chat/thread?${params.toString()}`;
-  }, [demoVisitorUid, htmlBaseUrl, isThreadDetailParamEnabled, locale, themeMode]);
+  }, [currentThemeColor, currentThemeTextColor, demoVisitorUid, htmlBaseUrl, isThreadDetailParamEnabled, locale, themeMode]);
 
   const usageNotes = messages.pages.threadHistoryDemo.usageNotes;
   const urlParams = messages.pages.threadHistoryDemo.urlParams;
@@ -176,7 +202,24 @@ const ThreadHistoryDemo = ({ locale, themeMode, selectedChatProfile, selectedUse
             <Divider style={{ margin: '4px 0' }} />
 
             <Space wrap>
-              <Button type="primary" onClick={() => (window as any).bytedesk?.showThread()}>
+              <Button
+                type="primary"
+                onClick={() => (window as any).bytedesk?.showThread({
+                  htmlUrl: htmlBaseUrl,
+                  threadPath: '/chat/thread',
+                  chatConfig: {
+                    ...config.chatConfig,
+                    backgroundColor: currentThemeColor,
+                    textColor: currentThemeTextColor,
+                  },
+                  theme: {
+                    mode: themeMode,
+                    backgroundColor: currentThemeColor,
+                    textColor: currentThemeTextColor,
+                  },
+                  forceRefresh: true,
+                })}
+              >
                 {threadHistoryMessages.buttons.openHistoryPage}
               </Button>
             <Button onClick={() => (window as any).bytedesk?.hideChat()}>{messages.common.buttons.closeChat}</Button>

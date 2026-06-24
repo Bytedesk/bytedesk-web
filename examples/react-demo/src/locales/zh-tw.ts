@@ -186,6 +186,9 @@ export const zhTw = {
     videoSupportDemo: '🎥 影片客服示範',
     webrtcDemo: '📹 音視訊客服示範',
     callCenterDemo: '📞 电话客服示範',
+    ticketDemo: '🎫 工單示範',
+    ratingDemo: '⭐ 滿意度評價示範',
+    platformDemo: '🏬 平台客服示範',
     proactiveDemo: '🎯 主動獲客示範',
     voiceAgentDemo: '🎙️ 語音助手示範',
     videoConferenceDemo: '🎬 視訊會議示範',
@@ -251,6 +254,8 @@ export const zhTw = {
       anonymousUserHint: '目前為匿名測試：不傳 visitorUid、nickname、avatar 等使用者資訊',
       currentUserTitle: '目前業務系統使用者資訊',
       currentUserIdLabel: '使用者 ID',
+      currentUidLabel: 'uid',
+      currentVisitorUidLabel: 'visitorUid',
       currentUserNicknameLabel: '暱稱',
       contactSupport: '聯絡客服',
       inviteText: '您好，請問有什麼可以協助您？',
@@ -603,6 +608,66 @@ export const zhTw = {
         visitorRef: '參考 visitor ThreadList 實作',
         reactExample: 'React 歷史會話示範原始碼'
       }
+    },
+    ticketDemo: {
+      ...en.pages.ticketDemo,
+      title: '訪客工單示範',
+      description: '示範如何把 Bytedesk Web SDK 入口切到 visitorTicket 專案中的歷史工單、工單提交、狀態查看、詳情查看與訊息提醒路由，適用於 iframe 嵌入場景。',
+      bubbleTitle: '工單中心',
+      bubbleSubtitle: '開啟訪客工單路由',
+      currentPathLabel: '目前入口路徑',
+      currentPathHint: '懸浮入口會在不同 /ticket 路由之間切換，並保留 org、sid、訪客、語言與主題參數。',
+      selectedScenarioTitle: '工單場景按鈕',
+      detailTicketIdLabel: '詳情路由使用的工單 ID',
+      detailTicketIdPlaceholder: '輸入真實工單 UID 後可自動開啟詳情抽屜',
+      usageTitle: '示範說明',
+      buttons: {
+        closeTicket: '關閉工單視窗'
+      },
+      docLinks: {
+        ...en.pages.ticketDemo.docLinks,
+        visitorTicketRef: '查看 visitorTicket 路由實作',
+        reactExample: 'React 工單示範原始碼'
+      }
+    },
+    ratingDemo: {
+      ...en.pages.ratingDemo,
+      title: '訪客滿意度評價示範',
+      description: '示範如何透過訪客歷史會話入口承接滿意度評價流程。待評價與支援追評目前都共用 /chat/thread。',
+      bubbleTitle: '服務評價',
+      bubbleSubtitle: '開啟評價相關歷史會話',
+      currentPathLabel: '目前入口路徑',
+      currentPathHint: '支援正常發起對話，以及按待評價/已評價情境開啟歷史會話。',
+      selectedScenarioTitle: '評價場景按鈕',
+      usageTitle: '示範說明',
+      routeRows: {
+        chat: {
+          label: '正常發起對話',
+          purpose: '開啟一般聊天頁面，從評價氣泡提交時會覆蓋先前評價內容。',
+          example: '/chat'
+        },
+        pending: {
+          label: '待評價會話列表',
+          purpose: '開啟待評價歷史會話列表並進行首次評價。',
+          example: '/chat/thread?ratingIntent=pending'
+        },
+        followup: {
+          label: '已評價會話列表',
+          purpose: '開啟已評價歷史會話列表，僅支援追加評價內容。',
+          example: '/chat/thread?ratingIntent=followup'
+        }
+      },
+      docLinks: {
+        rateBubbleRef: '查看 visitor RateBubble 實作',
+        reactExample: 'React 滿意度評價示範原始碼'
+      }
+    },
+    platformDemo: {
+      ...en.pages.platformDemo,
+      title: '平台客服示範',
+      description: '說明如何區分平台客服與店鋪客服。預設組織 orgUid=df_org_uid 視為平台客服，其餘 orgUid 視為店鋪客服，且每個組織可配置多個入口，例如售前與售後。',
+      bubbleTitle: '平台客服',
+      bubbleSubtitle: '切換平台或店鋪諮詢入口'
     },
     videoSupportDemo: {
       title: '影片客服示範',

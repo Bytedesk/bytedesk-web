@@ -186,6 +186,9 @@ export const viVn = {
     videoSupportDemo: '🎥 Ho tro video',
     webrtcDemo: '📹 Demo WebRTC',
     callCenterDemo: '📞 Tong dai',
+    ticketDemo: '🎫 Demo ticket',
+    ratingDemo: '⭐ Demo danh gia',
+    platformDemo: '🏬 Demo nen tang',
     proactiveDemo: '🎯 Thu hut khach hang chu dong',
     voiceAgentDemo: '🎙️ Tac nhan giong noi',
     videoConferenceDemo: '🎬 Hoi nghi video',
@@ -250,6 +253,8 @@ export const viVn = {
       anonymousUserHint: 'Che do kiem thu an danh: bo qua visitorUid, nickname, avatar va cac truong nguoi dung khac.',
       currentUserTitle: 'Nguoi dung hien tai cua he thong nghiep vu',
       currentUserIdLabel: 'ID nguoi dung',
+      currentUidLabel: 'uid',
+      currentVisitorUidLabel: 'visitorUid',
       currentUserNicknameLabel: 'Biet danh',
       contactSupport: 'Lien he ho tro',
       inviteText: 'Xin chao, chung toi co the giup gi cho ban?',
@@ -600,6 +605,41 @@ export const viVn = {
         visitorRef: 'Tham chieu Visitor ThreadList',
         reactExample: 'Nguon demo lich su hoi thoai React'
       }
+    },
+    ticketDemo: {
+      ...en.pages.ticketDemo,
+      title: 'Demo ticket visitor',
+      description: 'Trinh bay cach chuyen diem vao Bytedesk Web SDK sang cac route history, tao moi, trang thai, chi tiet va thong bao trong visitorTicket, phu hop cho iframe nhung.',
+      bubbleTitle: 'Trung tam ticket',
+      bubbleSubtitle: 'Mo cac route ticket visitor',
+      currentPathLabel: 'Duong dan vao hien tai',
+      currentPathHint: 'Diem vao noi giua cac route /ticket va van giu tham so org, sid, visitor, ngon ngu va theme.',
+      selectedScenarioTitle: 'Kich ban ticket',
+      detailTicketIdLabel: 'Ticket ID cho route chi tiet',
+      detailTicketIdPlaceholder: 'Nhap UID ticket that de tu dong mo ngan chi tiet',
+      usageTitle: 'Ghi chu demo',
+      buttons: {
+        closeTicket: 'Dong cua so ticket'
+      },
+      docLinks: {
+        ...en.pages.ticketDemo.docLinks,
+        visitorTicketRef: 'Xem implement route visitorTicket',
+        reactExample: 'Nguon demo ticket React'
+      }
+    },
+    ratingDemo: {
+      ...en.pages.ratingDemo,
+      title: 'Demo danh gia muc do hai long',
+      description: 'Trinh bay cach vao luong danh gia bang lich su hoi thoai. Ca danh gia cho xu ly va danh gia bo sung hien deu dung /chat/thread.',
+      bubbleTitle: 'Danh gia dich vu',
+      bubbleSubtitle: 'Mo lich su hoi thoai lien quan den danh gia'
+    },
+    platformDemo: {
+      ...en.pages.platformDemo,
+      title: 'Demo ho tro nen tang',
+      description: 'Giai thich cach dung orgUid=df_org_uid cho ho tro nen tang, con cac orgUid khac duoc xem la ho tro cua cua hang. Moi to chuc co the co nhieu diem vao nhu tien ban va hau mai.',
+      bubbleTitle: 'Ho tro nen tang',
+      bubbleSubtitle: 'Chuyen giua diem vao nen tang va cua hang'
     },
     videoSupportDemo: {
       title: 'Demo ho tro video',

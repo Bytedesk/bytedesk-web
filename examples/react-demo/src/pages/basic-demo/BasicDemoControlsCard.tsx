@@ -12,6 +12,9 @@ type LocalizedCopy = {
   entryTextToggleLabel: string;
   entryTextInputLabel: string;
   entryTextInputPlaceholder: string;
+  minimizedBarTextToggleLabel: string;
+  minimizedBarTextInputLabel: string;
+  minimizedBarTextInputPlaceholder: string;
   qrInputLabel: string;
   qrInputPlaceholder: string;
   customTitleLabel: string;
@@ -48,6 +51,7 @@ interface BasicDemoControlsCardProps {
   selectedEntryButtonIconLabel: string;
   isEntryButtonTextEnabled: boolean;
   entryButtonTextValue: string;
+  minimizedBarTextValue: string;
   locale: DemoLanguage;
   localeValueHint: string;
   lastActionApiHint: string;
@@ -85,6 +89,7 @@ interface BasicDemoControlsCardProps {
   onEntryButtonIconClick: NonNullable<MenuProps['onClick']>;
   onEntryButtonTextToggle: () => void;
   onEntryButtonTextChange: (nextText: string) => void;
+  onMinimizedBarTextChange: (nextText: string) => void;
   onNavbarToggle: () => void;
   onQrCodeParamToggle: () => void;
   onThreadDetailParamToggle: () => void;
@@ -119,6 +124,7 @@ const BasicDemoControlsCard = ({
   selectedEntryButtonIconLabel,
   isEntryButtonTextEnabled,
   entryButtonTextValue,
+  minimizedBarTextValue,
   locale,
   localeValueHint,
   lastActionApiHint,
@@ -156,6 +162,7 @@ const BasicDemoControlsCard = ({
   onEntryButtonIconClick,
   onEntryButtonTextToggle,
   onEntryButtonTextChange,
+  onMinimizedBarTextChange,
   onNavbarToggle,
   onQrCodeParamToggle,
   onThreadDetailParamToggle,
@@ -167,6 +174,7 @@ const BasicDemoControlsCard = ({
   onQrCodeImageUrlChange,
 }: BasicDemoControlsCardProps) => {
   const [isEntryTextModalOpen, setIsEntryTextModalOpen] = useState(false);
+  const [isMinimizedBarTextModalOpen, setIsMinimizedBarTextModalOpen] = useState(false);
   const bubbleSwitchModeMenuItems: MenuProps['items'] = [
     { key: 'default', label: 'default' },
     { key: 'fade', label: 'fade' },
@@ -198,6 +206,9 @@ const BasicDemoControlsCard = ({
               )}
             </Space>
           ))}
+          <Button type={minimizedBarTextValue.trim() ? 'primary' : 'default'} onClick={() => setIsMinimizedBarTextModalOpen(true)}>
+            {localizedCopy.minimizedBarTextToggleLabel}: {minimizedBarTextValue.trim() ? loadHistoryEnabledLabel : loadHistoryDisabledLabel}
+          </Button>
           <Button type="primary" onClick={onPlacementToggle}>
             {togglePlacementLabel} ({placementLabel})
           </Button>
@@ -380,6 +391,27 @@ const BasicDemoControlsCard = ({
               placeholder={localizedCopy.entryTextInputPlaceholder}
               onChange={(event) => onEntryButtonTextChange(event.target.value)}
               disabled={!isEntryButtonTextEnabled}
+            />
+          </Space>
+        </Space>
+      </Modal>
+      <Modal
+        title={localizedCopy.minimizedBarTextToggleLabel}
+        open={isMinimizedBarTextModalOpen}
+        onCancel={() => setIsMinimizedBarTextModalOpen(false)}
+        footer={[
+          <Button key="close" type="primary" onClick={() => setIsMinimizedBarTextModalOpen(false)}>
+            OK
+          </Button>,
+        ]}
+      >
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Space orientation="vertical" size={6} style={{ width: '100%' }}>
+            <Typography.Text type="secondary">{localizedCopy.minimizedBarTextInputLabel}</Typography.Text>
+            <Input
+              value={minimizedBarTextValue}
+              placeholder={localizedCopy.minimizedBarTextInputPlaceholder}
+              onChange={(event) => onMinimizedBarTextChange(event.target.value)}
             />
           </Space>
         </Space>

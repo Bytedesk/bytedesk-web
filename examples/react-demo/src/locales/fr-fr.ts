@@ -272,6 +272,8 @@ export const frFr = {
       anonymousUserHint: 'Mode de test anonyme : visitorUid, nickname, avatar et les autres champs utilisateur sont omis.',
       currentUserTitle: 'Utilisateur actuel du systeme metier',
       currentUserIdLabel: 'ID utilisateur',
+      currentUidLabel: 'uid',
+      currentVisitorUidLabel: 'visitorUid',
       currentUserNicknameLabel: 'Pseudo',
       contactSupport: 'Contacter le support',
       inviteText: 'Bonjour, comment pouvons-nous vous aider ?',
@@ -566,6 +568,41 @@ export const frFr = {
         visitorRef: 'Reference Visitor ThreadList',
         reactExample: 'Source React de l historique'
       }
+    },
+    ticketDemo: {
+      ...en.pages.ticketDemo,
+      title: 'Demo tickets visiteur',
+      description: 'Montre comment router l entree du SDK Web Bytedesk vers les routes historique, creation, statut, detail et notifications de visitorTicket pour un usage iframe embarque.',
+      bubbleTitle: 'Centre de tickets',
+      bubbleSubtitle: 'Ouvrir les routes ticket visiteur',
+      currentPathLabel: 'Chemin d entree actuel',
+      currentPathHint: 'L entree flottante bascule entre les routes /ticket en conservant org, sid, visiteur, langue et theme.',
+      selectedScenarioTitle: 'Scenarios ticket',
+      detailTicketIdLabel: 'ID ticket pour la route detail',
+      detailTicketIdPlaceholder: 'Saisissez un UID reel pour ouvrir automatiquement le panneau detail',
+      usageTitle: 'Notes du demo',
+      buttons: {
+        closeTicket: 'Fermer la fenetre ticket'
+      },
+      docLinks: {
+        ...en.pages.ticketDemo.docLinks,
+        visitorTicketRef: 'Voir l implementation des routes visitorTicket',
+        reactExample: 'Source du demo React ticket'
+      }
+    },
+    ratingDemo: {
+      ...en.pages.ratingDemo,
+      title: 'Demo d evaluation visiteur',
+      description: 'Montre comment entrer dans le flux d evaluation depuis l historique des conversations. L evaluation en attente et l evaluation complementaire reutilisent actuellement /chat/thread.',
+      bubbleTitle: 'Evaluation du service',
+      bubbleSubtitle: 'Ouvrir les historiques lies a l evaluation'
+    },
+    platformDemo: {
+      ...en.pages.platformDemo,
+      title: 'Demo support plateforme',
+      description: 'Explique comment utiliser orgUid=df_org_uid pour le support plateforme et considerer les autres orgUid comme des boutiques. Chaque organisation peut exposer plusieurs entrees comme avant-vente et apres-vente.',
+      bubbleTitle: 'Support plateforme',
+      bubbleSubtitle: 'Basculer entre les entrees plateforme et boutique'
     },
     callCenterDemo: {
       ...en.pages.callCenterDemo,

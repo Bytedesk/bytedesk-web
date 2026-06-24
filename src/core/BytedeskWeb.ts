@@ -30,6 +30,7 @@ import {
 } from "../utils/constants";
 import type { ButtonConfig, BytedeskConfig } from "../types";
 import { logBizMessageCallbackDebug } from "../utils/bizMessageCallbackDebug";
+import { getLocaleMessages } from "../locales";
 import logger, { setGlobalConfig } from "../utils/logger";
 import { serializeBrowseConfig } from "./browseUrl";
 
@@ -46,6 +47,7 @@ export default class BytedeskWeb {
   private unreadBadgeCount: number = 0;
   private bubble: HTMLElement | null = null;
   private bubbleContainer: HTMLElement | null = null;
+  private minimizedBar: HTMLButtonElement | null = null;
   private buttonElements: HTMLButtonElement[] = [];
   private buttonPreviewElement: HTMLElement | null = null;
   private buttonPreviewHideTimer: number | null = null;
@@ -162,6 +164,10 @@ export default class BytedeskWeb {
         ...(this.config.window || {}),
         ...(nextConfig.window || {}),
       },
+      minimizedBarConfig: {
+        ...(this.config.minimizedBarConfig || {}),
+        ...(nextConfig.minimizedBarConfig || {}),
+      },
       theme: {
         ...(this.config.theme || {}),
         ...(nextConfig.theme || {}),
@@ -206,9 +212,186 @@ export default class BytedeskWeb {
 
     this.createBubble();
     this.createInviteDialog();
+    if (this.windowState === "minimized") {
+      this.hideDefaultFloatingUi();
+      this.showMinimizedBar();
+    }
     if (inviteWasVisible) {
       this.showInviteDialog();
     }
+  }
+
+  private getMinimizedBarLabel(): string {
+    const customText = this.config.minimizedBarConfig?.text?.trim();
+    if (customText) {
+      return customText;
+    }
+
+    return getLocaleMessages(this.config.locale).actions.continueChat;
+  }
+
+  private createMinimizedBarIcon(): HTMLSpanElement {
+    const iconElement = document.createElement("span");
+    iconElement.textContent = "💬";
+    iconElement.setAttribute("aria-hidden", "true");
+    iconElement.style.cssText = `
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1;
+      flex-shrink: 0;
+    `;
+
+    return iconElement;
+  }
+
+  private createMinimizedBarLabelElement(label: string): HTMLSpanElement {
+    const labelElement = document.createElement("span");
+    labelElement.textContent = label;
+    labelElement.style.cssText = `
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    `;
+
+    return labelElement;
+  }
+
+  private hideDefaultFloatingUi() {
+    if (this.bubbleContainer) {
+      this.bubbleContainer.style.display = "none";
+    }
+
+    this.hideInviteDialog();
+    this.hideButtonPreview();
+  }
+
+  private restoreDefaultFloatingUi() {
+    if (this.bubbleContainer) {
+      this.bubbleContainer.style.display = "block";
+    }
+
+    if (this.bubble) {
+      this.bubble.style.display = "flex";
+    }
+  }
+
+  private removeMinimizedBar() {
+    if (this.minimizedBar && document.body.contains(this.minimizedBar)) {
+      this.minimizedBar.remove();
+    }
+
+    this.minimizedBar = null;
+  }
+
+  private showMinimizedBar() {
+    this.removeMinimizedBar();
+
+    const minimizedBar = document.createElement("button");
+    const minimizedBarLabel = this.getMinimizedBarLabel();
+    const isMobile = window.innerWidth <= 768;
+    const textColor = this.config.theme?.textColor || "#ffffff";
+    const backgroundColor = this.config.theme?.backgroundColor || "#0066FF";
+
+    minimizedBar.type = "button";
+    minimizedBar.setAttribute("aria-label", minimizedBarLabel);
+    minimizedBar.style.cssText = isMobile
+      ? `
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 52px;
+        padding: 0 20px;
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.18);
+        background: ${backgroundColor};
+        color: ${textColor};
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        z-index: 10001;
+        box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.18);
+      `
+      : `
+        position: fixed;
+        ${this.config.placement === "bottom-right" ? "right" : "left"}: ${this.config.marginSide}px;
+        bottom: 0;
+        min-width: 164px;
+        max-width: min(320px, calc(100vw - 32px));
+        height: 46px;
+        padding: 0 20px;
+        border: none;
+        border-radius: 12px 12px 0 0;
+        background: ${backgroundColor};
+        color: ${textColor};
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        z-index: 10001;
+        box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.18);
+      `;
+
+    minimizedBar.appendChild(this.createMinimizedBarIcon());
+    minimizedBar.appendChild(this.createMinimizedBarLabelElement(minimizedBarLabel));
+
+    minimizedBar.addEventListener("click", () => {
+      this.restoreMinimizedWindow();
+    });
+
+    document.body.appendChild(minimizedBar);
+    this.minimizedBar = minimizedBar;
+  }
+
+  private restoreMinimizedWindow() {
+    if (!this.window) {
+      this.showChat();
+      return;
+    }
+
+    this.removeMinimizedBar();
+
+    const isMobile = window.innerWidth <= 768;
+    this.window.style.display = "block";
+
+    this.setupResizeListener();
+
+    if (isMobile) {
+      this.window.style.transform = "translateY(100%)";
+      requestAnimationFrame(() => {
+        if (this.window) {
+          this.window.style.transform = "translateY(0)";
+        }
+      });
+    }
+
+    this.isVisible = true;
+    this.windowState = "normal";
+
+    if (this.bubble) {
+      this.bubble.style.display = "none";
+      const messageElement = (this.bubble as any).messageElement;
+      if (messageElement instanceof HTMLElement) {
+        messageElement.style.display = "none";
+      }
+    }
+
+    this.hideInviteDialog();
+    this.config.onShowChat?.();
   }
 
   private updateChatWindowLayout() {
@@ -309,6 +492,10 @@ export default class BytedeskWeb {
       this.refreshFloatingUi();
     }
 
+    if (this.windowState === "minimized" && this.minimizedBar) {
+      this.showMinimizedBar();
+    }
+
     if (this.window && document.body.contains(this.window) && nextConfig.tabsConfig) {
       const wasVisible = this.window.style.display !== "none";
       document.body.removeChild(this.window);
@@ -334,6 +521,7 @@ export default class BytedeskWeb {
         nextConfig.threadPath ||
         nextConfig.webrtcPath ||
         nextConfig.callPath ||
+        nextConfig.ticketPath ||
         nextConfig.tabsConfig
       );
 
@@ -345,16 +533,16 @@ export default class BytedeskWeb {
     this.config.onConfigChange?.(this.config);
   }
 
-  private getPrimaryActionFromConfig(nextConfig: Partial<BytedeskConfig>): "chat" | "thread" | "webrtc" | "call" | null {
+  private getPrimaryActionFromConfig(nextConfig: Partial<BytedeskConfig>): "chat" | "thread" | "webrtc" | "call" | "ticket" | null {
     const singleAction = nextConfig.buttonConfig?.action;
-    if (singleAction && ["chat", "thread", "webrtc", "call"].includes(singleAction)) {
-      return singleAction as "chat" | "thread" | "webrtc" | "call";
+    if (singleAction && ["chat", "thread", "webrtc", "call", "ticket"].includes(singleAction)) {
+      return singleAction as "chat" | "thread" | "webrtc" | "call" | "ticket";
     }
 
     return null;
   }
 
-  private syncChatPathByAction(action: "chat" | "thread" | "webrtc" | "call") {
+  private syncChatPathByAction(action: "chat" | "thread" | "webrtc" | "call" | "ticket") {
     switch (action) {
       case "thread":
         this.config.chatPath = this.normalizePath(this.config.threadPath, "/chat/thread");
@@ -364,6 +552,9 @@ export default class BytedeskWeb {
         break;
       case "call":
         this.config.chatPath = this.normalizePath(this.config.callPath, "/call");
+        break;
+      case "ticket":
+        this.config.chatPath = this.normalizePath(this.config.ticketPath, "/ticket/history");
         break;
       case "chat":
       default:
@@ -383,6 +574,7 @@ export default class BytedeskWeb {
       threadPath: "/chat/thread",
       webrtcPath: "/webrtc",
       callPath: "/call",
+      ticketPath: "/ticket/history",
       placement: "bottom-right",
       marginBottom: 20,
       marginSide: 20,
@@ -448,6 +640,7 @@ export default class BytedeskWeb {
         textColor: "#ffffff",
         backgroundColor: "#0066FF",
       },
+      minimizedBarConfig: {},
       window: {
         width: 380,
         height: 640,
@@ -518,6 +711,9 @@ export default class BytedeskWeb {
         break;
       case "call":
         this.showCall();
+        break;
+      case "ticket":
+        this.showTicket();
         break;
       case "chat":
       default:
@@ -2360,6 +2556,8 @@ export default class BytedeskWeb {
   }
 
   showChat(config?: Partial<BytedeskConfig>) {
+    this.removeMinimizedBar();
+
     // 合并新配置（如果提供了）
     if (config) {
       this.config = this.mergeConfig(config);
@@ -2403,6 +2601,7 @@ export default class BytedeskWeb {
       }
 
       this.isVisible = true;
+      this.windowState = "normal";
       if (this.bubble) {
         this.bubble.style.display = "none";
         const messageElement = (this.bubble as any).messageElement;
@@ -2415,7 +2614,7 @@ export default class BytedeskWeb {
     this.config.onShowChat?.();
   }
 
-  hideChat() {
+  hideChat(options?: { preserveFloatingUiHidden?: boolean }) {
     if (this.window) {
       const isMobile = window.innerWidth <= 768;
 
@@ -2431,13 +2630,20 @@ export default class BytedeskWeb {
       }
 
       this.isVisible = false;
-      if (this.buttonElements.length > 0) {
+      if (options?.preserveFloatingUiHidden) {
+        this.hideDefaultFloatingUi();
+      } else if (this.buttonElements.length > 0) {
+        this.removeMinimizedBar();
+        this.restoreDefaultFloatingUi();
         this.applyConfiguredButtonVisibility();
         const messageElement = (this.bubble as any).messageElement;
         if (messageElement instanceof HTMLElement) {
           messageElement.style.display =
             this.config.bubbleConfig?.show === false ? "none" : "block";
         }
+      } else {
+        this.removeMinimizedBar();
+        this.restoreDefaultFloatingUi();
       }
       this.config.onHideChat?.();
     }
@@ -2464,12 +2670,18 @@ export default class BytedeskWeb {
     });
   }
 
+  showTicket(config?: Partial<BytedeskConfig>) {
+    return this.showChat({
+      ...config,
+      chatPath: this.normalizePath(config?.ticketPath || this.config.ticketPath, "/ticket/history"),
+    });
+  }
+
   private minimizeWindow() {
     if (this.window) {
       this.windowState = "minimized";
-      this.window.style.display = "none";
-      // 显示气泡
-      this.hideChat();
+      this.hideChat({ preserveFloatingUiHidden: true });
+      this.showMinimizedBar();
     }
   }
 
@@ -2580,6 +2792,7 @@ export default class BytedeskWeb {
       document.body.removeChild(this.bubbleContainer);
     }
     this.hideButtonPreview();
+    this.removeMinimizedBar();
     this.bubbleContainer = null;
     this.bubble = null;
     this.buttonElements = [];
