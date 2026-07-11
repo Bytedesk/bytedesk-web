@@ -247,6 +247,7 @@ export const esEs = {
         bottomRight: 'Abajo a la derecha'
       },
       navbarLabel: 'Ocultar navegacion superior',
+      draggableLabel: 'Botón/barra arrastrable',
       navbarHidden: 'ACTIVADO',
       navbarShown: 'DESACTIVADO',
       navbarParamPurpose: 'Indica si se oculta la barra de navegacion superior. navbar=0 oculta la navegacion.',

@@ -206,6 +206,7 @@ export const en = {
         bottomRight: 'Bottom Right'
       },
       navbarLabel: 'Hide top nav',
+      draggableLabel: 'Draggable button/minimized bar',
       navbarHidden: 'ON',
       navbarShown: 'OFF',
       navbarParamPurpose: 'Whether to hide the top navigation bar. navbar=0 hides the navbar.',

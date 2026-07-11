@@ -96,37 +96,32 @@ const TicketDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAn
   const isTicketSupported = selectedChatProfile.key === 'workgroup';
 
   // 获取未读通知数：直接使用 visitorUid + orgUid 查询，后端 native query 自动 join visitor 表解析
-  useEffect(() => {
+  const fetchUnreadCount = useCallback(async () => {
     if (!isTicketSupported || isAnonymousMode || !selectedUser.visitorUid) {
       setTicketNotificationUnreadCount(0);
       return;
     }
 
-    let cancelled = false;
-    const fetchUnreadCount = async () => {
-      try {
-        const baseUrl = demoApiUrl || 'https://api.weiyuai.cn';
-        const orgUid = selectedChatProfile.chatConfig.org;
+    try {
+      const baseUrl = demoApiUrl || 'https://api.weiyuai.cn';
+      const orgUid = selectedChatProfile.chatConfig.org;
 
-        const url = `${baseUrl}/visitor/api/v1/notification/query/unread/count?visitorUid=${encodeURIComponent(selectedUser.visitorUid)}&orgUid=${encodeURIComponent(orgUid)}&channel=HTTP`;
-        const response = await fetch(url, { credentials: 'include' });
-        if (!response.ok || cancelled) return;
-        const json = await response.json();
-        console.log('Fetch unread notification count:', { visitorUid: selectedUser.visitorUid, orgUid, response: json });
-        if (!cancelled && json?.code === 200) {
-          setTicketNotificationUnreadCount(Number(json?.data) || 0);
-        }
-      } catch (err) {
-        console.warn('Fetch unread notification count failed:', err);
+      const url = `${baseUrl}/visitor/api/v1/notification/query/unread/count?visitorUid=${encodeURIComponent(selectedUser.visitorUid)}&orgUid=${encodeURIComponent(orgUid)}&channel=HTTP`;
+      const response = await fetch(url, { credentials: 'include' });
+      if (!response.ok) return;
+      const json = await response.json();
+      console.log('Fetch unread notification count:', { visitorUid: selectedUser.visitorUid, orgUid, response: json });
+      if (json?.code === 200) {
+        setTicketNotificationUnreadCount(Number(json?.data) || 0);
       }
-    };
-
-    fetchUnreadCount();
-
-    return () => {
-      cancelled = true;
-    };
+    } catch (err) {
+      console.warn('Fetch unread notification count failed:', err);
+    }
   }, [demoApiUrl, isAnonymousMode, isTicketSupported, selectedChatProfile.chatConfig.org, selectedUser.visitorUid]);
+
+  useEffect(() => {
+    fetchUnreadCount();
+  }, [fetchUnreadCount]);
 
   const embedCodeCopy = useMemo(() => getCurrentEmbedCodeCopy(locale), [locale]);
   const codeBlockStyle = useMemo(() => ({
@@ -342,7 +337,12 @@ const TicketDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAn
                   key={scenarioKey}
                   type={selectedScenarioKey === scenarioKey ? 'primary' : 'default'}
                   disabled={!isTicketSupported}
-                  onClick={() => setSelectedScenarioKey(scenarioKey)}
+                  onClick={() => {
+                    setSelectedScenarioKey(scenarioKey);
+                    if (scenarioKey === 'notifications') {
+                      fetchUnreadCount();
+                    }
+                  }}
                 >
                   {scenarioKey === 'notifications' && ticketNotificationUnreadCount > 0 ? (
                     <Badge count={ticketNotificationUnreadCount} size="small" offset={[4, -4]}>

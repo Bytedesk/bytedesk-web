@@ -248,8 +248,7 @@ export const koKr = {
         bottomLeft: '왼쪽 아래',
         bottomRight: '오른쪽 아래'
       },
-      navbarLabel: '상단 네비 숨기기',
-      navbarHidden: 'ON',
+      navbarLabel: '상단 네비 숨기기',      draggableLabel: '드래그 가능한 버튼/대화 계속하기',      navbarHidden: 'ON',
       navbarShown: 'OFF',
       navbarParamPurpose: '상단 내비게이션 바를 숨길지 여부입니다. navbar=0 이면 숨깁니다.',
       qrCodeParamLabel: 'QR 버튼 표시',

@@ -6,3 +6,5 @@
 - [x] 参考 ThreadHistoryDemo 演示排版，在RatingDemo中增加 待评价历史会话、支持追评 按钮
 - [x] 参考 ThreadHistoryDemo 演示排版，在PlatformDemo中增加说明：使用默认组织orgUid=df_org_uid作为平台客服，其余orgUid都视为店铺客服，并且每个组织支持设置多个咨询入口：售前客服、售后客服等
 - [x] 修改TicketDemo中消息提醒：通知消息提醒
+- [x] 参考react-demo中实现，帮我补充完善 [examples](/Users/ningjinpeng/Desktop/Git/Github/private/bytedesk-3x/frontend/apps/visitorSdk/examples) 文件夹中其余几个demo，不要增加或减少 react-demo 中功能，尽量实现功能一比一复刻
+- [] 在 BasicDemo 中增加一个演示按钮，点击按钮弹窗用户输入自己网址，点击确定之后，打开一个新tab，使用iframe的方式嵌入显示用户输入的网址，然后在此页面显示 BasicDemo 中的当前嵌入代码。用于方便用户在自家网站预览效果

@@ -21,6 +21,7 @@ export interface BasicDemoLocalizedCopy {
   switchModeLabel: string;
   customTitleLabel: string;
   carryBrowseInfoLabel: string;
+  draggableLabel: string;
   apiMessageLabel: string;
   consultParamsLabel: string;
   entrySelectorLabel: string;
@@ -145,6 +146,7 @@ export const getLocalizedCopy = (
         switchModeLabel: `Kieu chuyen bong: ${bubbleSwitchMode === 'fade' ? 'Mo dan' : bubbleSwitchMode === 'slide-up' ? 'Truot len' : 'Bang thong bao'}`,
         customTitleLabel: 'Tieu de tuy chinh',
         carryBrowseInfoLabel: 'Mang thong tin browse',
+        draggableLabel: 'Nút/thanh tiếp tục có thể kéo',
         apiMessageLabel: 'API hien tai:',
         consultParamsLabel: 'Tham so tu van:',
         entrySelectorLabel: 'Demo nhieu loi vao',
@@ -179,6 +181,7 @@ export const getLocalizedCopy = (
         switchModeLabel: `Mod pertukaran gelembung: ${bubbleSwitchMode === 'fade' ? 'Pudar' : bubbleSwitchMode === 'slide-up' ? 'Gelongsor naik' : 'Pita ticker'}`,
         customTitleLabel: 'Tajuk tersuai',
         carryBrowseInfoLabel: 'Bawa maklumat browse',
+        draggableLabel: 'Butang/bar sambung boleh seret',
         apiMessageLabel: 'API semasa:',
         consultParamsLabel: 'Parameter rundingan:',
         entrySelectorLabel: 'Demo pelbagai pintu masuk',
@@ -213,6 +216,7 @@ export const getLocalizedCopy = (
         switchModeLabel: `Cambio de globo: ${bubbleSwitchMode === 'fade' ? 'Desvanecer' : bubbleSwitchMode === 'slide-up' ? 'Deslizar hacia arriba' : 'Ticker'}`,
         customTitleLabel: 'Titulo personalizado',
         carryBrowseInfoLabel: 'Incluir informacion de browse',
+        draggableLabel: 'Botón/barra arrastrable',
         apiMessageLabel: 'API actual:',
         consultParamsLabel: 'Parametros de consulta:',
         entrySelectorLabel: 'Demo de entradas multiples',
@@ -246,8 +250,7 @@ export const getLocalizedCopy = (
         multiBubbleLabel: `Demo multi-bulles : ${isMultiBubbleDemo ? 'ACTIVEE' : 'DESACTIVEE'}`,
         switchModeLabel: `Changement de bulle : ${bubbleSwitchMode === 'fade' ? 'Fondu' : bubbleSwitchMode === 'slide-up' ? 'Glissement vers le haut' : 'Bandeau'}`,
         customTitleLabel: 'Titre personnalise',
-        carryBrowseInfoLabel: 'Inclure les infos browse',
-        apiMessageLabel: 'API actuelle :',
+        carryBrowseInfoLabel: 'Inclure les infos browse',        draggableLabel: 'Bouton/barre déplaçable',        apiMessageLabel: 'API actuelle :',
         consultParamsLabel: 'Parametres de consultation :',
         entrySelectorLabel: 'Demo multi-entrees',
         entryIconLabel: 'Icone d entree',
@@ -281,6 +284,7 @@ export const getLocalizedCopy = (
         switchModeLabel: `Bubble Switch: ${bubbleSwitchMode === 'fade' ? 'Fade' : bubbleSwitchMode === 'slide-up' ? 'Slide Up' : 'Ticker'}`,
         customTitleLabel: 'Custom title',
         carryBrowseInfoLabel: 'Carry browse info',
+        draggableLabel: 'Draggable button/minimized bar',
         apiMessageLabel: 'Current API:',
         consultParamsLabel: 'Consultation params:',
         entrySelectorLabel: 'Multi-entry demo',
@@ -315,6 +319,7 @@ export const getLocalizedCopy = (
         switchModeLabel: `バブル切替: ${bubbleSwitchMode === 'fade' ? 'フェード' : bubbleSwitchMode === 'slide-up' ? '上方向スライド' : 'ティッカー'}`,
         customTitleLabel: 'カスタム title',
         carryBrowseInfoLabel: 'browse 情報を付与',
+        draggableLabel: 'ドラッグ可能なボタン/会話を続ける',
         apiMessageLabel: '現在の API:',
         consultParamsLabel: '相談パラメータ:',
         entrySelectorLabel: '複数入口デモ',
@@ -349,6 +354,7 @@ export const getLocalizedCopy = (
         switchModeLabel: `버블 전환: ${bubbleSwitchMode === 'fade' ? '페이드' : bubbleSwitchMode === 'slide-up' ? '위로 슬라이드' : '티커'}`,
         customTitleLabel: '커스텀 title',
         carryBrowseInfoLabel: 'browse 정보 포함',
+        draggableLabel: '드래그 가능한 버튼/대화 계속하기',
         apiMessageLabel: '현재 API:',
         consultParamsLabel: '상담 파라미터:',
         entrySelectorLabel: '다중 진입 데모',
@@ -383,6 +389,7 @@ export const getLocalizedCopy = (
         switchModeLabel: `氣泡切換方式：${bubbleSwitchMode === 'fade' ? '淡入淡出' : bubbleSwitchMode === 'slide-up' ? '向上滾動' : '連續公告欄'}`,
         customTitleLabel: '自訂 title',
         carryBrowseInfoLabel: '攜帶 browse 資訊',
+        draggableLabel: '可拖動懸浮按鈕/繼續會話',
         apiMessageLabel: '目前呼叫介面:',
         consultParamsLabel: '諮詢參數:',
         entrySelectorLabel: '多入口示範',
@@ -417,6 +424,7 @@ export const getLocalizedCopy = (
         switchModeLabel: `气泡切换方式：${bubbleSwitchMode === 'fade' ? '淡入淡出' : bubbleSwitchMode === 'slide-up' ? '向上滚动' : '连续公告栏'}`,
         customTitleLabel: '自定义 title',
         carryBrowseInfoLabel: '携带 browse 信息',
+        draggableLabel: '可拖动悬浮按钮/继续会话',
         apiMessageLabel: '当前调用接口:',
         consultParamsLabel: '咨询参数:',
         entrySelectorLabel: '多入口演示',

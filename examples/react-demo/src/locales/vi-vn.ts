@@ -208,6 +208,7 @@ export const viVn = {
         bottomRight: 'Goc duoi ben phai'
       },
       navbarLabel: 'An thanh dieu huong tren',
+      draggableLabel: 'Nút/thanh tiếp tục có thể kéo',
       navbarHidden: 'BAT',
       navbarShown: 'TAT',
       navbarParamPurpose: 'Co an thanh dieu huong phia tren hay khong. navbar=0 se an thanh dieu huong.',

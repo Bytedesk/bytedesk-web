@@ -57,6 +57,8 @@ export default class BytedeskWeb {
   private hideTimeout: NodeJS.Timeout | null = null;
   private isVisible: boolean = false;
   private isDragging: boolean = false;
+  private isMinimizedBarDragging: boolean = false;
+  private dragDidMove: boolean = false;
   private windowState: "minimized" | "maximized" | "normal" = "normal";
   private loopCount: number = 0;
   private loopTimer: number | null = null;
@@ -296,6 +298,7 @@ export default class BytedeskWeb {
     const isMobile = window.innerWidth <= 768;
     const textColor = this.config.theme?.textColor || "#ffffff";
     const backgroundColor = this.config.theme?.backgroundColor || "#0066FF";
+    const isDraggable = this.config.draggable !== false;
 
     minimizedBar.type = "button";
     minimizedBar.setAttribute("aria-label", minimizedBarLabel);
@@ -341,7 +344,7 @@ export default class BytedeskWeb {
         font-size: 14px;
         font-weight: 600;
         letter-spacing: 0.02em;
-        cursor: pointer;
+        cursor: ${isDraggable ? "grab" : "pointer"};
         z-index: 10001;
         box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.18);
       `;
@@ -349,9 +352,74 @@ export default class BytedeskWeb {
     minimizedBar.appendChild(this.createMinimizedBarIcon());
     minimizedBar.appendChild(this.createMinimizedBarLabelElement(minimizedBarLabel));
 
-    minimizedBar.addEventListener("click", () => {
-      this.restoreMinimizedWindow();
-    });
+    // 桌面端: draggable=true 时启用拖拽
+    if (isDraggable && !isMobile) {
+      let startX = 0;
+      let startY = 0;
+      let startLeft = 0;
+      let startBottom = 0;
+      let hasMoved = false;
+      const DRAG_THRESHOLD = 5;
+
+      minimizedBar.addEventListener("mousedown", (e) => {
+        if (e.button !== 0) return;
+        this.isMinimizedBarDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        hasMoved = false;
+        const rect = minimizedBar.getBoundingClientRect();
+        startLeft = rect.left;
+        startBottom = window.innerHeight - rect.bottom;
+        minimizedBar.style.transition = "none";
+        minimizedBar.style.cursor = "grabbing";
+      });
+
+      const onMouseMove = (e: MouseEvent) => {
+        if (!this.isMinimizedBarDragging) return;
+        e.preventDefault();
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+          hasMoved = true;
+        }
+        const barWidth = minimizedBar.offsetWidth;
+        const newLeft = startLeft + dx;
+        const newBottom = Math.max(0, startBottom - dy);
+
+        if (newLeft + barWidth / 2 <= window.innerWidth / 2) {
+          minimizedBar.style.left = `${Math.max(0, newLeft)}px`;
+          minimizedBar.style.right = "auto";
+        } else {
+          const newRight = window.innerWidth - newLeft - barWidth;
+          minimizedBar.style.right = `${Math.max(0, newRight)}px`;
+          minimizedBar.style.left = "auto";
+        }
+        minimizedBar.style.bottom = `${newBottom}px`;
+      };
+
+      const onMouseUp = () => {
+        if (!this.isMinimizedBarDragging) return;
+        this.isMinimizedBarDragging = false;
+        minimizedBar.style.transition = "all 0.3s ease";
+        minimizedBar.style.cursor = "grab";
+      };
+
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+
+      minimizedBar.addEventListener("click", (e) => {
+        if (hasMoved) {
+          e.stopPropagation();
+          e.preventDefault();
+          return;
+        }
+        this.restoreMinimizedWindow();
+      });
+    } else {
+      minimizedBar.addEventListener("click", () => {
+        this.restoreMinimizedWindow();
+      });
+    }
 
     document.body.appendChild(minimizedBar);
     this.minimizedBar = minimizedBar;
@@ -645,7 +713,7 @@ export default class BytedeskWeb {
         width: 380,
         height: 640,
       },
-      draggable: false,
+      draggable: true,
       locale: "zh-cn",
     } as BytedeskConfig;
   }
@@ -947,13 +1015,15 @@ export default class BytedeskWeb {
       }
     });
     buttonElement.addEventListener("click", () => {
-      if (!this.isDragging) {
-        logger.debug("bubble click", buttonConfig.action || "chat");
-        if (messageElement instanceof HTMLElement) {
-          this.hideBubbleMessageElement();
-        }
-        this.triggerButtonAction(buttonConfig);
+      if (this.dragDidMove) {
+        this.dragDidMove = false;
+        return;
       }
+      logger.debug("bubble click", buttonConfig.action || "chat");
+      if (messageElement instanceof HTMLElement) {
+        this.hideBubbleMessageElement();
+      }
+      this.triggerButtonAction(buttonConfig);
     });
     buttonElement.addEventListener("contextmenu", (e) => {
       this.showContextMenu(e);
@@ -2122,11 +2192,13 @@ export default class BytedeskWeb {
       let startY = 0;
       let initialX = 0;
       let initialY = 0;
+      const DRAG_THRESHOLD = 5;
 
       this.buttonElements.forEach((buttonElement) => {
         buttonElement.addEventListener("mousedown", (e) => {
           if (e.button !== 0) return;
           this.isDragging = true;
+          this.dragDidMove = false;
           startX = e.clientX;
           startY = e.clientY;
           initialX = container.offsetLeft;
@@ -2143,6 +2215,10 @@ export default class BytedeskWeb {
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
 
+        if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+          this.dragDidMove = true;
+        }
+
         const newX = initialX + dx;
         const newY = initialY + dy;
 
@@ -2156,9 +2232,6 @@ export default class BytedeskWeb {
           container.style.right = "auto";
           container.style.alignItems = "flex-start";
           this.config.placement = "bottom-left";
-
-          // 实时更新气泡三角形和内容布局
-          // this.updateBubbleLayout('bottom-left');
         } else {
           // 靠右
           container.style.right = `${Math.max(
@@ -2168,9 +2241,6 @@ export default class BytedeskWeb {
           container.style.left = "auto";
           container.style.alignItems = "flex-end";
           this.config.placement = "bottom-right";
-
-          // 实时更新气泡三角形和内容布局
-          // this.updateBubbleLayout('bottom-right');
         }
 
         // 更新垂直位置

@@ -19,6 +19,7 @@ type LocalizedCopy = {
   qrInputPlaceholder: string;
   customTitleLabel: string;
   carryBrowseInfoLabel: string;
+  draggableLabel: string;
 };
 
 type QuickAction = {
@@ -73,6 +74,7 @@ interface BasicDemoControlsCardProps {
   loadHistoryDisabledLabel: string;
   customTitleEnabled: boolean;
   carryBrowseInfoEnabled: boolean;
+  draggableEnabled: boolean;
   localizedCopy: LocalizedCopy;
   chatConfigHint: string;
   qrCodeImageUrl: string;
@@ -97,6 +99,7 @@ interface BasicDemoControlsCardProps {
   onLoadHistoryToggle: () => void;
   onCustomTitleToggle: () => void;
   onCarryBrowseInfoToggle: () => void;
+  onDraggableToggle: () => void;
   onLocaleSwitch: (nextLocale: DemoLanguage) => void;
   onQrCodeImageUrlChange: (nextUrl: string) => void;
 }
@@ -146,6 +149,7 @@ const BasicDemoControlsCard = ({
   loadHistoryDisabledLabel,
   customTitleEnabled,
   carryBrowseInfoEnabled,
+  draggableEnabled,
   localizedCopy,
   chatConfigHint,
   qrCodeImageUrl,
@@ -170,6 +174,7 @@ const BasicDemoControlsCard = ({
   onLoadHistoryToggle,
   onCustomTitleToggle,
   onCarryBrowseInfoToggle,
+  onDraggableToggle,
   onLocaleSwitch,
   onQrCodeImageUrlChange,
 }: BasicDemoControlsCardProps) => {
@@ -318,6 +323,9 @@ const BasicDemoControlsCard = ({
           </Button>
           <Button type={carryBrowseInfoEnabled ? 'primary' : 'default'} onClick={onCarryBrowseInfoToggle}>
             {localizedCopy.carryBrowseInfoLabel}: {carryBrowseInfoEnabled ? navbarHiddenLabel : navbarShownLabel}
+          </Button>
+          <Button type={draggableEnabled ? 'primary' : 'default'} onClick={onDraggableToggle}>
+            {localizedCopy.draggableLabel}: {draggableEnabled ? navbarHiddenLabel : navbarShownLabel}
           </Button>
         </Space>
         <Space wrap>

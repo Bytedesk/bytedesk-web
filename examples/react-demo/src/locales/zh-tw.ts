@@ -208,6 +208,7 @@ export const zhTw = {
         bottomRight: '右下角'
       },
       navbarLabel: '隱藏上方導覽',
+      draggableLabel: '可拖動懸浮按鈕/繼續會話',
       navbarHidden: '是',
       navbarShown: '否',
       navbarParamPurpose: '是否隱藏頂部導覽列。navbar=0 時隱藏導覽。',

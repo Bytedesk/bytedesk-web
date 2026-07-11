@@ -247,8 +247,7 @@ export const jaJp = {
         bottomLeft: '左下',
         bottomRight: '右下'
       },
-      navbarLabel: '上部ナビを隠す',
-      navbarHidden: 'オン',
+      navbarLabel: '上部ナビを隠す',      draggableLabel: 'ドラッグ可能なボタン/会話を続ける',      navbarHidden: 'オン',
       navbarShown: 'オフ',
       navbarParamPurpose: '上部ナビゲーションバーを非表示にするかどうかです。navbar=0 で非表示になります。',
       qrCodeParamLabel: 'QRボタンを表示',

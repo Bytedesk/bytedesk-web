@@ -143,6 +143,7 @@ const BasicDemo = ({
   const [isVisitorProfileParamEnabled, setIsVisitorProfileParamEnabled] = useState<boolean>(false);
   const [selectedBubbleSwitchMode, setSelectedBubbleSwitchMode] = useState<BubbleSwitchModeSelection>(DEFAULT_BUBBLE_SWITCH_MODE);
   const [minimizedBarTextOverride, setMinimizedBarTextOverride] = useState<string>(DEFAULT_MINIMIZED_BAR_TEXT);
+  const [draggableEnabled, setDraggableEnabled] = useState<boolean>(true);
 
   const localeValueHint = getLocaleValueHint(locale);
   const localizedCopy = useMemo(
@@ -263,7 +264,7 @@ const BasicDemo = ({
     marginBottom: 20,
     marginSide: 20,
     autoPopup: false,
-    draggable: true,
+    draggable: draggableEnabled,
     inviteConfig: {
       show: false,
       delay: 1000,
@@ -287,7 +288,20 @@ const BasicDemo = ({
     buttonsConfig: multiSessionButtons,
     chatConfig: {
       qrcode: '1',
-      ...selectedChatProfile.chatConfig
+      ...selectedChatProfile.chatConfig,
+      // 传入用户信息
+      ...(isAnonymousMode
+        ? {}
+        : {
+            visitorUid: selectedUser.visitorUid,
+            nickname: selectedUser.nickname,
+            avatar: selectedUser.avatar,
+            mobile: '13800138000',
+            email: 'test@test.com',
+            note: 'test'
+          }),
+      // 自定义字段
+      extra: JSON.stringify({ type: 'type', test: 'test' }),
     },
     browseConfig: {
       referer: '',
@@ -332,6 +346,17 @@ const BasicDemo = ({
       chatConfig: {
         ...(prevConfig.chatConfig || {}),
         ...selectedChatProfile.chatConfig,
+        // 传入用户信息
+        ...(isAnonymousMode
+          ? { visitorUid: undefined, nickname: undefined, avatar: undefined }
+          : {
+              visitorUid: selectedUser.visitorUid,
+              nickname: selectedUser.nickname,
+              avatar: selectedUser.avatar,
+              mobile: '13800138000',
+              email: 'test@test.com',
+              note: 'test'
+            }),
         ...(isCustomTitleEnabled ? { title: messages.pages.basicDemo.title } : { title: undefined }),
         qrcode: isQrCodeParamEnabled ? '1' : '0',
         threadDetail: isThreadDetailParamEnabled ? '1' : '0',
@@ -351,9 +376,10 @@ const BasicDemo = ({
       minimizedBarConfig: {
         text: minimizedBarTextOverride.trim() || undefined,
       },
+      draggable: draggableEnabled,
       buttonsConfig: multiSessionButtons
     }));
-  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile, isQrCodeParamEnabled, isThreadDetailParamEnabled, isVisitorProfileParamEnabled, isCustomTitleEnabled, isBrowseInfoEnabled, bubbleMessages, selectedBubbleSwitchMode, minimizedBarTextOverride]);
+  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile, selectedUser, isAnonymousMode, isQrCodeParamEnabled, isThreadDetailParamEnabled, isVisitorProfileParamEnabled, isCustomTitleEnabled, isBrowseInfoEnabled, bubbleMessages, selectedBubbleSwitchMode, minimizedBarTextOverride, draggableEnabled]);
 
   const handleInit = () => {
     console.log('BytedeskReact initialized BasicDemo');
@@ -504,6 +530,13 @@ const BasicDemo = ({
       setLastActionApiHint(`chatUrl${next ? ' + browse' : ' - browse'}`);
       return next;
     });
+  };
+
+  const handleToggleDraggable = () => {
+    const nextDraggable = !draggableEnabled;
+    setDraggableEnabled(nextDraggable);
+    getBytedeskRuntime()?.setConfig?.({ draggable: nextDraggable });
+    setLastActionApiHint(`setConfig({ draggable: ${nextDraggable} })`);
   };
 
   const handleLocaleSwitch = (nextLocale: DemoLanguage) => {
@@ -927,6 +960,8 @@ const BasicDemo = ({
         onLoadHistoryToggle={handleToggleLoadHistory}
         onCustomTitleToggle={handleToggleCustomTitle}
         onCarryBrowseInfoToggle={handleToggleBrowseInfo}
+        draggableEnabled={draggableEnabled}
+        onDraggableToggle={handleToggleDraggable}
         onLocaleSwitch={handleLocaleSwitch}
         onQrCodeImageUrlChange={handleQrCodeImageUrlChange}
       />

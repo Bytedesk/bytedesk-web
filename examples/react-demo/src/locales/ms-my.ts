@@ -208,6 +208,7 @@ export const msMy = {
         bottomRight: 'Bawah kanan'
       },
       navbarLabel: 'Sembunyi nav atas',
+      draggableLabel: 'Butang/bar sambung boleh seret',
       navbarHidden: 'HIDUP',
       navbarShown: 'MATI',
       navbarParamPurpose: 'Sama ada menyembunyikan bar navigasi atas. navbar=0 akan menyembunyikan navigasi.',

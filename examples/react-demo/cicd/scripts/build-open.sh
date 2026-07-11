@@ -19,7 +19,7 @@ set -euo pipefail
 # 本地路径
 DIST=dist
 # 本地路径
-TARGET_DIST=/Users/ningjinpeng/Desktop/Git/Github/private/bytedesk-2x/starter/src/main/resources/static/reactdemo
+TARGET_DIST=/Users/ningjinpeng/Desktop/Git/Github/private/bytedesk-3x/starter/src/main/resources/static/reactdemo
 
 # 清理 dist 目录
 echo "Cleaning dist directory..."
@@ -28,7 +28,7 @@ rm -rf "./$DIST"
 # 打包完，复制
 echo "Building project..."
 pnpm build
-# 将dist文件夹复制到bytedesk-2x/starter/src/main/resources/templates/文件夹中，并重命名为chat
+# 将dist文件夹复制到bytedesk-3x/starter/src/main/resources/templates/文件夹中，并重命名为chat
 echo "Copying to target directory..."
 rm -fr "$TARGET_DIST"
 cp -r "./$DIST" "$TARGET_DIST"

@@ -206,6 +206,7 @@ export const zhCn = {
         bottomRight: '右下角'
       },
       navbarLabel: '隐藏上方导航',
+      draggableLabel: '可拖动悬浮按钮/继续会话',
       navbarHidden: '是',
       navbarShown: '否',
       navbarParamPurpose: '是否隐藏顶部导航栏。navbar=0 时隐藏导航。',

@@ -2,37 +2,42 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 13:32:43
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-28 21:05:51
- * @Description: bytedesk.com
+ * @LastEditTime: 2025-07-08 10:00:00
+ * @Description: Bytedesk JavaScript Demo - replicates react-demo patterns
 -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bytedesk JavaScript Demo</title>
+    <title>微语 JavaScript Demo</title>
     <style>
-        .nav-links {
-            margin: 20px 0;
-        }
-        .nav-links a {
-            display: inline-block;
-            margin: 0 10px;
-            padding: 10px 20px;
-            background: #2e88ff;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        .nav-links a:hover {
-            background: #1a6cd1;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; padding: 24px; }
+        h1 { font-size: 24px; margin-bottom: 4px; }
+        .desc { color: #666; margin-bottom: 24px; }
+        .card { background: #fff; border-radius: 8px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        h3 { margin: 0 0 12px; font-size: 16px; }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .chip { padding: 8px 20px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; cursor: pointer; font-size: 13px; font-weight: 500; }
+        .chip.active { border-color: #1677ff; background: #e6f4ff; color: #1677ff; }
+        .color-btn { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #d9d9d9; cursor: pointer; }
+        .color-btn.selected { border-color: #333; border-width: 3px; }
+        .btn { padding: 8px 16px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; cursor: pointer; font-size: 13px; }
+        .btn.primary { background: #1677ff; color: #fff; border-color: #1677ff; }
+        .btn.danger { background: #ff4d4f; color: #fff; border-color: #ff4d4f; }
+        pre { background: #f6f8fa; padding: 12px; border-radius: 6px; font-size: 12px; overflow-x: auto; margin: 0; }
+        .nav-links { margin: 20px 0; }
+        .nav-links a { display: inline-block; margin: 0 10px; padding: 10px 20px; background: #2e88ff; color: white; text-decoration: none; border-radius: 4px; }
+        .nav-links a:hover { background: #1a6cd1; }
     </style>
 </head>
 <body>
-    <h1>Bytedesk JavaScript Demo</h1>
+<div class="container">
+    <h1>微语 JavaScript Demo</h1>
+    <p class="desc">Bytedesk JavaScript integration with full control panel (cdn / global variable)</p>
 
-    <!-- 添加安装指南 -->
     <div id="install-guide"></div>
 
     <div class="nav-links">
@@ -40,15 +45,118 @@
         <a href="/module.html">ES Module Demo</a>
     </div>
 
-    <script>
-        // 加载安装指南
-        fetch('install-guide.html')
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('install-guide').innerHTML = html;
-            });
+    <!-- Chat Type Selector -->
+    <div class="card">
+        <h3>选择客服类型</h3>
+        <div class="btn-group">
+            <button class="chip" data-chat-type="agent" onclick="selectChatType('agent', this)">一对一客服</button>
+            <button class="chip" data-chat-type="workgroup" onclick="selectChatType('workgroup', this)">工作组</button>
+            <button class="chip active" data-chat-type="robot" onclick="selectChatType('robot', this)">机器人</button>
+        </div>
+    </div>
 
-        // ... 其他脚本代码 ...
-    </script>
+    <!-- Theme Color -->
+    <div class="card">
+        <h3>主题色</h3>
+        <div class="btn-group" id="color-group">
+            <button class="color-btn selected" style="background-color: #1677ff" onclick="selectColor('#1677ff', this)"></button>
+            <button class="color-btn" style="background-color: #ff4d4f" onclick="selectColor('#ff4d4f', this)"></button>
+            <button class="color-btn" style="background-color: #52c41a" onclick="selectColor('#52c41a', this)"></button>
+            <button class="color-btn" style="background-color: #faad14" onclick="selectColor('#faad14', this)"></button>
+            <button class="color-btn" style="background-color: #722ed1" onclick="selectColor('#722ed1', this)"></button>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="card">
+        <h3>控制面板</h3>
+        <div class="btn-group">
+            <button class="btn primary" onclick="showChat()">打开聊天</button>
+            <button class="btn danger" onclick="hideChat()">关闭聊天</button>
+            <button class="btn" id="bubble-btn" onclick="toggleBubble()">隐藏气泡</button>
+        </div>
+    </div>
+
+    <!-- Config -->
+    <div class="card">
+        <h3>当前配置</h3>
+        <pre><code id="config-display"></code></pre>
+    </div>
+</div>
+
+<script type="application/javascript" src="/dist/bytedesk-web.js"></script>
+<script>
+    let currentChatType = 'robot';
+    let currentThemeColor = '#1677ff';
+    let showBubble = true;
+
+    const chatConfigs = {
+        agent: { t: '0', sid: 'df_rt_uid' },
+        workgroup: { t: '1', sid: 'df_wg_uid' },
+        robot: { t: '2', sid: 'df_rt_uid' }
+    };
+
+    let bytedesk;
+
+    function getConfig() {
+        const cfg = chatConfigs[currentChatType];
+        return {
+            isDebug: true,
+            placement: 'bottom-right',
+            marginBottom: 20,
+            marginSide: 20,
+            autoPopup: false,
+            draggable: true,
+            inviteConfig: { show: false },
+            bubbleConfig: { show: showBubble, icon: '👋', title: '需要帮助吗？', subtitle: '点击开始对话' },
+            buttonConfig: { show: true, width: 60, height: 60 },
+            theme: { mode: 'light', backgroundColor: currentThemeColor, textColor: '#ffffff' },
+            chatConfig: { org: 'df_org_uid', t: cfg.t, sid: cfg.sid },
+            locale: 'zh-cn'
+        };
+    }
+
+    function initBytedesk() {
+        if (bytedesk) { bytedesk.destroy(); }
+        bytedesk = new BytedeskWeb(getConfig());
+        bytedesk.init();
+        updateConfigDisplay();
+    }
+
+    function selectChatType(type, btn) {
+        currentChatType = type;
+        document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        initBytedesk();
+    }
+
+    function selectColor(color, btn) {
+        currentThemeColor = color;
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        initBytedesk();
+    }
+
+    function showChat() { bytedesk?.showChat(); }
+    function hideChat() { bytedesk?.hideChat(); }
+    function toggleBubble() {
+        showBubble = !showBubble;
+        document.getElementById('bubble-btn').textContent = (showBubble ? '隐藏' : '显示') + '气泡';
+        initBytedesk();
+    }
+
+    function updateConfigDisplay() {
+        document.getElementById('config-display').textContent =
+            JSON.stringify({ chatConfig: getConfig().chatConfig, theme: getConfig().theme }, null, 2);
+    }
+
+    // 加载安装指南
+    fetch('install-guide.html').then(r => r.text()).then(html => {
+        document.getElementById('install-guide').innerHTML = html;
+    });
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', initBytedesk);
+</script>
 </body>
 </html> 

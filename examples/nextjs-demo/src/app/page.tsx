@@ -1,97 +1,174 @@
-/*
- * @Author: jackning 270580156@qq.com
- * @Date: 2025-01-22 13:19:31
- * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-01-22 15:11:13
- * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
- *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
- *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
- *  仅支持企业内部员工自用，严禁私自用于销售、二次销售或者部署SaaS方式销售 
- *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
- *  contact: 270580156@qq.com 
- *  联系：270580156@qq.com
- * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
- */
 'use client';
 
 // @ts-ignore
 import { BytedeskNextjs } from '@bytedesk/web/adapters/nextjs';
 // @ts-ignore
 import type { BytedeskConfig } from '@bytedesk/web/types';
-import InstallGuide from '../components/InstallGuide';
 import { useState } from 'react';
 
+type ChatType = 'agent' | 'workgroup' | 'robot';
+
+const CHAT_CONFIGS: Record<ChatType, { t: string; sid: string; label: string }> = {
+  agent: { t: '0', sid: 'df_rt_uid', label: '一对一客服' },
+  workgroup: { t: '1', sid: 'df_wg_uid', label: '工作组' },
+  robot: { t: '2', sid: 'df_rt_uid', label: '机器人' },
+};
+
 export default function Home() {
-  const [config] = useState<BytedeskConfig>({
+  const [chatType, setChatType] = useState<ChatType>('robot');
+  const [themeColor, setThemeColor] = useState('#1677ff');
+  const [showBubble, setShowBubble] = useState(true);
+  const [showButton, setShowButton] = useState(true);
+
+  const currentChatConfig = CHAT_CONFIGS[chatType];
+
+  const config: BytedeskConfig = {
+    isDebug: true,
     htmlUrl: 'http://127.0.0.1:9006',
     placement: 'bottom-right',
     marginBottom: 20,
     marginSide: 20,
     autoPopup: false,
+    draggable: true,
     inviteConfig: {
-      show: true,
-      delay: 1000, // 首次弹出延迟时间, 单位: 毫秒
-      loop: true, // 是否启用循环
-      loopDelay: 10000, // 循环间隔, 单位: 毫秒
-      loopCount: 3, // 循环次数, 设置为0表示无限循环
+      show: false,
+      delay: 1000,
+      loop: true,
+      loopDelay: 10000,
+      loopCount: 3,
     },
     bubbleConfig: {
-      show: true,
+      show: showBubble,
       icon: '👋',
-      title: 'Need help?',
-      subtitle: 'Click to chat'
+      title: '需要帮助吗？',
+      subtitle: '点击开始对话'
+    },
+    buttonConfig: {
+      show: showButton,
+      width: 60,
+      height: 60,
     },
     theme: {
-      mode: 'system',
-      backgroundColor: '#ff4d4f',
+      mode: 'light',
+      backgroundColor: themeColor,
       textColor: '#ffffff'
     },
     chatConfig: {
       org: 'df_org_uid',
-      t: "2",
-      sid: 'df_rt_uid'
-    }
-  });
-
-  const handleInit = () => {
-    console.log('BytedeskNextjs initialized');
+      t: currentChatConfig.t,
+      sid: currentChatConfig.sid,
+      loadHistory: true,
+    },
+    locale: 'zh-cn',
   };
 
-  const showChat = () => {
-    (window as any).bytedesk?.showChat();
-  };
-
-  const hideChat = () => {
-    (window as any).bytedesk?.hideChat();
-  };
+  const showChat = () => (window as any).bytedesk?.showChat();
+  const hideChat = () => (window as any).bytedesk?.hideChat();
+  const showButtonFn = () => (window as any).bytedesk?.showButton();
+  const hideButtonFn = () => (window as any).bytedesk?.hideButton();
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-4">Bytedesk Next.js Demo</h1>
-      <p className="text-gray-600 mb-6">This demo uses local development files</p>
+    <div style={{ maxWidth: 800, margin: '0 auto' }}>
+      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>微语 Next.js Demo</h1>
+      <p style={{ color: '#666', marginBottom: 24 }}>This demo shows the Bytedesk Next.js integration with full control panel</p>
 
-      <div className="space-x-4">
-        <button 
-          onClick={showChat}
-          className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          Open Chat
-        </button>
-
-        <button 
-          onClick={hideChat}
-          className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          Close Chat
-        </button>
+      {/* Chat Type Selector */}
+      <div style={{ background: '#fff', borderRadius: 8, padding: 24, marginBottom: 16 }}>
+        <h3 style={{ margin: '0 0 12px' }}>选择客服类型</h3>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {(Object.keys(CHAT_CONFIGS) as ChatType[]).map((type) => (
+            <button
+              key={type}
+              onClick={() => setChatType(type)}
+              style={{
+                padding: '8px 20px',
+                border: chatType === type ? '2px solid #1677ff' : '1px solid #d9d9d9',
+                borderRadius: 6,
+                background: chatType === type ? '#e6f4ff' : '#fff',
+                color: chatType === type ? '#1677ff' : '#333',
+                cursor: 'pointer',
+                fontWeight: chatType === type ? 600 : 400,
+              }}
+            >
+              {CHAT_CONFIGS[type].label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <BytedeskNextjs 
-        {...config}
-        onInit={handleInit}
-      />
-      
-      <InstallGuide />
+      {/* Theme Color */}
+      <div style={{ background: '#fff', borderRadius: 8, padding: 24, marginBottom: 16 }}>
+        <h3 style={{ margin: '0 0 12px' }}>主题色</h3>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          {['#1677ff', '#ff4d4f', '#52c41a', '#faad14', '#722ed1'].map((color) => (
+            <button
+              key={color}
+              onClick={() => setThemeColor(color)}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                background: color,
+                border: themeColor === color ? '3px solid #333' : '2px solid #d9d9d9',
+                cursor: 'pointer',
+              }}
+            />
+          ))}
+          <input
+            type="color"
+            value={themeColor}
+            onChange={(e) => setThemeColor(e.target.value)}
+            style={{ width: 32, height: 32, border: 'none', cursor: 'pointer' }}
+          />
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div style={{ background: '#fff', borderRadius: 8, padding: 24, marginBottom: 16 }}>
+        <h3 style={{ margin: '0 0 12px' }}>控制面板</h3>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button onClick={showChat} style={btnStyle('#1677ff')}>打开聊天</button>
+          <button onClick={hideChat} style={btnStyle('#ff4d4f')}>关闭聊天</button>
+          <button onClick={showButtonFn} style={btnStyle('#52c41a')} disabled={showButton}>显示按钮</button>
+          <button onClick={hideButtonFn} style={btnStyle('#faad14')} disabled={!showButton}>隐藏按钮</button>
+          <button onClick={() => { setShowBubble(!showBubble); }} style={btnStyle('#722ed1')}>
+            {showBubble ? '隐藏' : '显示'}气泡
+          </button>
+        </div>
+      </div>
+
+      {/* Embed Info */}
+      <div style={{ background: '#fff', borderRadius: 8, padding: 24, marginBottom: 16 }}>
+        <h3 style={{ margin: '0 0 12px' }}>当前配置摘要</h3>
+        <pre style={{ background: '#f6f8fa', padding: 12, borderRadius: 6, fontSize: 12, overflow: 'auto' }}>
+{`import { BytedeskNextjs } from '@bytedesk/web/adapters/nextjs';
+
+<BytedeskNextjs
+  chatConfig={{
+    org: "df_org_uid",
+    t: "${currentChatConfig.t}",
+    sid: "${currentChatConfig.sid}"
+  }}
+  theme={{
+    mode: "light",
+    backgroundColor: "${themeColor}"
+  }}
+/>`}
+        </pre>
+      </div>
+
+      <BytedeskNextjs {...config} />
     </div>
   );
-} 
+}
+
+const btnStyle = (color: string, disabled?: boolean): React.CSSProperties => ({
+  padding: '8px 16px',
+  background: disabled ? '#f5f5f5' : color,
+  color: disabled ? '#999' : '#fff',
+  border: 'none',
+  borderRadius: 6,
+  cursor: disabled ? 'not-allowed' : 'pointer',
+  fontSize: 13,
+  fontWeight: 500,
+}); 

@@ -247,6 +247,7 @@ export const frFr = {
         bottomRight: 'En bas a droite'
       },
       navbarLabel: 'Masquer la navigation haute',
+      draggableLabel: 'Bouton/barre déplaçable',
       navbarHidden: 'ACTIVE',
       navbarShown: 'DESACTIVE',
       navbarParamPurpose: 'Indique si la barre de navigation superieure est masquee. navbar=0 masque la navigation.',
