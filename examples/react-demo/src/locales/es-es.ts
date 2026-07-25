@@ -189,6 +189,7 @@ export const esEs = {
     threadHistoryDemo: '🧵 Historial de conversaciones',
     webrtcDemo: '📹 Demo WebRTC',
     callCenterDemo: '📞 Centro de llamadas',
+    digitalHumanDemo: '🤖 Humano Digital',
     proactiveDemo: '🎯 Captacion proactiva',
     videoConferenceDemo: '🎬 Videoconferencia',
     documentFeedbackDemo: '📝 Comentarios del documento',

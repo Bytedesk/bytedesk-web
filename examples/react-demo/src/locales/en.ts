@@ -184,6 +184,7 @@ export const en = {
     videoSupportDemo: '🎥 Video Support',
     webrtcDemo: '📹 WebRTC Demo',
     callCenterDemo: '📞 Call Center',
+    digitalHumanDemo: '🤖 Digital Human',
     ticketDemo: '🎫 Ticket Demo',
     ratingDemo: '⭐ Rating Demo',
     platformDemo: '🏬 Platform Demo',

@@ -104,6 +104,74 @@ export default function VisitorWidget() {
 }`;
 };
 
+interface VanillaJsEmbedCodeExampleParams {
+  config: BytedeskConfig;
+  isAnonymousMode: boolean;
+  selectedUser: DemoUserProfile;
+  themeMode: Theme['mode'];
+}
+
+export const buildVanillaJsEmbedCodeExample = ({
+  config,
+  isAnonymousMode,
+  selectedUser,
+  themeMode,
+}: VanillaJsEmbedCodeExampleParams) => {
+  const currentChatConfig = {
+    ...(config.chatConfig || {}),
+    ...(isAnonymousMode
+      ? {}
+      : {
+          visitorUid: selectedUser.visitorUid,
+          nickname: selectedUser.nickname,
+          avatar: selectedUser.avatar,
+        }),
+  };
+
+  // Derive script CDN base from htmlUrl (e.g. https://www.weiyuai.cn/chat -> https://www.weiyuai.cn)
+  let scriptBase = 'https://www.weiyuai.cn';
+  if (config.htmlUrl) {
+    try {
+      const url = new URL(config.htmlUrl);
+      scriptBase = url.origin;
+    } catch {
+      // keep default
+    }
+  }
+
+  const vanillaConfig = {
+    ...(config.apiUrl ? { apiUrl: config.apiUrl } : {}),
+    htmlUrl: config.htmlUrl,
+    placement: config.placement,
+    marginBottom: config.marginBottom,
+    marginSide: config.marginSide,
+    autoPopup: config.autoPopup,
+    draggable: config.draggable,
+    locale: config.locale,
+    buttonConfig: config.buttonConfig,
+    buttonsConfig: config.buttonsConfig,
+    inviteConfig: config.inviteConfig,
+    bubbleConfig: config.bubbleConfig,
+    minimizedBarConfig: config.minimizedBarConfig,
+    chatConfig: currentChatConfig,
+    browseConfig: config.browseConfig,
+    theme: {
+      ...(config.theme || {}),
+      mode: config.theme?.mode || themeMode || 'light',
+    },
+  };
+
+  const serializedConfig = stringifyForCode(vanillaConfig);
+
+  return `<!-- bytedesk.com -->
+<script src="${scriptBase}/embed/bytedesk-web.js"></script>
+<script>
+  const config = ${serializedConfig};
+  const bytedesk = new BytedeskWeb(config);
+  bytedesk.init();
+</script>`;
+};
+
 export const buildFullConfigExample = ({
   config,
   exampleCopy,

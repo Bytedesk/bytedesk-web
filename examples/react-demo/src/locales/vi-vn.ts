@@ -186,6 +186,7 @@ export const viVn = {
     videoSupportDemo: '🎥 Ho tro video',
     webrtcDemo: '📹 Demo WebRTC',
     callCenterDemo: '📞 Tong dai',
+    digitalHumanDemo: '🤖 Con nguoi ky thuat so',
     ticketDemo: '🎫 Demo ticket',
     ratingDemo: '⭐ Demo danh gia',
     platformDemo: '🏬 Demo nen tang',

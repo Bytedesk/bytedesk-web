@@ -186,6 +186,7 @@ export const msMy = {
     videoSupportDemo: '🎥 Sokongan video',
     webrtcDemo: '📹 Demo WebRTC',
     callCenterDemo: '📞 Pusat panggilan',
+    digitalHumanDemo: '🤖 Manusia Digital',
     ticketDemo: '🎫 Demo tiket',
     ratingDemo: '⭐ Demo penilaian',
     platformDemo: '🏬 Demo platform',

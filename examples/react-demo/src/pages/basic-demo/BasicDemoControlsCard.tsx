@@ -190,7 +190,8 @@ const BasicDemoControlsCard = ({
     'openChat',
     'closeChat',
     'openInNewWindow',
-    'openInNewTab'
+    'openInNewTab',
+    'openSitePreview'
   ]);
   const featuredQuickActions = quickActions.filter((action) => featuredQuickActionKeys.has(action.key));
   const secondaryQuickActions = quickActions.filter((action) => !featuredQuickActionKeys.has(action.key));

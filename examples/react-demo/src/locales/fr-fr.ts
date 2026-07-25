@@ -189,6 +189,7 @@ export const frFr = {
     threadHistoryDemo: '🧵 Historique des conversations',
     webrtcDemo: '📹 Demo WebRTC',
     callCenterDemo: '📞 Centre d appels',
+    digitalHumanDemo: '🤖 Humain numerique',
     proactiveDemo: '🎯 Acquisition proactive',
     videoConferenceDemo: '🎬 Visioconference',
     documentFeedbackDemo: '📝 Retour sur document',

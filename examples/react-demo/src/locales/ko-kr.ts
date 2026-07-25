@@ -190,6 +190,7 @@ export const koKr = {
     videoSupportDemo: '🎥 영상 상담',
     webrtcDemo: '📹 WebRTC 데모',
     callCenterDemo: '📞 콜센터',
+    digitalHumanDemo: '🤖 디지털 휴먼',
     proactiveDemo: '🎯 능동 고객 확보',
     voiceAgentDemo: '🎙️ 음성 에이전트',
     videoConferenceDemo: '🎬 화상 회의',

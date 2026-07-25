@@ -117,3 +117,112 @@ export default function VisitorWidget() {
   return <BytedeskReact {...bytedeskConfig} />;
 }`;
 };
+
+export const getVanillaJsCurrentEmbedCodeCopy = (locale: string) => {
+  switch (locale) {
+    case 'en':
+      return {
+        title: 'Pure JavaScript embed code',
+        description: 'This snippet can be copied directly into a static HTML page. It uses plain <script> tags without requiring React or any other framework.'
+      };
+    case 'zh-tw':
+      return {
+        title: '純 JavaScript 嵌入程式碼',
+        description: '這段程式碼可以直接複製到靜態 HTML 頁面中。使用純 <script> 標籤，不需要 React 或其他框架。'
+      };
+    case 'ja':
+    case 'ja-jp':
+      return {
+        title: '純粋な JavaScript 埋め込みコード',
+        description: 'このコードは静的な HTML ページに直接コピーできます。React や他のフレームワークを必要とせず、プレーンな <script> タグを使用します。'
+      };
+    case 'ko':
+    case 'ko-kr':
+      return {
+        title: '순수 JavaScript 임베드 코드',
+        description: '이 코드는 정적 HTML 페이지에 직접 복사할 수 있습니다. React나 다른 프레임워크 없이 순수 <script> 태그를 사용합니다.'
+      };
+    case 'vi-vn':
+      return {
+        title: 'Ma nhung JavaScript thuan',
+        description: 'Doan ma nay co the sao chep truc tiep vao trang HTML tinh. No su dung the <script> thuan ma khong can React hoac framework nao khac.'
+      };
+    case 'ms-my':
+      return {
+        title: 'Kod benam JavaScript tulen',
+        description: 'Kod ini boleh disalin terus ke dalam halaman HTML statik. Ia menggunakan tag <script> tulen tanpa memerlukan React atau sebarang framework lain.'
+      };
+    case 'es-es':
+      return {
+        title: 'Codigo embebido JavaScript puro',
+        description: 'Este codigo se puede copiar directamente en una pagina HTML estatica. Utiliza etiquetas <script> puras sin necesidad de React ni otros frameworks.'
+      };
+    case 'fr-fr':
+      return {
+        title: 'Code embarque JavaScript pur',
+        description: "Ce code peut etre copie directement dans une page HTML statique. Il utilise des balises <script> pures sans necessiter React ou d'autres frameworks."
+      };
+    case 'th-th':
+      return {
+        title: 'โค้ดฝัง JavaScript ล้วน',
+        description: 'โค้ดชุดนี้สามารถคัดลอกไปใช้ในหน้า HTML โดยตรง ใช้แท็ก <script> ล้วน ไม่ต้องใช้ React หรือเฟรมเวิร์กอื่น'
+      };
+    case 'zh-cn':
+    default:
+      return {
+        title: '纯 JavaScript 嵌入代码',
+        description: '这段代码可以直接复制到静态 HTML 页面中使用。使用纯 <script> 标签，无需 React 或其他框架。'
+      };
+  }
+};
+
+export const buildVanillaJsCurrentEmbedCodeExample = ({
+  config,
+}: {
+  config: BytedeskConfig;
+}) => {
+  // Derive script CDN base from htmlUrl (e.g. https://www.weiyuai.cn/chat -> https://www.weiyuai.cn)
+  let scriptBase = 'https://www.weiyuai.cn';
+  if (config.htmlUrl) {
+    try {
+      const url = new URL(config.htmlUrl);
+      scriptBase = url.origin;
+    } catch {
+      // keep default
+    }
+  }
+
+  const vanillaConfig: Record<string, unknown> = {};
+  if (typeof config.isDebug === 'boolean') vanillaConfig.isDebug = config.isDebug;
+  if (typeof config.forceRefresh === 'boolean') vanillaConfig.forceRefresh = config.forceRefresh;
+  if (config.apiUrl) vanillaConfig.apiUrl = config.apiUrl;
+  if (config.htmlUrl) vanillaConfig.htmlUrl = config.htmlUrl;
+  if (config.chatPath) vanillaConfig.chatPath = config.chatPath;
+  if (config.threadPath) vanillaConfig.threadPath = config.threadPath;
+  if (config.webrtcPath) vanillaConfig.webrtcPath = config.webrtcPath;
+  if (config.callPath) vanillaConfig.callPath = config.callPath;
+  if (config.ticketPath) vanillaConfig.ticketPath = config.ticketPath;
+  if (config.placement) vanillaConfig.placement = config.placement;
+  if (typeof config.autoPopup === 'boolean') vanillaConfig.autoPopup = config.autoPopup;
+  if (typeof config.draggable === 'boolean') vanillaConfig.draggable = config.draggable;
+  if (typeof config.marginBottom === 'number') vanillaConfig.marginBottom = config.marginBottom;
+  if (typeof config.marginSide === 'number') vanillaConfig.marginSide = config.marginSide;
+  if (config.locale) vanillaConfig.locale = config.locale;
+  if (config.tabsConfig) vanillaConfig.tabsConfig = config.tabsConfig;
+  if (config.inviteConfig) vanillaConfig.inviteConfig = config.inviteConfig;
+  if (config.buttonConfig) vanillaConfig.buttonConfig = config.buttonConfig;
+  if (config.bubbleConfig) vanillaConfig.bubbleConfig = config.bubbleConfig;
+  if (config.chatConfig) vanillaConfig.chatConfig = config.chatConfig;
+  if (config.theme) vanillaConfig.theme = config.theme;
+  if (config.window) vanillaConfig.window = config.window;
+
+  const serializedConfig = stringifyForCode(vanillaConfig);
+
+  return `<!-- bytedesk.com -->
+<script src="${scriptBase}/embed/bytedesk-web.js"></script>
+<script>
+  const config = ${serializedConfig};
+  const bytedesk = new BytedeskWeb(config);
+  bytedesk.init();
+</script>`;
+};

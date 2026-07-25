@@ -40,6 +40,7 @@ export const thTh = {
     threadHistoryDemo: '🧵 ประวัติการสนทนา',
     webrtcDemo: '📹 เดโม WebRTC',
     callCenterDemo: '📞 คอลเซ็นเตอร์',
+    digitalHumanDemo: '🤖 มนุษย์ดิจิทัล',
     proactiveDemo: '🎯 เข้าถึงเชิงรุก',
     documentFeedbackDemo: '📝 ความคิดเห็นเอกสาร'
   },

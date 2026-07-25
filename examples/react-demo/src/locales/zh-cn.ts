@@ -184,6 +184,7 @@ export const zhCn = {
     videoSupportDemo: '🎥 视频客服演示',
     webrtcDemo: '📹 音视频客服演示',
     callCenterDemo: '📞 电话客服演示',
+    digitalHumanDemo: '🤖 数字人客服演示（开发中）',
     ticketDemo: '🎫 工单演示',
     ratingDemo: '⭐ 满意度评价演示',
     platformDemo: '🏬 平台客服演示',

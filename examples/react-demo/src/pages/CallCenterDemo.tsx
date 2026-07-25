@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Button, Card, FloatButton, Input, Space, Table, Tag, Typography } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
@@ -9,8 +9,14 @@ import PageContainer from '../components/PageContainer';
 import type { DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
-import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
+import {
+  buildCurrentEmbedCodeExample,
+  buildVanillaJsCurrentEmbedCodeExample,
+  getCurrentEmbedCodeCopy,
+  getVanillaJsCurrentEmbedCodeCopy
+} from '../utils/embed-code-guide';
 import { buildUrlParamRowsWithEncodeHint } from '../utils/url-param-guide';
+import logger from '../utils/logger';
 
 interface DemoPageProps {
   locale: Language;
@@ -26,8 +32,6 @@ type AudioPreset = {
   target: string;
 };
 
-const DIRECT_CALL_DEMO_PARAM = 'directCallDemo';
-
 type CallLaunchMode = 'embed' | 'window' | 'tab';
 
 const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAnonymousMode }: DemoPageProps) => {
@@ -35,6 +39,8 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
   const [customTarget, setCustomTarget] = useState('');
   const [lastPopupUrl, setLastPopupUrl] = useState('');
   const [lastLaunchMode, setLastLaunchMode] = useState<CallLaunchMode | null>(null);
+  const [latestSipExtension, setLatestSipExtension] = useState('');
+  // const [isProfileLoading, setIsProfileLoading] = useState(false);
   const htmlBaseUrl = getDemoHtmlBaseUrl(9022);
   const embedCodeCopy = useMemo(() => getCurrentEmbedCodeCopy(locale), [locale]);
   const codeBlockStyle = useMemo(() => ({
@@ -61,8 +67,10 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
 
   const audioAiPresets = useMemo<AudioPreset[]>(() => [
     // { key: '9200', label: '音频AI 9200', target: '9200' },
-    { key: '9201', label: '音频AI 9201 多轮对话', target: '9201' },
-    { key: '9203', label: '音频AI 9203 不限轮对话', target: '9203' },
+    // { key: '9294', label: '音频AI 9294 一轮对话', target: '9294' },
+    { key: '9205', label: '音频AI 9205 多轮对话', target: '9205' },
+    // { key: '9201', label: '音频AI 9201 多轮对话', target: '9201' },
+    // { key: '9203', label: '音频AI 9203 不限轮对话', target: '9203' },
     // { key: '92030', label: '音频AI 92030', target: '92030' },
     // { key: '9295', label: '音频AI 9295', target: '9295' },
     // { key: '9296', label: '音频AI 9296', target: '9296' },
@@ -89,6 +97,60 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
   const audioAiTargetSet = useMemo(() => new Set(audioAiPresets.map((preset) => preset.target)), [audioAiPresets]);
   const ivrTargetSet = useMemo(() => new Set(ivrPresets.map((preset) => preset.target)), [ivrPresets]);
   // const speechTestTargetSet = useMemo(() => new Set(speechTestPresets.map((preset) => preset.target)), [speechTestPresets]);
+  const currentSipExtension = latestSipExtension || selectedUser.sipExtension || '-';
+
+  useEffect(() => {
+    let active = true;
+
+    const fetchLatestCallProfile = async () => {
+      if (isAnonymousMode || !selectedUser.visitorUid || !selectedChatProfile.chatConfig.org) {
+        setLatestSipExtension('');
+        // setIsProfileLoading(false);
+        return;
+      }
+
+      // setIsProfileLoading(true);
+      try {
+        const baseUrl = demoApiUrl || window.location.origin;
+        const response = await fetch(`${baseUrl}/visitor/api/v1/call/extension`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            orgUid: selectedChatProfile.chatConfig.org,
+            visitorUid: selectedUser.visitorUid
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`request failed: ${response.status}`);
+        }
+
+        const json = await response.json();
+        const nextExtension = json?.data?.extension || '';
+        if (active) {
+          setLatestSipExtension(nextExtension);
+        }
+      } catch (error) {
+        console.warn('Fetch visitor call extension failed:', error);
+        if (active) {
+          setLatestSipExtension('');
+        }
+      } finally {
+        if (active) {
+          // setIsProfileLoading(false);
+        }
+      }
+    };
+
+    void fetchLatestCallProfile();
+
+    return () => {
+      active = false;
+    };
+  }, [isAnonymousMode, selectedChatProfile.chatConfig.org, selectedUser.visitorUid]);
 
   const getAudioCallDisplayName = useCallback((target?: string) => {
     if (!target) {
@@ -161,8 +223,6 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
     params.append('sid', String(selectedChatProfile.chatConfig.sid));
     if (!isAnonymousMode) {
       appendIfPresent('visitorUid', selectedUser.visitorUid);
-      appendIfPresent('nickname', selectedUser.nickname);
-      appendIfPresent('avatar', selectedUser.avatar);
     }
     params.append('audio', '1');
     params.append('video', '0');
@@ -179,13 +239,50 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
       url.searchParams.set('target', target);
       url.searchParams.set('callNumber', target);
       url.searchParams.set('callDisplayName', getAudioCallDisplayName(target) || `Audio ${target}`);
-      url.searchParams.set(DIRECT_CALL_DEMO_PARAM, '1');
     }
+    logger.debug('buildAudioCallUrl', { target, url: url.toString() });
     return url.toString();
   }, [getAudioCallDisplayName, sampleUrl]);
 
+  const buildSoftPhoneUrl = useCallback(() => {
+    const url = new URL(`${htmlBaseUrl}/call/phone`);
+    url.searchParams.set('lang', locale);
+    url.searchParams.set('mode', String(themeMode || 'light'));
+    url.searchParams.set('org', selectedChatProfile.chatConfig.org);
+    if (!isAnonymousMode && selectedUser.visitorUid) {
+      url.searchParams.set('visitorUid', selectedUser.visitorUid);
+    }
+    if (!isAnonymousMode && selectedUser.nickname) {
+      url.searchParams.set('nickname', selectedUser.nickname);
+    }
+    if (!isAnonymousMode && selectedUser.avatar) {
+      url.searchParams.set('avatar', selectedUser.avatar);
+    }
+    logger.debug('buildSoftPhoneUrl', { url: url.toString() });
+    return url.toString();
+  }, [htmlBaseUrl, isAnonymousMode, locale, selectedChatProfile.chatConfig.org, selectedUser.avatar, selectedUser.nickname, selectedUser.visitorUid, themeMode]);
+
+  const buildSoftPhoneBarUrl = useCallback(() => {
+    const url = new URL(`${htmlBaseUrl}/call/phone-bar`);
+    url.searchParams.set('lang', locale);
+    url.searchParams.set('mode', String(themeMode || 'light'));
+    url.searchParams.set('org', selectedChatProfile.chatConfig.org);
+    if (!isAnonymousMode && selectedUser.visitorUid) {
+      url.searchParams.set('visitorUid', selectedUser.visitorUid);
+    }
+    if (!isAnonymousMode && selectedUser.nickname) {
+      url.searchParams.set('nickname', selectedUser.nickname);
+    }
+    if (!isAnonymousMode && selectedUser.avatar) {
+      url.searchParams.set('avatar', selectedUser.avatar);
+    }
+    logger.debug('buildSoftPhoneBarUrl', { url: url.toString() });
+    return url.toString();
+  }, [htmlBaseUrl, isAnonymousMode, locale, selectedChatProfile.chatConfig.org, selectedUser.avatar, selectedUser.nickname, selectedUser.visitorUid, themeMode]);
+
   const openAudioCallWindow = useCallback((target?: string) => {
     const nextUrl = buildAudioCallUrl(target);
+    logger.debug('openAudioCallWindow', { target, nextUrl });
     setLastPopupUrl(nextUrl);
     setLastLaunchMode('window');
     window.open(nextUrl, '_blank', 'width=420,height=760,resizable=yes,scrollbars=yes');
@@ -193,10 +290,27 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
 
   const openAudioCallTab = useCallback((target?: string) => {
     const nextUrl = buildAudioCallUrl(target);
+    logger.debug('openAudioCallTab', { target, nextUrl });
     setLastPopupUrl(nextUrl);
     setLastLaunchMode('tab');
     window.open(nextUrl, '_blank');
   }, [buildAudioCallUrl]);
+
+  const openSoftPhonePopup = useCallback(() => {
+    const nextUrl = buildSoftPhoneUrl();
+    logger.debug('openSoftPhonePopup', { nextUrl });
+    setLastPopupUrl(nextUrl);
+    setLastLaunchMode('window');
+    window.open(nextUrl, '_blank', 'width=420,height=820,resizable=yes,scrollbars=yes');
+  }, [buildSoftPhoneUrl]);
+
+  const openSoftPhoneBarPopup = useCallback(() => {
+    const nextUrl = buildSoftPhoneBarUrl();
+    logger.debug('openSoftPhoneBarPopup', { nextUrl });
+    setLastPopupUrl(nextUrl);
+    setLastLaunchMode('window');
+    window.open(nextUrl, '_blank', 'width=1280,height=260,resizable=yes,scrollbars=yes');
+  }, [buildSoftPhoneBarUrl]);
 
   const showAudioCallPopup = useCallback((target?: string) => {
     const popupUrl = buildAudioCallUrl(target);
@@ -218,8 +332,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
           ? {
               target,
               callNumber: target,
-              callDisplayName: getAudioCallDisplayName(target) || `Audio ${target}`,
-              [DIRECT_CALL_DEMO_PARAM]: 1
+              callDisplayName: getAudioCallDisplayName(target) || `Audio ${target}`
             }
           : {})
       }
@@ -243,7 +356,6 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
       'video: 是否启用视频（当前示例固定 0）',
       'target / callNumber: 分机号或呼叫目标（可选）',
       'callDisplayName: 呼叫展示名称（可选）',
-      'directCallDemo: 固定号码直呼模式标记；开启后 /call 直接使用演示 SIP 账号外呼（可选）',
       'lang / mode: 语言与主题参数（可选）'
     ],
     []
@@ -258,6 +370,11 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
     () => buildCurrentEmbedCodeExample({ config }),
     [config]
   );
+  const vanillaJsEmbedCodeExample = useMemo(
+    () => buildVanillaJsCurrentEmbedCodeExample({ config }),
+    [config]
+  );
+  const vanillaJsEmbedCodeCopy = useMemo(() => getVanillaJsCurrentEmbedCodeCopy(locale), [locale]);
 
   return (
     <PageContainer>
@@ -287,9 +404,29 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
             <Typography.Text type="secondary">{messages.pages.callCenterDemo.currentPathHint}</Typography.Text>
           </Space>
 
+          <Space align="center" wrap>
+            <Typography.Text strong>当前演示账号</Typography.Text>
+            {isAnonymousMode ? (
+              <Tag>匿名访客</Tag>
+            ) : (
+              <>
+                <Tag color="blue">{selectedUser.nickname}</Tag>
+                <Tag>{selectedUser.visitorUid}</Tag>
+                <Tag color="purple">分机 {currentSipExtension}</Tag>
+                {/* {isProfileLoading ? <Tag color="processing">同步中</Tag> : <Tag color="success">最新配置</Tag>} */}
+              </>
+            )}
+          </Space>
+
           <Space wrap>
             <Button type="primary" onClick={() => showAudioCallPopup()}>
               {consultButtonLabel}
+            </Button>
+            <Button onClick={() => openSoftPhonePopup()}>
+              软电话测试
+            </Button>
+            <Button onClick={() => openSoftPhoneBarPopup()}>
+              软电话工具条测试
             </Button>
             <Button onClick={() => (window as any).bytedesk?.hideChat()}>{messages.common.buttons.closeChat}</Button>
             <Button onClick={() => openAudioCallWindow()}>
@@ -303,7 +440,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
           <Card size="small" title="SIP/Freeswitch 呼叫演示按钮">
             <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
               <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                下面的按钮统一通过 /call 页面发起 SIP/Freeswitch 音频会话。固定号码会附带 directCallDemo=1，使 /call 直接使用演示 SIP 账号发起外呼；如果 SDK 尚未初始化，则自动退回到新窗口打开 /call。
+                下面的按钮统一通过 /call 页面发起 SIP/Freeswitch 音频会话，统一走后端返回的最新访客呼叫配置；如果 SDK 尚未初始化，则自动退回到新窗口打开 /call。
               </Typography.Paragraph>
               <Alert
                 type="info"
@@ -371,6 +508,22 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
             </Space>
           </Card>
 
+          <Card size="small" title="TTS 语音测试">
+            <Space wrap>
+              <Button
+                type="primary"
+                onClick={() => window.open(`${htmlBaseUrl}/call/tts-test`, '_blank')}
+              >
+                TTS 语音合成测试
+              </Button>
+              <Button
+                onClick={() => window.open(`${htmlBaseUrl}/call/tts-realtime`, '_blank')}
+              >
+                实时语音对话
+              </Button>
+            </Space>
+          </Card>
+
           <Alert
             type="info"
             showIcon
@@ -418,7 +571,7 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
           <Typography.Text strong>音频示例 URL</Typography.Text>
           <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{callExampleUrl}</pre>
           <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            音频示例参数：audio=1、video=0；固定号码直呼会额外附加 target、callNumber、callDisplayName、directCallDemo=1。
+            音频示例参数：audio=1、video=0；固定号码直呼会附加 target、callNumber、callDisplayName。
           </Typography.Paragraph>
           <Typography.Text strong>参数说明</Typography.Text>
           <Table
@@ -476,6 +629,20 @@ const CallCenterDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, 
             style={{ ...codeBlockStyle, marginBottom: 0 }}
           >
             {currentEmbedCodeExample}
+          </Typography.Paragraph>
+        </Space>
+      </Card>
+
+      <Card title={vanillaJsEmbedCodeCopy.title} style={{ marginTop: 16 }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {vanillaJsEmbedCodeCopy.description}
+          </Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{ text: vanillaJsEmbedCodeExample }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {vanillaJsEmbedCodeExample}
           </Typography.Paragraph>
         </Space>
       </Card>

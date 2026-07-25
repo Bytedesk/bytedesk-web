@@ -13,7 +13,12 @@ import type { DemoUserKey, DemoUserProfile } from '../types/demo-user';
 import type { DemoChatProfile } from '../types/chat-profile';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 import { buildUrlParamRowsWithEncodeHint } from '../utils/url-param-guide';
-import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
+import {
+  buildCurrentEmbedCodeExample,
+  buildVanillaJsCurrentEmbedCodeExample,
+  getCurrentEmbedCodeCopy,
+  getVanillaJsCurrentEmbedCodeCopy
+} from '../utils/embed-code-guide';
 
 interface DemoPageProps {
   locale: Language;
@@ -143,6 +148,8 @@ const RatingDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAn
   }), [currentThemeColor, currentThemeTextColor, htmlBaseUrl, locale, ratingMessages.bubbleSubtitle, ratingMessages.bubbleTitle, sharedChatConfig, themeMode]);
 
   const currentEmbedCodeExample = useMemo(() => buildCurrentEmbedCodeExample({ config }), [config]);
+  const vanillaJsEmbedCodeExample = useMemo(() => buildVanillaJsCurrentEmbedCodeExample({ config }), [config]);
+  const vanillaJsEmbedCodeCopy = useMemo(() => getVanillaJsCurrentEmbedCodeCopy(locale), [locale]);
 
   const docLinks = useMemo(() => [
     { href: 'https://github.com/Bytedesk/bytedesk/blob/main/frontend/apps/visitorSdk/examples/react-demo/src/pages/RatingDemo.tsx', label: ratingMessages.docLinks.reactExample },
@@ -381,6 +388,20 @@ const RatingDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, isAn
             style={{ ...codeBlockStyle, marginBottom: 0 }}
           >
             {currentEmbedCodeExample}
+          </Typography.Paragraph>
+        </Space>
+      </Card>
+
+      <Card title={vanillaJsEmbedCodeCopy.title} style={{ marginTop: 16 }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {vanillaJsEmbedCodeCopy.description}
+          </Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{ text: vanillaJsEmbedCodeExample }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {vanillaJsEmbedCodeExample}
           </Typography.Paragraph>
         </Space>
       </Card>

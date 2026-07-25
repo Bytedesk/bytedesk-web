@@ -9,7 +9,12 @@ import { getLocaleMessages } from '../locales';
 import { formatChatConfigQuery, type DemoChatProfile } from '../types/chat-profile';
 import type { DemoUserProfile } from '../types/demo-user';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
-import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
+import {
+  buildCurrentEmbedCodeExample,
+  buildVanillaJsCurrentEmbedCodeExample,
+  getCurrentEmbedCodeCopy,
+  getVanillaJsCurrentEmbedCodeCopy
+} from '../utils/embed-code-guide';
 
 interface HelpcenterDemoProps {
   locale: Language;
@@ -98,6 +103,11 @@ const HelpcenterDemo = ({
     () => buildCurrentEmbedCodeExample({ config }),
     [config]
   );
+  const vanillaJsEmbedCodeExample = useMemo(
+    () => buildVanillaJsCurrentEmbedCodeExample({ config }),
+    [config]
+  );
+  const vanillaJsEmbedCodeCopy = useMemo(() => getVanillaJsCurrentEmbedCodeCopy(locale), [locale]);
 
   const helpcenterUrl = useMemo(() => {
     const params = new URLSearchParams();
@@ -205,6 +215,20 @@ const HelpcenterDemo = ({
             style={{ ...codeBlockStyle, marginBottom: 0 }}
           >
             {currentEmbedCodeExample}
+          </Typography.Paragraph>
+        </Space>
+      </Card>
+
+      <Card title={vanillaJsEmbedCodeCopy.title} style={{ marginTop: 16 }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {vanillaJsEmbedCodeCopy.description}
+          </Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{ text: vanillaJsEmbedCodeExample }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {vanillaJsEmbedCodeExample}
           </Typography.Paragraph>
         </Space>
       </Card>

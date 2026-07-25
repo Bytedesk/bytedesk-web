@@ -26,7 +26,12 @@ import type { DemoGoodsInfo, DemoOrderInfo, DemoOrderInfoInput, LegacyOrderInfoP
 import { normalizeDemoGoods, normalizeDemoOrder, parseJsonString } from '../utils/biz-card';
 import { parseBizPayloadFromNavigateToPath } from '../utils/biz-message-callback';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
-import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
+import {
+  buildCurrentEmbedCodeExample,
+  buildVanillaJsCurrentEmbedCodeExample,
+  getCurrentEmbedCodeCopy,
+  getVanillaJsCurrentEmbedCodeCopy
+} from '../utils/embed-code-guide';
 
 const { Title, Paragraph, Text } = Typography;
 const callbackModalTitle = '商品回调Demo演示';
@@ -518,6 +523,11 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
     }),
     [config]
   );
+  const vanillaJsEmbedCodeExample = useMemo(
+    () => buildVanillaJsCurrentEmbedCodeExample({ config }),
+    [config]
+  );
+  const vanillaJsEmbedCodeCopy = useMemo(() => getVanillaJsCurrentEmbedCodeCopy(locale), [locale]);
 
   return (
     <PageContainer>
@@ -696,6 +706,20 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
             style={{ ...codeBlockStyle, marginBottom: 0 }}
           >
             {currentEmbedCodeExample}
+          </Typography.Paragraph>
+        </Space>
+      </Card>
+
+      <Card title={vanillaJsEmbedCodeCopy.title} style={{ marginTop: 16 }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {vanillaJsEmbedCodeCopy.description}
+          </Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{ text: vanillaJsEmbedCodeExample }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {vanillaJsEmbedCodeExample}
           </Typography.Paragraph>
         </Space>
       </Card>

@@ -186,6 +186,7 @@ export const zhTw = {
     videoSupportDemo: '🎥 影片客服示範',
     webrtcDemo: '📹 音視訊客服示範',
     callCenterDemo: '📞 电话客服示範',
+    digitalHumanDemo: '🤖 數字人客服示範',
     ticketDemo: '🎫 工單示範',
     ratingDemo: '⭐ 滿意度評價示範',
     platformDemo: '🏬 平台客服示範',

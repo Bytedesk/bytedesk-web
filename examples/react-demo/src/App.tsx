@@ -33,6 +33,7 @@ import {
 } from './types/chat-profile';
 
 const BasicDemo = lazy(() => import('./pages/BasicDemo'));
+const BasicDemoPreview = lazy(() => import('./pages/BasicDemoPreview'));
 const GoodsInfoDemo = lazy(() => import('./pages/GoodsInfoDemo'));
 const OrderInfoDemo = lazy(() => import('./pages/OrderInfoDemo'));
 const TicketDemo = lazy(() => import('./pages/TicketDemo'));
@@ -43,6 +44,7 @@ const UnreadCountDemo = lazy(() => import('./pages/UnreadCountDemo'));
 const UserInfoDemo = lazy(() => import('./pages/UserInfoDemo'));
 const VipLevelDemo = lazy(() => import('./pages/VipLevelDemo'));
 const CallCenterDemo = lazy(() => import('./pages/CallCenterDemo'));
+const DigitalHumanDemo = lazy(() => import('./pages/DigitalHumanDemo'));
 const WebrtcDemo = lazy(() => import('./pages/WebrtcDemo'));
 const ProactiveDemo = lazy(() => import('./pages/ProactiveDemo'));
 const VoiceAgentDemo = lazy(() => import('./pages/VoiceAgentDemo'));
@@ -322,7 +324,8 @@ function ThemedRouterApp() {
       key: activeUserKey,
       visitorUid: preset.visitorUid,
       avatar: preset.avatar,
-      nickname: messages.pages.userInfoDemo.users[activeUserKey]
+      nickname: messages.pages.userInfoDemo.users[activeUserKey],
+      sipExtension: preset.sipExtension
     };
   }, [activeUserKey, messages]);
 
@@ -330,6 +333,20 @@ function ThemedRouterApp() {
     () => DEMO_CHAT_PROFILES[chatProfileKey],
     [chatProfileKey]
   );
+
+  if (location.pathname === '/preview/basic') {
+    return (
+      <ConfigProvider theme={themeConfig} componentSize="middle">
+        <AntdApp>
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/preview/basic" element={<BasicDemoPreview />} />
+            </Routes>
+          </Suspense>
+        </AntdApp>
+      </ConfigProvider>
+    );
+  }
 
   return (
     <ConfigProvider theme={themeConfig} componentSize="middle">
@@ -418,6 +435,7 @@ function AppLayout({
     { path: '/callCenter', label: messages.nav.callCenterDemo },
     ...(isDebugMode
       ? [
+         { path: '/digitalHuman', label: messages.nav.digitalHumanDemo },
         { path: '/helpcenter', label: messages.nav.helpcenterDemo },
       ]
       : []),
@@ -961,6 +979,10 @@ function AppLayout({
             {isDebugMode && (
               <>
                 <Route
+                  path="/digitalHuman"
+                  element={<DigitalHumanDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
+                />
+                <Route
                   path="/helpcenter"
                   element={<HelpcenterDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
                 />
@@ -986,7 +1008,6 @@ function AppLayout({
               path="/callCenter"
               element={<CallCenterDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} selectedUser={activeUserProfile} isAnonymousMode={isAnonymousMode} />}
             />
-
             <Route
               path="/documentFeedback"
               element={<DocFeedbackDemo locale={locale as Language} themeMode={resolvedTheme as BytedeskTheme['mode']} selectedChatProfile={selectedChatProfile} />}

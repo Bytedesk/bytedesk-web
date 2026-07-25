@@ -27,6 +27,9 @@ import {
   POST_MESSAGE_MAXIMIZE_WINDOW,
   POST_MESSAGE_MINIMIZE_WINDOW,
   POST_MESSAGE_RECEIVE_MESSAGE,
+  POST_MESSAGE_WINDOW_DRAG_START,
+  POST_MESSAGE_WINDOW_DRAG_MOVE,
+  POST_MESSAGE_WINDOW_DRAG_END,
 } from "../utils/constants";
 import type { ButtonConfig, BytedeskConfig } from "../types";
 import { logBizMessageCallbackDebug } from "../utils/bizMessageCallbackDebug";
@@ -63,6 +66,13 @@ export default class BytedeskWeb {
   private loopCount: number = 0;
   private loopTimer: number | null = null;
   private isDestroyed: boolean = false;
+  private isWindowDragging: boolean = false;
+  private windowDragState: {
+    startScreenX: number;
+    startScreenY: number;
+    startLeft: number;
+    startTop: number;
+  } | null = null;
 
   // 添加请求状态管理
   private initVisitorPromise: Promise<any> | null = null;
@@ -590,7 +600,8 @@ export default class BytedeskWeb {
         nextConfig.webrtcPath ||
         nextConfig.callPath ||
         nextConfig.ticketPath ||
-        nextConfig.tabsConfig
+        nextConfig.tabsConfig ||
+        Object.prototype.hasOwnProperty.call(nextConfig, "draggable")
       );
 
       if (shouldRefreshIframe) {
@@ -2465,6 +2476,11 @@ export default class BytedeskWeb {
 
     params.append("lang", this.config.locale || "zh-cn");
 
+    // 传递 draggable 配置到 iframe，使导航栏支持拖动窗口
+    if (this.config.draggable !== false) {
+      params.append("draggable", "1");
+    }
+
     // if (preload) {
     //   params.append("preload", "1");
     // }
@@ -2581,6 +2597,15 @@ export default class BytedeskWeb {
         case POST_MESSAGE_LOCALSTORAGE_RESPONSE:
           // 处理获取 localStorage 的请求
           this.handleLocalStorageData(event);
+          break;
+        case POST_MESSAGE_WINDOW_DRAG_START:
+          this.handleWindowDragStart(event.data.screenX, event.data.screenY);
+          break;
+        case POST_MESSAGE_WINDOW_DRAG_MOVE:
+          this.handleWindowDragMove(event.data.screenX, event.data.screenY);
+          break;
+        case POST_MESSAGE_WINDOW_DRAG_END:
+          this.handleWindowDragEnd();
           break;
       }
     });
@@ -2768,6 +2793,49 @@ export default class BytedeskWeb {
     // this.setupResizeListener();
   }
 
+  private handleWindowDragStart(screenX: number, screenY: number) {
+    if (!this.window || this.isWindowDragging) return;
+
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) return;
+
+    const rect = this.window.getBoundingClientRect();
+
+    this.windowDragState = {
+      startScreenX: screenX,
+      startScreenY: screenY,
+      startLeft: rect.left,
+      startTop: rect.top,
+    };
+    this.isWindowDragging = true;
+
+    // 将窗口定位方式从 right/bottom 切换到 left/top
+    this.window.style.left = `${rect.left}px`;
+    this.window.style.top = `${rect.top}px`;
+    this.window.style.right = 'auto';
+    this.window.style.bottom = 'auto';
+    this.window.style.transition = 'none';
+  }
+
+  private handleWindowDragMove(screenX: number, screenY: number) {
+    if (!this.window || !this.windowDragState) return;
+
+    const deltaX = screenX - this.windowDragState.startScreenX;
+    const deltaY = screenY - this.windowDragState.startScreenY;
+
+    this.window.style.left = `${this.windowDragState.startLeft + deltaX}px`;
+    this.window.style.top = `${this.windowDragState.startTop + deltaY}px`;
+  }
+
+  private handleWindowDragEnd = () => {
+    this.isWindowDragging = false;
+    this.windowDragState = null;
+
+    if (this.window) {
+      this.window.style.transition = `all ${this.config.animation?.duration || 300}ms ${this.config.animation?.type || 'ease'}`;
+    }
+  };
+
   private setupResizeListener() {
     const updateWindowSize = () => {
       if (!this.window || !this.isVisible) return;
@@ -2904,6 +2972,9 @@ export default class BytedeskWeb {
       clearTimeout(this.selectionDebounceTimer);
       this.selectionDebounceTimer = null;
     }
+
+    // 清理窗口拖动监听器
+    this.handleWindowDragEnd();
 
     // 清理反馈功能
     this.destroyFeedbackFeature();

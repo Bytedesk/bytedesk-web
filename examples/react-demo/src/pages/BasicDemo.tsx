@@ -14,7 +14,7 @@ import PageContainer from '../components/PageContainer';
 import { getLocaleMessages, type DemoLanguage } from '../locales';
 import { formatChatConfigQuery, getConsultButtonLabel, type DemoChatProfile } from '../types/chat-profile';
 import type { DemoUserProfile } from '../types/demo-user';
-import { Card, FloatButton, Space, Table, Tag, Typography, theme } from 'antd';
+import { Card, FloatButton, Input, Modal, Space, Table, Tag, Typography, theme } from 'antd';
 import BasicDemoControlsCard from './basic-demo/BasicDemoControlsCard';
 import {
   type BubbleSwitchMode,
@@ -24,6 +24,7 @@ import {
 } from './basic-demo/copy';
 import {
   buildRuntimeEmbedCodeExample,
+  buildVanillaJsEmbedCodeExample,
 } from './basic-demo/examples';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 import { buildUrlParamRowsWithEncodeHint } from '../utils/url-param-guide';
@@ -32,6 +33,11 @@ import {
   THEME_COLORS,
   type EntryAction,
 } from './basic-demo/constants';
+import {
+  buildBasicDemoPreviewStorageKey,
+  isValidPreviewTargetUrl,
+  type BasicDemoPreviewPayload,
+} from '../utils/basic-demo-preview';
 
 interface BasicDemoProps {
   locale: DemoLanguage;
@@ -112,6 +118,29 @@ const DEFAULT_BUBBLE_SWITCH_MODE: BubbleSwitchModeSelection = 'default';
 const DEFAULT_BUBBLE_ROTATE_INTERVAL = 3000;
 const DEFAULT_ENTRY_BUTTON_TEXT = '在线客服';
 const DEFAULT_MINIMIZED_BAR_TEXT = '';
+const DEFAULT_PREVIEW_TARGET_URL = 'https://';
+
+const getPreviewRouteUrl = () => {
+  const normalizedBaseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+  return new URL(`${normalizedBaseUrl}/preview/basic`, window.location.origin);
+};
+
+const sanitizePreviewSdkConfig = (config: BytedeskConfig): Partial<BytedeskConfig> => {
+  return {
+    ...config,
+    buttonConfig: config.buttonConfig ? { ...config.buttonConfig } : undefined,
+    buttonsConfig: config.buttonsConfig?.map((buttonConfig) => ({
+      ...buttonConfig,
+      onClick: undefined,
+    })),
+    bubbleConfig: config.bubbleConfig ? { ...config.bubbleConfig } : undefined,
+    chatConfig: config.chatConfig ? { ...config.chatConfig } : undefined,
+    browseConfig: config.browseConfig ? { ...config.browseConfig } : undefined,
+    inviteConfig: config.inviteConfig ? { ...config.inviteConfig } : undefined,
+    minimizedBarConfig: config.minimizedBarConfig ? { ...config.minimizedBarConfig } : undefined,
+    onVisitorInfo: undefined,
+  };
+};
 
 const BasicDemo = ({
   locale,
@@ -144,6 +173,9 @@ const BasicDemo = ({
   const [selectedBubbleSwitchMode, setSelectedBubbleSwitchMode] = useState<BubbleSwitchModeSelection>(DEFAULT_BUBBLE_SWITCH_MODE);
   const [minimizedBarTextOverride, setMinimizedBarTextOverride] = useState<string>(DEFAULT_MINIMIZED_BAR_TEXT);
   const [draggableEnabled, setDraggableEnabled] = useState<boolean>(true);
+  const [isSitePreviewModalOpen, setIsSitePreviewModalOpen] = useState<boolean>(false);
+  const [sitePreviewTargetUrl, setSitePreviewTargetUrl] = useState<string>(DEFAULT_PREVIEW_TARGET_URL);
+  const [sitePreviewValidationMessage, setSitePreviewValidationMessage] = useState<string>('');
 
   const localeValueHint = getLocaleValueHint(locale);
   const localizedCopy = useMemo(
@@ -740,6 +772,74 @@ const BasicDemo = ({
     return `${chatHtmlBaseUrl}/chat?${params.toString()}`;
   })();
 
+  const sitePreviewCopy = useMemo(() => {
+    if (locale === 'en') {
+      return {
+        buttonLabel: 'Preview on your site',
+        modalTitle: 'Preview current embed on your website',
+        modalDescription: 'Enter a full website URL. A new tab will open with your site embedded in an iframe and the current embed code shown alongside it.',
+        inputPlaceholder: 'https://www.example.com',
+        invalidUrlMessage: 'Enter a valid URL starting with http:// or https://',
+        popupBlockedMessage: 'The preview tab was blocked by the browser. Allow pop-ups and try again.',
+        openFailedMessage: 'Unable to open the preview page. Try again.',
+      };
+    }
+
+    return {
+      buttonLabel: '站点预览演示',
+      modalTitle: '在你的网站中预览当前嵌入效果',
+      modalDescription: '输入完整网站地址后，会新开一个 Tab，用 iframe 嵌入显示你的网站，并同时展示当前嵌入代码，方便直接预览集成效果。',
+      inputPlaceholder: 'https://www.example.com',
+      invalidUrlMessage: '请输入以 http:// 或 https:// 开头的有效网址',
+      popupBlockedMessage: '浏览器拦截了新标签页，请允许弹窗后重试。',
+      openFailedMessage: '打开预览页失败，请稍后重试。',
+    };
+  }, [locale]);
+
+  const handleOpenSitePreviewModal = () => {
+    setSitePreviewValidationMessage('');
+    setIsSitePreviewModalOpen(true);
+  };
+
+  const handleConfirmSitePreview = () => {
+    const normalizedTargetUrl = sitePreviewTargetUrl.trim();
+
+    if (!isValidPreviewTargetUrl(normalizedTargetUrl)) {
+      setSitePreviewValidationMessage(sitePreviewCopy.invalidUrlMessage);
+      return;
+    }
+
+    const previewId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    const previewPayload: BasicDemoPreviewPayload = {
+      targetUrl: normalizedTargetUrl,
+      runtimeEmbedCode: runtimeEmbedCodeExample,
+      vanillaJsEmbedCode: vanillaJsEmbedCodeExample,
+      sdkConfig: sanitizePreviewSdkConfig(config),
+      locale,
+      createdAt: Date.now(),
+    };
+
+    window.sessionStorage.setItem(
+      buildBasicDemoPreviewStorageKey(previewId),
+      JSON.stringify(previewPayload)
+    );
+
+    const previewUrl = getPreviewRouteUrl();
+    previewUrl.searchParams.set('previewId', previewId);
+    previewUrl.searchParams.set('lang', String(locale));
+
+    const openedWindow = window.open(previewUrl.toString(), '_blank');
+
+    if (!openedWindow) {
+      setSitePreviewValidationMessage(sitePreviewCopy.popupBlockedMessage);
+      return;
+    }
+
+    setIsSitePreviewModalOpen(false);
+    setSitePreviewValidationMessage('');
+    setLastActionApiHint(`window.open("${previewUrl.toString()}", "_blank")`);
+  };
+
   const quickActions = [
     {
       key: 'openChat',
@@ -780,6 +880,11 @@ const BasicDemo = ({
         window.open(chatPageUrl, '_blank');
         setLastActionApiHint('window.open(chatUrl, "_blank")');
       }
+    },
+    {
+      key: 'openSitePreview',
+      label: sitePreviewCopy.buttonLabel,
+      handler: handleOpenSitePreviewModal,
     },
     {
       key: 'toggleButtonVisibility',
@@ -860,6 +965,13 @@ const BasicDemo = ({
   // const exampleCopy = getExampleCopy(locale);
 
   const runtimeEmbedCodeExample = useMemo(() => buildRuntimeEmbedCodeExample({
+    config,
+    isAnonymousMode,
+    selectedUser,
+    themeMode,
+  }), [config, isAnonymousMode, selectedUser, themeMode]);
+
+  const vanillaJsEmbedCodeExample = useMemo(() => buildVanillaJsEmbedCodeExample({
     config,
     isAnonymousMode,
     selectedUser,
@@ -1042,10 +1154,58 @@ const BasicDemo = ({
         </Space>
       </Card>
 
+      <Card title={localizedCopy.vanillaJsEmbedCodeTitle} style={{ marginTop: 16 }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {localizedCopy.vanillaJsEmbedCodeDescription}
+          </Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{ text: vanillaJsEmbedCodeExample }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {vanillaJsEmbedCodeExample}
+          </Typography.Paragraph>
+        </Space>
+      </Card>
+
       <BytedeskReact
         {...config}
         onInit={handleInit}
       />
+
+      <Modal
+        title={sitePreviewCopy.modalTitle}
+        open={isSitePreviewModalOpen}
+        onOk={handleConfirmSitePreview}
+        onCancel={() => {
+          setIsSitePreviewModalOpen(false);
+          setSitePreviewValidationMessage('');
+        }}
+        okText={messages.common.buttons.submit}
+        cancelText={messages.common.buttons.cancel}
+      >
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {sitePreviewCopy.modalDescription}
+          </Typography.Paragraph>
+          <Input
+            value={sitePreviewTargetUrl}
+            placeholder={sitePreviewCopy.inputPlaceholder}
+            onChange={(event) => {
+              setSitePreviewTargetUrl(event.target.value);
+              if (sitePreviewValidationMessage) {
+                setSitePreviewValidationMessage('');
+              }
+            }}
+            onPressEnter={handleConfirmSitePreview}
+          />
+          {sitePreviewValidationMessage && (
+            <Typography.Text type="danger">
+              {sitePreviewValidationMessage || sitePreviewCopy.openFailedMessage}
+            </Typography.Text>
+          )}
+        </Space>
+      </Modal>
 
       <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
     </PageContainer>

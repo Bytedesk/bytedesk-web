@@ -10,7 +10,12 @@ import type { DemoUserProfile } from '../types/demo-user';
 import { formatChatConfigQuery, type DemoChatProfile } from '../types/chat-profile';
 import { demoApiUrl, getDemoHtmlBaseUrl } from '../utils/env';
 import { buildUrlParamRowsWithEncodeHint } from '../utils/url-param-guide';
-import { buildCurrentEmbedCodeExample, getCurrentEmbedCodeCopy } from '../utils/embed-code-guide';
+import {
+  buildCurrentEmbedCodeExample,
+  buildVanillaJsCurrentEmbedCodeExample,
+  getCurrentEmbedCodeCopy,
+  getVanillaJsCurrentEmbedCodeCopy
+} from '../utils/embed-code-guide';
 
 interface VoiceAgentDemoProps {
   locale: Language;
@@ -30,6 +35,7 @@ const VoiceAgentDemo = ({
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const m = messages.pages.voiceAgentDemo;
   const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
+  const htmlBaseUrlCall = getDemoHtmlBaseUrl(9022);
   const requiredUrlParams = useMemo(() => new Set(['org', 't', 'sid']), []);
   const embedCodeCopy = useMemo(() => getCurrentEmbedCodeCopy(locale), [locale]);
   const codeBlockStyle = useMemo(() => ({
@@ -122,6 +128,11 @@ const VoiceAgentDemo = ({
     () => buildCurrentEmbedCodeExample({ config }),
     [config]
   );
+  const vanillaJsEmbedCodeExample = useMemo(
+    () => buildVanillaJsCurrentEmbedCodeExample({ config }),
+    [config]
+  );
+  const vanillaJsEmbedCodeCopy = useMemo(() => getVanillaJsCurrentEmbedCodeCopy(locale), [locale]);
 
   return (
     <PageContainer>
@@ -174,6 +185,21 @@ const VoiceAgentDemo = ({
               {messages.common.buttons.openInNewTab}
             </Button>
           </Space>
+          <Card size="small" title="TTS 语音测试">
+            <Space wrap>
+              <Button
+                type="primary"
+                onClick={() => window.open(`${htmlBaseUrlCall}/call/tts-test`, '_blank')}
+              >
+                TTS 语音合成测试
+              </Button>
+              <Button
+                onClick={() => window.open(`${htmlBaseUrlCall}/call/tts-realtime`, '_blank')}
+              >
+                实时语音对话
+              </Button>
+            </Space>
+          </Card>
 
           <Alert
             type="info"
@@ -269,6 +295,20 @@ const VoiceAgentDemo = ({
             style={{ ...codeBlockStyle, marginBottom: 0 }}
           >
             {currentEmbedCodeExample}
+          </Typography.Paragraph>
+        </Space>
+      </Card>
+
+      <Card title={vanillaJsEmbedCodeCopy.title} style={{ marginTop: 16 }}>
+        <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            {vanillaJsEmbedCodeCopy.description}
+          </Typography.Paragraph>
+          <Typography.Paragraph
+            copyable={{ text: vanillaJsEmbedCodeExample }}
+            style={{ ...codeBlockStyle, marginBottom: 0 }}
+          >
+            {vanillaJsEmbedCodeExample}
           </Typography.Paragraph>
         </Space>
       </Card>

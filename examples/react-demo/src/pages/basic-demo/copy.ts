@@ -45,6 +45,8 @@ export interface BasicDemoLocalizedCopy {
   popupUrlDescription: string;
   embedCodeTitle: string;
   embedCodeDescription: string;
+  vanillaJsEmbedCodeTitle: string;
+  vanillaJsEmbedCodeDescription: string;
 }
 
 export interface ConfigGuideCopy {
@@ -169,7 +171,9 @@ export const getLocalizedCopy = (
         popupUrlTitle: 'URL cua cua so rieng hien tai:',
         popupUrlDescription: 'URL nay se thay doi theo cau hinh hien tai va co the duoc sao chep de mo cua so doc lap ngay lap tuc.',
         embedCodeTitle: 'Ma nhung hien tai:',
-        embedCodeDescription: 'Doan ma nay duoc tao theo cau hinh hien tai. Sao chep vao du an React de su dung truc tiep.'
+        embedCodeDescription: 'Doan ma nay duoc tao theo cau hinh hien tai. Sao chep vao du an React de su dung truc tiep.',
+        vanillaJsEmbedCodeTitle: 'Ma nhung JavaScript thuan:',
+        vanillaJsEmbedCodeDescription: 'Doan ma nay co the sao chep truc tiep vao trang HTML tinh. No su dung the <script> thuan ma khong can React hoac framework nao khac.'
       };
     case LANG_MS_MY:
       return {
@@ -204,7 +208,9 @@ export const getLocalizedCopy = (
         popupUrlTitle: 'URL tetingkap berasingan semasa:',
         popupUrlDescription: 'URL ini akan berubah bersama konfigurasi semasa dan boleh terus disalin untuk membuka tetingkap berasingan.',
         embedCodeTitle: 'Kod benam semasa:',
-        embedCodeDescription: 'Kod ini dijana daripada konfigurasi semasa. Salin ke projek React anda untuk digunakan terus.'
+        embedCodeDescription: 'Kod ini dijana daripada konfigurasi semasa. Salin ke projek React anda untuk digunakan terus.',
+        vanillaJsEmbedCodeTitle: 'Kod benam JavaScript tulen:',
+        vanillaJsEmbedCodeDescription: 'Kod ini boleh disalin terus ke dalam halaman HTML statik. Ia menggunakan tag <script> tulen tanpa memerlukan React atau sebarang framework lain.'
       };
     case LANG_ES_ES:
       return {
@@ -239,7 +245,9 @@ export const getLocalizedCopy = (
         popupUrlTitle: 'URL completa actual de la ventana independiente:',
         popupUrlDescription: 'Esta URL cambia segun la configuracion actual y se puede copiar directamente para abrir la ventana independiente.',
         embedCodeTitle: 'Codigo embebido actual:',
-        embedCodeDescription: 'Este codigo se genera segun la configuracion actual. Copialo en tu proyecto React para usarlo directamente.'
+        embedCodeDescription: 'Este codigo se genera segun la configuracion actual. Copialo en tu proyecto React para usarlo directamente.',
+        vanillaJsEmbedCodeTitle: 'Codigo embebido JavaScript puro:',
+        vanillaJsEmbedCodeDescription: 'Este codigo se puede copiar directamente en una pagina HTML estatica. Utiliza etiquetas <script> puras sin necesidad de React ni otros frameworks.'
       };
     case LANG_FR_FR:
       return {
@@ -272,7 +280,9 @@ export const getLocalizedCopy = (
         popupUrlTitle: 'URL complete actuelle de la fenetre independante :',
         popupUrlDescription: 'Cette URL suit la configuration actuelle et peut etre copiee telle quelle pour ouvrir la fenetre autonome.',
         embedCodeTitle: 'Code embarque actuel :',
-        embedCodeDescription: 'Ce code est genere a partir de la configuration courante. Copiez-le dans votre projet React pour l utiliser directement.'
+        embedCodeDescription: 'Ce code est genere a partir de la configuration courante. Copiez-le dans votre projet React pour l utiliser directement.',
+        vanillaJsEmbedCodeTitle: 'Code embarque JavaScript pur :',
+        vanillaJsEmbedCodeDescription: "Ce code peut etre copie directement dans une page HTML statique. Il utilise des balises <script> pures sans necessiter React ou d'autres frameworks."
       };
     case LANG_EN:
       return {
@@ -307,7 +317,9 @@ export const getLocalizedCopy = (
         popupUrlTitle: 'Current standalone window full URL:',
         popupUrlDescription: 'This URL updates with the current configuration and can be copied as-is to open the standalone chat window.',
         embedCodeTitle: 'Current embed code:',
-        embedCodeDescription: 'This snippet is generated from the current configuration. Copy it into your React project and use it directly.'
+        embedCodeDescription: 'This snippet is generated from the current configuration. Copy it into your React project and use it directly.',
+        vanillaJsEmbedCodeTitle: 'Pure JavaScript embed code:',
+        vanillaJsEmbedCodeDescription: 'This snippet can be copied directly into a static HTML page. It uses plain <script> tags without requiring React or any other framework.'
       };
     case LANG_JA_JP:
       return {
@@ -342,7 +354,9 @@ export const getLocalizedCopy = (
         popupUrlTitle: '現在の独立ウィンドウ完全 URL:',
         popupUrlDescription: 'この URL は現在の設定に応じて変わり、そのままコピーして独立ウィンドウを開けます。',
         embedCodeTitle: '現在の埋め込みコード:',
-        embedCodeDescription: 'このコードは現在の設定から生成されます。React プロジェクトへコピーすればそのまま利用できます。'
+        embedCodeDescription: 'このコードは現在の設定から生成されます。React プロジェクトへコピーすればそのまま利用できます。',
+        vanillaJsEmbedCodeTitle: '純粋な JavaScript 埋め込みコード:',
+        vanillaJsEmbedCodeDescription: 'このコードは静的な HTML ページに直接コピーできます。React や他のフレームワークを必要とせず、プレーンな <script> タグを使用します。'
       };
     case LANG_KO_KR:
       return {
@@ -377,7 +391,9 @@ export const getLocalizedCopy = (
         popupUrlTitle: '현재 독립 창 전체 URL:',
         popupUrlDescription: '이 URL 은 현재 설정에 맞춰 갱신되며, 그대로 복사해 독립 창을 열 수 있습니다.',
         embedCodeTitle: '현재 임베드 코드:',
-        embedCodeDescription: '이 코드는 현재 설정을 기준으로 생성됩니다. React 프로젝트에 복사해서 바로 사용할 수 있습니다.'
+        embedCodeDescription: '이 코드는 현재 설정을 기준으로 생성됩니다. React 프로젝트에 복사해서 바로 사용할 수 있습니다.',
+        vanillaJsEmbedCodeTitle: '순수 JavaScript 임베드 코드:',
+        vanillaJsEmbedCodeDescription: '이 코드는 정적 HTML 페이지에 직접 복사할 수 있습니다. React나 다른 프레임워크 없이 순수 <script> 태그를 사용합니다.'
       };
     case LANG_ZH_TW:
       return {
@@ -412,7 +428,9 @@ export const getLocalizedCopy = (
         popupUrlTitle: '目前獨立視窗完整 URL：',
         popupUrlDescription: '此 URL 會隨目前配置即時更新，可直接複製後開啟獨立聊天視窗。',
         embedCodeTitle: '目前嵌入程式碼：',
-        embedCodeDescription: '這段程式碼會根據目前配置生成，複製到 React 專案即可直接使用。'
+        embedCodeDescription: '這段程式碼會根據目前配置生成，複製到 React 專案即可直接使用。',
+        vanillaJsEmbedCodeTitle: '純 JavaScript 嵌入程式碼：',
+        vanillaJsEmbedCodeDescription: '這段程式碼可以直接複製到靜態 HTML 頁面中。使用純 <script> 標籤，不需要 React 或其他框架。'
       };
     default:
       return {
@@ -447,7 +465,9 @@ export const getLocalizedCopy = (
         popupUrlTitle: '当前独立窗口完整 URL：',
         popupUrlDescription: '这个 URL 会随着当前配置实时变化，可以直接复制后打开独立聊天窗口。',
         embedCodeTitle: '当前嵌入代码：',
-        embedCodeDescription: '这段代码根据当前配置实时生成，复制到 React 项目里即可直接使用。'
+        embedCodeDescription: '这段代码根据当前配置实时生成，复制到 React 项目里即可直接使用。',
+        vanillaJsEmbedCodeTitle: '纯 JavaScript 嵌入代码：',
+        vanillaJsEmbedCodeDescription: '这段代码可以直接复制到静态 HTML 页面中使用。使用纯 <script> 标签，无需 React 或其他框架。'
       };
   }
 };

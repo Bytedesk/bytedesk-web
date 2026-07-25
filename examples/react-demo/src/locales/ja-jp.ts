@@ -189,6 +189,7 @@ export const jaJp = {
     videoSupportDemo: '🎥 ビデオサポート',
     webrtcDemo: '📹 WebRTC デモ',
     callCenterDemo: '📞 コールセンター',
+    digitalHumanDemo: '🤖 デジタルヒューマン',
     proactiveDemo: '🎯 プロアクティブ獲得',
     voiceAgentDemo: '🎙️ 音声エージェント',
     videoConferenceDemo: '🎬 ビデオ会議',
