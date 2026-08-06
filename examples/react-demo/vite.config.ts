@@ -135,10 +135,10 @@ export default defineConfig({
   resolve: {
     dedupe: ['react', 'react-dom', 'react-intl'],
     alias: {
-      react: path.resolve(__dirname, '../../node_modules/react'),
-      'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
-      'react-intl': path.resolve(__dirname, '../../node_modules/react-intl'),
-      '@bytedesk/web': path.resolve(__dirname, '../../src')
+      react: path.resolve(import.meta.dirname, '../../node_modules/react'),
+      'react-dom': path.resolve(import.meta.dirname, '../../node_modules/react-dom'),
+      'react-intl': path.resolve(import.meta.dirname, '../../node_modules/react-intl'),
+      '@bytedesk/web': path.resolve(import.meta.dirname, '../../src')
     }
   }
 }) 

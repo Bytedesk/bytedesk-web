@@ -679,6 +679,8 @@ export const msMy = {
       currentChatProfile: 'Parameter chat semasa',
       openChatButton: 'Buka tetingkap chat berbilang tab',
       openHelpcenterButton: 'Buka pusat bantuan sahaja',
+      openEmbedDocButton: 'Buka halaman dokumen dalam iframe tertanam',
+      embedUrlLabel: 'URL tertanam',
       helpHiddenText: 'Tab help dimatikan',
       windowHint: 'Klik butang dan lihat tetingkap tertanam di penjuru kanan bawah. messages membuka chat, thread membuka sejarah perbualan, manakala help membuka dokumen bantuan.',
       embeddedWindowDescription: 'Halaman ini tidak merender Helpcenter visitor secara terus. Ia menunjukkan bagaimana BytedeskConfig.tabsConfig mengubah tab bawah tetingkap tertanam.',
@@ -973,7 +975,8 @@ export const msMy = {
           'Cadangan lain'
         ],
         typesSectionTitle: 'Jenis isu',
-        typesDescription: '(boleh pilih banyak)'
+        typesDescription: '(boleh pilih banyak)',
+        askAiText: 'Tanya AI'
       },
       manualTriggerMessage: 'Maklum balas ini dicetuskan secara manual untuk mengesahkan aliran kerja.',
       testSelectionText: 'Teks sorotan contoh',

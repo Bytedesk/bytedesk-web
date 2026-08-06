@@ -679,6 +679,8 @@ export const viVn = {
       currentChatProfile: 'Tham so chat hien tai',
       openChatButton: 'Mo cua so chat da tab',
       openHelpcenterButton: 'Mo rieng trung tam tro giup',
+      openEmbedDocButton: 'Mo trang tai lieu bang iframe nhung',
+      embedUrlLabel: 'URL nhung',
       helpHiddenText: 'Tab help da tat',
       windowHint: 'Nhan nut va xem cua so nhung o goc phai duoi. messages mo chat, thread mo lich su hoi thoai, help mo tai lieu tro giup.',
       embeddedWindowDescription: 'Trang nay khong render truc tiep Helpcenter cua visitor. No chi demo BytedeskConfig.tabsConfig anh huong den tab duoi cua cua so nhung.',
@@ -973,7 +975,8 @@ export const viVn = {
           'De xuat khac'
         ],
         typesSectionTitle: 'Loai van de',
-        typesDescription: '(chon nhieu)'
+        typesDescription: '(chon nhieu)',
+        askAiText: 'Hỏi AI'
       },
       manualTriggerMessage: 'Phan hoi nay duoc kich hoat thu cong de xac minh luong xu ly.',
       testSelectionText: 'Van ban boi den mau',

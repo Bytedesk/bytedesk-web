@@ -707,6 +707,8 @@ export const zhTw = {
       currentChatProfile: '目前諮詢參數',
       openChatButton: '開啟多 Tab 客服視窗',
       openHelpcenterButton: '單獨開啟幫助中心',
+      openEmbedDocButton: '以 iframe 嵌入顯示文件頁面',
+      embedUrlLabel: '嵌入網址',
       helpHiddenText: 'help tab 已關閉',
       windowHint: '點擊按鈕後查看右下角嵌入式視窗，底部會顯示已啟用的 tab。messages 開啟對話視窗，thread 開啟歷史會話視窗，help 開啟幫助文件視窗。',
       embeddedWindowDescription: '本頁不直接渲染 visitor 的 Helpcenter 頁面，只示範 BytedeskConfig.tabsConfig 如何影響嵌入式視窗底部 tab。',
@@ -1001,7 +1003,8 @@ export const zhTw = {
           '其他建議'
         ],
         typesSectionTitle: '問題類型',
-        typesDescription: '（可多選）'
+        typesDescription: '（可多選）',
+        askAiText: '問AI'
       },
       manualTriggerMessage: '這是一則手動觸發的文件回饋示例。',
       testSelectionText: '測試選取的文字內容',

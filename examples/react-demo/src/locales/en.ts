@@ -936,6 +936,8 @@ export const en = {
       currentChatProfile: 'Current chat params',
       openChatButton: 'Open chat with multiple tabs',
       openHelpcenterButton: 'Open Help Center alone',
+      openEmbedDocButton: 'Open docs in iframe embed',
+      embedUrlLabel: 'Embed URL',
       helpHiddenText: 'The help tab is disabled',
       windowHint: 'Click the button and check the embedded window in the bottom-right corner. messages opens chat, thread opens thread history, and help opens the help documentation tab.',
       embeddedWindowDescription: 'This page does not render the visitor Helpcenter directly. It demonstrates how BytedeskConfig.tabsConfig changes the embedded window bottom tabs.',
@@ -1181,9 +1183,16 @@ export const en = {
       ],
       highlightsTitle: 'How document feedback works',
       highlights: [
-        'Select text to summon a floating “Document feedback” button that carries the selection.',
+        'Highlight any paragraph below to see the “🤖 Ask AI” and “📝 Document feedback” tooltip buttons.',
         'The SDK captures a screenshot automatically so agents see what the user saw.',
         'Category chips and rich placeholders guide users to provide actionable detail.'
+      ],
+      askAiTitle: '🤖 "Ask AI" feature',
+      askAiDescription: 'After selecting text, the floating tooltip shows two buttons side by side:',
+      askAiSteps: [
+        'Click 🤖 Ask AI — opens the chat window and auto-sends the selected text as a TEXT message to the AI agent, enabling one-click Q&A.',
+        'Click 📝 Document feedback — opens the feedback dialog to submit structured feedback with screenshot.',
+        'Customize button text via feedbackConfig.askAiText and click behavior via the feedbackConfig.onAskAi callback.'
       ],
       controlPanel: {
         title: 'Troubleshooting panel',
@@ -1206,7 +1215,7 @@ export const en = {
           'The floating tooltip respects dark/light themes and supports custom icons, copy, and trigger modes. It is perfect for docs portals, knowledge bases, and long-form marketing pages.',
           'Each submission arrives with the selected text, coordinates, categories, and optional screenshots so support and docs teams can resolve issues quickly.'
         ],
-        tip: 'Try highlighting any passage above to see the tooltip in action.'
+        tip: 'Try highlighting any passage above to see the “🤖 Ask AI” and “📝 Document feedback” tooltip buttons in action.'
       },
       logs: {
         title: 'Feedback logs',
@@ -1230,7 +1239,8 @@ export const en = {
           'Other suggestions'
         ],
         typesSectionTitle: 'Issue types',
-        typesDescription: '(multiple choice)'
+        typesDescription: '(multiple choice)',
+        askAiText: 'Ask AI'
       },
       manualTriggerMessage: 'This feedback was triggered manually to verify the workflow.',
       testSelectionText: 'Sample highlighted text',

@@ -12,3 +12,10 @@
 - [x] 当在 BasicDemo中打开嵌入式窗口时，使用iframe显示的是 visitor 中 chatbox，需要支持通过拖动嵌入式窗口导航拖动整个对话窗口
 - [x] 现在visitor中ChatBox页面已经支持拖动，帮我完善visitorCall中#sym:VisitorCall 使得在 #sym:CallCenterDemo 中也支持拖拽呼叫窗口
 - [x] 继续在 TicketDemo 中打开 visitorTicket 中 Ticket 窗口时，也支持拖拽窗口上方导航实现拖拽
+- [x] 支持在bytedesk-web中传入URL，直接使用iframe嵌入式显示网页。在 HelpcenterDemo 中增加测试按钮，弹窗演示嵌入式显示: [url](https://www.weiyuai.cn/docs/zh-CN/?showBytedesk=0)
+- [x] 希望在打开嵌入式窗口时，在iframe窗口上方增加一个导航，用于关闭窗口，以及返回之前页面和前进
+- [] 在iframe导航关闭按钮左侧，增加icon支持，在新浏览器tab页面打开当前URL
+- [] 目前在导航中默认显示URL网址为标题，支持在打开时通过参数，自定义标题，如果没有定义标题时，兜底显示网址URL
+- [x] 加入当打开 HelpcenterDemo 页面时，首先点击的是：打开多tab客服窗口，再点击：iframe嵌入式显示文档页面 按钮，则不会显示 嵌入式URL窗口，只有重新刷新页面，然后点击：iframe嵌入式显示文档页面，才会显示嵌入式URL页面。同理如果一开始点击的是：iframe嵌入式显示文档页面，那么关闭之后，在点击：打开多tab客服窗口 按钮，还是会显示嵌入式URLiframe窗口，没有显示多tab窗口内容，请修复
+- [x] 当前在 DocFeedbackDemo 现在选中文字仅会显示：文档反馈 按钮，选中文字时增加： 问AI 按钮，参考 GoodsInfoDemo 和 OrderInfoDemo 中携带 商品和订单参数，在点击 问AI 按钮时，增加传递 TEXT 文字消息自动发送
+- [x] 现在当刷新页面，首先在HelpcenterDemo中点击：iframe嵌入式显示文档页面 按钮，关闭之后，点击顶部导航切换到 BasicDemo页面之后，在 BasicDemo中点击 咨询工作组会话时，会在嵌入式窗口上方显示 iframe上方导航，这是错误的，只有在点击 iframe嵌入式显示文档页面 才会显示上方导航

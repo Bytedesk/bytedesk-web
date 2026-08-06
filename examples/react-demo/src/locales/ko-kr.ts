@@ -704,7 +704,8 @@ export const koKr = {
           '기타 제안'
         ],
         typesSectionTitle: '문제 유형',
-        typesDescription: '(복수 선택 가능)'
+        typesDescription: '(복수 선택 가능)',
+        askAiText: 'AI에게 물어보기'
       },
       manualTriggerMessage: '워크플로 검증을 위해 수동으로 트리거한 피드백입니다.',
       testSelectionText: '샘플 하이라이트 텍스트',

@@ -30,6 +30,7 @@ import {
   POST_MESSAGE_WINDOW_DRAG_START,
   POST_MESSAGE_WINDOW_DRAG_MOVE,
   POST_MESSAGE_WINDOW_DRAG_END,
+  POST_MESSAGE_AUTO_SEND_TEXT,
 } from "../utils/constants";
 import type { ButtonConfig, BytedeskConfig } from "../types";
 import { logBizMessageCallbackDebug } from "../utils/bizMessageCallbackDebug";
@@ -55,6 +56,9 @@ export default class BytedeskWeb {
   private buttonPreviewElement: HTMLElement | null = null;
   private buttonPreviewHideTimer: number | null = null;
   private window: HTMLElement | null = null;
+  private embedNavBar: HTMLElement | null = null;
+  private isEmbedMode: boolean = false;
+  private embedCurrentUrl: string = "";
   private inviteDialog: HTMLElement | null = null;
   private contextMenu: HTMLElement | null = null;
   private hideTimeout: NodeJS.Timeout | null = null;
@@ -686,6 +690,7 @@ export default class BytedeskWeb {
         trigger: "selection",
         showOnSelection: true,
         selectionText: "文档反馈",
+        askAiText: "问AI",
         buttonText: "文档反馈",
         dialogTitle: "提交意见反馈",
         placeholder: "请描述您的问题或优化建议",
@@ -2364,24 +2369,212 @@ export default class BytedeskWeb {
       height: 100%;
       overflow: hidden;
       position: relative;
+      display: flex;
+      flex-direction: column;
       background: ${this.config.theme?.mode === "dark" ? "#111827" : "#ffffff"};
     `;
+
+    // 创建嵌入式导航栏（默认隐藏，仅 showEmbed 时显示）
+    const embedNavBar = this.createEmbedNavBar();
+    frameContainer.appendChild(embedNavBar);
+
+    // 如果当前已处于嵌入模式，预显示导航栏（避免闪烁）
+    if (this.isEmbedMode && this.embedNavBar) {
+      this.embedNavBar.style.display = "flex";
+    }
 
     const iframe = document.createElement("iframe");
     iframe.setAttribute("allow", "microphone *; camera *; autoplay *; clipboard-write *");
     iframe.style.cssText = `
       width: 100%;
-      height: 100%;
+      flex: 1;
       border: none;
       display: block;
       vertical-align: bottom;
     `;
-    iframe.src = this.generateChatUrl();
+    iframe.src = this.config.embedUrl || this.generateChatUrl();
+    // 清除 embedUrl，防止后续 showChat 重建窗口时复用旧的嵌入 URL
+    this.config.embedUrl = undefined;
     logger.debug("iframe.src: ", iframe.src);
     frameContainer.appendChild(iframe);
     this.window.appendChild(frameContainer);
 
     document.body.appendChild(this.window);
+  }
+
+  private createEmbedNavBar(): HTMLElement {
+    const isDark = this.config.theme?.mode === "dark";
+    const bgColor = isDark ? "#1e293b" : "#f8fafc";
+    const borderColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(15,23,42,0.08)";
+    const textColor = isDark ? "#e2e8f0" : "#334155";
+    const hoverBg = isDark ? "rgba(255,255,255,0.1)" : "rgba(15,23,42,0.06)";
+
+    const navBar = document.createElement("div");
+    navBar.setAttribute("data-bytedesk-embed-nav", "true");
+    navBar.style.cssText = `
+      display: none;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      height: 40px;
+      padding: 0 8px;
+      background: ${bgColor};
+      border-bottom: 1px solid ${borderColor};
+      box-sizing: border-box;
+      flex-shrink: 0;
+      user-select: none;
+    `;
+    this.embedNavBar = navBar;
+
+    // URL 显示区域
+    const urlDisplay = document.createElement("div");
+    urlDisplay.setAttribute("data-bytedesk-embed-url", "true");
+    urlDisplay.style.cssText = `
+      flex: 1;
+      min-width: 0;
+      padding: 0 8px;
+      font-size: 12px;
+      color: ${textColor};
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: left;
+      line-height: 40px;
+    `;
+    navBar.appendChild(urlDisplay);
+
+    // 在新标签页打开按钮
+    const openBtn = this.createEmbedNavButton("↗", "在新标签页打开", hoverBg, "#94a3b8");
+    openBtn.addEventListener("click", () => {
+      if (this.embedCurrentUrl) {
+        window.open(this.embedCurrentUrl, "_blank", "noopener,noreferrer");
+      }
+    });
+    navBar.appendChild(openBtn);
+
+    // 关闭按钮
+    const closeBtn = this.createEmbedNavButton("✕", "关闭窗口", hoverBg, "#94a3b8");
+    closeBtn.addEventListener("click", () => this.hideChat());
+    navBar.appendChild(closeBtn);
+
+    return navBar;
+  }
+
+  private createEmbedNavButton(
+    symbol: string,
+    label: string,
+    hoverBg: string,
+    mutedColor: string
+  ): HTMLButtonElement {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.title = label;
+    btn.setAttribute("aria-label", label);
+    btn.textContent = symbol;
+    btn.style.cssText = `
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: ${mutedColor};
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: 0;
+      line-height: 1;
+      transition: background 0.15s, color 0.15s;
+    `;
+    btn.addEventListener("mouseenter", () => {
+      btn.style.background = hoverBg;
+      btn.style.color = "#3b82f6";
+    });
+    btn.addEventListener("mouseleave", () => {
+      btn.style.background = "transparent";
+      btn.style.color = mutedColor;
+    });
+    return btn;
+  }
+
+  private updateEmbedUrlDisplay(url: string, title?: string) {
+    if (!this.embedNavBar) return;
+    const urlDisplay = this.embedNavBar.querySelector(
+      '[data-bytedesk-embed-url]'
+    ) as HTMLElement | null;
+    if (urlDisplay) {
+      if (title) {
+        urlDisplay.textContent = title;
+      } else {
+        try {
+          const parsed = new URL(url);
+          urlDisplay.textContent = parsed.hostname + parsed.pathname;
+        } catch {
+          urlDisplay.textContent = url;
+        }
+      }
+    }
+  }
+
+  private showEmbedNavBar(url: string, title?: string) {
+    this.isEmbedMode = true;
+    this.embedCurrentUrl = url;
+
+    // 确保导航栏 DOM 存在（处理遗留窗口没有导航栏的情况）
+    this.ensureEmbedNavBar();
+
+    if (this.embedNavBar) {
+      this.embedNavBar.style.display = "flex";
+    }
+    this.updateEmbedUrlDisplay(url, title);
+  }
+
+  /**
+   * 确保嵌入导航栏存在并适配窗口布局。
+   * - 新窗口：createChatWindow 已创建，直接复用
+   * - 旧窗口（无导航栏）：动态注入导航栏并调整布局
+   */
+  private ensureEmbedNavBar() {
+    // 如果导航栏已存在且在 DOM 中，直接返回
+    if (this.embedNavBar && document.body.contains(this.embedNavBar)) {
+      return;
+    }
+
+    const frameContainer = this.window?.querySelector("div") as HTMLElement | null;
+    if (!frameContainer) return;
+
+    // 尝试查找已存在的导航栏
+    const existingNav = frameContainer.querySelector(
+      '[data-bytedesk-embed-nav]'
+    ) as HTMLElement | null;
+    if (existingNav) {
+      this.embedNavBar = existingNav;
+      return;
+    }
+
+    // 旧窗口没有导航栏，动态创建并注入
+    const navBar = this.createEmbedNavBar();
+    frameContainer.insertBefore(navBar, frameContainer.firstChild);
+
+    // 调整 frameContainer 为 flex 布局
+    frameContainer.style.display = "flex";
+    frameContainer.style.flexDirection = "column";
+
+    // 调整 iframe 样式为 flex 自适应
+    const iframe = frameContainer.querySelector("iframe") as HTMLElement | null;
+    if (iframe) {
+      iframe.style.height = "";
+      iframe.style.flex = "1";
+    }
+  }
+
+  private hideEmbedNavBar() {
+    this.isEmbedMode = false;
+    if (this.embedNavBar) {
+      this.embedNavBar.style.display = "none";
+    }
   }
 
   private getEnabledEmbeddedTabs(): EmbeddedTabKey[] {
@@ -2653,6 +2846,9 @@ export default class BytedeskWeb {
   showChat(config?: Partial<BytedeskConfig>) {
     this.removeMinimizedBar();
 
+    // 记录进入前的嵌入模式状态，用于判断是否需要隐藏导航栏
+    const wasEmbedMode = this.isEmbedMode;
+
     // 合并新配置（如果提供了）
     if (config) {
       this.config = this.mergeConfig(config);
@@ -2666,6 +2862,11 @@ export default class BytedeskWeb {
     //
     if (!this.window) {
       this.createChatWindow();
+    }
+
+    // 非嵌入模式下隐藏导航栏
+    if (!wasEmbedMode) {
+      this.hideEmbedNavBar();
     }
 
     // 打开聊天窗口时清空未读消息计数
@@ -2725,6 +2926,8 @@ export default class BytedeskWeb {
       }
 
       this.isVisible = false;
+      // 关闭窗口时重置嵌入模式，防止切换到其他页面时导航栏残留
+      this.hideEmbedNavBar();
       if (options?.preserveFloatingUiHidden) {
         this.hideDefaultFloatingUi();
       } else if (this.buttonElements.length > 0) {
@@ -2770,6 +2973,39 @@ export default class BytedeskWeb {
       ...config,
       chatPath: this.normalizePath(config?.ticketPath || this.config.ticketPath, "/ticket/history"),
     });
+  }
+
+  /**
+   * 嵌入式显示外部网页（如帮助文档、产品页面等）
+   * @param url - 要嵌入显示的外部网页完整 URL
+   * @param title - 导航栏自定义标题，未传时兜底显示网址
+   */
+  showEmbed(url: string, title?: string) {
+    this.removeMinimizedBar();
+
+    // 如果窗口已存在，直接更新 iframe 的 src
+    if (this.window && document.body.contains(this.window)) {
+      const iframe = this.window.querySelector("iframe") as HTMLIFrameElement | null;
+      if (iframe) {
+        iframe.src = url;
+      }
+    } else {
+      // 窗口不存在时，临时设置 embedUrl 让 createChatWindow 使用
+      this.config.embedUrl = url;
+    }
+
+    this.showChat();
+
+    // 防御：确保 showChat 没有意外覆盖 iframe src（如 forceRefresh 场景）
+    if (this.window) {
+      const iframe = this.window.querySelector("iframe") as HTMLIFrameElement | null;
+      if (iframe && iframe.src !== url) {
+        iframe.src = url;
+      }
+    }
+
+    // 在窗口创建/显示后再初始化导航栏（此时 embedNavBar DOM 一定存在）
+    this.showEmbedNavBar(url, title);
   }
 
   private minimizeWindow() {
@@ -2934,6 +3170,10 @@ export default class BytedeskWeb {
     this.bubbleContainer = null;
     this.bubble = null;
     this.buttonElements = [];
+
+    // 清理嵌入导航栏引用
+    this.embedNavBar = null;
+    this.isEmbedMode = false;
 
     // 移除聊天窗口
     if (this.window && document.body.contains(this.window)) {
@@ -3609,7 +3849,7 @@ export default class BytedeskWeb {
   }
 
   /**
-   * 创建反馈提示框
+   * 创建反馈提示框（含"问AI"和"文档反馈"两个按钮）
    */
   private createFeedbackTooltip() {
     if (this.config.isDebug) {
@@ -3636,36 +3876,102 @@ export default class BytedeskWeb {
     this.feedbackTooltip.setAttribute('data-bytedesk-feedback', 'tooltip');
     this.feedbackTooltip.style.cssText = `
       position: fixed;
-      background: #2e88ff;
-      color: white;
-      padding: 8px 16px;
+      background: transparent;
+      padding: 0;
       border-radius: 6px;
-      font-size: 14px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-      cursor: pointer;
       z-index: 999999;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transform: translateY(-100%);
-      margin-top: -8px;
       user-select: none;
       opacity: 0;
       transition: opacity 0.2s ease;
       display: none;
+      white-space: nowrap;
     `;
 
+    const askAiText = this.config.feedbackConfig?.askAiText || '问AI';
     const selectionText = this.config.feedbackConfig?.selectionText || '文档反馈';
-    if (this.config.isDebug) {
-      logger.debug('BytedeskWeb: 提示框文本:', selectionText);
-    }
 
-    // 添加图标和文本
-    this.feedbackTooltip.innerHTML = `
-      <span style="margin-right: 4px;">📝</span>
-      ${selectionText}
+    // 创建按钮容器
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      background: transparent;
     `;
 
-    // 点击事件
-    this.feedbackTooltip.addEventListener('click', async (e) => {
+    // "问AI" 按钮
+    const askAiBtn = document.createElement('button');
+    askAiBtn.type = 'button';
+    askAiBtn.setAttribute('data-bytedesk-feedback-action', 'ask-ai');
+    askAiBtn.style.cssText = `
+      padding: 7px 14px;
+      background: #2e88ff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 0.15s ease;
+    `;
+    askAiBtn.innerHTML = `<span style="margin-right: 3px;">🤖</span>${askAiText}`;
+    askAiBtn.addEventListener('mouseenter', () => {
+      askAiBtn.style.background = '#1a6de0';
+    });
+    askAiBtn.addEventListener('mouseleave', () => {
+      askAiBtn.style.background = '#2e88ff';
+    });
+
+    // "文档反馈" 按钮
+    const feedbackBtn = document.createElement('button');
+    feedbackBtn.type = 'button';
+    feedbackBtn.setAttribute('data-bytedesk-feedback-action', 'feedback');
+    feedbackBtn.style.cssText = `
+      padding: 7px 14px;
+      background: #2e88ff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: background 0.15s ease;
+    `;
+    feedbackBtn.innerHTML = `<span style="margin-right: 3px;">📝</span>${selectionText}`;
+    feedbackBtn.addEventListener('mouseenter', () => {
+      feedbackBtn.style.background = '#1a6de0';
+    });
+    feedbackBtn.addEventListener('mouseleave', () => {
+      feedbackBtn.style.background = '#2e88ff';
+    });
+
+    // "问AI" 点击事件
+    askAiBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (this.config.isDebug) {
+        logger.debug('BytedeskWeb: "问AI"按钮被点击，选中文字:', this.selectedText);
+      }
+
+      const text = this.selectedText;
+      this.hideFeedbackTooltip();
+
+      if (this.config.feedbackConfig?.onAskAi) {
+        // 使用自定义回调
+        this.config.feedbackConfig.onAskAi(text);
+      } else {
+        // 默认行为：显示聊天窗口并发送选中文本
+        this.showChatAndSendText(text);
+      }
+    });
+
+    // "文档反馈" 点击事件
+    feedbackBtn.addEventListener('click', async (e) => {
       if (this.config.isDebug) {
         logger.debug('BytedeskWeb: 反馈提示框被点击');
         logger.debug('BytedeskWeb: 点击时选中文字:', this.selectedText);
@@ -3687,11 +3993,18 @@ export default class BytedeskWeb {
       }
     });
 
+    buttonContainer.appendChild(askAiBtn);
+    buttonContainer.appendChild(feedbackBtn);
+
+    // 清空并添加按钮容器
+    this.feedbackTooltip.innerHTML = '';
+    this.feedbackTooltip.appendChild(buttonContainer);
+
     // 添加到页面
     document.body.appendChild(this.feedbackTooltip);
     
     if (this.config.isDebug) {
-      logger.debug('BytedeskWeb: 反馈提示框已创建并添加到页面');
+      logger.debug('BytedeskWeb: 反馈提示框已创建并添加到页面（含"问AI"和"文档反馈"按钮）');
       logger.debug('BytedeskWeb: 提示框元素:', this.feedbackTooltip);
     }
   }
@@ -3795,7 +4108,7 @@ export default class BytedeskWeb {
     }
 
     // 计算提示框位置 - 显示在选中文字第一行左上角上方
-    const tooltipWidth = 120; // 预估提示框宽度
+    const tooltipWidth = 220; // 预估提示框宽度（含"问AI"和"文档反馈"两个按钮）
     const tooltipHeight = 40; // 预估提示框高度
     const verticalOffset = 15; // 与选中文字的垂直间距，增加间距避免遮挡
     const horizontalOffset = 5; // 水平微调，避免完全贴边
@@ -4812,6 +5125,43 @@ export default class BytedeskWeb {
     }
 
     this.showFeedbackDialog();
+  }
+
+  /**
+   * 公共方法：显示聊天窗口并自动发送选中的文本
+   * @param text - 要自动发送的文本内容
+   */
+  public showChatAndSendText(text: string) {
+    if (!text) {
+      logger.warn('showChatAndSendText: text is empty');
+      return;
+    }
+
+    this.showChat();
+
+    // 使用重试机制发送消息到 iframe，确保 iframe 已加载完成
+    const trySend = (retries: number) => {
+      const iframe = this.window?.querySelector('iframe') as HTMLIFrameElement | null;
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage(
+          { type: POST_MESSAGE_AUTO_SEND_TEXT, content: text },
+          '*'
+        );
+        if (this.config.isDebug) {
+          logger.debug('BytedeskWeb: AUTO_SEND_TEXT 消息已发送到 iframe', text);
+        }
+      } else if (retries > 0) {
+        if (this.config.isDebug) {
+          logger.debug(`BytedeskWeb: iframe 尚未就绪，剩余重试次数: ${retries}`);
+        }
+        setTimeout(() => trySend(retries - 1), 500);
+      } else {
+        logger.warn('BytedeskWeb: 发送 AUTO_SEND_TEXT 失败，iframe 未就绪');
+      }
+    };
+
+    // 延迟 800ms 后开始尝试发送，给 iframe 加载留出时间
+    setTimeout(() => trySend(15), 800);
   }
 
   /**

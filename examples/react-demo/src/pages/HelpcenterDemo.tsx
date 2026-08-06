@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
 import type { BytedeskConfig, Language, Theme as BytedeskTheme } from '@bytedesk/web/types';
-import { Alert, Button, Card, Divider, Space, Typography, theme } from 'antd';
+import { Alert, Button, Card, Divider, Space, Typography, message, theme } from 'antd';
 import PageContainer from '../components/PageContainer';
 import { getLocaleMessages } from '../locales';
 import { formatChatConfigQuery, type DemoChatProfile } from '../types/chat-profile';
@@ -148,6 +148,19 @@ const HelpcenterDemo = ({
     (window as any).bytedesk?.hideChat?.();
   };
 
+  const openEmbedWindow = () => {
+    const bytedesk = (window as any).bytedesk;
+    if (!bytedesk) {
+      message.warning('SDK 尚未初始化完成，请稍后再试');
+      return;
+    }
+    if (typeof bytedesk.showEmbed !== 'function') {
+      message.warning('showEmbed 方法未加载，请刷新页面（Cmd+Shift+R）后重试');
+      return;
+    }
+    bytedesk.showEmbed('https://www.weiyuai.cn/docs/zh-CN/?showBytedesk=0', '微语帮助文档');
+  };
+
   return (
     <PageContainer>
       <Card>
@@ -194,12 +207,15 @@ const HelpcenterDemo = ({
             <Button onClick={() => window.open(helpcenterUrl, '_blank')}>
               {messages.common.buttons.openInNewTab}
             </Button>
+            <Button type="primary" onClick={openEmbedWindow}>
+              {messages.pages.helpcenterDemo.openEmbedDocButton}
+            </Button>
           </Space>
 
           <Alert
             type="info"
             showIcon
-            title={`${messages.common.apiHintPrefix} showChat() / hideChat()`}
+            title={`${messages.common.apiHintPrefix} showChat() / hideChat() / showEmbed()`}
             style={{ alignSelf: 'flex-start', width: 'fit-content', maxWidth: '100%' }}
           />
         </Space>

@@ -937,6 +937,8 @@ export const zhCn = {
       currentChatProfile: '当前咨询参数',
       openChatButton: '打开多 Tab 客服窗口',
       openHelpcenterButton: '单独打开帮助中心',
+      openEmbedDocButton: 'iframe 嵌入式显示文档页面',
+      embedUrlLabel: '嵌入网址',
       helpHiddenText: 'help tab 已关闭',
       windowHint: '点击按钮后查看右下角嵌入式窗口，底部会显示已开启的 tab。help 打开帮助文档窗口，thread 打开历史会话窗口，messages 打开对话窗口。',
       embeddedWindowDescription: '本页不直接渲染 visitor 的 Helpcenter 页面，只演示 BytedeskConfig.tabsConfig 如何影响嵌入式窗口底部 tab。',
@@ -1178,13 +1180,20 @@ export const zhCn = {
         '安装 SDK 并准备 BytedeskConfig 配置。',
         '在 feedbackConfig 中启用文档反馈与选中文本触发。',
         '在页面中渲染 <BytedeskReact {...config} />。',
-        '选中下面任意段落，即可看到“文档反馈”提示按钮。'
+        '选中下面任意段落，即可看到“🤖 问AI”和“📝 文档反馈”两个提示按钮。'
       ],
       highlightsTitle: '文档反馈如何工作',
       highlights: [
         '选中文本后会出现悬浮提示按钮，并携带选中内容。',
         'SDK 自动生成截图，支持查看用户的真实上下文。',
         '类别标签与占位提示引导用户输出可执行反馈。'
+      ],
+      askAiTitle: '🤖 "问AI" 功能说明',
+      askAiDescription: '选中文本后，悬浮提示框会同时显示两个按钮：',
+      askAiSteps: [
+        '点击 🤖 问AI — 自动打开客服聊天窗口，将选中的文字作为 TEXT 消息自动发送给 AI 客服，实现"即选即问"。',
+        '点击 📝 文档反馈 — 打开反馈对话框，提交带截图的结构化反馈。',
+        '可通过 feedbackConfig.askAiText 自定义按钮文案，通过 feedbackConfig.onAskAi 回调自定义点击行为。'
       ],
       controlPanel: {
         title: '排障工具面板',
@@ -1207,7 +1216,7 @@ export const zhCn = {
           '悬浮提示跟随明暗主题，支持自定义图标、文案与触发方式，特别适合文档站、知识库与长文内容。',
           '每条反馈都会附带选中文本、坐标、分类与可选截图，帮助文档与客服团队快速定位问题。'
         ],
-        tip: '尝试选中上方任意文字，立即体验提示气泡。'
+        tip: '尝试选中上方任意文字，立即体验 “🤖 问AI” 和 “📝 文档反馈” 两个提示按钮。'
       },
       logs: {
         title: '反馈记录',
@@ -1231,7 +1240,8 @@ export const zhCn = {
           '其他建议'
         ],
         typesSectionTitle: '问题类型',
-        typesDescription: '（可多选）'
+        typesDescription: '（可多选）',
+        askAiText: '问AI'
       },
       manualTriggerMessage: '这是一次手动触发的文档反馈，用于验证流程。',
       testSelectionText: '测试选中的文字内容',
@@ -1365,7 +1375,7 @@ export const zhCn = {
       usageTitle: '体验步骤',
       usageSteps: [
         '选中下方任意一句话。',
-        '光标附近会出现“文档反馈”提示按钮。',
+        '光标附近会出现“🤖 问AI”和“📝 文档反馈”两个提示按钮。',
         '点击按钮查看选中文本，并提交你的意见。'
       ],
       exampleParagraphs: [
@@ -1540,7 +1550,7 @@ export const zhCn = {
           title: '6. 文档反馈功能说明',
           intro: '文档反馈可以让用户针对页面内容精准选中、附带截图，并提交结构化建议。',
           bullets: [
-            '自动检测文本选择，浮出“文档反馈”提示按钮。',
+            '自动检测文本选择，浮出“🤖 问AI”和“📝 文档反馈”两个提示按钮。',
             '集成 html2canvas 自动截图，方便还原上下文。',
             '记录选中文字，帮助开发者快速定位问题。',
             '支持选中文本触发、按钮触发或组合触发。',

@@ -62,6 +62,7 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
     trigger: 'selection',
     showOnSelection: true,
     selectionText: messages.pages.documentFeedbackDemo.feedbackConfigText.selectionText,
+    askAiText: messages.pages.documentFeedbackDemo.feedbackConfigText.askAiText,
     dialogTitle: messages.pages.documentFeedbackDemo.feedbackConfigText.dialogTitle,
     placeholder: messages.pages.documentFeedbackDemo.feedbackConfigText.placeholder,
     submitText: messages.pages.documentFeedbackDemo.feedbackConfigText.submitText,
@@ -85,6 +86,19 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
     },
     onCancel: () => {
       console.log('[DocumentFeedbackDemo] feedback dialog cancelled');
+    },
+    onAskAi: (selectedText: string) => {
+      console.log('[DocumentFeedbackDemo] "问AI" clicked, selectedText:', selectedText);
+      const bytedesk = (window as any).bytedesk;
+      if (bytedesk && typeof bytedesk.showChatAndSendText === 'function') {
+        bytedesk.showChatAndSendText(selectedText);
+      } else {
+        console.warn('[DocumentFeedbackDemo] bytedesk.showChatAndSendText not available');
+        // 兜底：仅显示聊天窗口
+        if (bytedesk && typeof bytedesk.showChat === 'function') {
+          bytedesk.showChat();
+        }
+      }
     }
   });
 
@@ -406,6 +420,17 @@ const DocFeedbackDemo = ({ locale, themeMode, selectedChatProfile }: DemoPagePro
             <li key={item}>{item}</li>
           ))}
         </ul>
+      </Card>
+
+      <Card title={messages.pages.documentFeedbackDemo.askAiTitle || '🤖 "问AI" 功能说明'} variant="outlined">
+        <Typography.Paragraph style={{ marginBottom: 8 }}>
+          {messages.pages.documentFeedbackDemo.askAiDescription || '选中文本后，悬浮提示框会同时显示两个按钮：'}
+        </Typography.Paragraph>
+        <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.9 }}>
+          {(messages.pages.documentFeedbackDemo.askAiSteps || []).map((step: string) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
       </Card>
 
       <Card title={`🔧 ${messages.pages.documentFeedbackDemo.controlPanel.title}`} variant="outlined">

@@ -1,7 +1,7 @@
 {
   "name": "react-demo",
   "private": true,
-  "version": "3.3.0",
+  "version": "4.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host --port 9021",
@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "antd": "^6.3.6",
-    "bytedesk-web": "^3.1.0",
+    "antd": "^6.5.3",
+    "bytedesk-web": "^3.3.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.1"

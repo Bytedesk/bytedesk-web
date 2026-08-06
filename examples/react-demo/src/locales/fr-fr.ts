@@ -791,7 +791,8 @@ export const frFr = {
           'Autres suggestions'
         ],
         typesSectionTitle: 'Types de probleme',
-        typesDescription: '(choix multiple)'
+        typesDescription: '(choix multiple)',
+        askAiText: 'Demander IA'
       },
       manualTriggerMessage: 'Ce feedback a ete declenche manuellement pour verifier le flux.',
       testSelectionText: 'Texte exemple selectionne',

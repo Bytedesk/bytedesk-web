@@ -765,7 +765,8 @@ export const esEs = {
           'Otras sugerencias'
         ],
         typesSectionTitle: 'Tipos de incidencia',
-        typesDescription: '(seleccion multiple)'
+        typesDescription: '(seleccion multiple)',
+        askAiText: 'Preguntar IA'
       },
       manualTriggerMessage: 'Este feedback se disparo manualmente para verificar el flujo.',
       testSelectionText: 'Texto de prueba seleccionado',

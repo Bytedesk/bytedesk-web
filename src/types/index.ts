@@ -130,6 +130,7 @@ export interface FeedbackConfig {
   trigger?: 'selection' | 'button' | 'both'; // 触发方式：选中文本、按钮、或两者
   showOnSelection?: boolean; // 是否在选中文本时显示提示
   selectionText?: string; // 选中文本时显示的提示文字
+  askAiText?: string; // "问AI"按钮文字
   buttonText?: string; // 按钮文字
   dialogTitle?: string; // 反馈对话框标题
   placeholder?: string; // 反馈内容输入框占位符
@@ -143,6 +144,7 @@ export interface FeedbackConfig {
   submitScreenshot?: boolean; // 是否提交截图
   onSubmit?: (feedback: FeedbackData) => void; // 提交回调
   onCancel?: () => void; // 取消回调
+  onAskAi?: (selectedText: string) => void; // "问AI"按钮点击回调
 }
 
 export interface FeedbackData {
@@ -172,6 +174,7 @@ export interface BytedeskConfig {
   forceRefresh?: boolean; // 是否强制刷新页面
   apiUrl?: string; // API基础URL
   htmlUrl?: string; // Html基础URL，推荐传站点根地址
+  embedUrl?: string; // 嵌入式外部网页 URL，传入后将直接通过 iframe 展示指定页面（如文档、帮助中心等）
   chatPath?: string; // 文本聊天页面路径，默认 /chat
   threadPath?: string; // 历史会话页面路径，默认 /chat/thread
   webrtcPath?: string; // 音视频通话页面路径，默认 /webrtc
