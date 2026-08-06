@@ -930,6 +930,13 @@ export const viVn = {
         'SDK tu dong chup man hinh de nhan vien thay duoc dung boi canh nguoi dung da thay.',
         'Chip phan loai va placeholder thong minh giup nguoi dung cung cap thong tin hanh dong duoc.'
       ],
+      askAiTitle: '🤖 Tinh nang "Hoi AI"',
+      askAiDescription: 'Sau khi boi den van ban, tooltip noi se hien thi hai nut:',
+      askAiSteps: [
+        'Nhan 🤖 Hoi AI — mo cua so chat va tu dong gui van ban da chon nhu mot tin nhan TEXT den AI agent.',
+        'Nhan 📝 Phan hoi tai lieu — mo dialog phan hoi de gui phan hoi co cau truc kem anh chup man hinh.',
+        'Co the tuy chinh van ban nut qua feedbackConfig.askAiText va hanh vi click qua callback feedbackConfig.onAskAi.'
+      ],
       controlPanel: {
         title: 'Bang xu ly su co',
         buttons: {

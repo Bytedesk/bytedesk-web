@@ -19,7 +19,7 @@ set -euo pipefail
 # 本地路径
 DIST=dist
 # 本地路径
-TARGET_DIST=/Users/ningjinpeng/Desktop/Git/Github/private/bytedesk-3x/starter/src/main/resources/static/reactdemo
+TARGET_DIST=/Users/ningjinpeng/Desktop/Git/Github/private/bytedesk-main/starter/src/main/resources/static/reactdemo
 
 # 清理 dist 目录
 echo "Cleaning dist directory..."

@@ -958,6 +958,13 @@ export const zhTw = {
         'SDK 會自動截圖，方便還原使用者視角。',
         '分類標籤與佔位文字協助產出可執行的建議。'
       ],
+      askAiTitle: '🤖 "問AI" 功能說明',
+      askAiDescription: '選中文字後，懸浮提示框會同時顯示兩個按鈕：',
+      askAiSteps: [
+        '點擊 🤖 問AI — 自動開啟客服聊天視窗，將選中的文字作為 TEXT 訊息自動傳送給 AI 客服，實現「即選即問」。',
+        '點擊 📝 文件回饋 — 開啟回饋對話框，提交帶截圖的結構化回饋。',
+        '可透過 feedbackConfig.askAiText 自訂按鈕文案，透過 feedbackConfig.onAskAi 回呼自訂點擊行為。'
+      ],
       controlPanel: {
         title: '除錯工具面板',
         buttons: {

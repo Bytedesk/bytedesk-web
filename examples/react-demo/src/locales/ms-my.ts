@@ -930,6 +930,13 @@ export const msMy = {
         'SDK menangkap tangkapan skrin secara automatik supaya ejen melihat konteks yang sama seperti pengguna.',
         'Chip kategori dan placeholder yang jelas membantu pengguna memberi butiran yang boleh diambil tindakan.'
       ],
+      askAiTitle: '🤖 Ciri "Tanya AI"',
+      askAiDescription: 'Selepas menyorot teks, tooltip terapung akan menunjukkan dua butang:',
+      askAiSteps: [
+        'Klik 🤖 Tanya AI — membuka tetingkap sembang dan auto-hantar teks yang disorot sebagai mesej TEXT kepada ejen AI.',
+        'Klik 📝 Maklum balas dokumen — membuka dialog maklum balas untuk menghantar maklum balas berstruktur dengan tangkapan skrin.',
+        'Boleh sesuaikan teks butang melalui feedbackConfig.askAiText dan tingkah laku klik melalui callback feedbackConfig.onAskAi.'
+      ],
       controlPanel: {
         title: 'Panel penyelesaian masalah',
         buttons: {

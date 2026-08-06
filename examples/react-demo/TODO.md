@@ -19,3 +19,4 @@
 - [x] 加入当打开 HelpcenterDemo 页面时，首先点击的是：打开多tab客服窗口，再点击：iframe嵌入式显示文档页面 按钮，则不会显示 嵌入式URL窗口，只有重新刷新页面，然后点击：iframe嵌入式显示文档页面，才会显示嵌入式URL页面。同理如果一开始点击的是：iframe嵌入式显示文档页面，那么关闭之后，在点击：打开多tab客服窗口 按钮，还是会显示嵌入式URLiframe窗口，没有显示多tab窗口内容，请修复
 - [x] 当前在 DocFeedbackDemo 现在选中文字仅会显示：文档反馈 按钮，选中文字时增加： 问AI 按钮，参考 GoodsInfoDemo 和 OrderInfoDemo 中携带 商品和订单参数，在点击 问AI 按钮时，增加传递 TEXT 文字消息自动发送
 - [x] 现在当刷新页面，首先在HelpcenterDemo中点击：iframe嵌入式显示文档页面 按钮，关闭之后，点击顶部导航切换到 BasicDemo页面之后，在 BasicDemo中点击 咨询工作组会话时，会在嵌入式窗口上方显示 iframe上方导航，这是错误的，只有在点击 iframe嵌入式显示文档页面 才会显示上方导航
+- [] 参考chatbox的ChatHeader中支持拖拽，给iframe上方导航增加支持拖拽从而支持拖拽整个窗口移动

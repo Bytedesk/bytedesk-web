@@ -2411,6 +2411,7 @@ export default class BytedeskWeb {
 
     const navBar = document.createElement("div");
     navBar.setAttribute("data-bytedesk-embed-nav", "true");
+    const isDraggable = this.config.draggable !== false;
     navBar.style.cssText = `
       display: none;
       align-items: center;
@@ -2423,8 +2424,65 @@ export default class BytedeskWeb {
       box-sizing: border-box;
       flex-shrink: 0;
       user-select: none;
+      cursor: ${isDraggable ? "grab" : "default"};
     `;
     this.embedNavBar = navBar;
+
+    // 拖拽支持：参考 ChatHeader 的 postMessage 拖动方案，直接在导航栏 DOM 上监听
+    if (isDraggable) {
+      let dragRafId: number | null = null;
+
+      navBar.addEventListener("mousedown", (e: MouseEvent) => {
+        // 不拦截按钮点击
+        if ((e.target as HTMLElement)?.closest("button")) return;
+        this.handleWindowDragStart(e.screenX, e.screenY);
+        navBar.style.cursor = "grabbing";
+
+        const onMouseMove = (moveEvent: MouseEvent) => {
+          if (dragRafId !== null) return;
+          dragRafId = requestAnimationFrame(() => {
+            dragRafId = null;
+            this.handleWindowDragMove(moveEvent.screenX, moveEvent.screenY);
+          });
+        };
+
+        const onMouseUp = () => {
+          if (dragRafId !== null) {
+            cancelAnimationFrame(dragRafId);
+            dragRafId = null;
+          }
+          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseup", onMouseUp);
+          navBar.style.cursor = "grab";
+          this.handleWindowDragEnd();
+        };
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+      });
+
+      navBar.addEventListener("touchstart", (e: TouchEvent) => {
+        if ((e.target as HTMLElement)?.closest("button")) return;
+        const touch = e.touches[0];
+        if (!touch) return;
+        this.handleWindowDragStart(touch.screenX, touch.screenY);
+
+        const onTouchMove = (moveEvent: TouchEvent) => {
+          const moveTouch = moveEvent.touches[0];
+          if (!moveTouch) return;
+          this.handleWindowDragMove(moveTouch.screenX, moveTouch.screenY);
+        };
+
+        const onTouchEnd = () => {
+          document.removeEventListener("touchmove", onTouchMove);
+          document.removeEventListener("touchend", onTouchEnd);
+          this.handleWindowDragEnd();
+        };
+
+        document.addEventListener("touchmove", onTouchMove);
+        document.addEventListener("touchend", onTouchEnd);
+      });
+    }
 
     // URL 显示区域
     const urlDisplay = document.createElement("div");
