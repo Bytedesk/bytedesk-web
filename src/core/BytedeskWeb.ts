@@ -47,6 +47,10 @@ type EmbeddedTabKey = "messages" | "thread" | "help";
 
 export default class BytedeskWeb {
   private config: BytedeskConfig;
+  private originalBodyPaddingRight: string | null = null;
+  private resizeHandler: (() => void) | null = null;
+  private resizeDebounceTimer: number | null = null;
+  private resizeObserver: ResizeObserver | null = null;
   private unreadBadgeMode: "hidden" | "dot" | "count" = "hidden";
   private unreadBadgeCount: number = 0;
   private bubble: HTMLElement | null = null;
@@ -192,7 +196,117 @@ export default class BytedeskWeb {
     };
   }
 
+  private isInlineMode(): boolean {
+    return this.config.mode === "inline";
+  }
+
+  private isInlineFixedRightMode(): boolean {
+    return this.isInlineMode() && this.config.inlineConfig?.mode === "fixed-right";
+  }
+
+  private getInlineFixedRightWidth(): number {
+    return this.config.inlineConfig?.width || this.config.window?.width || 420;
+  }
+
+  private getInlineFixedRightTopOffset(): number {
+    return this.config.inlineConfig?.offsetTop || 0;
+  }
+
+  private getInlineFixedRightBottomOffset(): number {
+    return this.config.inlineConfig?.offsetBottom || 0;
+  }
+
+  private applyInlineFixedRightBodySpacing() {
+    if (!this.isInlineFixedRightMode()) {
+      return;
+    }
+
+    if (this.originalBodyPaddingRight === null) {
+      this.originalBodyPaddingRight = document.body.style.paddingRight || "";
+    }
+
+    document.body.style.paddingRight = `${this.getInlineFixedRightWidth()}px`;
+  }
+
+  private restoreInlineFixedRightBodySpacing() {
+    if (this.originalBodyPaddingRight === null) {
+      return;
+    }
+
+    document.body.style.paddingRight = this.originalBodyPaddingRight;
+    this.originalBodyPaddingRight = null;
+  }
+
+  private isFloatingMode(): boolean {
+    return !this.config.mode || this.config.mode === "floating";
+  }
+
+  private resolveContainer(): HTMLElement | null {
+    if (!this.isInlineMode()) {
+      return document.body;
+    }
+
+    if (this.isInlineFixedRightMode()) {
+      return document.body;
+    }
+
+    const container = this.config.container;
+
+    if (typeof container === "string") {
+      return document.querySelector(container) as HTMLElement | null;
+    }
+
+    if (container instanceof HTMLElement) {
+      return container;
+    }
+
+    return null;
+  }
+
+  private getWindowParent(): HTMLElement | null {
+    return this.isInlineMode() ? this.resolveContainer() : document.body;
+  }
+
+  private isElementAttached(element: HTMLElement | null): boolean {
+    if (!element) {
+      return false;
+    }
+
+    if (this.isInlineMode()) {
+      return !!element.parentElement;
+    }
+
+    return document.body.contains(element);
+  }
+
+  private detachElement(element: HTMLElement | null) {
+    if (element?.parentElement) {
+      element.parentElement.removeChild(element);
+    }
+  }
+
+  private clearResizeSubscriptions() {
+    if (this.resizeHandler) {
+      window.removeEventListener("resize", this.resizeHandler);
+      this.resizeHandler = null;
+    }
+
+    if (this.resizeDebounceTimer !== null) {
+      window.clearTimeout(this.resizeDebounceTimer);
+      this.resizeDebounceTimer = null;
+    }
+
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+  }
+
   private refreshFloatingUi() {
+    if (!this.isFloatingMode()) {
+      return;
+    }
+
     const inviteWasVisible = !!(
       this.inviteDialog &&
       document.body.contains(this.inviteDialog) &&
@@ -481,6 +595,48 @@ export default class BytedeskWeb {
       return;
     }
 
+    if (this.isInlineMode()) {
+      if (this.isInlineFixedRightMode()) {
+        const panelWidth = this.getInlineFixedRightWidth();
+        const offsetTop = this.getInlineFixedRightTopOffset();
+        const offsetBottom = this.getInlineFixedRightBottomOffset();
+        Object.assign(this.window.style, {
+          position: "fixed",
+          left: "auto",
+          right: "0",
+          top: `${offsetTop}px`,
+          bottom: `${offsetBottom}px`,
+          width: `${panelWidth}px`,
+          height: "auto",
+          minHeight: "100vh",
+          borderRadius: "0",
+          boxShadow: "-8px 0 24px rgba(15, 23, 42, 0.08)",
+          boxSizing: "border-box",
+          paddingTop: "",
+          paddingBottom: "",
+          zIndex: `${this.config.inlineConfig?.zIndex || 1000}`,
+        });
+        return;
+      }
+
+      Object.assign(this.window.style, {
+        position: "relative",
+        left: "auto",
+        right: "auto",
+        top: "auto",
+        bottom: "auto",
+        width: "100%",
+        height: "100%",
+        minHeight: `${this.config.window?.height || 400}px`,
+        borderRadius: "0",
+        boxShadow: "none",
+        boxSizing: "border-box",
+        paddingTop: "",
+        paddingBottom: "",
+      });
+      return;
+    }
+
     const isMobile = window.innerWidth <= 768;
     const maxWidth = window.innerWidth;
     const maxHeight = window.innerHeight;
@@ -578,9 +734,9 @@ export default class BytedeskWeb {
       this.showMinimizedBar();
     }
 
-    if (this.window && document.body.contains(this.window) && nextConfig.tabsConfig) {
+    if (this.window && this.isElementAttached(this.window) && nextConfig.tabsConfig) {
       const wasVisible = this.window.style.display !== "none";
-      document.body.removeChild(this.window);
+      this.detachElement(this.window);
       this.window = null;
       if (wasVisible) {
         this.createChatWindow();
@@ -591,7 +747,7 @@ export default class BytedeskWeb {
       }
     }
 
-    if (this.window && document.body.contains(this.window)) {
+    if (this.window && this.isElementAttached(this.window)) {
       this.updateChatWindowLayout();
 
       const shouldRefreshIframe = Boolean(
@@ -1071,11 +1227,19 @@ export default class BytedeskWeb {
     }
 
     //
-    this.createBubble();
-    if (this.isDestroyed) return;
+    if (this.isFloatingMode()) {
+      this.createBubble();
+      if (this.isDestroyed) return;
 
-    this.createInviteDialog();
-    if (this.isDestroyed) return;
+      this.createInviteDialog();
+      if (this.isDestroyed) return;
+    } else {
+      this.createChatWindow();
+      if (this.isDestroyed) return;
+      if (this.config.inlineConfig?.autoShow !== false) {
+        this.showChat();
+      }
+    }
 
     this.setupMessageListener();
     this.setupResizeListener();
@@ -1130,7 +1294,7 @@ export default class BytedeskWeb {
     }
 
     // 自动弹出
-    if (this.config.autoPopup) {
+    if (this.isFloatingMode() && this.config.autoPopup) {
       if (this.isDestroyed) return;
       setTimeout(() => {
         this.showChat();
@@ -1139,7 +1303,7 @@ export default class BytedeskWeb {
     if (this.isDestroyed) return;
 
     // 显示邀请框
-    if (this.config.inviteConfig?.show) {
+    if (this.isFloatingMode() && this.config.inviteConfig?.show) {
       if (this.isDestroyed) return;
       setTimeout(() => {
         this.showInviteDialog();
@@ -2297,14 +2461,20 @@ export default class BytedeskWeb {
 
 
   private createChatWindow() {
+    const parent = this.getWindowParent();
+    if (!parent) {
+      logger.error("Inline mode: container not found");
+      return;
+    }
+
     // 检查聊天窗口是否已存在
-    if (this.window && document.body.contains(this.window)) {
+    if (this.window && this.isElementAttached(this.window)) {
       logger.debug("createChatWindow: 聊天窗口已存在，不重复创建");
       return;
     }
     
     // 如果 window 存在但不在 DOM 中，先清理
-    if (this.window && !document.body.contains(this.window)) {
+    if (this.window && !this.isElementAttached(this.window)) {
       logger.debug("createChatWindow: 清理已存在的 window 引用");
       this.window = null;
     }
@@ -2324,7 +2494,41 @@ export default class BytedeskWeb {
       maxHeight * 0.9
     );
 
-    if (isMobile) {
+    if (this.isInlineMode()) {
+      if (this.isInlineFixedRightMode()) {
+        const panelWidth = this.getInlineFixedRightWidth();
+        const offsetTop = this.getInlineFixedRightTopOffset();
+        const offsetBottom = this.getInlineFixedRightBottomOffset();
+        this.window.style.cssText = `
+          position: fixed;
+          top: ${offsetTop}px;
+          right: 0;
+          bottom: ${offsetBottom}px;
+          width: ${panelWidth}px;
+          height: auto;
+          min-height: 100vh;
+          display: none;
+          overflow: hidden;
+          box-sizing: border-box;
+          border-radius: 0;
+          box-shadow: -8px 0 24px rgba(15, 23, 42, 0.08);
+          z-index: ${this.config.inlineConfig?.zIndex || 1000};
+        `;
+      } else {
+        this.window.style.cssText = `
+          position: relative;
+          width: 100%;
+          height: 100%;
+          min-height: ${this.config.window?.height || 400}px;
+          display: none;
+          overflow: hidden;
+          box-sizing: border-box;
+          border-radius: 0;
+          box-shadow: none;
+          z-index: auto;
+        `;
+      }
+    } else if (isMobile) {
       this.window.style.cssText = `
         position: fixed;
         left: 0;
@@ -2399,7 +2603,7 @@ export default class BytedeskWeb {
     frameContainer.appendChild(iframe);
     this.window.appendChild(frameContainer);
 
-    document.body.appendChild(this.window);
+    parent.appendChild(this.window);
   }
 
   private createEmbedNavBar(): HTMLElement {
@@ -2596,7 +2800,7 @@ export default class BytedeskWeb {
    */
   private ensureEmbedNavBar() {
     // 如果导航栏已存在且在 DOM 中，直接返回
-    if (this.embedNavBar && document.body.contains(this.embedNavBar)) {
+    if (this.embedNavBar && this.isElementAttached(this.embedNavBar)) {
       return;
     }
 
@@ -2902,6 +3106,39 @@ export default class BytedeskWeb {
   }
 
   showChat(config?: Partial<BytedeskConfig>) {
+    if (this.isInlineMode()) {
+      this.removeMinimizedBar();
+
+      if (config) {
+        this.config = this.mergeConfig(config);
+        if (this.window) {
+          this.detachElement(this.window);
+          this.window = null;
+        }
+      }
+
+      if (!this.window) {
+        this.createChatWindow();
+      }
+
+      if (this.window) {
+        this.window.style.display = "block";
+        if (this.config.forceRefresh) {
+          const iframe = this.window.querySelector("iframe") as HTMLIFrameElement | null;
+          if (iframe) {
+            iframe.src = this.generateChatUrl();
+          }
+        }
+        this.setupResizeListener();
+        this.applyInlineFixedRightBodySpacing();
+        this.isVisible = true;
+        this.windowState = "normal";
+      }
+
+      this.config.onShowChat?.();
+      return;
+    }
+
     this.removeMinimizedBar();
 
     // 记录进入前的嵌入模式状态，用于判断是否需要隐藏导航栏
@@ -2913,7 +3150,7 @@ export default class BytedeskWeb {
 
       // 如果修改了配置并且窗口已经创建，需要销毁重建
       if (this.window) {
-        document.body.removeChild(this.window);
+        this.detachElement(this.window);
         this.window = null;
       }
     }
@@ -2970,6 +3207,15 @@ export default class BytedeskWeb {
 
   hideChat(options?: { preserveFloatingUiHidden?: boolean }) {
     if (this.window) {
+      if (this.isInlineMode()) {
+        this.window.style.display = "none";
+        this.restoreInlineFixedRightBodySpacing();
+        this.isVisible = false;
+        this.hideEmbedNavBar();
+        this.config.onHideChat?.();
+        return;
+      }
+
       const isMobile = window.innerWidth <= 768;
 
       if (isMobile) {
@@ -3039,6 +3285,11 @@ export default class BytedeskWeb {
    * @param title - 导航栏自定义标题，未传时兜底显示网址
    */
   showEmbed(url: string, title?: string) {
+    if (this.isInlineMode()) {
+      logger.warn("showEmbed is not supported in inline mode");
+      return;
+    }
+
     this.removeMinimizedBar();
 
     // 如果窗口已存在，直接更新 iframe 的 src
@@ -3131,76 +3382,34 @@ export default class BytedeskWeb {
   };
 
   private setupResizeListener() {
+    this.clearResizeSubscriptions();
+
     const updateWindowSize = () => {
       if (!this.window || !this.isVisible) return;
-
-      const isMobile = window.innerWidth <= 768;
-      const maxWidth = window.innerWidth;
-      const maxHeight = window.innerHeight;
-
-      if (isMobile) {
-        Object.assign(this.window.style, {
-          left: "0",
-          bottom: "0",
-          width: "100%",
-          height: "100vh",
-          borderTopLeftRadius: "12px",
-          borderTopRightRadius: "12px",
-          borderBottomLeftRadius: "0",
-          borderBottomRightRadius: "0",
-          boxSizing: "border-box",
-          paddingTop: "env(safe-area-inset-top)",
-          paddingBottom: "env(safe-area-inset-bottom)",
-        });
-
-        // iOS/Safari 地址栏伸缩时，dvh 更贴近真实可视区域
-        // 不支持 dvh 的浏览器会忽略该值，从而保留上面的 100vh
-        this.window.style.height = "100dvh";
-      } else {
-        let width =
-          this.windowState === "maximized"
-            ? maxWidth
-            : Math.min(
-                this.config.window?.width || maxWidth * 0.9,
-                maxWidth * 0.9
-              );
-        let height =
-          this.windowState === "maximized"
-            ? maxHeight
-            : Math.min(
-                this.config.window?.height || maxHeight * 0.9,
-                maxHeight * 0.9
-              );
-
-        // 确保窗口不会超出屏幕
-        const right =
-          this.config.placement === "bottom-right"
-            ? this.config.marginSide
-            : undefined;
-        const left =
-          this.config.placement === "bottom-left"
-            ? this.config.marginSide
-            : undefined;
-
-        Object.assign(this.window.style, {
-          width: `${width}px`,
-          height: `${height}px`,
-          right: right ? `${right}px` : "auto",
-          left: left ? `${left}px` : "auto",
-          bottom: `${this.config.marginBottom}px`,
-          borderRadius: this.windowState === "maximized" ? "0" : "12px",
-        });
-      }
+      this.updateChatWindowLayout();
     };
 
-    // 添加防抖
-    let resizeTimeout: number;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = window.setTimeout(updateWindowSize, 100);
-    });
+    this.resizeHandler = () => {
+      if (this.resizeDebounceTimer !== null) {
+        clearTimeout(this.resizeDebounceTimer);
+      }
+      this.resizeDebounceTimer = window.setTimeout(updateWindowSize, 100);
+    };
 
-    // 初始更新
+    if (this.isInlineMode()) {
+      const targetContainer = this.resolveContainer();
+      if (!this.isInlineFixedRightMode() && targetContainer && typeof ResizeObserver !== "undefined") {
+        this.resizeObserver = new ResizeObserver(() => {
+          updateWindowSize();
+        });
+        this.resizeObserver.observe(targetContainer);
+      } else {
+        window.addEventListener("resize", this.resizeHandler);
+      }
+    } else {
+      window.addEventListener("resize", this.resizeHandler);
+    }
+
     updateWindowSize();
   }
 
@@ -3234,13 +3443,14 @@ export default class BytedeskWeb {
     this.isEmbedMode = false;
 
     // 移除聊天窗口
-    if (this.window && document.body.contains(this.window)) {
-      document.body.removeChild(this.window);
+    if (this.window) {
+      this.detachElement(this.window);
       this.window = null;
     }
+    this.restoreInlineFixedRightBodySpacing();
 
     // 清理事件监听器
-    window.removeEventListener("resize", this.setupResizeListener.bind(this));
+    this.clearResizeSubscriptions();
 
     // 清理循环定时器
     if (this.loopTimer) {
@@ -3279,6 +3489,10 @@ export default class BytedeskWeb {
   }
 
   private createInviteDialog() {
+    if (!this.isFloatingMode()) {
+      return;
+    }
+
     // 检查邀请框是否已存在
     if (this.inviteDialog && document.body.contains(this.inviteDialog)) {
       logger.debug("createInviteDialog: 邀请框已存在，不重复创建");
@@ -3387,6 +3601,10 @@ export default class BytedeskWeb {
   }
 
   showInviteDialog() {
+    if (!this.isFloatingMode()) {
+      return;
+    }
+
     // 移除对 inviteConfig.show 的检查，直接显示邀请框
     if (this.inviteDialog) {
       this.inviteDialog.style.display = "block";
@@ -3428,6 +3646,10 @@ export default class BytedeskWeb {
   }
 
   showButton() {
+    if (this.isInlineMode() && this.config.inlineConfig?.showBubble !== true) {
+      return;
+    }
+
     // 检查按钮是否已经显示
     if (this.buttonElements.length > 0 && this.buttonElements.every((buttonElement) => buttonElement.style.display !== "none")) {
       logger.debug("showButton: 按钮已经显示，无需重复显示");
@@ -3445,6 +3667,10 @@ export default class BytedeskWeb {
   }
 
   hideButton() {
+    if (this.isInlineMode() && this.config.inlineConfig?.showBubble !== true) {
+      return;
+    }
+
     if (this.buttonElements.length > 0) {
       this.buttonElements.forEach((buttonElement) => {
         buttonElement.style.display = "none";
@@ -3453,6 +3679,10 @@ export default class BytedeskWeb {
   }
 
   showBubble() {
+    if (this.isInlineMode() && this.config.inlineConfig?.showBubble !== true) {
+      return;
+    }
+
     if (this.bubble) {
       const messageElement = (this.bubble as any).messageElement;
       if (messageElement instanceof HTMLElement) {
@@ -3479,6 +3709,10 @@ export default class BytedeskWeb {
   }
 
   hideBubble() {
+    if (this.isInlineMode() && this.config.inlineConfig?.showBubble !== true) {
+      return;
+    }
+
     if (this.bubble) {
       const messageElement = (this.bubble as any).messageElement;
       if (messageElement instanceof HTMLElement) {

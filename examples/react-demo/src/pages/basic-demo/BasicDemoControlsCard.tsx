@@ -188,6 +188,7 @@ const BasicDemoControlsCard = ({
   ];
   const featuredQuickActionKeys = new Set([
     'openChat',
+    'showInlineDemo',
     'closeChat',
     'openInNewWindow',
     'openInNewTab',
@@ -343,7 +344,7 @@ const BasicDemoControlsCard = ({
         <Divider />
         <Space wrap>
           {featuredQuickActions.map((action, index) => (
-            <Button key={action.key} type={index === 0 ? 'primary' : 'default'} onClick={action.handler}>
+            <Button key={action.key} type={action.type || (index === 0 ? 'primary' : 'default')} onClick={action.handler}>
               {action.label}
             </Button>
           ))}

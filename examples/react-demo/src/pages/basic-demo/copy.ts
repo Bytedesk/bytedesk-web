@@ -17,6 +17,12 @@ export interface BasicDemoLocalizedCopy {
   bubbleAgentSubtitle: string;
   bubbleWebrtcTitle: string;
   bubbleWebrtcSubtitle: string;
+  inlineDemoTitle?: string;
+  inlineDemoMainContent?: string;
+  renderModeLabel?: string;
+  modeFloating?: string;
+  modeInline?: string;
+  modeSwitchWarning?: string;
   multiBubbleLabel: string;
   switchModeLabel: string;
   customTitleLabel: string;

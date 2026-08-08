@@ -200,6 +200,12 @@ export const zhTw = {
     basicDemo: {
       title: '微語基本設定',
       intro: '透過下方按鈕即可快速體驗 Bytedesk Web SDK 的常見能力。',
+        renderModeLabel: '渲染模式',
+        modeFloating: '浮動彈窗',
+        modeInline: '內聯嵌入',
+        modeSwitchWarning: '切換模式將重新初始化 SDK。',
+        inlineDemoTitle: '內聯嵌入演示',
+        inlineDemoMainContent: '此處模擬宿主頁面的主內容區域。',
       themeButtonLabel: '切換導航顏色',
       themeTextButtonLabel: '切換導航字體顏色',
       bubbleTitle: '需要幫忙嗎？',

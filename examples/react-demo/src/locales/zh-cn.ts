@@ -198,6 +198,12 @@ export const zhCn = {
     basicDemo: {
       title: '微语基本设置',
       intro: '通过下方按钮可以快速体验 Bytedesk Web SDK 的常见能力。',
+      renderModeLabel: '渲染模式',
+      modeFloating: '浮动弹窗',
+      modeInline: '内联嵌入',
+      modeSwitchWarning: '切换模式将重新初始化 SDK。',
+      inlineDemoTitle: '内联嵌入演示',
+      inlineDemoMainContent: '此处模拟宿主页面的主内容区域。',
       themeButtonLabel: '切换导航颜色',
       themeTextButtonLabel: '切换导航字体颜色',
       bubbleTitle: '需要帮助吗？',

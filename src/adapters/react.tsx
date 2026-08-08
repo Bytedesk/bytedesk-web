@@ -22,6 +22,18 @@ interface BytedeskReactProps extends BytedeskConfig {
   onInit?: () => void;
 }
 
+const getContainerIdentity = (container: BytedeskConfig['container']) => {
+  if (typeof container === 'string') {
+    return container;
+  }
+
+  if (container instanceof HTMLElement) {
+    return container;
+  }
+
+  return null;
+};
+
 const normalizeConfigValue = (value: unknown): unknown => {
   if (Array.isArray(value)) {
     return value.map(normalizeConfigValue);
@@ -60,18 +72,45 @@ export const BytedeskReact = ({ locale = 'zh-cn', ...props }: BytedeskReactProps
 // 全局单例实例
 let globalBytedeskInstance: BytedeskWeb | null = null;
 let activeComponentCount = 0;
+let globalInstanceMode: BytedeskConfig['mode'] = 'floating';
+let globalInstanceContainer: string | HTMLElement | null = null;
 
 const BytedeskComponent = (props: BytedeskReactProps) => {
   const bytedeskRef = useRef<BytedeskWeb | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const didCallInitRef = useRef(false);
   const { onInit, ...config } = props;
   const configSignature = createConfigSignature(config);
 
   useEffect(() => {
+    const shouldUseHostContainer = config.mode === 'inline' && config.inlineConfig?.mode !== 'fixed-right';
+    const effectiveConfig = shouldUseHostContainer
+      ? {
+          ...config,
+          container: config.container || containerRef.current || undefined,
+        }
+      : config;
+    const nextMode = effectiveConfig.mode || 'floating';
+    const nextContainerIdentity = getContainerIdentity(effectiveConfig.container);
+
     activeComponentCount++;
 
+    if (
+      globalBytedeskInstance &&
+      (
+        globalInstanceMode !== nextMode ||
+        (nextMode === 'inline' && globalInstanceContainer !== nextContainerIdentity)
+      )
+    ) {
+      globalBytedeskInstance.destroy();
+      globalBytedeskInstance = null;
+      delete (window as any).bytedesk;
+    }
+
     if (!globalBytedeskInstance) {
-      globalBytedeskInstance = new BytedeskWeb(config);
+      globalBytedeskInstance = new BytedeskWeb(effectiveConfig);
+      globalInstanceMode = nextMode;
+      globalInstanceContainer = nextContainerIdentity;
       bytedeskRef.current = globalBytedeskInstance;
       (window as any).bytedesk = globalBytedeskInstance;
 
@@ -84,9 +123,11 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
         onInit?.();
       });
     } else {
+      globalInstanceMode = nextMode;
+      globalInstanceContainer = nextContainerIdentity;
       bytedeskRef.current = globalBytedeskInstance;
       (window as any).bytedesk = globalBytedeskInstance;
-      globalBytedeskInstance.setConfig(config, { replaceChatConfig: true, replaceTabsConfig: true });
+      globalBytedeskInstance.setConfig(effectiveConfig, { replaceChatConfig: true, replaceTabsConfig: true });
 
       if (!didCallInitRef.current) {
         didCallInitRef.current = true;
@@ -106,6 +147,8 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
           if (globalBytedeskInstance && activeComponentCount <= 0) {
             globalBytedeskInstance.destroy();
             globalBytedeskInstance = null;
+            globalInstanceMode = 'floating';
+            globalInstanceContainer = null;
             delete (window as any).bytedesk;
             activeComponentCount = 0;
           }
@@ -114,7 +157,20 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
     };
   }, [configSignature]);
 
-
+  if (config.mode === 'inline' && config.inlineConfig?.mode !== 'fixed-right') {
+    return (
+      <div
+        ref={containerRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          minHeight: '400px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      />
+    );
+  }
 
   return null;
 }; 

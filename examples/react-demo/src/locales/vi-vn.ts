@@ -200,6 +200,12 @@ export const viVn = {
     basicDemo: {
       title: 'Cai dat co ban Bytedesk',
       intro: 'Su dung cac thao tac nhanh ben duoi de trai nghiem nhung tinh nang pho bien cua Bytedesk Web SDK.',
+        renderModeLabel: 'Che do hien thi',
+        modeFloating: 'Noi',
+        modeInline: 'Nhung trong trang',
+        modeSwitchWarning: 'Chuyen che do se khoi tao lai SDK.',
+        inlineDemoTitle: 'Demo nhung trong trang',
+        inlineDemoMainContent: 'Khu vuc nay mo phong noi dung chinh cua trang chu.',
       themeButtonLabel: 'Doi mau dieu huong',
       themeTextButtonLabel: 'Doi mau chu dieu huong',
       bubbleTitle: 'Ban can ho tro?',

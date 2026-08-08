@@ -37,6 +37,7 @@ interface RecommendedConfigExampleParams {
 interface RuntimeEmbedCodeExampleParams {
   config: BytedeskConfig;
   isAnonymousMode: boolean;
+  renderMode: 'floating' | 'inline';
   selectedUser: DemoUserProfile;
   themeMode: Theme['mode'];
 }
@@ -54,6 +55,7 @@ const stringifyForCode = (value: unknown): string => {
 export const buildRuntimeEmbedCodeExample = ({
   config,
   isAnonymousMode,
+  renderMode,
   selectedUser,
   themeMode,
 }: RuntimeEmbedCodeExampleParams) => {
@@ -69,6 +71,12 @@ export const buildRuntimeEmbedCodeExample = ({
   };
 
   const runtimeConfig = {
+    ...(renderMode === 'inline'
+      ? {
+          mode: 'inline' as const,
+          inlineConfig: { autoShow: true, mode: 'fixed-right' as const, width: 420 },
+        }
+      : {}),
     ...(config.apiUrl ? { apiUrl: config.apiUrl } : {}),
     htmlUrl: config.htmlUrl,
     placement: config.placement,
@@ -94,6 +102,17 @@ export const buildRuntimeEmbedCodeExample = ({
   const serializedConfig = stringifyForCode(runtimeConfig)
     .replace(/'\(uid, visitorUid\) => console\.log\(uid, visitorUid\)'/g, '(uid, visitorUid) => console.log(uid, visitorUid)');
 
+  if (renderMode === 'inline') {
+    return `import { BytedeskReact } from '@bytedesk/web/adapters/react';
+import type { BytedeskConfig } from '@bytedesk/web/types';
+
+const bytedeskConfig: BytedeskConfig = ${serializedConfig};
+
+export default function VisitorWidget() {
+  return <BytedeskReact {...bytedeskConfig} />;
+}`;
+  }
+
   return `import { BytedeskReact } from '@bytedesk/web/adapters/react';
 import type { BytedeskConfig } from '@bytedesk/web/types';
 
@@ -107,6 +126,7 @@ export default function VisitorWidget() {
 interface VanillaJsEmbedCodeExampleParams {
   config: BytedeskConfig;
   isAnonymousMode: boolean;
+  renderMode: 'floating' | 'inline';
   selectedUser: DemoUserProfile;
   themeMode: Theme['mode'];
 }
@@ -114,6 +134,7 @@ interface VanillaJsEmbedCodeExampleParams {
 export const buildVanillaJsEmbedCodeExample = ({
   config,
   isAnonymousMode,
+  renderMode,
   selectedUser,
   themeMode,
 }: VanillaJsEmbedCodeExampleParams) => {
@@ -140,6 +161,12 @@ export const buildVanillaJsEmbedCodeExample = ({
   }
 
   const vanillaConfig = {
+    ...(renderMode === 'inline'
+      ? {
+          mode: 'inline' as const,
+          inlineConfig: { autoShow: true, mode: 'fixed-right' as const, width: 420 },
+        }
+      : {}),
     ...(config.apiUrl ? { apiUrl: config.apiUrl } : {}),
     htmlUrl: config.htmlUrl,
     placement: config.placement,
@@ -162,6 +189,16 @@ export const buildVanillaJsEmbedCodeExample = ({
   };
 
   const serializedConfig = stringifyForCode(vanillaConfig);
+
+  if (renderMode === 'inline') {
+    return `<!-- bytedesk.com -->
+<script src="${scriptBase}/embed/bytedesk-web.js"></script>
+<script>
+  const config = ${serializedConfig};
+  const bytedesk = new BytedeskWeb(config);
+  bytedesk.init();
+</script>`;
+  }
 
   return `<!-- bytedesk.com -->
 <script src="${scriptBase}/embed/bytedesk-web.js"></script>

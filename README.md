@@ -164,6 +164,70 @@ const App = () => {
 };
 ```
 
+## Inline Embed Mode
+
+Embed the chat panel directly into any page — no floating bubble required.
+
+Two modes are supported:
+
+| Mode | Description | Requires host container? |
+| --- | --- | --- |
+| `container` | Chat fills a host-provided container | Yes |
+| `fixed-right` | SDK auto-creates a right-sidebar panel on `document.body`, stays pinned when scrolling | No |
+
+### `container` — Host-managed container
+
+```tsx
+<div style={{ display: 'flex', height: '100vh' }}>
+  <main style={{ flex: 1 }}>Main content</main>
+  <aside style={{ width: 380 }}>
+    <BytedeskReact
+      mode="inline"
+      chatConfig={{ org: 'df_org_uid', t: '2', sid: 'df_rt_uid' }}
+    />
+  </aside>
+</div>
+```
+
+### `fixed-right` — Zero host dependency (auto-panel)
+
+The SDK injects a 420px panel pinned to `position: fixed; right: 0` and automatically
+reserves body `padding-right` so page content reflows around it.
+
+```tsx
+<BytedeskReact
+  mode="inline"
+  inlineConfig={{ mode: 'fixed-right', autoShow: true, width: 420 }}
+  chatConfig={{ org: 'df_org_uid', t: '2', sid: 'df_rt_uid' }}
+/>
+```
+
+**Vanilla JS:**
+
+```html
+<script src="https://cdn.weiyuai.cn/embed/bytedesk-web.js"></script>
+<script>
+  new BytedeskWeb({
+    mode: 'inline',
+    inlineConfig: { mode: 'fixed-right', autoShow: true, width: 420 },
+    chatConfig: { org: 'df_org_uid', t: '2', sid: 'df_rt_uid' },
+    locale: 'zh-cn',
+  }).init();
+</script>
+```
+
+**`inlineConfig` options:**
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mode` | `'container' \| 'fixed-right'` | `'container'` | Host container vs. SDK auto-panel |
+| `autoShow` | `boolean` | `true` | Show the panel immediately after init |
+| `showBubble` | `boolean` | `false` | Keep a floating bubble entry in inline mode |
+| `width` | `number` | `420` | Panel width in px (fixed-right only) |
+| `zIndex` | `number` | `1000` | Panel z-index (fixed-right only) |
+| `offsetTop` | `number` | `0` | Top offset in px (fixed-right only, e.g. `64` for a 64px header) |
+| `offsetBottom` | `number` | `0` | Bottom offset in px (fixed-right only, e.g. `40` for a footer) |
+
 ### Available Methods
 
 ```bash

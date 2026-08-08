@@ -88,6 +88,12 @@ export const thTh = {
       ...en.pages.basicDemo,
       title: 'การตั้งค่าพื้นฐาน Bytedesk',
       intro: 'ใช้ปุ่มลัดด้านล่างเพื่อทดลองฟีเจอร์หลักของ Bytedesk Web SDK',
+        renderModeLabel: 'โหมดการแสดงผล',
+        modeFloating: 'ลอย',
+        modeInline: 'ฝังในหน้า',
+        modeSwitchWarning: 'การสลับโหมดจะเริ่มต้น SDK ใหม่',
+        inlineDemoTitle: 'เดโมการฝังแบบ inline',
+        inlineDemoMainContent: 'พื้นที่นี้จำลองเนื้อหาหลักของหน้าโฮสต์',
       currentConfigTitle: 'การตั้งค่าปัจจุบัน',
       copyConfig: 'คัดลอก JSON การตั้งค่า',
       fieldDocs: zhCn.pages.basicDemo.fieldDocs

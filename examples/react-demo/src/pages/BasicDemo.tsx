@@ -46,6 +46,8 @@ interface BasicDemoProps {
   selectedChatProfile: DemoChatProfile;
   selectedUser: DemoUserProfile;
   isAnonymousMode: boolean;
+  isInlineDemoVisible: boolean;
+  onInlineDemoVisibilityChange: (visible: boolean) => void;
   onLocaleChange: (nextLocale: DemoLanguage) => void;
   onThemePreferenceChange: (nextTheme: 'light' | 'dark' | 'system') => void;
 }
@@ -64,9 +66,11 @@ type BytedeskRuntimeApi = {
   hideBubble?: () => void;
   showInviteDialog?: () => void;
   hideInviteDialog?: () => void;
+  destroy?: () => void;
 };
 
 type EntryButtonIconKey = 'default' | 'message' | 'robot' | 'headset' | 'sparkles' | 'bell';
+type RenderMode = 'floating' | 'inline';
 
 const ENTRY_BUTTON_ICON_MAP: Record<EntryButtonIconKey, string> = {
   default: '',
@@ -149,6 +153,8 @@ const BasicDemo = ({
   selectedChatProfile,
   selectedUser,
   isAnonymousMode,
+  isInlineDemoVisible,
+  onInlineDemoVisibilityChange,
   onLocaleChange,
   onThemePreferenceChange
 }: BasicDemoProps) => {
@@ -176,6 +182,7 @@ const BasicDemo = ({
   const [isSitePreviewModalOpen, setIsSitePreviewModalOpen] = useState<boolean>(false);
   const [sitePreviewTargetUrl, setSitePreviewTargetUrl] = useState<string>(DEFAULT_PREVIEW_TARGET_URL);
   const [sitePreviewValidationMessage, setSitePreviewValidationMessage] = useState<string>('');
+  const renderMode: RenderMode = isInlineDemoVisible ? 'inline' : 'floating';
 
   const localeValueHint = getLocaleValueHint(locale);
   const localizedCopy = useMemo(
@@ -349,6 +356,7 @@ const BasicDemo = ({
       text: undefined,
     },
     locale,
+    onHideChat: undefined,
     onVisitorInfo: (uid: string, visitorUid: string) => {
       console.log('BasicDemo 收到访客信息:', { uid, visitorUid });
     }
@@ -357,6 +365,10 @@ const BasicDemo = ({
   useEffect(() => {
     setConfig((prevConfig: BytedeskConfig) => ({
       ...prevConfig,
+      mode: renderMode,
+      inlineConfig: renderMode === 'inline'
+        ? { autoShow: true, mode: 'fixed-right', width: 420 }
+        : undefined,
       locale,
       theme: {
         ...prevConfig.theme,
@@ -409,9 +421,14 @@ const BasicDemo = ({
         text: minimizedBarTextOverride.trim() || undefined,
       },
       draggable: draggableEnabled,
+      onHideChat: renderMode === 'inline'
+        ? () => {
+            onInlineDemoVisibilityChange(false);
+          }
+        : undefined,
       buttonsConfig: multiSessionButtons
     }));
-  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile, selectedUser, isAnonymousMode, isQrCodeParamEnabled, isThreadDetailParamEnabled, isVisitorProfileParamEnabled, isCustomTitleEnabled, isBrowseInfoEnabled, bubbleMessages, selectedBubbleSwitchMode, minimizedBarTextOverride, draggableEnabled]);
+  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile, selectedUser, isAnonymousMode, isQrCodeParamEnabled, isThreadDetailParamEnabled, isVisitorProfileParamEnabled, isCustomTitleEnabled, isBrowseInfoEnabled, bubbleMessages, selectedBubbleSwitchMode, minimizedBarTextOverride, draggableEnabled, renderMode, onInlineDemoVisibilityChange]);
 
   const handleInit = () => {
     console.log('BytedeskReact initialized BasicDemo');
@@ -585,6 +602,21 @@ const BasicDemo = ({
     getBytedeskRuntime()?.setTheme?.({ mode: runtimeMode });
     onThemePreferenceChange(nextTheme);
     setLastActionApiHint(`bytedesk.setTheme({ mode: "${runtimeMode}" })`);
+  };
+
+  const handleRenderModeChange = (nextMode: RenderMode) => {
+    if (nextMode === renderMode) {
+      return;
+    }
+
+    getBytedeskRuntime()?.destroy?.();
+    setIsInviteDialogVisible(false);
+    onInlineDemoVisibilityChange(nextMode === 'inline');
+    setLastActionApiHint(`bytedesk.destroy() + <BytedeskReact mode="${nextMode}" />`);
+  };
+
+  const handleShowInlineDemo = () => {
+    handleRenderModeChange('inline');
   };
 
   const handleBubbleSwitchModeChange = (nextMode: BubbleSwitchModeSelection) => {
@@ -844,7 +876,26 @@ const BasicDemo = ({
     {
       key: 'openChat',
       label: consultButtonLabel,
+      type: 'primary' as const,
       handler: () => {
+        if (renderMode === 'inline') {
+          getBytedeskRuntime()?.destroy?.();
+          setIsInviteDialogVisible(false);
+          onInlineDemoVisibilityChange(false);
+          setLastActionApiHint('bytedesk.destroy() + bytedesk.showChat()');
+          window.setTimeout(() => {
+            (window as any).bytedesk?.showChat({
+              htmlUrl: config.htmlUrl || chatHtmlBaseUrl,
+              chatConfig: {
+                ...(config.chatConfig || {}),
+                mode: config.theme?.mode || themeMode || 'light',
+                themeMode: themePreference,
+              } as any,
+            });
+          }, 0);
+          return;
+        }
+
         const chatConfigWithTheme = {
           ...(config.chatConfig || {}),
           mode: config.theme?.mode || themeMode || 'light',
@@ -856,6 +907,12 @@ const BasicDemo = ({
         });
         setLastActionApiHint(`bytedesk.showChat({ htmlUrl: "${config.htmlUrl || chatHtmlBaseUrl}", chatConfig: { ${chatConfigHint}, mode: "${config.theme?.mode || themeMode || 'light'}", themeMode: "${themePreference}" } })`);
       }
+    },
+    {
+      key: 'showInlineDemo',
+      label: locale === 'en' ? 'Inline embed demo' : '演示内联嵌入',
+      type: renderMode === 'inline' ? 'primary' as const : 'default' as const,
+      handler: handleShowInlineDemo,
     },
     {
       key: 'closeChat',
@@ -967,16 +1024,22 @@ const BasicDemo = ({
   const runtimeEmbedCodeExample = useMemo(() => buildRuntimeEmbedCodeExample({
     config,
     isAnonymousMode,
+    renderMode,
     selectedUser,
     themeMode,
-  }), [config, isAnonymousMode, selectedUser, themeMode]);
+  }), [config, isAnonymousMode, renderMode, selectedUser, themeMode]);
 
   const vanillaJsEmbedCodeExample = useMemo(() => buildVanillaJsEmbedCodeExample({
     config,
     isAnonymousMode,
+    renderMode,
     selectedUser,
     themeMode,
-  }), [config, isAnonymousMode, selectedUser, themeMode]);
+  }), [config, isAnonymousMode, renderMode, selectedUser, themeMode]);
+
+  const visibleQuickActions = renderMode === 'inline'
+    ? quickActions.filter((action) => !['toggleButtonVisibility', 'toggleBubbleVisibility', 'toggleInviteVisibility'].includes(action.key))
+    : quickActions;
 
   return (
     <PageContainer>
@@ -1004,7 +1067,7 @@ const BasicDemo = ({
       </Card>
 
       <BasicDemoControlsCard
-        quickActions={quickActions}
+        quickActions={visibleQuickActions}
         togglePlacementLabel={messages.common.buttons.togglePlacement}
         placementLabel={placementLabel}
         bubbleSwitchModeLabel={localizedCopy.switchModeLabel}
@@ -1169,7 +1232,10 @@ const BasicDemo = ({
       </Card>
 
       <BytedeskReact
+        key={renderMode}
         {...config}
+        mode={renderMode}
+        inlineConfig={renderMode === 'inline' ? { autoShow: true, mode: 'fixed-right', width: 420 } : undefined}
         onInit={handleInit}
       />
 

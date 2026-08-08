@@ -172,6 +172,17 @@ export interface MessageBubbleClickEvent {
 export interface BytedeskConfig {
   isDebug?: boolean; // 是否开启调试模式
   forceRefresh?: boolean; // 是否强制刷新页面
+  mode?: 'floating' | 'inline'; // 渲染模式
+  container?: string | HTMLElement; // inline 模式挂载容器
+  inlineConfig?: {
+    autoShow?: boolean; // inline 模式是否自动显示
+    showBubble?: boolean; // inline 模式是否保留浮动气泡
+    mode?: 'container' | 'fixed-right'; // inline 容器模式：宿主容器/SDK 自动固定在页面右侧
+    width?: number; // fixed-right 模式宽度
+    zIndex?: number; // fixed-right 模式层级
+    offsetTop?: number; // fixed-right 模式顶部偏移（避开站点 header）
+    offsetBottom?: number; // fixed-right 模式底部偏移（避开站点 footer）
+  };
   apiUrl?: string; // API基础URL
   htmlUrl?: string; // Html基础URL，推荐传站点根地址
   embedUrl?: string; // 嵌入式外部网页 URL，传入后将直接通过 iframe 展示指定页面（如文档、帮助中心等）

@@ -206,6 +206,7 @@ function ThemedRouterApp() {
   const [activeUserKey, setActiveUserKey] = useState<DemoUserKey>(getStoredUserKey);
   const [isAnonymousMode, setIsAnonymousMode] = useState<boolean>(getStoredAnonymousMode);
   const [chatProfileKey, setChatProfileKey] = useState<ChatProfileKey>(getStoredChatProfileKey);
+  const [isInlineDemoVisible, setIsInlineDemoVisible] = useState(false);
   const didSyncVisitorIdentityRef = useRef(false);
   const systemTheme = useSystemTheme();
   const locale = useMemo<DemoLocale>(() => {
@@ -334,6 +335,12 @@ function ThemedRouterApp() {
     [chatProfileKey]
   );
 
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setIsInlineDemoVisible(false);
+    }
+  }, [location.pathname]);
+
   if (location.pathname === '/preview/basic') {
     return (
       <ConfigProvider theme={themeConfig} componentSize="middle">
@@ -361,7 +368,9 @@ function ThemedRouterApp() {
           activeUserKey={activeUserKey}
           activeUserProfile={activeUserProfile}
           isAnonymousMode={isAnonymousMode}
+          isInlineDemoVisible={isInlineDemoVisible}
           selectedChatProfile={selectedChatProfile}
+          onInlineDemoVisibilityChange={setIsInlineDemoVisible}
           onLocaleChange={handleLocaleChange}
           onThemeChange={setThemeMode}
           onActiveUserChange={setActiveUserKey}
@@ -380,10 +389,12 @@ interface AppLayoutProps {
   activeUserKey: DemoUserKey;
   activeUserProfile: DemoUserProfile;
   isAnonymousMode: boolean;
+  isInlineDemoVisible: boolean;
   selectedChatProfile: DemoChatProfile;
   messages: LocaleMessages;
   languageOptions: { value: DemoLocale; label: string }[];
   themeOptions: { value: ThemeMode; label: string }[];
+  onInlineDemoVisibilityChange: (visible: boolean) => void;
   onLocaleChange: (nextLocale: DemoLocale) => void;
   onThemeChange: (nextTheme: ThemeMode) => void;
   onActiveUserChange: (nextUser: DemoUserKey) => void;
@@ -402,10 +413,12 @@ function AppLayout({
   activeUserKey,
   activeUserProfile,
   isAnonymousMode,
+  isInlineDemoVisible,
   selectedChatProfile,
   messages,
   languageOptions,
   themeOptions,
+  onInlineDemoVisibilityChange,
   onLocaleChange,
   onThemeChange,
   onActiveUserChange,
@@ -622,7 +635,7 @@ function AppLayout({
 
   return (
     <Layout style={{ minHeight: '100vh', background: token.colorBgLayout }}>
-      <Layout.Header
+        <Layout.Header
         style={{
           background: token.colorBgContainer,
           borderBottom: `1px solid ${token.colorSplit}`,
@@ -925,8 +938,8 @@ function AppLayout({
             </Button>
           </Dropdown>
         </div>
-      </Layout.Header>
-      <Layout.Content style={{ padding: 0, background: token.colorBgLayout }}>
+        </Layout.Header>
+        <Layout.Content style={{ padding: 0, background: token.colorBgLayout }}>
         <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route
@@ -939,6 +952,8 @@ function AppLayout({
                   selectedChatProfile={selectedChatProfile}
                   selectedUser={activeUserProfile}
                   isAnonymousMode={isAnonymousMode}
+                  isInlineDemoVisible={isInlineDemoVisible}
+                  onInlineDemoVisibilityChange={onInlineDemoVisibilityChange}
                   onLocaleChange={(nextLocale) => onLocaleChange(nextLocale as DemoLocale)}
                   onThemePreferenceChange={(nextTheme) => onThemeChange(nextTheme as ThemeMode)}
                 />
@@ -1014,8 +1029,8 @@ function AppLayout({
             />
           </Routes>
         </Suspense>
-      </Layout.Content>
-      <Layout.Footer
+        </Layout.Content>
+        <Layout.Footer
         style={{
           background: token.colorBgContainer,
           borderTop: `1px solid ${token.colorSplit}`,
@@ -1035,7 +1050,7 @@ function AppLayout({
           </a>
           <span style={{ marginLeft: 8 }}>v{APP_VERSION}</span>
         </div>
-      </Layout.Footer>
+        </Layout.Footer>
     </Layout>
   );
 }

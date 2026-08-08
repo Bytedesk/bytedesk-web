@@ -200,6 +200,12 @@ export const msMy = {
     basicDemo: {
       title: 'Tetapan asas Bytedesk',
       intro: 'Gunakan tindakan pantas di bawah untuk mencuba ciri biasa Bytedesk Web SDK.',
+        renderModeLabel: 'Mod paparan',
+        modeFloating: 'Terapung',
+        modeInline: 'Terbenam dalam halaman',
+        modeSwitchWarning: 'Menukar mod akan memulakan semula SDK.',
+        inlineDemoTitle: 'Demo benaman inline',
+        inlineDemoMainContent: 'Kawasan ini mensimulasikan kandungan utama halaman hos.',
       themeButtonLabel: 'Tukar warna navigasi',
       themeTextButtonLabel: 'Tukar warna teks navigasi',
       bubbleTitle: 'Perlukan bantuan?',

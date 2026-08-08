@@ -198,6 +198,12 @@ export const en = {
     basicDemo: {
       title: 'Bytedesk Basic Setup',
       intro: 'Use the quick actions below to experience common Bytedesk Web SDK features.',
+      renderModeLabel: 'Render Mode',
+      modeFloating: 'Floating',
+      modeInline: 'Inline',
+      modeSwitchWarning: 'Switching mode will re-initialize the SDK.',
+      inlineDemoTitle: 'Inline Embed Demo',
+      inlineDemoMainContent: 'This area simulates the host page main content.',
       themeButtonLabel: 'Switch nav color',
       themeTextButtonLabel: 'Switch nav text color',
       bubbleTitle: 'Need help?',
