@@ -41,6 +41,9 @@ const HelpcenterDemo = ({
     thread: true,
     messages: true
   });
+  const [isInlineDocVisible, setIsInlineDocVisible] = useState(false);
+
+  const helpDocEmbedUrl = 'https://www.weiyuai.cn/docs/zh-CN/?showBytedesk=0';
 
   const chatConfig = useMemo<NonNullable<BytedeskConfig['chatConfig']>>(() => ({
     ...selectedChatProfile.chatConfig,
@@ -158,7 +161,18 @@ const HelpcenterDemo = ({
       message.warning('showEmbed 方法未加载，请刷新页面（Cmd+Shift+R）后重试');
       return;
     }
-    bytedesk.showEmbed('https://www.weiyuai.cn/docs/zh-CN/?showBytedesk=0', '微语帮助文档');
+    bytedesk.showEmbed(helpDocEmbedUrl, '微语帮助文档');
+  };
+
+  const handleToggleInlineDocEmbed = () => {
+    const nextVisible = !isInlineDocVisible;
+    (window as any).bytedesk?.destroy?.();
+    setIsInlineDocVisible(nextVisible);
+  };
+
+  const handleInlineDocHide = () => {
+    (window as any).bytedesk?.destroy?.();
+    setIsInlineDocVisible(false);
   };
 
   return (
@@ -210,6 +224,9 @@ const HelpcenterDemo = ({
             <Button type="primary" onClick={openEmbedWindow}>
               {messages.pages.helpcenterDemo.openEmbedDocButton}
             </Button>
+            <Button type={isInlineDocVisible ? 'primary' : 'default'} onClick={handleToggleInlineDocEmbed}>
+              {isInlineDocVisible ? '关闭右侧文档' : '页面右侧内嵌文档'}
+            </Button>
           </Space>
 
           <Alert
@@ -249,7 +266,20 @@ const HelpcenterDemo = ({
         </Space>
       </Card>
 
-      <BytedeskReact {...config} />
+      {isInlineDocVisible ? (
+        <BytedeskReact
+          key="inline-doc"
+          mode="inline"
+          inlineConfig={{ mode: 'fixed-right', autoShow: true, width: 480 }}
+          embedUrl={helpDocEmbedUrl}
+          htmlUrl={htmlBaseUrl}
+          theme={{ mode: themeMode || 'light' }}
+          locale={locale}
+          onHideChat={handleInlineDocHide}
+        />
+      ) : (
+        <BytedeskReact {...config} />
+      )}
     </PageContainer>
   );
 };

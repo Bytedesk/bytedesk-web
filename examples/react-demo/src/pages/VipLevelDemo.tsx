@@ -14,7 +14,7 @@
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Alert, Button, Card, Table, Typography, Space, Tag, theme as antdTheme, FloatButton } from 'antd';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
@@ -135,6 +135,16 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
         (window as any).bytedesk?.hideChat();
     };
 
+    const handleToggleInlineDemo = () => {
+        if (isInlineDemoVisible) {
+            (window as any).bytedesk?.destroy?.();
+            setIsInlineDemoVisible(false);
+        } else {
+            (window as any).bytedesk?.destroy?.();
+            setIsInlineDemoVisible(true);
+        }
+    };
+
     // 获取VIP等级标签颜色
     const getVipLevelColor = (level: number) => {
         switch (level) {
@@ -202,6 +212,7 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     const vipPayloadEncoded = useMemo(() => encodeURIComponent(vipPayloadJson), [vipPayloadJson]);
     const chatConfigHint = formatChatConfigQuery(selectedChatProfile.chatConfig);
     const consultButtonLabel = getConsultButtonLabel(selectedChatProfile, locale);
+    const [isInlineDemoVisible, setIsInlineDemoVisible] = useState(false);
     const codeBlockStyle = useMemo(() => ({
         margin: 0,
         padding: '12px 14px',
@@ -308,6 +319,9 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                     <Space wrap>
                         <Button type="primary" onClick={handleShowChat}>
                             {consultButtonLabel}
+                        </Button>
+                        <Button type={isInlineDemoVisible ? 'primary' : 'default'} onClick={handleToggleInlineDemo}>
+                            {isInlineDemoVisible ? '关闭右侧演示' : '演示内联嵌入'}
                         </Button>
                         <Button onClick={handleHideChat}>
                             {messages.common.buttons.closeChat}
@@ -433,7 +447,24 @@ const VipLevelDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                 </Space>
             </Card>
 
-            <BytedeskReact {...config} />
+            {isInlineDemoVisible ? (
+                <BytedeskReact
+                    key="inline-demo"
+                    mode="inline"
+                    inlineConfig={{ mode: 'fixed-right', autoShow: true, width: 420 }}
+                    htmlUrl={htmlBaseUrl}
+                    {...(demoApiUrl ? { apiUrl: demoApiUrl } : {})}
+                    chatConfig={{
+                        ...selectedChatProfile.chatConfig,
+                        ...(isAnonymousMode ? {} : { visitorUid: currentUser.visitorUid, nickname: currentUser.nickname, avatar: currentUser.avatar, vipLevel: String(currentUser.vipLevel) }),
+                    }}
+                    locale={locale}
+                    theme={{ mode: themeMode }}
+                    onHideChat={() => { (window as any).bytedesk?.destroy?.(); setIsInlineDemoVisible(false); }}
+                />
+            ) : (
+                <BytedeskReact {...config} />
+            )}
 
             <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
         </PageContainer>

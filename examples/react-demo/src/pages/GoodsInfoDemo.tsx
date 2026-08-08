@@ -161,6 +161,7 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
   const [isGoodsDetailModalOpen, setIsGoodsDetailModalOpen] = useState(false);
   const [clickedOrderDetail, setClickedOrderDetail] = useState<DemoOrderInfo>();
   const [isOrderDetailModalOpen, setIsOrderDetailModalOpen] = useState(false);
+  const [isInlineDemoVisible, setIsInlineDemoVisible] = useState(false);
 
   useEffect(() => {
     if (!orgUid) {
@@ -439,6 +440,16 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
   const handleShowChat = () => (window as any).bytedesk?.showChat();
   const handleHideChat = () => (window as any).bytedesk?.hideChat();
 
+  const handleToggleInlineDemo = () => {
+    if (isInlineDemoVisible) {
+      (window as any).bytedesk?.destroy?.();
+      setIsInlineDemoVisible(false);
+    } else {
+      (window as any).bytedesk?.destroy?.();
+      setIsInlineDemoVisible(true);
+    }
+  };
+
   const chatPageUrl = useMemo(() => {
     const baseHtmlUrl = (config.htmlUrl || 'https://cdn.weiyuai.cn/chat').replace(/\/?chat(?:\/thread)?\/?$/, '');
     const params = new URLSearchParams();
@@ -628,6 +639,9 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
 
           <Space wrap>
             <Button type="primary" onClick={handleShowChat} disabled={!selectedGoods}>{consultButtonLabel}</Button>
+            <Button type={isInlineDemoVisible ? 'primary' : 'default'} onClick={handleToggleInlineDemo}>
+              {isInlineDemoVisible ? '关闭右侧演示' : '演示内联嵌入'}
+            </Button>
             <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
             <Button onClick={() => window.open(chatPageUrl, '_blank', 'width=420,height=680,resizable=yes,scrollbars=yes')} disabled={!selectedGoods}>
               {messages.common.buttons.openInNewWindow}
@@ -859,7 +873,27 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
         ) : null}
       </Modal>
 
-      <BytedeskReact {...config} />
+      {isInlineDemoVisible ? (
+        <BytedeskReact
+          key="inline-demo"
+          mode="inline"
+          inlineConfig={{ mode: 'fixed-right', autoShow: true, width: 420 }}
+          htmlUrl={htmlBaseUrl}
+          {...(demoApiUrl ? { apiUrl: demoApiUrl } : {})}
+          chatConfig={{
+            ...selectedChatProfile.chatConfig,
+            ...(isAnonymousMode ? {} : { visitorUid: selectedUser.visitorUid, nickname: selectedUser.nickname, avatar: selectedUser.avatar }),
+            autoSendBizInfo: '1',
+            ...(goodsInfoPayload ? { goodsInfo: JSON.stringify(goodsInfoPayload) } : {}),
+            ...(selectedShop ? { extra: JSON.stringify({ type: 'type', test: 'test', shopUid: selectedShop.shopUid }) } : {}),
+          }}
+          locale={locale}
+          theme={{ mode: themeMode }}
+          onHideChat={() => { (window as any).bytedesk?.destroy?.(); setIsInlineDemoVisible(false); }}
+        />
+      ) : (
+        <BytedeskReact {...config} />
+      )}
 
       <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
     </PageContainer>

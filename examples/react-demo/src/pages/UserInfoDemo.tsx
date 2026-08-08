@@ -53,6 +53,7 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     const { token } = antdTheme.useToken();
     const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
     const [visitorIdentity, setVisitorIdentity] = useState<VisitorIdentity>({ uid: '', visitorUid: '' });
+    const [isInlineDemoVisible, setIsInlineDemoVisible] = useState(false);
     const bubbleNickname = isAnonymousMode ? messages.pages.userInfoDemo.anonymousUserLabel : selectedUser.nickname;
     const users = useMemo(() => (Object.keys(DEMO_USER_PRESETS) as DemoUserKey[]).map((key) => ({
         key,
@@ -133,6 +134,16 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
     const handleHideChat = () => {
         console.log("hideChat");
         (window as any).bytedesk?.hideChat();
+    };
+
+    const handleToggleInlineDemo = () => {
+        if (isInlineDemoVisible) {
+            (window as any).bytedesk?.destroy?.();
+            setIsInlineDemoVisible(false);
+        } else {
+            (window as any).bytedesk?.destroy?.();
+            setIsInlineDemoVisible(true);
+        }
     };
 
     const docLinks = [
@@ -305,6 +316,9 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                     </Space>
                     <Space wrap>
                         <Button type="primary" onClick={handleShowChat}>{consultButtonLabel}</Button>
+                        <Button type={isInlineDemoVisible ? 'primary' : 'default'} onClick={handleToggleInlineDemo}>
+                            {isInlineDemoVisible ? '关闭右侧演示' : '演示内联嵌入'}
+                        </Button>
                         <Button onClick={handleHideChat}>{messages.common.buttons.closeChat}</Button>
                         <Button onClick={() => window.open(sampleUrl, '_blank', 'width=420,height=680,resizable=yes,scrollbars=yes')}>
                             {messages.common.buttons.openInNewWindow}
@@ -423,7 +437,24 @@ const UserInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, is
                 </Space>
             </Card>
 
-            <BytedeskReact {...config} />
+            {isInlineDemoVisible ? (
+                <BytedeskReact
+                    key="inline-demo"
+                    mode="inline"
+                    inlineConfig={{ mode: 'fixed-right', autoShow: true, width: 420 }}
+                    htmlUrl={htmlBaseUrl}
+                    {...(demoApiUrl ? { apiUrl: demoApiUrl } : {})}
+                    chatConfig={{
+                        ...selectedChatProfile.chatConfig,
+                        ...(isAnonymousMode ? {} : { visitorUid: selectedUser.visitorUid, nickname: selectedUser.nickname, avatar: selectedUser.avatar }),
+                    }}
+                    locale={locale}
+                    theme={{ mode: themeMode }}
+                    onHideChat={() => { (window as any).bytedesk?.destroy?.(); setIsInlineDemoVisible(false); }}
+                />
+            ) : (
+                <BytedeskReact {...config} />
+            )}
 
             <FloatButton.BackTop style={{ marginRight: 200, marginBottom: -30 }}/>
         </PageContainer>

@@ -2582,9 +2582,12 @@ export default class BytedeskWeb {
     const embedNavBar = this.createEmbedNavBar();
     frameContainer.appendChild(embedNavBar);
 
+    const wasEmbedUrl = !!this.config.embedUrl;
+
     // 如果当前已处于嵌入模式，预显示导航栏（避免闪烁）
-    if (this.isEmbedMode && this.embedNavBar) {
+    if ((this.isEmbedMode || (this.isInlineMode() && wasEmbedUrl)) && this.embedNavBar) {
       this.embedNavBar.style.display = "flex";
+      this.isEmbedMode = true;
     }
 
     const iframe = document.createElement("iframe");
