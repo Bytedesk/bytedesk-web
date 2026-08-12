@@ -138,6 +138,8 @@ export const viVn = {
       system: 'Theo he thong'
     },
     officialSiteLabel: 'Trang chinh thuc Bytedesk',
+    docsLabel: 'Tài liệu',
+    adminLabel: 'Quản trị',
     resetAnonymousVisitorLabel: 'Dat lai khach an danh',
     resetAnonymousVisitorSuccess: 'Da dat lai khach an danh',
     docLinks: {

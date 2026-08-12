@@ -41,6 +41,12 @@ export const POST_MESSAGE_WINDOW_DRAG_START = "WINDOW_DRAG_START";
 export const POST_MESSAGE_WINDOW_DRAG_MOVE = "WINDOW_DRAG_MOVE";
 export const POST_MESSAGE_WINDOW_DRAG_END = "WINDOW_DRAG_END";
 export const POST_MESSAGE_AUTO_SEND_TEXT = "AUTO_SEND_TEXT";
+// 切换显示模式：floating（弹窗） <-> inline（嵌入页面右侧）
+export const POST_MESSAGE_TOGGLE_VIEW_MODE = "TOGGLE_VIEW_MODE";
+// URL 参数：当前显示模式，供 iframe 内 ChatHeader 渲染对应切换按钮
+export const URL_PARAM_VIEW_MODE = "viewMode";
+// URL 参数：是否显示“切换显示模式”按钮（默认显示，传 0/false 隐藏）
+export const URL_PARAM_TOGGLE_VIEW_MODE_BUTTON = "toggleViewModeButton";
 // 
 export const BYTEDESK_UID = "BYTEDESK_UID";
 export const BYTEDESK_VISITOR_UID = "BYTEDESK_VISITOR_UID";

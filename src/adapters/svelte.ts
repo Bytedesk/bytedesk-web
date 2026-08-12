@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2024-12-28 15:08:00
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2024-12-30 17:06:57
+ * @LastEditTime: 2026-08-08 22:00:00
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -29,54 +29,93 @@ init({
   initialLocale: getLocaleFromNavigator()
 });
 
+const getContainerIdentity = (container: BytedeskConfig['container']) => {
+  if (typeof container === 'string') {
+    return container;
+  }
+  if (container instanceof HTMLElement) {
+    return container;
+  }
+  return null;
+};
+
 // 全局单例实例
 let globalBytedeskInstance: BytedeskWeb | null = null;
 let activeComponentCount = 0;
+let globalInstanceMode: BytedeskConfig['mode'] = 'floating';
+let globalInstanceContainer: string | HTMLElement | null = null;
 
 export const BytedeskSvelte = (node: HTMLElement, config: BytedeskConfig & { locale?: string }) => {
   logger.debug('config', config, node);
 
-  onMount(() => {
-    activeComponentCount++;
-    
+  const setupInstance = (cfg: BytedeskConfig & { locale?: string }) => {
+    const shouldUseHostContainer = cfg.mode === 'inline' && cfg.inlineConfig?.mode !== 'fixed-right';
+    const effectiveConfig = shouldUseHostContainer
+      ? { ...cfg, container: cfg.container || node }
+      : { ...cfg };
+
     const fullConfig = {
-      ...config,
-      locale: config.locale || getLocaleFromNavigator() || 'zh-cn'
+      ...effectiveConfig,
+      locale: cfg.locale || getLocaleFromNavigator() || 'zh-cn',
     };
 
-    // 检查是否已经存在全局实例
-    if (globalBytedeskInstance) {
-      // console.log('BytedeskSvelte: 使用现有全局实例，当前活跃组件数:', activeComponentCount);
-      return;
+    const nextMode = fullConfig.mode || 'floating';
+    const nextContainerIdentity = getContainerIdentity(fullConfig.container);
+
+    // Mode or container changed → destroy and recreate
+    if (
+      globalBytedeskInstance &&
+      (
+        globalInstanceMode !== nextMode ||
+        (nextMode === 'inline' && globalInstanceContainer !== nextContainerIdentity)
+      )
+    ) {
+      globalBytedeskInstance.destroy();
+      globalBytedeskInstance = null;
+      delete (window as any).bytedesk;
     }
 
-    // 创建新的全局实例
-    // console.log('BytedeskSvelte: 创建新的全局实例');
-    globalBytedeskInstance = new BytedeskWeb(fullConfig);
-    
-    globalBytedeskInstance.init();
+    globalInstanceMode = nextMode;
+    globalInstanceContainer = nextContainerIdentity;
+
+    if (!globalBytedeskInstance) {
+      globalBytedeskInstance = new BytedeskWeb(fullConfig);
+      (window as any).bytedesk = globalBytedeskInstance;
+      globalBytedeskInstance.init();
+    } else {
+      (window as any).bytedesk = globalBytedeskInstance;
+      globalBytedeskInstance.setConfig(fullConfig, { replaceChatConfig: true, replaceTabsConfig: true });
+    }
+  };
+
+  onMount(() => {
+    activeComponentCount++;
+    setupInstance(config);
   });
 
   onDestroy(() => {
     activeComponentCount--;
-    // console.log('BytedeskSvelte: 组件卸载，当前活跃组件数:', activeComponentCount);
-    
-    // 如果没有活跃组件了，清理全局实例
+
     if (activeComponentCount <= 0) {
-      // console.log('BytedeskSvelte: 没有活跃组件，清理全局实例');
-              setTimeout(() => {
-          if (globalBytedeskInstance && activeComponentCount <= 0) {
-            globalBytedeskInstance.destroy();
-            globalBytedeskInstance = null;
-            activeComponentCount = 0;
-          }
-        }, 100);
+      setTimeout(() => {
+        if (globalBytedeskInstance && activeComponentCount <= 0) {
+          globalBytedeskInstance.destroy();
+          globalBytedeskInstance = null;
+          globalInstanceMode = 'floating';
+          globalInstanceContainer = null;
+          delete (window as any).bytedesk;
+          activeComponentCount = 0;
+        }
+      }, 100);
     }
   });
 
   return {
+    update(nextConfig: BytedeskConfig & { locale?: string }) {
+      setupInstance(nextConfig);
+    },
     destroy() {
-      // 这里不需要调用 destroy，因为 onDestroy 已经处理了
+      // Cleanup handled by onDestroy
     }
   };
 }; 

@@ -26,6 +26,8 @@ export const thTh = {
       system: 'ตามระบบ'
     },
     officialSiteLabel: 'เว็บไซต์ทางการ Bytedesk',
+    docsLabel: 'เอกสาร',
+    adminLabel: 'ผู้ดูแลระบบ',
     resetAnonymousVisitorLabel: 'รีเซ็ตผู้เยี่ยมชมแบบไม่ระบุตัวตน',
     resetAnonymousVisitorSuccess: 'รีเซ็ตผู้เยี่ยมชมแบบไม่ระบุตัวตนแล้ว'
   },

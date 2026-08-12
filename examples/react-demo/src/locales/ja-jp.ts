@@ -139,6 +139,8 @@ export const jaJp = {
       system: 'システムに従う'
     },
     officialSiteLabel: 'Bytedesk 公式サイト',
+    docsLabel: 'ドキュメント',
+    adminLabel: '管理画面',
     resetAnonymousVisitorLabel: '匿名訪問者をリセット',
     resetAnonymousVisitorSuccess: '匿名訪問者をリセットしました',
     docLinks: {

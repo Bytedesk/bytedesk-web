@@ -138,6 +138,8 @@ export const msMy = {
       system: 'Ikut sistem'
     },
     officialSiteLabel: 'Laman rasmi Bytedesk',
+    docsLabel: 'Dokumen',
+    adminLabel: 'Admin',
     resetAnonymousVisitorLabel: 'Set semula pelawat tanpa nama',
     resetAnonymousVisitorSuccess: 'Pelawat tanpa nama telah diset semula',
     docLinks: {

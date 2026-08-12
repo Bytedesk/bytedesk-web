@@ -4,7 +4,7 @@
  * @LastEditors: jackning 270580156@qq.com
  * @LastEditTime: 2025-09-22 10:31:18
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 // @ts-ignore
 import { BytedeskReact } from '@bytedesk/web/adapters/react';
 // @ts-ignore
@@ -169,6 +169,7 @@ const BasicDemo = ({
   const [isEntryButtonTextEnabled, setIsEntryButtonTextEnabled] = useState<boolean>(true);
   const [entryButtonTextOverride, setEntryButtonTextOverride] = useState<string>(DEFAULT_ENTRY_BUTTON_TEXT);
   const [areEntryButtonsVisible, setAreEntryButtonsVisible] = useState<boolean>(true);
+  const [isToggleViewModeButtonVisible, setIsToggleViewModeButtonVisible] = useState<boolean>(true);
   const [qrCodeImageUrl, setQrCodeImageUrl] = useState<string>('https://www.weiyuai.cn/assets/images/qrcode/wechat.png');
   const [isInviteDialogVisible, setIsInviteDialogVisible] = useState<boolean>(false);
   const [isCustomTitleEnabled, setIsCustomTitleEnabled] = useState<boolean>(false);
@@ -183,6 +184,11 @@ const BasicDemo = ({
   const [sitePreviewTargetUrl, setSitePreviewTargetUrl] = useState<string>(DEFAULT_PREVIEW_TARGET_URL);
   const [sitePreviewValidationMessage, setSitePreviewValidationMessage] = useState<string>('');
   const renderMode: RenderMode = isInlineDemoVisible ? 'inline' : 'floating';
+  // 标记“切换显示模式 -> 浮窗”后需要主动打开浮窗对话。
+  // 由 handleToggleViewMode 置位，在 renderMode 变为 'floating' 的副作用中消费。
+  //（React 保证子组件 BytedeskReact 的挂载副作用先于父组件副作用执行，
+  //  因此父副作用运行时 window.bytedesk 已是新创建的浮窗实例。）
+  const pendingShowFloatingChatRef = useRef(false);
 
   const localeValueHint = getLocaleValueHint(locale);
   const localizedCopy = useMemo(
@@ -304,6 +310,7 @@ const BasicDemo = ({
     marginSide: 20,
     autoPopup: false,
     draggable: draggableEnabled,
+    showToggleViewModeButton: isToggleViewModeButtonVisible,
     inviteConfig: {
       show: false,
       delay: 1000,
@@ -421,14 +428,16 @@ const BasicDemo = ({
         text: minimizedBarTextOverride.trim() || undefined,
       },
       draggable: draggableEnabled,
+      showToggleViewModeButton: isToggleViewModeButtonVisible,
       onHideChat: renderMode === 'inline'
         ? () => {
             onInlineDemoVisibilityChange(false);
           }
         : undefined,
-      buttonsConfig: multiSessionButtons
+      buttonsConfig: multiSessionButtons,
+      onToggleViewMode: handleToggleViewMode,
     }));
-  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile, selectedUser, isAnonymousMode, isQrCodeParamEnabled, isThreadDetailParamEnabled, isVisitorProfileParamEnabled, isCustomTitleEnabled, isBrowseInfoEnabled, bubbleMessages, selectedBubbleSwitchMode, minimizedBarTextOverride, draggableEnabled, renderMode, onInlineDemoVisibilityChange]);
+  }, [locale, multiSessionButtons, themeMode, messages, selectedChatProfile, selectedUser, isAnonymousMode, isQrCodeParamEnabled, isThreadDetailParamEnabled, isVisitorProfileParamEnabled, isCustomTitleEnabled, isBrowseInfoEnabled, bubbleMessages, selectedBubbleSwitchMode, minimizedBarTextOverride, draggableEnabled, isToggleViewModeButtonVisible, renderMode, onInlineDemoVisibilityChange]);
 
   const handleInit = () => {
     console.log('BytedeskReact initialized BasicDemo');
@@ -616,8 +625,55 @@ const BasicDemo = ({
   };
 
   const handleShowInlineDemo = () => {
-    handleRenderModeChange('inline');
+    if (renderMode === 'inline') {
+      handleRenderModeChange('floating');
+    } else {
+      handleRenderModeChange('inline');
+    }
   };
+
+  // 由 iframe 内 ChatHeader“切换显示模式”按钮通过 onToggleViewMode 回调触发：
+  // - 切到内联：关闭弹窗，重建为右侧内联栏（autoShow 自动展示对话）
+  // - 切到弹窗：关闭右侧内联栏，重建为浮窗，并主动打开弹窗（保持对话可见）
+  const handleToggleViewMode = (nextMode: 'floating' | 'inline') => {
+    // handleRenderModeChange 内部会 destroy 当前实例并切换渲染模式（触发 remount）
+    handleRenderModeChange(nextMode);
+
+    if (nextMode === 'floating') {
+      // inline -> floating：标记需要在浮窗实例 remount 后打开对话。
+      // 不在此处直接 showChat：此时 window.bytedesk 仍是旧的内联实例，
+      // 真正的新浮窗实例要等 React 完成 remount（适配器副作用）后才会创建。
+      pendingShowFloatingChatRef.current = true;
+      setLastActionApiHint('bytedesk.destroy() + <BytedeskReact mode="floating" /> + bytedesk.showChat()');
+    } else {
+      setLastActionApiHint('bytedesk.destroy() + <BytedeskReact mode="inline" />');
+    }
+  };
+
+  // 浮窗 remount 完成后，若标记了“切换到浮窗需打开对话”，则主动打开浮窗。
+  // React 保证子组件（BytedeskReact 适配器）的挂载副作用先于本父组件副作用执行，
+  // 因此这里的 window.bytedesk 已是新创建的浮窗实例。
+  useEffect(() => {
+    if (renderMode !== 'floating' || !pendingShowFloatingChatRef.current) {
+      return;
+    }
+
+    pendingShowFloatingChatRef.current = false;
+
+    const target = getBytedeskRuntime();
+    if (!target || typeof target.showChat !== 'function') {
+      return;
+    }
+
+    target.showChat({
+      htmlUrl: config.htmlUrl || chatHtmlBaseUrl,
+      chatConfig: {
+        ...(config.chatConfig || {}),
+        mode: config.theme?.mode || themeMode || 'light',
+        themeMode: themePreference,
+      } as any,
+    });
+  }, [renderMode, config.htmlUrl, config.chatConfig, config.theme, themeMode, themePreference, chatHtmlBaseUrl]);
 
   const handleBubbleSwitchModeChange = (nextMode: BubbleSwitchModeSelection) => {
     setSelectedBubbleSwitchMode(nextMode);
@@ -719,6 +775,14 @@ const BasicDemo = ({
       }))
     }));
     setLastActionApiHint(`setConfig({ buttonConfig: { show: ${nextVisible} }, buttonsConfig: [{ show: ${nextVisible} }] })`);
+  };
+
+  // 切换 ChatHeader“切换显示模式”按钮的可见性（通过 SDK 配置 showToggleViewModeButton 控制）
+  const handleToggleViewModeButtonVisibility = () => {
+    const nextVisible = !isToggleViewModeButtonVisible;
+    setIsToggleViewModeButtonVisible(nextVisible);
+    getBytedeskRuntime()?.setConfig?.({ showToggleViewModeButton: nextVisible });
+    setLastActionApiHint(`setConfig({ showToggleViewModeButton: ${nextVisible} })`);
   };
 
   const handleToggleBubbleVisibility = () => {
@@ -910,7 +974,9 @@ const BasicDemo = ({
     },
     {
       key: 'showInlineDemo',
-      label: locale === 'en' ? 'Inline embed demo' : '演示内联嵌入',
+      label: locale === 'en'
+        ? (renderMode === 'inline' ? 'Close inline demo' : 'Inline embed demo')
+        : (renderMode === 'inline' ? '关闭内联演示' : '演示内联嵌入'),
       type: renderMode === 'inline' ? 'primary' as const : 'default' as const,
       handler: handleShowInlineDemo,
     },
@@ -960,6 +1026,14 @@ const BasicDemo = ({
       label: `${messages.common.buttons.showInvite}: ${isInviteDialogVisible ? messages.pages.basicDemo.navbarHidden : messages.pages.basicDemo.navbarShown}`,
       type: isInviteDialogVisible ? 'primary' as const : 'default' as const,
       handler: handleToggleInviteVisibility
+    },
+    {
+      key: 'toggleViewModeButtonVisibility',
+      label: locale === 'en'
+        ? `Toggle button: ${isToggleViewModeButtonVisible ? 'shown' : 'hidden'}`
+        : `切换按钮: ${isToggleViewModeButtonVisible ? '显示中' : '已隐藏'}`,
+      type: isToggleViewModeButtonVisible ? 'primary' as const : 'default' as const,
+      handler: handleToggleViewModeButtonVisibility
     },
   ];
 

@@ -136,6 +136,8 @@ export const en = {
       system: 'System'
     },
     officialSiteLabel: 'Bytedesk Official Site',
+    docsLabel: 'Docs',
+    adminLabel: 'Admin',
     resetAnonymousVisitorLabel: 'Reset anonymous visitor',
     resetAnonymousVisitorSuccess: 'Anonymous visitor reset',
     docLinks: {

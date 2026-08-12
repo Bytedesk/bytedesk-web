@@ -20,3 +20,6 @@
 - [x] 当前在 DocFeedbackDemo 现在选中文字仅会显示：文档反馈 按钮，选中文字时增加： 问AI 按钮，参考 GoodsInfoDemo 和 OrderInfoDemo 中携带 商品和订单参数，在点击 问AI 按钮时，增加传递 TEXT 文字消息自动发送
 - [x] 现在当刷新页面，首先在HelpcenterDemo中点击：iframe嵌入式显示文档页面 按钮，关闭之后，点击顶部导航切换到 BasicDemo页面之后，在 BasicDemo中点击 咨询工作组会话时，会在嵌入式窗口上方显示 iframe上方导航，这是错误的，只有在点击 iframe嵌入式显示文档页面 才会显示上方导航
 - [x] 参考chatbox的ChatHeader中支持拖拽，给iframe上方导航增加支持拖拽从而支持拖拽整个窗口移动
+- [x] 在对话窗口嵌入到页面右侧时，支持在chatheader增加按钮，点击按钮可以切换为弹窗形式。在弹窗形式下，也在chatheader增加按钮，点击按钮可以切换到嵌入到页面右侧。这两种状态可以自由互相切换
+- [x] 在页面右侧时，点击切换按钮时，不是继续在右侧栏中显示弹窗，需要关闭右侧栏，并显示类似在basicdemo中点击 咨询工作组客服 按钮那样，显示floating弹窗
+- [x] 在floating弹窗的情况下，可以正常切换到inline嵌入式模式。但是在inline嵌入式模式下，当点击切换时，确实可以默认隐藏关闭右侧栏，但是floating弹窗对话窗口没有显示

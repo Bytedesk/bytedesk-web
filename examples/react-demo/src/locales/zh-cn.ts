@@ -136,6 +136,8 @@ export const zhCn = {
       system: '跟随系统'
     },
     officialSiteLabel: '微语官网',
+    docsLabel: '文档',
+    adminLabel: '管理后台',
     resetAnonymousVisitorLabel: '重置匿名访客',
     resetAnonymousVisitorSuccess: '匿名访客已重置',
     docLinks: {

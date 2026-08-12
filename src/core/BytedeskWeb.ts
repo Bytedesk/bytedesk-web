@@ -31,6 +31,9 @@ import {
   POST_MESSAGE_WINDOW_DRAG_MOVE,
   POST_MESSAGE_WINDOW_DRAG_END,
   POST_MESSAGE_AUTO_SEND_TEXT,
+  POST_MESSAGE_TOGGLE_VIEW_MODE,
+  URL_PARAM_VIEW_MODE,
+  URL_PARAM_TOGGLE_VIEW_MODE_BUTTON,
 } from "../utils/constants";
 import type { ButtonConfig, BytedeskConfig } from "../types";
 import { logBizMessageCallbackDebug } from "../utils/bizMessageCallbackDebug";
@@ -2939,6 +2942,14 @@ export default class BytedeskWeb {
       params.append("draggable", "1");
     }
 
+    // 传递当前显示模式到 iframe，使 ChatHeader 能渲染对应的“弹窗/嵌入”切换按钮
+    const viewMode = this.config.mode === "inline" ? "inline" : "floating";
+    params.append(URL_PARAM_VIEW_MODE, viewMode);
+
+    // 传递“切换显示模式”按钮可见性到 iframe（默认显示，显式 false 隐藏）
+    const showToggleViewModeButton = this.config.showToggleViewModeButton !== false;
+    params.append(URL_PARAM_TOGGLE_VIEW_MODE_BUTTON, showToggleViewModeButton ? "1" : "0");
+
     // if (preload) {
     //   params.append("preload", "1");
     // }
@@ -3064,6 +3075,10 @@ export default class BytedeskWeb {
           break;
         case POST_MESSAGE_WINDOW_DRAG_END:
           this.handleWindowDragEnd();
+          break;
+        case POST_MESSAGE_TOGGLE_VIEW_MODE:
+          // iframe 内 ChatHeader 请求切换显示模式（弹窗 <-> 嵌入页面右侧）
+          this.handleToggleViewModeRequest();
           break;
       }
     });
@@ -3318,6 +3333,141 @@ export default class BytedeskWeb {
 
     // 在窗口创建/显示后再初始化导航栏（此时 embedNavBar DOM 一定存在）
     this.showEmbedNavBar(url, title);
+  }
+
+  /**
+   * 处理 iframe 内 ChatHeader 的切换显示模式请求。
+   * 优先交给宿主回调（如 React/Vue 适配器通过 remount 切换，保证与宿主渲染状态一致）；
+   * 宿主未提供回调时（如纯 JS 嵌入），由 SDK 内部重建 UI。
+   */
+  private handleToggleViewModeRequest() {
+    if (this.isDestroyed) {
+      logger.warn("BytedeskWeb 已销毁，跳过切换显示模式");
+      return;
+    }
+
+    const nextMode: "floating" | "inline" = this.isInlineMode() ? "floating" : "inline";
+    logger.info(`handleToggleViewModeRequest: ${this.config.mode || "floating"} -> ${nextMode}`);
+
+    if (typeof this.config.onToggleViewMode === "function") {
+      // 交由宿主处理（宿主负责关闭右侧栏 / 打开弹窗，保证与宿主渲染状态一致）
+      this.config.onToggleViewMode(nextMode);
+      return;
+    }
+
+    // 纯 JS 嵌入：SDK 内部重建 UI
+    this.rebuildForViewMode(nextMode);
+    this.config.onConfigChange?.(this.config);
+  }
+
+  /**
+   * 切换显示模式：floating（弹窗） <-> inline（嵌入页面右侧）
+   * 由 iframe 内 ChatHeader 按钮通过 postMessage 触发，也可由宿主直接调用。
+   * 切换后会以“当前对话可见”为目标重建 UI：
+   *   - floating -> inline：销毁浮窗 UI，在内联容器重建并展示聊天窗口
+   *   - inline -> floating：销毁内联窗口，重建浮窗 UI 并直接打开聊天窗口
+   *
+   * 注意：此方法始终走 SDK 内部重建。若宿主需要接管切换（例如 React 适配器
+   * 通过 key remount 切换），请在 config 中提供 onToggleViewMode 回调，
+   * iframe 按钮触发的请求会优先调用该回调。
+   */
+  toggleViewMode() {
+    if (this.isDestroyed) {
+      logger.warn("BytedeskWeb 已销毁，跳过切换显示模式");
+      return;
+    }
+
+    const nextMode: "floating" | "inline" = this.isInlineMode() ? "floating" : "inline";
+    logger.info(`toggleViewMode: ${this.config.mode || "floating"} -> ${nextMode}`);
+
+    this.rebuildForViewMode(nextMode);
+    this.config.onConfigChange?.(this.config);
+  }
+
+  /**
+   * 切换到弹窗（floating）模式
+   */
+  switchToFloatingMode() {
+    if (this.isDestroyed || this.isFloatingMode()) {
+      return;
+    }
+    this.rebuildForViewMode("floating");
+    this.config.onConfigChange?.(this.config);
+  }
+
+  /**
+   * 切换到内联嵌入（inline）模式
+   */
+  switchToInlineMode() {
+    if (this.isDestroyed || this.isInlineMode()) {
+      return;
+    }
+    this.rebuildForViewMode("inline");
+    this.config.onConfigChange?.(this.config);
+  }
+
+  private rebuildForViewMode(nextMode: "floating" | "inline") {
+    // 1. 清理现有 UI（浮窗 + 内联窗口 + 最小化条 + 悬浮预览），但不清除访客/配置
+    this.stopBubbleMessageRotation();
+    this.stopBubbleMessageTransition();
+    this.destroyBubbleTicker();
+    this.bubbleMessageViewportElement = null;
+    this.bubbleMessageContentElement = null;
+    this.bubblePendingMessageElement = null;
+    this.bubbleTickerTrackElement = null;
+    this.bubbleTickerStyleElement = null;
+    this.bubbleIconElement = null;
+    this.bubbleTitleElement = null;
+    this.bubbleSubtitleElement = null;
+    this.bubbleMessages = [];
+    this.bubbleMessageIndex = 0;
+
+    if (this.bubbleContainer && document.body.contains(this.bubbleContainer)) {
+      document.body.removeChild(this.bubbleContainer);
+    }
+    this.bubbleContainer = null;
+    this.bubble = null;
+    this.buttonElements = [];
+
+    this.hideButtonPreview();
+    this.removeMinimizedBar();
+
+    if (this.inviteDialog && document.body.contains(this.inviteDialog)) {
+      document.body.removeChild(this.inviteDialog);
+    }
+    this.inviteDialog = null;
+
+    if (this.window) {
+      this.detachElement(this.window);
+      this.window = null;
+    }
+    this.embedNavBar = null;
+    this.isEmbedMode = false;
+    this.isVisible = false;
+    this.windowState = "normal";
+    // 退出内联 fixed-right 模式时，恢复宿主页面的 body padding（关闭右侧栏占位）
+    this.restoreInlineFixedRightBodySpacing();
+
+    // 2. 应用新模式
+    this.config.mode = nextMode;
+    if (nextMode === "inline" && !this.config.inlineConfig) {
+      // 默认使用 fixed-right，与默认内联演示保持一致
+      this.config.inlineConfig = { autoShow: true, mode: "fixed-right", width: 420 };
+    }
+    setGlobalConfig(this.config);
+
+    // 3. 按新模式重建并展示
+    if (this.isFloatingMode()) {
+      // 切到弹窗：重建浮窗 UI，并直接打开聊天窗口（用户正在查看对话）
+      this.createBubble();
+      this.createInviteDialog();
+      this.showChat();
+    } else {
+      // 切到内联：在内联容器重建聊天窗口并自动展示
+      this.applyInlineFixedRightBodySpacing();
+      this.createChatWindow();
+      this.showChat();
+    }
   }
 
   private minimizeWindow() {

@@ -198,6 +198,12 @@ export interface BytedeskConfig {
   autoPopupDelay?: number; // 自动弹出延迟时间, 单位: 毫秒
   draggable?: boolean; // 是否可拖动
   locale?: string; // 语言
+  /**
+   * 是否在 ChatHeader 显示“切换显示模式”按钮（弹窗 <-> 嵌入页面右侧）。
+   * 默认 true（嵌入宿主时显示）。设为 false 可隐藏该按钮。
+   * 仅在嵌入宿主（window.parent !== window）时生效。
+   */
+  showToggleViewModeButton?: boolean; // 是否显示切换显示模式按钮
   inviteConfig?: InviteConfig; // 邀请配置
   tabsConfig?: TabsConfig; // 标签配置
   bubbleConfig?: BubbleConfig; // 气泡配置
@@ -217,6 +223,14 @@ export interface BytedeskConfig {
   onMessageBubbleClick?: (event: MessageBubbleClickEvent) => void; // 消息气泡点击回调，event.type 为消息类型
   onConfigChange?: (config: BytedeskConfig) => void; // 配置变更回调
   onVisitorInfo?: (uid: string, visitorUid: string) => void; // localStorage 数据回调
+  /**
+   * 切换显示模式回调（弹窗 <-> 嵌入页面右侧）。
+   * 当 iframe 内 ChatHeader 点击切换按钮时触发。
+   * 若宿主（如 React/Vue 适配器）提供了该回调，SDK 将把切换交由宿主处理
+   *（例如通过 remount 实例切换）；未提供时 SDK 内部自行重建 UI。
+   * nextMode: 'floating' | 'inline'
+   */
+  onToggleViewMode?: (nextMode: 'floating' | 'inline') => void; // 切换显示模式回调
 }
 
 export type Language = 'zh-cn' | 'zh-tw' | 'en' | 'ja' | 'ja-jp' | 'ko' | 'ko-kr' | 'vi-vn' | 'ms-my' | 'es-es' | 'fr-fr';

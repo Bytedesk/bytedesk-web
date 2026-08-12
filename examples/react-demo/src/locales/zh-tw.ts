@@ -138,6 +138,8 @@ export const zhTw = {
       system: '跟隨系統'
     },
     officialSiteLabel: '微語官方網站',
+    docsLabel: '文檔',
+    adminLabel: '管理後台',
     resetAnonymousVisitorLabel: '重設匿名訪客',
     resetAnonymousVisitorSuccess: '匿名訪客已重設',
     docLinks: {

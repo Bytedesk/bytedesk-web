@@ -140,6 +140,8 @@ export const esEs = {
       system: 'Sistema'
     },
     officialSiteLabel: 'Sitio oficial de Bytedesk',
+    docsLabel: 'Documentación',
+    adminLabel: 'Administración',
     resetAnonymousVisitorLabel: 'Restablecer visitante anonimo',
     resetAnonymousVisitorSuccess: 'Visitante anonimo restablecido',
     docLinks: {

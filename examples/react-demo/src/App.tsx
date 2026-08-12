@@ -1048,6 +1048,22 @@ function AppLayout({
           >
             {messages.common.officialSiteLabel}
           </a>
+          <a
+            href="https://www.weiyuai.cn/docs/"
+            target="_blank"
+            rel="noreferrer"
+            style={{ marginLeft: 8, color: token.colorText }}
+          >
+            {messages.common.docsLabel}
+          </a>
+          <a
+            href="https://www.weiyuai.cn/admin/"
+            target="_blank"
+            rel="noreferrer"
+            style={{ marginLeft: 8, color: token.colorText }}
+          >
+            {messages.common.adminLabel}
+          </a>
           <span style={{ marginLeft: 8 }}>v{APP_VERSION}</span>
         </div>
         </Layout.Footer>

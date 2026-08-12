@@ -140,6 +140,8 @@ export const frFr = {
       system: 'Systeme'
     },
     officialSiteLabel: 'Site officiel Bytedesk',
+    docsLabel: 'Documentation',
+    adminLabel: 'Administration',
     resetAnonymousVisitorLabel: 'Reinitialiser le visiteur anonyme',
     resetAnonymousVisitorSuccess: 'Visiteur anonyme reinitialise',
     docLinks: {

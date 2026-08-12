@@ -140,6 +140,8 @@ export const koKr = {
       system: '시스템'
     },
     officialSiteLabel: 'Bytedesk 공식 사이트',
+    docsLabel: '문서',
+    adminLabel: '관리자',
     resetAnonymousVisitorLabel: '익명 방문자 초기화',
     resetAnonymousVisitorSuccess: '익명 방문자가 초기화되었습니다',
     docLinks: {
