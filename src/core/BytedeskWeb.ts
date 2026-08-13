@@ -3406,6 +3406,20 @@ export default class BytedeskWeb {
     this.config.onConfigChange?.(this.config);
   }
 
+  /**
+   * 应用指定显示模式（floating/inline），供宿主适配器在接管切换时调用。
+   * 与 toggleViewMode 不同，此方法接收显式 nextMode，而非自动取反当前模式。
+   */
+  applyViewMode(nextMode: "floating" | "inline") {
+    if (this.isDestroyed) {
+      logger.warn("BytedeskWeb 已销毁，跳过切换显示模式");
+      return;
+    }
+    logger.info(`applyViewMode: ${this.config.mode || "floating"} -> ${nextMode}`);
+    this.rebuildForViewMode(nextMode);
+    this.config.onConfigChange?.(this.config);
+  }
+
   private rebuildForViewMode(nextMode: "floating" | "inline") {
     // 1. 清理现有 UI（浮窗 + 内联窗口 + 最小化条 + 悬浮预览），但不清除访客/配置
     this.stopBubbleMessageRotation();

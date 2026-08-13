@@ -74,6 +74,10 @@ let globalBytedeskInstance: BytedeskWeb | null = null;
 let activeComponentCount = 0;
 let globalInstanceMode: BytedeskConfig['mode'] = 'floating';
 let globalInstanceContainer: string | HTMLElement | null = null;
+// 适配器期望的显示模式（由 iframe 内 ChatHeader“切换显示模式”按钮触发）。
+// 一旦被置位，将覆盖宿主传入的 mode，确保适配器与 SDK 实例的 mode 始终一致，
+// 避免宿主重渲染时通过 setConfig 把实例的 mode 覆盖回 floating（导致切换失效）。
+let globalDesiredMode: BytedeskConfig['mode'] | undefined = undefined;
 
 const BytedeskComponent = (props: BytedeskReactProps) => {
   const bytedeskRef = useRef<BytedeskWeb | null>(null);
@@ -83,13 +87,32 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
   const configSignature = createConfigSignature(config);
 
   useEffect(() => {
-    const shouldUseHostContainer = config.mode === 'inline' && config.inlineConfig?.mode !== 'fixed-right';
-    const effectiveConfig = shouldUseHostContainer
-      ? {
-          ...config,
-          container: config.container || containerRef.current || undefined,
-        }
-      : config;
+    // 适配器期望的显示模式：切换按钮触发后会覆盖宿主传入的 mode
+    const resolvedMode = globalDesiredMode ?? config.mode;
+    const shouldUseHostContainer = resolvedMode === 'inline' && config.inlineConfig?.mode !== 'fixed-right';
+    // 构建实际生效的配置：固定 mode 为 resolvedMode，并补一个默认的 onToggleViewMode（除非宿主已提供）
+    const effectiveConfig: BytedeskConfig = {
+      ...config,
+      mode: resolvedMode,
+      ...(shouldUseHostContainer
+        ? { container: config.container || containerRef.current || undefined }
+        : {}),
+      ...(typeof config.onToggleViewMode === 'function'
+        ? {}
+        : {
+            onToggleViewMode: (nextMode: 'floating' | 'inline') => {
+              // 默认切换处理：由 SDK 内部重建 UI，并同步适配器的全局状态，
+              // 使后续重渲染不会撤销切换（避免把实例 mode 覆盖回 floating）。
+              globalDesiredMode = nextMode;
+              globalInstanceMode = nextMode;
+              const instance = globalBytedeskInstance;
+              if (instance && typeof instance.applyViewMode === 'function') {
+                // 重建为新模式（销毁旧 UI + 按新模式重建并展示对话）
+                instance.applyViewMode(nextMode);
+              }
+            },
+          }),
+    };
     const nextMode = effectiveConfig.mode || 'floating';
     const nextContainerIdentity = getContainerIdentity(effectiveConfig.container);
 
@@ -148,8 +171,7 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
             globalBytedeskInstance.destroy();
             globalBytedeskInstance = null;
             globalInstanceMode = 'floating';
-            globalInstanceContainer = null;
-            delete (window as any).bytedesk;
+            globalInstanceContainer = null;            globalDesiredMode = undefined;            delete (window as any).bytedesk;
             activeComponentCount = 0;
           }
         }, 100);
@@ -157,7 +179,7 @@ const BytedeskComponent = (props: BytedeskReactProps) => {
     };
   }, [configSignature]);
 
-  if (config.mode === 'inline' && config.inlineConfig?.mode !== 'fixed-right') {
+  if ((globalDesiredMode ?? config.mode) === 'inline' && config.inlineConfig?.mode !== 'fixed-right') {
     return (
       <div
         ref={containerRef}
