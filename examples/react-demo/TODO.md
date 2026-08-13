@@ -24,3 +24,4 @@
 - [x] 在页面右侧时，点击切换按钮时，不是继续在右侧栏中显示弹窗，需要关闭右侧栏，并显示类似在basicdemo中点击 咨询工作组客服 按钮那样，显示floating弹窗
 - [x] 在floating弹窗的情况下，可以正常切换到inline嵌入式模式。但是在inline嵌入式模式下，当点击切换时，确实可以默认隐藏关闭右侧栏，但是floating弹窗对话窗口没有显示
 - [x] 在basicdemo中现在确实可以互相切换inline和floating模式，但是当发布npm包，在admin项目安装之后bytedesk-web包之后，点击切换按钮，并没有效果
+- [x] 默认不显示切换inline和floating按钮，并在basicdemo中增加切换演示按钮，用于开启和关闭此功能

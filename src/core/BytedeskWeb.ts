@@ -2946,8 +2946,8 @@ export default class BytedeskWeb {
     const viewMode = this.config.mode === "inline" ? "inline" : "floating";
     params.append(URL_PARAM_VIEW_MODE, viewMode);
 
-    // 传递“切换显示模式”按钮可见性到 iframe（默认显示，显式 false 隐藏）
-    const showToggleViewModeButton = this.config.showToggleViewModeButton !== false;
+    // 传递“切换显示模式”按钮可见性到 iframe（默认隐藏，显式 true 显示）
+    const showToggleViewModeButton = this.config.showToggleViewModeButton === true;
     params.append(URL_PARAM_TOGGLE_VIEW_MODE_BUTTON, showToggleViewModeButton ? "1" : "0");
 
     // if (preload) {

@@ -200,7 +200,7 @@ export interface BytedeskConfig {
   locale?: string; // 语言
   /**
    * 是否在 ChatHeader 显示“切换显示模式”按钮（弹窗 <-> 嵌入页面右侧）。
-   * 默认 true（嵌入宿主时显示）。设为 false 可隐藏该按钮。
+   * 默认 false（不显示）。设为 true 可显示该按钮。
    * 仅在嵌入宿主（window.parent !== window）时生效。
    */
   showToggleViewModeButton?: boolean; // 是否显示切换显示模式按钮
