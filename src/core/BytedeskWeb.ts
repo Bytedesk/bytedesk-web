@@ -2937,8 +2937,10 @@ export default class BytedeskWeb {
 
     params.append("lang", this.config.locale || "zh-cn");
 
-    // 传递 draggable 配置到 iframe，使导航栏支持拖动窗口
-    if (this.config.draggable !== false) {
+    // 传递 draggable 配置到 iframe，使导航栏支持拖动窗口。
+    // 内联（嵌入/右侧停靠）模式下窗口为停靠面板，不支持拖动，不传递 draggable，
+    // 避免 ChatHeader 绑定拖动事件导致宿主侧误切换窗口定位
+    if (this.config.draggable !== false && !this.isInlineMode()) {
       params.append("draggable", "1");
     }
 
@@ -3468,6 +3470,13 @@ export default class BytedeskWeb {
       // 默认使用 fixed-right，与默认内联演示保持一致
       this.config.inlineConfig = { autoShow: true, mode: "fixed-right", width: 420 };
     }
+    // 切换显示模式会销毁并重建聊天 iframe，聊天页面将重新初始化会话，
+    // 默认只会拉取欢迎消息导致上下文丢失。这里自动开启 loadHistory，
+    // 使重建的聊天 URL 附带 loadHistory=1，页面初始化后自动加载历史聊天记录
+    this.config.chatConfig = {
+      ...(this.config.chatConfig || ({} as NonNullable<BytedeskConfig["chatConfig"]>)),
+      loadHistory: true,
+    };
     setGlobalConfig(this.config);
 
     // 3. 按新模式重建并展示
@@ -3510,6 +3519,12 @@ export default class BytedeskWeb {
 
     const isMobile = window.innerWidth <= 768;
     if (isMobile) return;
+
+    // 内联模式（fixed-right 停靠面板 / 宿主容器内嵌）不支持拖动窗口：
+    // fixed-right 面板高度依赖 top+bottom 双向约束（height: auto），
+    // 若将 right/bottom 切换为 left/top，高度将失去约束而塌陷（iframe 坍缩为内在高度），
+    // 表现为窗口底部出现大面积空白、输入框被顶到窗口上方
+    if (this.isInlineMode()) return;
 
     const rect = this.window.getBoundingClientRect();
 

@@ -28,7 +28,7 @@ rm -rf "./$DIST"
 # 打包完，复制
 echo "Building project..."
 pnpm build
-# 将dist文件夹复制到bytedesk-3x/starter/src/main/resources/templates/文件夹中，并重命名为chat
+# 将dist文件夹复制到bytedesk-main/starter/src/main/resources/templates/文件夹中，并重命名为chat
 echo "Copying to target directory..."
 rm -fr "$TARGET_DIST"
 cp -r "./$DIST" "$TARGET_DIST"

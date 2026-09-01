@@ -1049,7 +1049,7 @@ function AppLayout({
             {messages.common.officialSiteLabel}
           </a>
           <a
-            href="https://www.weiyuai.cn/docs/"
+            href="https://www.weiyuai.cn/docs/zh-CN/"
             target="_blank"
             rel="noreferrer"
             style={{ marginLeft: 8, color: token.colorText }}
