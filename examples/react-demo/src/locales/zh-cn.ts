@@ -906,6 +906,7 @@ export const zhCn = {
       ],
       docLinks: {
         chatProfileRef: '查看示例 chat-profile 配置',
+        platformDoc: '查看平台客服文档',
         reactExample: 'React 平台客服演示源码'
       }
     },

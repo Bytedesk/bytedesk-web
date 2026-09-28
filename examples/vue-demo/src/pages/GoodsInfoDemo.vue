@@ -7,12 +7,28 @@
         点击下方按钮可以打开客服窗口，商品信息会自动传递给客服。
         <br />
         <a
+          href="https://www.weiyuai.cn/docs/zh-CN/docs/integration/shop_open"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="color: #2e88ff; margin-right: 12px"
+        >
+          查看业务系统店铺信息对接文档
+        </a>
+        <a
           href="https://www.weiyuai.cn/docs/zh-CN/docs/development/goodsinfo"
           target="_blank"
           rel="noopener noreferrer"
           style="color: #2e88ff"
         >
           查看商品信息对接文档
+        </a>
+        <a
+          href="https://www.weiyuai.cn/docs/zh-CN/docs/integration/goods_open"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="color: #2e88ff; margin-left: 12px"
+        >
+          查看业务系统商品同步对接文档
         </a>
       </p>
 

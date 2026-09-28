@@ -143,7 +143,9 @@ const GoodsInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
   const docLinks = [
-    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/goods_info', label: locale === 'en' ? 'View goods info integration docs' : '查看商品信息对接文档' },
+    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/shop_open', label: locale === 'en' ? 'View business shop onboarding integration docs' : '查看业务系统店铺信息对接文档' },
+    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/goods_open', label: locale === 'en' ? 'View business goods sync integration docs' : '查看业务系统商品同步对接文档' },
+    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/goods_info', label: locale === 'en' ? 'View goods info integration docs' : '查看访客端商品信息对接文档' },
     { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/GoodsInfoDemo.tsx', label: locale === 'en' ? 'React goods info sample' : 'React 商品信息对接代码示例' },
     { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/GoodsInfoDemo.vue', label: locale === 'en' ? 'Vue goods info sample' : 'Vue 商品信息对接代码示例' }
   ];

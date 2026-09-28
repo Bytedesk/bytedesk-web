@@ -31,8 +31,9 @@ const PlatformDemo = ({ locale }: DemoPageProps) => {
   const scenarioRows = platformMessages.routeRows;
 
   const docLinks = useMemo(() => [
+    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/development/platform_service', label: platformMessages.docLinks.platformDoc },
     { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/PlatformDemo.tsx', label: platformMessages.docLinks.reactExample }
-  ], [platformMessages.docLinks.reactExample]);
+  ], [platformMessages.docLinks.platformDoc, platformMessages.docLinks.reactExample]);
 
   const routeTableRows = useMemo(() => PLATFORM_SCENARIO_ORDER.map((key) => ({
     key,

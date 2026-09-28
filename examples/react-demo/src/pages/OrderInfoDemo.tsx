@@ -164,7 +164,9 @@ const OrderInfoDemo = ({ locale, themeMode, selectedChatProfile, selectedUser, i
   const messages = useMemo(() => getLocaleMessages(locale), [locale]);
   const htmlBaseUrl = getDemoHtmlBaseUrl(9006);
   const docLinks = [
-    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/order_info', label: locale === 'en' ? 'View order info integration docs' : '查看订单信息对接文档' },
+    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/shop_open', label: locale === 'en' ? 'View business shop onboarding integration docs' : '查看业务系统店铺信息对接文档' },
+    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/order_open', label: locale === 'en' ? 'View business order sync integration docs' : '查看业务系统订单同步对接文档' },
+    { href: 'https://www.weiyuai.cn/docs/zh-CN/docs/integration/order_info', label: locale === 'en' ? 'View order info integration docs' : '查看访客端订单信息对接文档' },
     { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/react-demo/src/pages/OrderInfoDemo.tsx', label: locale === 'en' ? 'React order info sample' : 'React 订单信息对接代码示例' },
     { href: 'https://github.com/Bytedesk/bytedesk-web/blob/master/examples/vue-demo/src/pages/OrderInfoDemo.vue', label: locale === 'en' ? 'Vue order info sample' : 'Vue 订单信息对接代码示例' }
   ];

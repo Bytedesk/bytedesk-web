@@ -120,7 +120,6 @@ type BubbleSwitchModeSelection = BubbleSwitchMode | 'default';
 
 const DEFAULT_BUBBLE_SWITCH_MODE: BubbleSwitchModeSelection = 'default';
 const DEFAULT_BUBBLE_ROTATE_INTERVAL = 3000;
-const DEFAULT_ENTRY_BUTTON_TEXT = '在线客服';
 const DEFAULT_MINIMIZED_BAR_TEXT = '';
 const DEFAULT_PREVIEW_TARGET_URL = 'https://';
 
@@ -167,7 +166,8 @@ const BasicDemo = ({
   const [selectedEntryActions, setSelectedEntryActions] = useState<EntryAction[]>(['chat']);
   const [selectedEntryButtonIconKey, setSelectedEntryButtonIconKey] = useState<EntryButtonIconKey>('default');
   const [isEntryButtonTextEnabled, setIsEntryButtonTextEnabled] = useState<boolean>(true);
-  const [entryButtonTextOverride, setEntryButtonTextOverride] = useState<string>(DEFAULT_ENTRY_BUTTON_TEXT);
+  // null 表示未自定义：入口按钮文案跟随当前 locale 的默认值（localizedCopy.entryTextDefaultLabel）
+  const [entryButtonTextOverride, setEntryButtonTextOverride] = useState<string | null>(null);
   const [areEntryButtonsVisible, setAreEntryButtonsVisible] = useState<boolean>(true);
   const [isToggleViewModeButtonVisible, setIsToggleViewModeButtonVisible] = useState<boolean>(true);
   const [qrCodeImageUrl, setQrCodeImageUrl] = useState<string>('https://www.weiyuai.cn/assets/images/qrcode/wechat.png');
@@ -233,7 +233,7 @@ const BasicDemo = ({
     [localizedCopy.entryDefaultIconLabel]
   );
 
-  const effectiveEntryButtonText = entryButtonTextOverride.trim() || DEFAULT_ENTRY_BUTTON_TEXT;
+  const effectiveEntryButtonText = (entryButtonTextOverride ?? '').trim() || localizedCopy.entryTextDefaultLabel;
 
   const getEntryButtonLabel = (_action: EntryAction): string | undefined => {
     // console.log('getEntryButtonLabel', { action, isEntryButtonTextEnabled, effectiveEntryButtonText });
@@ -734,7 +734,7 @@ const BasicDemo = ({
 
   const handleEntryButtonTextChange = (nextText: string) => {
     setEntryButtonTextOverride(nextText);
-    const nextDisplayText = nextText.trim() || DEFAULT_ENTRY_BUTTON_TEXT;
+    const nextDisplayText = nextText.trim() || localizedCopy.entryTextDefaultLabel;
     setLastActionApiHint(`setConfig({ buttonsConfig: [{ text: "${nextDisplayText}" }] })`);
   };
 
@@ -1162,7 +1162,7 @@ const BasicDemo = ({
         selectedEntryButtonIconKeys={[selectedEntryButtonIconKey]}
         selectedEntryButtonIconLabel={selectedEntryButtonIconLabel}
         isEntryButtonTextEnabled={isEntryButtonTextEnabled}
-        entryButtonTextValue={entryButtonTextOverride}
+        entryButtonTextValue={entryButtonTextOverride ?? localizedCopy.entryTextDefaultLabel}
         minimizedBarTextValue={minimizedBarTextOverride}
         locale={locale}
         localeValueHint={localeValueHint}

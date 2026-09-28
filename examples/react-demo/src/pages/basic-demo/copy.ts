@@ -35,6 +35,7 @@ export interface BasicDemoLocalizedCopy {
   entryTextToggleLabel: string;
   entryTextInputLabel: string;
   entryTextInputPlaceholder: string;
+  entryTextDefaultLabel: string;
   minimizedBarTextToggleLabel: string;
   minimizedBarTextInputLabel: string;
   minimizedBarTextInputPlaceholder: string;
@@ -162,6 +163,7 @@ export const getLocalizedCopy = (
         entryTextToggleLabel: 'Van ban tren nut',
         entryTextInputLabel: 'Noi dung van ban tren nut',
         entryTextInputPlaceholder: 'De trong de dung nhan mac dinh cua tung nut',
+        entryTextDefaultLabel: 'Cham soc truc tuyen',
         minimizedBarTextToggleLabel: 'Van ban tiep tuc hoi thoai',
         minimizedBarTextInputLabel: 'Noi dung van ban cho thanh phuc hoi',
         minimizedBarTextInputPlaceholder: 'De trong de dung van ban tiep tuc mac dinh theo locale',
@@ -199,6 +201,7 @@ export const getLocalizedCopy = (
         entryTextToggleLabel: 'Teks pada butang',
         entryTextInputLabel: 'Kandungan teks butang',
         entryTextInputPlaceholder: 'Biarkan kosong untuk guna label lalai setiap butang',
+        entryTextDefaultLabel: 'Khidmat pelanggan',
         minimizedBarTextToggleLabel: 'Teks sambung perbualan',
         minimizedBarTextInputLabel: 'Kandungan teks bar pemulihan',
         minimizedBarTextInputPlaceholder: 'Biarkan kosong untuk guna teks sambung lalai ikut locale',
@@ -236,6 +239,7 @@ export const getLocalizedCopy = (
         entryTextToggleLabel: 'Texto del boton',
         entryTextInputLabel: 'Contenido del texto del boton',
         entryTextInputPlaceholder: 'Dejalo vacio para usar la etiqueta predeterminada de cada boton',
+        entryTextDefaultLabel: 'Atencion al cliente',
         minimizedBarTextToggleLabel: 'Texto para continuar chat',
         minimizedBarTextInputLabel: 'Contenido del texto de la barra de recuperacion',
         minimizedBarTextInputPlaceholder: 'Dejalo vacio para usar el texto predeterminado segun locale',
@@ -271,6 +275,7 @@ export const getLocalizedCopy = (
         entryTextToggleLabel: 'Texte du bouton',
         entryTextInputLabel: 'Contenu du texte du bouton',
         entryTextInputPlaceholder: 'Laissez vide pour utiliser le libelle par defaut de chaque bouton',
+        entryTextDefaultLabel: 'Service client',
         minimizedBarTextToggleLabel: 'Texte pour reprendre la discussion',
         minimizedBarTextInputLabel: 'Contenu du texte de la barre de reprise',
         minimizedBarTextInputPlaceholder: 'Laissez vide pour utiliser le texte par defaut selon la locale',
@@ -308,6 +313,7 @@ export const getLocalizedCopy = (
         entryTextToggleLabel: 'Button text',
         entryTextInputLabel: 'Button text content',
         entryTextInputPlaceholder: 'Leave empty to use each button\'s default label',
+        entryTextDefaultLabel: 'Online support',
         minimizedBarTextToggleLabel: 'Continue chat text',
         minimizedBarTextInputLabel: 'Minimized restore bar text',
         minimizedBarTextInputPlaceholder: 'Leave empty to use the locale default continue-chat label',
@@ -345,6 +351,7 @@ export const getLocalizedCopy = (
         entryTextToggleLabel: 'ボタン文言',
         entryTextInputLabel: 'ボタン文言の内容',
         entryTextInputPlaceholder: '空欄の場合は各ボタンの既定ラベルを使います',
+        entryTextDefaultLabel: 'オンラインサポート',
         minimizedBarTextToggleLabel: '会話を続ける文言',
         minimizedBarTextInputLabel: '最小化復帰バーの文言',
         minimizedBarTextInputPlaceholder: '空欄の場合は locale の既定文言を使います',
@@ -382,6 +389,7 @@ export const getLocalizedCopy = (
         entryTextToggleLabel: '버튼 텍스트',
         entryTextInputLabel: '버튼 텍스트 내용',
         entryTextInputPlaceholder: '비워 두면 각 버튼의 기본 라벨을 사용합니다',
+        entryTextDefaultLabel: '온라인 상담',
         minimizedBarTextToggleLabel: '대화 계속 문구',
         minimizedBarTextInputLabel: '최소화 복귀 바 문구',
         minimizedBarTextInputPlaceholder: '비워 두면 locale 기본 문구를 사용합니다',
@@ -419,6 +427,7 @@ export const getLocalizedCopy = (
         entryTextToggleLabel: '按鈕文字',
         entryTextInputLabel: '按鈕文字內容',
         entryTextInputPlaceholder: '留空時使用各按鈕預設標籤',
+        entryTextDefaultLabel: '線上客服',
         minimizedBarTextToggleLabel: '繼續對話文案',
         minimizedBarTextInputLabel: '最小化恢復列文案',
         minimizedBarTextInputPlaceholder: '留空時使用 locale 預設的繼續對話文案',
@@ -456,6 +465,7 @@ export const getLocalizedCopy = (
         entryTextToggleLabel: '按钮文字',
         entryTextInputLabel: '按钮文字内容',
         entryTextInputPlaceholder: '留空时使用每个按钮的默认标签',
+        entryTextDefaultLabel: '在线客服',
         minimizedBarTextToggleLabel: '继续对话文案',
         minimizedBarTextInputLabel: '最小化恢复条文案',
         minimizedBarTextInputPlaceholder: '留空时使用 locale 默认的继续对话文案',

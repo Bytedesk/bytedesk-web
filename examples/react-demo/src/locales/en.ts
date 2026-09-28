@@ -905,6 +905,7 @@ export const en = {
       ],
       docLinks: {
         chatProfileRef: 'Demo chat-profile examples',
+        platformDoc: 'View platform customer service guide',
         reactExample: 'React platform demo source'
       }
     },
